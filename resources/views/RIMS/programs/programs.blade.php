@@ -33,7 +33,7 @@
                                 <option value="{{$row->id}}">{{$row->name}}</option>
                             @endforeach
                         </select>
-                    </div>
+                    </div>bbbbbb
                     <div class="col-lg-12">
                         <table id="viewTable" class="table table-bordered table-fixed"
                                     data-toggle="table"
