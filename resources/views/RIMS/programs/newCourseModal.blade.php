@@ -27,11 +27,11 @@
                 <label>Course Code</label>
                 <input type="text" class="form-control req" name="code">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-8">
                 <label>Descriptive Title</label>
                 <input type="text" class="form-control req" name="name">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-2">
                 <label>Units</label>
                 <input type="number" class="form-control req" name="units">
             </div>

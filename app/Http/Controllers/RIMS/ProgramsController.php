@@ -255,6 +255,47 @@ class ProgramsController extends Controller
         return response()->json($response);
     }
     public function newCourseSubmit(Request $request){
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $id = $request->id;
+        $grade_period = $request->grade_period;
+        $year_level = $request->year_level;
+        $code = $request->code;
+        $name = $request->name;
+        $units = $request->units;        
+        $courses = $request->courses;
+        try{
+            if($courses==NULL){
+                $pre_name = 'None';
+            }else{
+                $pre_name = $request->pre_name;
+            }
+            $insert = new EducCourses(); 
+            $insert->curriculum_id = $id;
+            $insert->grade_level_id = $year_level;
+            $insert->grade_period_id = $grade_period;
+            $insert->name = $name;
+            $insert->code = $code;
+            $insert->units = $units;
+            $insert->pre_name = $pre_name;
+            $insert->status_id = 1;
+            $insert->updated_by = $updated_by;
+            $insert->save();
+            $course_id = $insert->id;
+
+            if($courses!=NULL){
+                foreach($courses as $course){
+                    $insert = new EducCourses(); 
+                    $insert->course_id = $course_id;
+                    $insert->pre_id = $course;
+                    $insert->updated_by = $updated_by;
+                    $insert->save();
+                }
+            }
+        }catch(Exception $e){
+
+        }
+
         
     }
 }

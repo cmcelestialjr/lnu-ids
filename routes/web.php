@@ -82,6 +82,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/newCourseSubmit', 'RIMS\ProgramsController@newCourseSubmit');
             });
         });
+        
     });
 });
 

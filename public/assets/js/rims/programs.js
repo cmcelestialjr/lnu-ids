@@ -41,6 +41,7 @@ $(document).on('input', '#newCourseModal .req', function (e) {
 });
 $(document).on('click', '#newCourseModal button[name="submit"]', function (e) {
     var x = 0;
+    var id = $('#curriculumModal #curriculumDiv select[name="curriculum"] option:selected').val();
     var grade_period = $('#newCourseModal select[name="grade_period"] option:selected').val();
     var year_level = $('#newCourseModal select[name="year_level"] option:selected').val();
     var code = $('#newCourseModal input[name="code"]').val();
@@ -69,6 +70,7 @@ $(document).on('click', '#newCourseModal button[name="submit"]', function (e) {
     }
     if(x==0){
         var form_data = {
+            id:id,
             grade_period:grade_period,
             year_level:year_level,
             code:code,
