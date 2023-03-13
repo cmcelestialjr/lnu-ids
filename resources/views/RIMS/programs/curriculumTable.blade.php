@@ -5,7 +5,7 @@
         <div class="row">
         @foreach($period as $per)
         <div class="col-lg-6">  
-            <div class="card card-success card-outline">
+            <div class="card card-info card-outline">
                 <div class="card-body">
                     {{$per->name}}
                     <table class="table table-bordered" style="font-size:11px;">

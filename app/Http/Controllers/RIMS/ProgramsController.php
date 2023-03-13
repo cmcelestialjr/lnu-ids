@@ -146,7 +146,20 @@ class ProgramsController extends Controller
         $id = $request->id;
         $result = 'error';
         try{
-
+            $check = EducCourses::where('id', $id)->first();
+            if($check!=NULL){
+                if($check->status_id==1){
+                    $status_id = 2;
+                }else{
+                    $status_id = 1;
+                }
+                EducCourses::where('id', $id)
+                            ->update(['status_id' => $status_id,
+                                      'updated_by' => $updated_by,
+                                      'updated_at' => date('Y-m-d H:i:s')]);
+                $result = 'success';
+            }
+            
         }catch(Exception $e){
                 
         }
