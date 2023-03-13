@@ -82,6 +82,23 @@ class ProgramsController extends Controller
         );
         return view('rims/programs/viewModal',$data);
     }
+    public function newCourse(Request $request){
+        $id = $request->id;
+        $curriculum = EducCurriculum::with('programs','status')->where('id',$id)->first();
+        $year_level = EducYearLevel::where('program_level_id',$curriculum->programs->program_level_id)->orderBy('level','ASC')->get();
+        $grade_period = EducGradePeriod::get();
+        $courses = EducCourses::with('grade_period','grade_level')->where('curriculum_id',$id)
+                        ->orderBy('grade_level_id','ASC')
+                        ->orderBy('grade_period_id','ASC')->get();
+        $data = array(
+            'id' => $id,
+            'curriculum' => $curriculum,
+            'year_level' => $year_level,
+            'grade_period' => $grade_period,
+            'courses' => $courses
+        );
+        return view('rims/programs/newCourseModal',$data);
+    }
     public function curriculumTable(Request $request){
         $data = array();
         $user_access_level = $request->session()->get('user_access_level');
@@ -140,31 +157,105 @@ class ProgramsController extends Controller
         );
         return view('rims/programs/curriculumTable',$data);
     }
+    public function curriculumTablePre(Request $request){
+        $data = array();
+        $user_access_level = $request->session()->get('user_access_level');
+        $id = $request->id;
+        $level = $request->level;
+        $status = $request->status;
+        $where_level = 'whereIn';
+        $value_level = [];
+        if($level=='All' || $level==''){
+            $where_level = 'whereNotIn';
+            
+        }else{
+            foreach($level as $lev){
+                $value_level[] = $lev;
+            }
+        }
+        $where_status = 'whereIn';
+        $value_status = [];
+        if($status=='All' || $status==''){
+            $where_status = 'whereNotIn';            
+        }else{
+            foreach($status as $stat){
+                $value_status[] = $stat;
+            }
+        }
+        $query = EducCourses::with('grade_period','grade_level','status')
+                    ->where('curriculum_id',$id)
+                    ->$where_level('grade_level_id',$value_level)
+                    ->$where_status('status_id',$value_status)
+                    ->orderBy('grade_period_id','ASC')
+                    ->orderBy('grade_level_id','ASC')->get();
+        $get_ids = EducCourses::where('curriculum_id',$id)
+                    ->$where_level('grade_level_id',$value_level)
+                    ->$where_status('status_id',$value_status)->pluck('grade_level_id','grade_period_id')->toArray();
+        $year_level_ids = [];
+        $period_ids = [];
+        foreach($get_ids as $key => $row){
+            $year_level_ids[] = $row;
+            $period_ids[] = $key;
+        }
+        $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
+        $period = EducGradePeriod::with(['courses' => function ($query) 
+                            use ($where_status,$id,$value_status) {
+                            $query->where('curriculum_id', $id);
+                            $query->$where_status('status_id', $value_status);
+                            $query->orderBy('grade_period_id','ASC');
+                            $query->orderBy('grade_level_id','ASC');
+                        }])->whereIn('id',$period_ids)->get();
+        
+        $data = array(
+            'id' => $id,
+            'query' => $query,
+            'user_access_level' => $user_access_level,
+            'year_level' => $year_level,
+            'period' => $period
+        );
+        return view('rims/programs/curriculumTablePre',$data);
+    }
     public function courseStatus(Request $request){
+        $user_access_level = $request->session()->get('user_access_level');
         $user = Auth::user();
         $updated_by = $user->id;
         $id = $request->id;
         $result = 'error';
-        try{
-            $check = EducCourses::where('id', $id)->first();
-            if($check!=NULL){
-                if($check->status_id==1){
-                    $status_id = 2;
-                }else{
-                    $status_id = 1;
+        $btn_class = '';
+        $btn_html = '';
+        
+        if($user_access_level==1 || $user_access_level==2){
+            try{
+                $check = EducCourses::where('id', $id)->first();
+                if($check!=NULL){
+                    if($check->status_id==1){
+                        $status_id = 2;
+                        $btn_class = 'btn-danger btn-danger-scan';
+                        $btn_html = ' Closed';
+                    }else{
+                        $status_id = 1;
+                        $btn_class = 'btn-success btn-success-scan';
+                        $btn_html = ' Open';
+                    }
+                    EducCourses::where('id', $id)
+                                ->update(['status_id' => $status_id,
+                                        'updated_by' => $updated_by,
+                                        'updated_at' => date('Y-m-d H:i:s')]);
+                    $result = 'success';
+                    
                 }
-                EducCourses::where('id', $id)
-                            ->update(['status_id' => $status_id,
-                                      'updated_by' => $updated_by,
-                                      'updated_at' => date('Y-m-d H:i:s')]);
-                $result = 'success';
-            }
-            
-        }catch(Exception $e){
                 
+            }catch(Exception $e){
+                    
+            }
         }
-        $response = array('result' => $result);
+        $response = array('result' => $result,
+                          'btn_class' => $btn_class,
+                          'btn_html' => $btn_html);
         return response()->json($response);
+    }
+    public function newCourseSubmit(Request $request){
+        
     }
 }
 

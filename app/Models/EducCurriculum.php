@@ -10,7 +10,7 @@ class EducCurriculum extends Model
     protected $table = 'educ_curriculum';
     public function programs()
     {
-        return $this->belongsTo(EducPrograms::class, 'program', 'id')->withDefault();
+        return $this->belongsTo(EducPrograms::class, 'program_id', 'id')->withDefault();
     }
     public function status()
     {

@@ -1,6 +1,25 @@
-<div class="row" id="curriculumTable">
+<div class="row">
+    <div class="col-lg-6">
+        <label>Name appear in Pre-requisite</label>
+        <input type="text" class="form-control" name="pre_name" value="None">
+    </div>
+    <div class="col-lg-4">
+    </div>
+    <div class="col-lg-2">
+        <br><br>
+        <div class="form-group clearfix">
+            <div class="icheck-primary d-inline">
+                <input type="checkbox" id="checkboxPrimary1" class="all">
+                <label for="checkboxPrimary1">
+                    Check All
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row table-responsive" style="height:400px;">
     @foreach($year_level as $level)    
-    <div class="col-lg-12"> 
+    <div class="col-lg-12">
         <label>{{$level->name}}</label>
         <div class="row">
         @foreach($period as $per)
@@ -14,7 +33,7 @@
                             <th style="width: 50%">Descriptive Title</th>
                             <th style="width: 10%">Units</th>
                             <th style="width: 15%">Pre-req</th>
-                            <th style="width: 10%">Status</th>
+                            <th style="width: 10%">Option</th>
                         </thead>
                         <tbody>
                             @foreach($per->courses as $course)
@@ -25,20 +44,7 @@
                                     <td class="center">{{$course->units}}</td>
                                     <td class="center">{{$course->pre_name}}</td>
                                     <td class="center">
-                                        @php
-                                            if($user_access_level==1 || $user_access_level==2){
-                                                $courseStatus = 'courseStatus';
-                                            }else{
-                                                $courseStatus = '';
-                                            }
-                                        @endphp
-                                        @if($course->status_id==1)
-                                            <button class="btn btn-success btn-success-scan btn-sm {{$courseStatus}}"
-                                                    data-id="{{$course->id}}">{{$course->status->name}}</button>
-                                        @else
-                                            <button class="btn btn-danger btn-danger-scan btn-sm {{$courseStatus}}"
-                                                    data-id="{{$course->id}}">{{$course->status->name}}</button>
-                                        @endif
+                                        <input type="checkbox" data-val="{{$course->code}}" value="{{$course->id}}" class="form-control courses">
                                     </td>
                                 </tr>
                                 @endif

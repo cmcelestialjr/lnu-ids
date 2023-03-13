@@ -18,9 +18,7 @@ Route::get('/error/http', function () {
 Route::group(['middleware' => ['HTTPS']], function(){
     Route::group(['middleware' => ['CheckUser']], function(){
         Route::get('/', 'IndexController@view')->name('indexpage');
-        Route::post('/login', 'LoginController@check');
-        
-        
+        Route::post('/login', 'LoginController@check');        
     });
     
     Route::group(['middleware' => ['auth','Login','PreventBackHistory']], function(){
@@ -78,7 +76,10 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/viewTable', 'RIMS\ProgramsController@viewTable');
                 Route::post('/viewModal', 'RIMS\ProgramsController@viewModal');
                 Route::post('/curriculumTable', 'RIMS\ProgramsController@curriculumTable');
-                Route::post('/courseStatus', 'RIMS\ProgramsController@courseStatus');                
+                Route::post('/courseStatus', 'RIMS\ProgramsController@courseStatus');
+                Route::post('/newCourse', 'RIMS\ProgramsController@newCourse');   
+                Route::post('/curriculumTablePre', 'RIMS\ProgramsController@curriculumTablePre');
+                Route::post('/newCourseSubmit', 'RIMS\ProgramsController@newCourseSubmit');
             });
         });
     });

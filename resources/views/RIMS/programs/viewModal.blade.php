@@ -5,13 +5,13 @@
             {{$program->name}} - {{$program->shorten}}
         </h4>
         @if($user_access_level==1 || $user_access_level==2)
-        <button class="btn btn-primary btn-primary-scan" style="float:right;">
+        <button class="btn btn-primary btn-primary-scan" name="newCurriculum" style="float:right;">
             <span class="fa fa-plus-square"></span> New Curriculum</button>
         @endif
     </div>
     <div class="modal-body">
         <input type="hidden" name="id" value="{{$id}}">
-        <div class="row" id="curriculumDiv">            
+        <div class="row" id="curriculumDiv">
             <div class="col-lg-2">
                 <label>Status Curriculum</label><br>
                 <select class="form-control select2-default" name="status">
@@ -56,7 +56,7 @@
             <div class="col-lg-12">
                 <br>
                 @if($user_access_level==1 || $user_access_level==2)
-                <button class="btn btn-primary btn-primary-scan">
+                <button class="btn btn-primary btn-primary-scan" name="newCourse">
                     <span class="fa fa-plus-square"></span> New Subject/Course</button>
                 @endif
                 <br><br>

@@ -55,6 +55,9 @@
   border-radius: 0px;
   width: 100%;
 }
+.modal {
+  overflow-y:auto;
+}
 .center{
   text-align: center;
 }
