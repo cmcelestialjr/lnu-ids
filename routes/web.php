@@ -80,6 +80,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/newCourse', 'RIMS\ProgramsController@newCourse');   
                 Route::post('/curriculumTablePre', 'RIMS\ProgramsController@curriculumTablePre');
                 Route::post('/newCourseSubmit', 'RIMS\ProgramsController@newCourseSubmit');
+                Route::post('/courseUpdate', 'RIMS\ProgramsController@courseUpdate');
+                Route::post('/courseTablePre', 'RIMS\ProgramsController@courseTablePre');
             });
         });
         

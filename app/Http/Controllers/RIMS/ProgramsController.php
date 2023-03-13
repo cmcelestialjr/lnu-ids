@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\EducPrograms;
 use App\Models\EducCourses;
+use App\Models\EducCoursesPre;
 use App\Models\EducCurriculum;
 use App\Models\EducYearLevel;
 use App\Models\EducCourseStatus;
@@ -215,6 +216,50 @@ class ProgramsController extends Controller
         );
         return view('rims/programs/curriculumTablePre',$data);
     }
+    public function courseTablePre(Request $request){
+        $data = array();
+        $user_access_level = $request->session()->get('user_access_level');
+        $course_id = $request->id;
+        $query = EducCourses::where('id',$course_id)->first();
+        $id = $query->curriculum_id;
+        $query = EducCourses::with('grade_period','grade_level','status')
+                    ->where('curriculum_id',$id)
+                    ->orderBy('grade_period_id','ASC')
+                    ->orderBy('grade_level_id','ASC')->get();
+        $get_ids = EducCourses::where('curriculum_id',$id)->pluck('grade_level_id','grade_period_id')->toArray();
+        $year_level_ids = [];
+        $period_ids = [];
+        foreach($get_ids as $key => $row){
+            $year_level_ids[] = $row;
+            $period_ids[] = $key;
+        }
+        $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
+        $period = EducGradePeriod::with(['courses' => function ($query) 
+                            use ($id,$course_id) {
+                            $query->where('curriculum_id', $id);
+                            $query->where('id','<>', $course_id);
+                            $query->orderBy('grade_period_id','ASC');
+                            $query->orderBy('grade_level_id','ASC');
+                        }])->whereIn('id',$period_ids)->get();
+        
+        $data = array(
+            'id' => $id,
+            'query' => $query,
+            'user_access_level' => $user_access_level,
+            'year_level' => $year_level,
+            'period' => $period
+        );
+        return view('rims/programs/curriculumTablePre',$data);
+    }
+    public function courseUpdate(Request $request){
+        $id = $request->id;
+        $query = EducCourses::with('grade_level','grade_period')->where('id', $id)->first();
+        $data = array(
+            'id' => $id,
+            'query' => $query
+        );
+        return view('rims/programs/courseUpdateModal',$data);
+    }
     public function courseStatus(Request $request){
         $user_access_level = $request->session()->get('user_access_level');
         $user = Auth::user();
@@ -241,10 +286,8 @@ class ProgramsController extends Controller
                                 ->update(['status_id' => $status_id,
                                         'updated_by' => $updated_by,
                                         'updated_at' => date('Y-m-d H:i:s')]);
-                    $result = 'success';
-                    
-                }
-                
+                    $result = 'success';                    
+                }                
             }catch(Exception $e){
                     
             }
@@ -264,39 +307,46 @@ class ProgramsController extends Controller
         $name = $request->name;
         $units = $request->units;        
         $courses = $request->courses;
-        try{
-            if($courses==NULL){
-                $pre_name = 'None';
-            }else{
-                $pre_name = $request->pre_name;
-            }
-            $insert = new EducCourses(); 
-            $insert->curriculum_id = $id;
-            $insert->grade_level_id = $year_level;
-            $insert->grade_period_id = $grade_period;
-            $insert->name = $name;
-            $insert->code = $code;
-            $insert->units = $units;
-            $insert->pre_name = $pre_name;
-            $insert->status_id = 1;
-            $insert->updated_by = $updated_by;
-            $insert->save();
-            $course_id = $insert->id;
-
-            if($courses!=NULL){
-                foreach($courses as $course){
-                    $insert = new EducCourses(); 
-                    $insert->course_id = $course_id;
-                    $insert->pre_id = $course;
-                    $insert->updated_by = $updated_by;
-                    $insert->save();
+        $check = EducCourses::where('code',$code)->orWhere('name',$name)->first();
+        $result = 'error';
+        if($check==NULL){
+            try{
+                if($courses==NULL){
+                    $pre_name = 'None';
+                }else{
+                    $pre_name = $request->pre_name;
                 }
+                $insert = new EducCourses(); 
+                $insert->curriculum_id = $id;
+                $insert->grade_level_id = $year_level;
+                $insert->grade_period_id = $grade_period;
+                $insert->name = $name;
+                $insert->code = $code;
+                $insert->units = $units;
+                $insert->pre_name = $pre_name;
+                $insert->status_id = 1;
+                $insert->updated_by = $updated_by;
+                $insert->save();
+                $course_id = $insert->id;
+
+                if($courses!=NULL){
+                    foreach($courses as $course){
+                        $insert = new EducCoursesPre(); 
+                        $insert->course_id = $course_id;
+                        $insert->pre_id = $course;
+                        $insert->updated_by = $updated_by;
+                        $insert->save();
+                    }
+                }
+                $result = 'success';
+            }catch(Exception $e){
+
             }
-        }catch(Exception $e){
-
+        }else{
+            $result = 'exists';
         }
-
-        
+        $response = array('result' => $result);
+        return response()->json($response);
     }
 }
 

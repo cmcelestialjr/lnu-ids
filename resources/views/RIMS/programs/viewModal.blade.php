@@ -12,7 +12,7 @@
     <div class="modal-body">
         <input type="hidden" name="id" value="{{$id}}">
         <div class="row" id="curriculumDiv">
-            <div class="col-lg-2">
+            <div class="col-md-2">
                 <label>Status Curriculum</label><br>
                 <select class="form-control select2-default" name="status">
                     @foreach($status as $row)
@@ -25,7 +25,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-lg-3">
+            <div class="col-md-3">
                 <label>Curriculums</label>
                 <select class="form-control select2-default" name="curriculum">
                     @foreach($curriculums as $row)
@@ -33,7 +33,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-lg-2">
+            <div class="col-md-2">
                 <label>Year Level</label>
                 <select class="form-control select2-default" multiple name="year_level[]">
                     @foreach($year_level as $row)
@@ -41,7 +41,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-lg-2">
+            <div class="col-md-2">
                 <label>Status Courses</label>
                 <select class="form-control select2-default" multiple name="status_course[]">
                     @foreach($status as $row)
@@ -49,8 +49,8 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-lg-1">
-                &nbsp;<br>&nbsp;
+            <div class="col-md-1">
+                &nbsp;<br>
                 <button class="btn btn-primary btn-primary-scan" name="submit"><span class="fa fa-check"></span></button>
             </div>
             <div class="col-lg-12">
@@ -61,8 +61,8 @@
                 @endif
                 <br><br>
             </div>
-            <div class="col-lg-12 table-responsive" id="curriculumTable" style="height: 600px;">
-
+            <div class="col-lg-12" id="curriculumTable">
+                
             </div>
         </div>
     </div>

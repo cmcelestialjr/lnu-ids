@@ -40,6 +40,7 @@ $(document).on('input', '#newCourseModal .req', function (e) {
     }
 });
 $(document).on('click', '#newCourseModal button[name="submit"]', function (e) {
+    var thisBtn = $(this);
     var x = 0;
     var id = $('#curriculumModal #curriculumDiv select[name="curriculum"] option:selected').val();
     var grade_period = $('#newCourseModal select[name="grade_period"] option:selected').val();
@@ -95,12 +96,22 @@ $(document).on('click', '#newCourseModal button[name="submit"]', function (e) {
             success : function(data){
                 thisBtn.removeAttr('disabled');
                 thisBtn.removeClass('input-loading'); 
-                if(data=='error'){
-                    toastr.error('Error.');
-                    thisBtn.addClass('input-error');
-                }else{
+                if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
+                    $('#newCourseModal input[name="code"]').val('');
+                    $('#newCourseModal input[name="name"]').val('');
+                    $('#newCourseModal input[name="units"]').val('');
+                    $('#newCourseModal input[name="pre_name"]').val('None');
+                    $('#newCourseModal .courses').prop('checked', false);
+                    $('#newCourseModal .all').prop('checked', false);
+                    curriculum_div(thisBtn);
+                }else if(data.result=='exists'){
+                    toastr.error('Course Code or Descriptive Title already exists!');
+                    thisBtn.addClass('input-error');
+                }else{                    
+                    toastr.error('Error.');
+                    thisBtn.addClass('input-error');
                 }
                 setTimeout(function() {
                     thisBtn.removeClass('input-success');
@@ -138,7 +149,7 @@ $(document).on('click', '#curriculumDiv #curriculumTable .courseStatus', functio
         success : function(data){
             thisBtn.removeAttr('disabled');
             thisBtn.removeClass('input-loading'); 
-            if(data=='error'){
+            if(data.result=='error'){
                 toastr.error('Error.');
                 thisBtn.addClass('input-error');
             }else{
@@ -164,17 +175,25 @@ $(document).on('click', '#curriculumDiv #curriculumTable .courseStatus', functio
 });
 $(document).on('click', '#curriculumModal #curriculumDiv button[name="submit"]', function (e) {
     var thisBtn = $(this);
-    var id = $('#curriculumModal #curriculumDiv select[name="curriculum"] option:selected').val();
-    var year_level = $('#curriculumModal #curriculumDiv select[name="year_level[]"] option:selected').toArray().map(item => item.value);
-    var status_course = $('#curriculumModal #curriculumDiv select[name="status_course[]"] option:selected').toArray().map(item => item.value);
+    curriculum_div(thisBtn);
+});
+$(document).on('click', '#curriculumDiv #curriculumTable .courseUpdate', function (e) {
+    var thisBtn = $(this);
+    var id = thisBtn.data('id');
+    var url = base_url+'/rims/programs/courseUpdate';
+    var modal = 'primary';
+    var modal_size = 'modal-lg';
     var form_data = {
-        url_table:base_url+'/rims/programs/curriculumTable',
-        tid:'curriculumTable',
-        id:id,
-        level:year_level,
-        status:status_course
+        url:url,
+        modal:modal,
+        modal_size:modal_size,
+        static:'',
+        w_table:'div',
+        url_table:base_url+'/rims/programs/courseTablePre',
+        tid:'courseTablePre',
+        id:id
     };
-    loadDivwLoader(form_data,thisBtn);
+    loadModal(form_data,thisBtn);
 });
 $(document).on('click', '#programsDiv .viewModal', function (e) {
     var thisBtn = $(this);
@@ -216,6 +235,19 @@ $(document).on('click', '#curriculumModal #curriculumDiv button[name="newCourse"
     };
     loadModal(form_data,thisBtn);
 });
+function curriculum_div(thisBtn){
+    var id = $('#curriculumModal #curriculumDiv select[name="curriculum"] option:selected').val();
+    var year_level = $('#curriculumModal #curriculumDiv select[name="year_level[]"] option:selected').toArray().map(item => item.value);
+    var status_course = $('#curriculumModal #curriculumDiv select[name="status_course[]"] option:selected').toArray().map(item => item.value);
+    var form_data = {
+        url_table:base_url+'/rims/programs/curriculumTable',
+        tid:'curriculumTable',
+        id:id,
+        level:year_level,
+        status:status_course
+    };
+    loadDivwLoader(form_data,thisBtn);
+}
 function view_programs(){
     var thisBtn = $('#programsDiv select[name="status"]');
     var status_id = thisBtn.val();

@@ -1,22 +1,3 @@
-<div class="row">
-    <div class="col-lg-6">
-        <label>Name appear in Pre-requisite</label>
-        <input type="text" class="form-control" name="pre_name" value="None">
-    </div>
-    <div class="col-lg-4">
-    </div>
-    <div class="col-lg-2">
-        <br><br>
-        <div class="form-group clearfix">
-            <div class="icheck-primary d-inline">
-                <input type="checkbox" id="checkboxPrimary1" class="all">
-                <label for="checkboxPrimary1">
-                    Check All
-                </label>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="row table-responsive" style="height:400px;">
     @foreach($year_level as $level)    
     <div class="col-lg-12">
