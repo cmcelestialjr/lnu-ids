@@ -35,6 +35,7 @@
                         </select>
                     </div>
                     <div class="col-lg-12">
+                        gsags
                         <table id="viewTable" class="table table-bordered table-fixed"
                                     data-toggle="table"
                                     data-search="true"
