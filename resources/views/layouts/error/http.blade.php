@@ -24,13 +24,12 @@
     margin: 0;
     box-sizing: border-box;
 }
-
 body {
     background-color: #4682B4;
 	background: radial-gradient(ellipse at center, #4682B4 0%, #6082B6 100%) fixed no-repeat;
     overflow: hidden;
+    
 }
-
 p {
     font-family: "Arial";
     font-size: 100px;
@@ -43,40 +42,32 @@ p {
     -webkit-background-clip: text;
     -moz-background-clip: text;
     background-clip: text;
-
     span {
         font-size: 1.2em;
     }
 }
-
 code {
     font-family: "Arial";
-    color: #bdbdbd;
+    color: #ffffff;
     text-align: center;
     display: block;
     font-size: 18px;
     margin: 0 5px 5px;
-
     span {
         color: #f0c674;
     }
-
     i {
         color: #b5bd68;
     }
-
     em {
         color: #b294bb;
         font-style: unset;
     }
-
     b {
         color: #81a2be;
         font-weight: 500;
     }
 }
-
-
 a {
     color: #0047AB;
     font-family: monospace;
@@ -87,9 +78,12 @@ a {
 }
 img{
     margin-top:50px;
-    margin-left:100px;
+    margin-left:50px;
     height:120px;
     width:450px;
+}
+.center{
+    text-align: center;
 }
 @media screen and (max-width: 880px) {
     p {
@@ -98,18 +92,25 @@ img{
     code {
         font-size: 14px;
     }
+    img{
+        height:80px;
+        width:270px;
+    }
 }
 </style>
 <body>
     <section class="content">
         <img src="{{ asset('assets/images/logo/lnu_logo_header_blue.png') }}">
         <p>HTTP: <span>404</span></p>
-        <code><i class="fas fa-exclamation-triangle text-warning"></i> <span>Oops! </span>Your<em> connection</em> is <b>not private</b>.</code>
+        <code><i class="fas fa-exclamation-triangle text-warning"></i> <span>Oops! </span>
+            Your<em> connection</em> is <b>not private</b>.</code>
         <code><span>We</span> <b>recommend</b> <span>you to click</span> the <b>LINK</b> below.</code>
-        <code><center><a href="{{ str_replace('http','https',url('/')) }}">{{ str_replace("http","https",url('/')) }}</a></center></code>
+        <code class="center"><a href="{{ str_replace('http','https',url('/')) }}">{{ str_replace("http","https",url('/')) }}</a></code>
         <code><b>Hypertext Transfer Protocol Secure</b><span> is an extension of the Hypertext Transfer Protocol.</span></code>
-        <code><span>It is used for secure communication over a computer network,</span> <span>and is widely used on the Internet.</span> </code>
-        <code><b>In HTTPS,</b> <span>the communication protocol is</span> <span>encrypted using</span> <b>Transport Layer Security</b> <span>or, formerly, Secure Sockets Layer.</span> </code>
+        <code><span>It is used for secure communication over a computer network,</span> 
+            <span>and is widely used on the Internet.</span> </code>
+        <code><b>In HTTPS,</b> <span>the communication protocol is</span> <span>encrypted using</span> 
+            <b>Transport Layer Security</b> <span>or, formerly, Secure Sockets Layer.</span> </code>
     </section>
 </body>
 <script type="text/javascript">
@@ -117,7 +118,6 @@ function type(n, t) {
     var str = document.getElementsByTagName("code")[n].innerHTML.toString();
     var i = 0;
     document.getElementsByTagName("code")[n].innerHTML = "";
-
     setTimeout(function() {
         var se = setInterval(function() {
             i++;
@@ -130,7 +130,6 @@ function type(n, t) {
         }, 10);
     }, t);
 }
-
 type(0, 0);
 type(1, 200);
 type(2, 400);

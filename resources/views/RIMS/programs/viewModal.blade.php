@@ -14,16 +14,20 @@
         <div class="row" id="curriculumDiv">
             <div class="col-md-2">
                 <label>Status Curriculum</label><br>
-                <select class="form-control select2-default" name="status">
-                    @foreach($status as $row)
-                        @if($curriculum->status_id==$row->id)
-                            <option value="{{$row->id}}" selected>{{$row->name}}</option>
-                        @else
-                            <option value="{{$row->id}}">{{$row->name}}</option>
-                        @endif
-                        
-                    @endforeach
-                </select>
+                @php
+                    if($user_access_level==1 || $user_access_level==2){
+                        $curriculumStatus = 'curriculumStatus';
+                    }else{
+                        $curriculumStatus = '';
+                    }
+                @endphp
+                @if($curriculum->status_id==1)
+                    <button type="button" class="btn btn-success btn-success-scan {{$curriculumStatus}}"
+                        data-id="{{$curriculum->id}}"> Open</button>
+                @else
+                    <button type="button" class="btn btn-danger btn-danger-scan {{$curriculumStatus}}"
+                        data-id="{{$curriculum->id}}"> Close</button>
+                @endif
             </div>
             <div class="col-md-3">
                 <label>Curriculums</label>

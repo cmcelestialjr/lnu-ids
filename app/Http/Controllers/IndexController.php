@@ -71,6 +71,7 @@ class IndexController extends Controller
         $systems_nav_array = SystemsNav::whereIn('id',$user_systems_nav)->pluck('id')->toArray();
         
         $name = $name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname);
+        
         if($user->picture==''){
             $profile_url = 'assets/images/icons/png/user.png';
         }else{

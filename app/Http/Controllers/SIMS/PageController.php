@@ -9,6 +9,7 @@ use App\Services\ValidateAccessServices;
 class PageController extends Controller
 {
     private $page;
+    private $validate;
     public function __construct()
     {
         $this->page = 'sims';

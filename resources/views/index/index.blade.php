@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -65,18 +64,16 @@
     </div>
   </header><!-- End Header -->
 
-  <!-- ======= Hero Section ======= -->
   <section id="hero">
     <div class="hero-container" data-aos="zoom-in" data-aos-delay="100">
       <h1>INTEGRATED SYSTEM</h1>
       <h2>LNU - IS</h2>
       <!-- <a href="#about" class="btn-get-started">Get Started</a> -->
     </div>
-  </section><!-- End Hero Section -->
+  </section>
 
   <main id="main">
 
-    <!-- ======= About Section ======= -->
     <section id="about">
       <div class="container" data-aos="fade-up">
         <div class="row about-container">
@@ -237,7 +234,7 @@
 
       </div>
     </section><!-- End Team Section -->
-
+    
     <!-- ======= Contact Section ======= -->
     <section id="contact">
       <div class="container">

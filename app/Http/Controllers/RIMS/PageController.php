@@ -25,8 +25,8 @@ class PageController extends Controller
     public function students($data){        
         return view($this->page.'/students',$data);
     }
-    public function departments($data){        
-        return view($this->page.'/departments',$data);
+    public function departments($data){   
+        return view($this->page.'/departments/departments',$data);
     }
     public function programs($data){   
         $data['statuses'] = EducCourseStatus::get();     

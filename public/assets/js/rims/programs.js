@@ -61,6 +61,53 @@ $(document).on('input', '#newCourseModal .req', function (e) {
         $('#newCourseModal input[name="pre_name"]').addClass('border-require');
     }
 });
+$(document).on('click', '#curriculumModal .curriculumStatus', function (e) {
+    var thisBtn = $(this);
+    var id = thisBtn.data('id');
+    var form_data = {
+        id:id
+    };
+    $.ajax({
+        url: base_url+'/rims/programs/curriculumStatus',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading'); 
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisBtn.addClass('input-success');
+                thisBtn.removeClass('btn-danger btn-danger-scan');
+                thisBtn.removeClass('btn-success btn-success-scan');
+                thisBtn.addClass(data.btn_class);
+                thisBtn.html(data.btn_html);
+                curriculum_div(thisBtn);
+            }else{
+                toastr.error('Error.');
+                thisBtn.addClass('input-error');
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+});
 $(document).on('click', '#newCourseModal button[name="submit"]', function (e) {
     var thisBtn = $(this);
     var x = 0;
@@ -299,7 +346,7 @@ $(document).on('click', '#curriculumNewModal button[name="submit"]', function (e
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data=='error'){
                 toastr.error('Error.');
                 thisBtn.addClass('input-error');
@@ -311,6 +358,54 @@ $(document).on('click', '#curriculumNewModal button[name="submit"]', function (e
                 $(".select2-curriculum").select2({
                     dropdownParent: $("#curriculumModal #curriculumDiv #curriculums")
                 });
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+});
+$(document).on('click', '#programStatusModal button[name="submit"]', function (e) {
+    var thisBtn = $(this);
+    var id = $('#programStatusModal input[name="id"]').val();
+    var form_data = {
+        id:id
+    };
+    $.ajax({
+        url: base_url+'/rims/programs/programStatusSubmit',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading');
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisBtn.addClass('input-success');
+                $('#modal-primary').modal('hide');
+                $('#programsDiv #programStatus'+id).removeClass('btn-success btn-success-scan');
+                $('#programsDiv #programStatus'+id).removeClass('btn-danger btn-danger-scan');
+                $('#programsDiv #programStatus'+id).addClass(data.btn_class);
+                $('#programsDiv #programStatus'+id).html(data.btn_html);
+                
+            }else{
+                toastr.error('Error.');
+                thisBtn.addClass('input-error');
             }
             setTimeout(function() {
                 thisBtn.removeClass('input-success');
@@ -384,6 +479,22 @@ $(document).on('click', '#curriculumModal #curriculumDiv button[name="newCourse"
         id:id,
         level:'All',
         status:'All'
+    };
+    loadModal(form_data,thisBtn);
+});
+$(document).on('click', '#programsDiv .programStatus', function (e) {
+    var thisBtn = $(this);
+    var id = thisBtn.data('id');
+    var url = base_url+'/rims/programs/programStatusModal';
+    var modal = 'primary';
+    var modal_size = 'modal-sm';
+    var form_data = {
+        url:url,
+        modal:modal,
+        modal_size:modal_size,
+        static:'',
+        w_table:'wo',
+        id:id
     };
     loadModal(form_data,thisBtn);
 });
