@@ -151,12 +151,19 @@ function loadModal(form_data,thisBtn){
           $(".pagibig_num").inputmask('9999-9999-9999');          
           $(".year").inputmask('9999');          
           $(".datePicker").inputmask('mm/dd/yyyy');
+          $('.yearpicker').inputmask({'mask': '9999'});
           $('.datePicker').daterangepicker({
             locale: {
                 format: 'MM/DD/YYYY',
             },
             singleDatePicker: true,
             showDropdowns: true
+          });
+          $('.yearpicker').datepicker({
+            autoclose: true,
+            format: 'yyyy',
+            viewMode: 'years',
+            minViewMode: 'years'
           });
           $('.date-range').daterangepicker({
             locale: {

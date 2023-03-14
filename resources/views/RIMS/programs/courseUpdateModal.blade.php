@@ -1,5 +1,5 @@
 
-<div class="modal-content">
+<div class="modal-content" id="courseUpdateModal">
     <div class="modal-header">
         <h4 class="modal-title">
             
@@ -7,11 +7,12 @@
     </div>
     <div class="modal-body">
         <div class="row">
-            <div class="col-md-2">
+            <input type="hidden" name="id" value="{{$query->id}}">
+            <div class="col-md-3">
                 <label>Course Code</label>
                 <input type="text" class="form-control req" name="code" value="{{$query->code}}">
             </div>
-            <div class="col-md-8">
+            <div class="col-md-7">
                 <label>Descriptive Title</label>
                 <input type="text" class="form-control req" name="name" value="{{$query->name}}">
             </div>

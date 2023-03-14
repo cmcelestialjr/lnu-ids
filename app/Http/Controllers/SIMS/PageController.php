@@ -18,9 +18,18 @@ class PageController extends Controller
         return view($this->page.'/home',$data);
     }
     public function information($data){        
+        return view($this->page.'/information',$data);
+    }
+    public function teachers($data){
+        return view($this->page.'/home',$data);
+    }
+    public function info($data){
         return view($this->page.'/home',$data);
     }
     public function grades($data){
+        return view($this->page.'/home',$data);
+    }
+    public function schedule($data){
         return view($this->page.'/home',$data);
     }
     // public function grades($data){

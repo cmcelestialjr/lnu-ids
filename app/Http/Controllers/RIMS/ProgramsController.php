@@ -100,6 +100,19 @@ class ProgramsController extends Controller
         );
         return view('rims/programs/newCourseModal',$data);
     }
+    public function curriculumNewSubmit(Request $request){
+        $id = $request->id;
+        try{
+            
+        }catch(Exception $e){
+
+        }
+        $curriculums = EducCurriculum::with('status')->where('program_id',$id)->orderBy('year_from','DESC')->get();
+        $data = array(
+            'curriculums' => $curriculums
+        );
+        return view('rims/programs/curriculumSelect',$data);
+    }
     public function curriculumTable(Request $request){
         $data = array();
         $user_access_level = $request->session()->get('user_access_level');
@@ -260,6 +273,15 @@ class ProgramsController extends Controller
         );
         return view('rims/programs/courseUpdateModal',$data);
     }
+    public function curriculumNewModal(Request $request){
+        $id = $request->id;
+        $query = EducPrograms::where('id', $id)->first();
+        $data = array(
+            'id' => $id,
+            'query' => $query
+        );
+        return view('rims/programs/curriculumNewModal',$data);
+    }
     public function courseStatus(Request $request){
         $user_access_level = $request->session()->get('user_access_level');
         $user = Auth::user();
@@ -295,6 +317,50 @@ class ProgramsController extends Controller
         $response = array('result' => $result,
                           'btn_class' => $btn_class,
                           'btn_html' => $btn_html);
+        return response()->json($response);
+    }
+    public function courseUpdateSubmit(Request $request){
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $id = $request->id;
+        $code = $request->code;
+        $name = $request->name;
+        $units = $request->units;        
+        $courses = $request->courses;
+        $check = EducCourses::where(function ($query) use ($code,$name) {
+                        $query->where('code', $code)
+                            ->orWhere('name', $name);
+                    })->where('id','<>',$id)->first();
+        $result = 'error';
+        if($check==NULL){
+            if($courses==NULL){
+                $pre_name = 'None';
+            }else{
+                $pre_name = $request->pre_name;
+            }
+            EducCourses::where('id', $id)
+                    ->update(['code' => $code,
+                              'name' => $name,
+                              'units' => $units,
+                              'pre_name' => $pre_name,
+                              'updated_by' => $updated_by,
+                              'updated_at' => date('Y-m-d H:i:s')]);
+            $delete = EducCoursesPre::where('course_id', $id)->delete();
+            $auto_increment = DB::update("ALTER TABLE educ_courses_pre AUTO_INCREMENT = 0;");
+            if($courses!=NULL){                
+                foreach($courses as $course){
+                    $insert = new EducCoursesPre(); 
+                    $insert->course_id = $id;
+                    $insert->pre_id = $course;
+                    $insert->updated_by = $updated_by;
+                    $insert->save();
+                }
+            }
+            $result = 'success';  
+        }else{
+            $result = 'exists';
+        }
+        $response = array('result' => $result);
         return response()->json($response);
     }
     public function newCourseSubmit(Request $request){
