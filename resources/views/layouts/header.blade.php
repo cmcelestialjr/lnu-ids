@@ -18,7 +18,6 @@
   <!-- Bootstrap-table -->
   <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/bootstrap-table/bootstrap-table.min.css') }}">
   <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/fixed-columns/bootstrap-table-fixed-columns.min.css') }}">
-  <!-- <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/sticky-header/bootstrap-table-sticky-header.css') }}"> -->
   <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/filter-control/bootstrap-table-filter-control.min.css') }}">
   <!-- overlayScrollbars -->
   <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">

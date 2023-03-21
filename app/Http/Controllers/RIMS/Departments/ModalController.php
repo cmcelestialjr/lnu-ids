@@ -35,4 +35,17 @@ class ModalController extends Controller
         );
         return view('rims/departments/programsModal',$data);
     }
+    public function programAddModal(Request $request){
+        $id = $request->id;
+        $user_access_level = $request->session()->get('user_access_level');
+        $department = EducDepartments::where('id',$id)->first();
+        $departments = EducDepartments::where('id','<>',$id)->get();
+        $data = array(
+            'id' => $id,
+            'department' => $department,
+            'departments' => $departments,
+            'user_access_level' => $user_access_level
+        );
+        return view('rims/departments/programAddModal',$data);
+    }
 }

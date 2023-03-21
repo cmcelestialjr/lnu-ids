@@ -35,13 +35,20 @@
                         </select>
                     </div>
                     <div class="col-lg-12">
+                      @if($user_access->level_id==1 || $user_access->level_id==2)
+                      <button class="btn btn-primary btn-primary-scan programNewModal" style="float:right">
+                        <span class="fa fa-plus-square"></span> New Program
+                      </button>
+                      <br><br>
+                      @endif
                         <table id="viewTable" class="table table-bordered table-fixed"
                                     data-toggle="table"
                                     data-search="true"
-                                    data-height="650"
+                                    data-height="600"
                                     data-buttons-class="primary"
                                     data-show-export="true"
                                     data-show-columns-toggle-all="true"
+                                    data-mobile-responsive="true"
                                     data-pagination="true"
                                     data-page-size="10"
                                     data-page-list="[10, 50, 100, All]"

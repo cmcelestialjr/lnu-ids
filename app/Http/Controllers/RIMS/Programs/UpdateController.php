@@ -9,6 +9,7 @@ use App\Models\EducPrograms;
 use App\Models\EducCourses;
 use App\Models\EducCoursesPre;
 use App\Models\EducCurriculum;
+use App\Models\EducProgramsCode;
 use Exception;
 
 class UpdateController extends Controller
@@ -128,10 +129,11 @@ class UpdateController extends Controller
         $user = Auth::user();
         $updated_by = $user->id;
         $id = $request->id;
-        $code = $request->code;
+        $code = mb_strtoupper($request->code);
         $name = $request->name;
         $units = $request->units;        
         $courses = $request->courses;
+        $lab = $request->lab;
         $check = EducCourses::where(function ($query) use ($code,$name) {
                         $query->where('code', $code)
                             ->orWhere('name', $name);
@@ -147,6 +149,7 @@ class UpdateController extends Controller
                     ->update(['code' => $code,
                               'name' => $name,
                               'units' => $units,
+                              'lab' => $lab,
                               'pre_name' => $pre_name,
                               'updated_by' => $updated_by,
                               'updated_at' => date('Y-m-d H:i:s')]);
@@ -174,9 +177,10 @@ class UpdateController extends Controller
         $id = $request->id;
         $grade_period = $request->grade_period;
         $year_level = $request->year_level;
-        $code = $request->code;
+        $code = mb_strtoupper($request->code);
         $name = $request->name;
-        $units = $request->units;        
+        $units = $request->units;
+        $lab = $request->lab;       
         $courses = $request->courses;
         $check = EducCourses::where('code',$code)->orWhere('name',$name)->first();
         $result = 'error';
@@ -194,6 +198,7 @@ class UpdateController extends Controller
                 $insert->name = $name;
                 $insert->code = $code;
                 $insert->units = $units;
+                $insert->lab = $lab;
                 $insert->pre_name = $pre_name;
                 $insert->status_id = 1;
                 $insert->updated_by = $updated_by;
@@ -228,7 +233,6 @@ class UpdateController extends Controller
         $btn_class = '';
         $btn_html = '';
         if($user_access_level==1 || $user_access_level==2){
-            
             try{
                 $check = EducPrograms::where('id',$id)->first();
                 if($check!=NULL){
@@ -261,6 +265,164 @@ class UpdateController extends Controller
             }
         }
         
+        $response = array('result' => $result,
+                          'btn_class' => $btn_class,
+                          'btn_html' => $btn_html);
+        return response()->json($response);
+    }
+    public function programsNewSubmit(Request $request){
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $result = 'error';
+        $level = $request->level;
+        $department = $request->department;
+        $name = $request->name;
+        $shorten = $request->shorten;
+        $code = mb_strtoupper($request->code);
+        if($user_access_level==1 || $user_access_level==2){
+            $check = EducPrograms::where('name',$name)->orWhere('shorten',$shorten)->orWhere('code',$code)->first();
+            if($check==NULL){
+                try{
+                    $insert = new EducPrograms(); 
+                    $insert->department_id = $department;
+                    $insert->program_level_id = $level;
+                    $insert->name = $name;
+                    $insert->shorten = mb_strtoupper($shorten);
+                    $insert->status_id = 1;
+                    $insert->updated_by = $updated_by;
+                    $insert->save();
+                    $program_id = $insert->id;
+
+                    $insert = new EducProgramsCode(); 
+                    $insert->program_id = $program_id;
+                    $insert->name = $code;
+                    $insert->status_id = 1;
+                    $insert->updated_by = $updated_by;
+                    $insert->save();
+                    $result = 'success';
+                }catch(Exception $e){
+
+                }
+            }else{
+                $result = 'exists';
+            }
+        }
+        $response = array('result' => $result);
+        return response()->json($response);
+    }
+    public function programCodeNewSubmit(Request $request){
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $result = 'error';
+        $id = $request->id;
+        $name = mb_strtoupper($request->name);
+        $remarks = $request->remarks;
+        if($user_access_level==1 || $user_access_level==2){
+            $check = EducProgramsCode::where('name',$name)->first();
+            if($check==NULL){
+                try{
+                    $insert = new EducProgramsCode(); 
+                    $insert->program_id = $id;
+                    $insert->name = $name;
+                    $insert->remarks = $remarks;
+                    $insert->status_id = 1;
+                    $insert->updated_by = $updated_by;
+                    $insert->save();
+                    $result = 'success';
+                }catch(Exception $e){
+                    
+                }
+            }else{
+                $result = 'exists';
+            }
+        }
+        $response = array('result' => $result);
+        return response()->json($response);
+    }
+    public function programCodeEditSubmit(Request $request){
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $result = 'error';
+        $id = $request->id;
+        $name = mb_strtoupper($request->name);
+        $remarks = $request->remarks;
+        $program_id = '';
+        if($user_access_level==1 || $user_access_level==2){
+            $query = EducProgramsCode::where('id',$id)->first();
+            $program_id = $query->program_id;
+            $check = EducProgramsCode::where('name',$name)->where('id','<>',$id)->first();
+            if($check==NULL){
+                try{
+                    EducProgramsCode::where('id', $id)
+                                ->update(['name' => $name,
+                                        'remarks' => $remarks,
+                                        'updated_by' => $updated_by,
+                                        'updated_at' => date('Y-m-d H:i:s')]);
+                    $result = 'success';
+                }catch(Exception $e){
+                    
+                }
+            }else{
+                $result = 'exists';
+            }
+        }
+        $response = array('result' => $result,
+                          'id' => $program_id);
+        return response()->json($response);
+    }
+    public function programCodeStatus(Request $request){
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $id = $request->id;
+        $result = 'error';
+        $btn_class = '';
+        $btn_html = '';
+        if($user_access_level==1 || $user_access_level==2){            
+            try{
+                $check = EducProgramsCode::where('id',$id)->first();
+                if($check!=NULL){
+                    if($check->status_id==1){
+                        $status_id = 2;
+                        $btn_class = 'btn-danger btn-danger-scan';
+                        $btn_html = ' Closed';
+                    }else{
+                        $status_id = 1;
+                        $btn_class = 'btn-success btn-success-scan';
+                        $btn_html = ' Open';
+                    }
+                    EducProgramsCode::where('id', $id)
+                                ->update(['status_id' => $status_id,
+                                        'updated_by' => $updated_by,
+                                        'updated_at' => date('Y-m-d H:i:s')]);
+                    if($status_id==2){
+                        $program_id = $check->program_id;
+                        $check = EducProgramsCode::where('program_id',$program_id)->where('status_id',1)->first();
+                        if($check==NULL){
+                            $curriculum_id = EducCurriculum::where('program_id',$program_id)->pluck('id')->toArray();
+                            EducPrograms::where('id', $program_id)
+                                        ->update(['status_id' => $status_id,
+                                                'updated_by' => $updated_by,
+                                                'updated_at' => date('Y-m-d H:i:s')]);
+                            EducCurriculum::where('program_id', $program_id)
+                                        ->update(['status_id' => $status_id,
+                                                'updated_by' => $updated_by,
+                                                'updated_at' => date('Y-m-d H:i:s')]);
+                            EducCourses::whereIn('curriculum_id', $curriculum_id)
+                                        ->update(['status_id' => $status_id,
+                                                'updated_by' => $updated_by,
+                                                'updated_at' => date('Y-m-d H:i:s')]);
+                        }
+                    }
+                    $result = 'success';  
+                }
+            }catch(Exception $e){
+
+            }
+        }        
         $response = array('result' => $result,
                           'btn_class' => $btn_class,
                           'btn_html' => $btn_html);

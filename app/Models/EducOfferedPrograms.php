@@ -12,7 +12,7 @@ class EducOfferedPrograms extends Model
     {
         return $this->belongsTo(EducOfferedSchoolYear::class, 'school_year_id', 'id')->withDefault();
     }
-    public function departments()
+    public function department()
     {
         return $this->belongsTo(EducDepartments::class, 'department_id', 'id')->withDefault();
     }

@@ -29,7 +29,7 @@
           <div class="card-header p-0 pt-1">
             <ul class="nav nav-tabs" role="tablist">
               <li class="nav-item">
-                <a class="nav-link active" data-toggle="pill" href="#list" role="tab" aria-selected="true">List</a>
+                <a class="nav-link active" id="schoolYearList" data-toggle="pill" href="#list" role="tab" aria-selected="true">List</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="pill" href="#new" role="tab" aria-selected="false">New</a>
@@ -44,12 +44,14 @@
                     <table id="viewTable" class="table table-bordered table-fixed"
                             data-toggle="table"
                             data-search="true"
-                            data-height="700"
+                            data-height="600"
                             data-buttons-class="primary"
                             data-show-export="true"
                             data-show-columns-toggle-all="true"
-                            data-pagination="false"
-                            data-page-size="50"
+                            data-mobile-responsive="true"
+                            data-pagination="true"
+                            data-page-size="10"
+                            data-page-list="[10, 50, 100, All]"
                             data-loading-template="loadingTemplate"
                             data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
                       <thead>
@@ -60,8 +62,9 @@
                           <th data-field="f4" data-sortable="true" data-align="center">School Duration</th>
                           <th data-field="f5" data-sortable="true" data-align="center">School Enrollment</th>
                           <th data-field="f6" data-sortable="true" data-align="center">School Add/Dropping</th>
+                          <th data-field="f7" data-sortable="true" data-align="center">Programs</th>
                           @if($user_access->level_id==1 || $user_access->level_id==2)
-                          <th data-field="f7" data-sortable="true" data-align="center">Edit</th>
+                          <th data-field="f8" data-sortable="true" data-align="center">Edit</th>
                           @endif
                         </tr>
                       </thead>

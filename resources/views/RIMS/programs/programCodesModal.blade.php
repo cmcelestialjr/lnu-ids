@@ -1,39 +1,35 @@
 
-<div class="modal-content" id="programsModal">
+<div class="modal-content" id="programCodesModal">
     <div class="modal-header">
         <h4 class="modal-title">
-            {{$department->name}} ({{$department->shorten}})
+            {{$program->name}} ({{$program->shorten}})
         </h4>
     </div>
     <div class="modal-body">
         <div class="row">
            <div class="col-lg-12">
-                @if($user_access_level==1 || $user_access_level==2)
-                    <button class="btn btn-primary btn-primary-scan programAddModal" style="float:right;"
+                <button class="btn btn-primary btn-primary-scan programCodeNewModal" style="float:right;"
                         data-id="{{$id}}">
-                        <span class="fa fa-plus-square"></span> Add Program</button>
-                    <br><br>
-                @endif
-                <table id="programsList" class="table table-bordered table-fixed"
+                <span class="fa fa-plus-square"></span> New Code</button>
+                <br><br>
+                <table id="programCodesList" class="table table-bordered table-fixed"
                             data-toggle="table"
                             data-search="true"
-                            data-height="600"
+                            data-height="400"
                             data-buttons-class="primary"
                             data-show-export="true"
                             data-show-columns-toggle-all="true"
                             data-mobile-responsive="true"
                             data-pagination="true"
-                            data-page-size="10"
-                            data-page-list="[10, 50, 100, All]"
                             data-loading-template="loadingTemplate"
                             data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
                     <thead>
                         <tr>
                             <th data-field="f1" data-sortable="true" data-align="center">#</th>
-                            <th data-field="f2" data-sortable="true" data-align="center">Program</th>
-                            <th data-field="f3" data-sortable="true" data-align="center">Shorten</th>                                  
-                            <th data-field="f4" data-sortable="true" data-align="center">Code</th>
-                            <th data-field="f5" data-sortable="true" data-align="center">Status</th>
+                            <th data-field="f2" data-sortable="true" data-align="center">Code</th>
+                            <th data-field="f3" data-sortable="true" data-align="center">Remarks</th>
+                            <th data-field="f4" data-sortable="true" data-align="center">Status</th>
+                            <th data-field="f5" data-sortable="true" data-align="center">Edit</th>
                         </tr>
                     </thead>
                 </table>

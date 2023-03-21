@@ -18,6 +18,6 @@ class EducOfferedCourses extends Model
     }
     public function status()
     {
-        return $this->belongsTo(EducCourseStatus::class, 'course_status_id', 'id')->withDefault();
+        return $this->belongsTo(EducCourseStatus::class, 'status_id', 'id')->withDefault();
     }
 }

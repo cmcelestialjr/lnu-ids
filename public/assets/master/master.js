@@ -184,6 +184,11 @@ function loadModal(form_data,thisBtn){
             loadDivwLoader(form_data,thisBtn);
           }
           Livewire.rescan();
+          if(form_data.livewire){
+            if(form_data.livewire=='w'){
+              Livewire.emit(form_data.livewire_emit, form_data.livewire_value);
+            }
+          }
       },
       error: function (){
         toastr.error('Error!');
@@ -282,6 +287,9 @@ function loadDivwLoader(form_data,thisBtn){
     },
     success : function(data){      
       $('#'+form_data.tid).html(data);
+      $(".select2-div").select2({
+        dropdownParent: $("#modal-"+form_data.modal)
+      });
       thisBtn.removeAttr('disabled');
       thisBtn.removeClass('input-loading');
       thisBtn.addClass('input-success');

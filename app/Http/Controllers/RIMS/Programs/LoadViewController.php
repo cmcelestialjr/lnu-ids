@@ -16,7 +16,11 @@ class LoadViewController extends Controller
         if(isset($request->modal)){
             $id = $request->id;
             $curriculum = EducCurriculum::with('status')->where('program_id',$id)->orderBy('year_from','DESC')->first();
-            $id = $curriculum->id;
+            if($curriculum!=NULL){
+                $id = $curriculum->id;
+            }else{
+                $id = 0;
+            }
         }else{
             $id = $request->id;
         }
@@ -47,7 +51,7 @@ class LoadViewController extends Controller
                     ->$where_level('grade_level_id',$value_level)
                     ->$where_status('status_id',$value_status)
                     ->orderBy('grade_period_id','ASC')
-                    ->orderBy('grade_level_id','ASC')->get();
+                    ->orderBy('grade_level_id','ASC')->get();        
         $get_ids = EducCourses::where('curriculum_id',$id)
                     ->$where_level('grade_level_id',$value_level)
                     ->$where_status('status_id',$value_status)->pluck('grade_level_id','grade_period_id')->toArray();
@@ -58,14 +62,17 @@ class LoadViewController extends Controller
             $period_ids[] = $key;
         }
         $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
-        $period = EducGradePeriod::with(['courses' => function ($query) 
+        if($query->count()>0){
+            $period = EducGradePeriod::with(['courses' => function ($query) 
                             use ($where_status,$id,$value_status) {
                             $query->where('curriculum_id', $id);
                             $query->$where_status('status_id', $value_status);
                             $query->orderBy('grade_period_id','ASC');
                             $query->orderBy('grade_level_id','ASC');
                         }])->whereIn('id',$period_ids)->get();
-        
+        }else{
+            $period = NULL;
+        }
         $data = array(
             'id' => $id,
             'query' => $query,

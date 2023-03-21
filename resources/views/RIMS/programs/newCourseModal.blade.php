@@ -35,6 +35,10 @@
                 <label>Units</label>
                 <input type="number" class="form-control req" name="units">
             </div>
+            <div class="col-md-2">
+                <label>Lab</label>
+                <input type="number" class="form-control req" name="lab" value="0">
+            </div>
             <div class="col-md-12">
                 <br>
                 <label>Pre-requisite</label>

@@ -12,4 +12,8 @@ class EducProgramsCode extends Model
     {
         return $this->belongsTo(EducPrograms::class, 'program_id', 'id')->withDefault();
     }
+    public function status()
+    {
+        return $this->belongsTo(EducCourseStatus::class, 'status_id', 'id')->withDefault();
+    }
 }

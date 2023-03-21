@@ -8,7 +8,10 @@ use App\Models\EducCourses;
 use App\Models\EducCurriculum;
 use App\Models\EducYearLevel;
 use App\Models\EducCourseStatus;
+use App\Models\EducDepartments;
 use App\Models\EducGradePeriod;
+use App\Models\EducProgramLevel;
+use App\Models\EducProgramsCode;
 use Exception;
 
 class ModalController extends Controller
@@ -87,5 +90,39 @@ class ModalController extends Controller
             'query' => $query
         );
         return view('rims/programs/curriculumNewModal',$data);
+    }
+    public function programNewModal(Request $request){
+        $levels = EducProgramLevel::get();
+        $departments = EducDepartments::orderBy('name')->get();
+        $data = array(
+            'levels' => $levels,
+            'departments' => $departments
+        );
+        return view('rims/programs/programNewModal',$data);
+    }
+    public function programCodesModal(Request $request){
+        $id = $request->id;
+        $program = EducPrograms::where('id',$id)->first();
+        $data = array(
+            'id' => $id,
+            'program' => $program
+        );
+        return view('rims/programs/programCodesModal',$data);
+    }
+    public function programCodeNewModal(Request $request){
+        $id = $request->id;
+        $data = array(
+            'id' => $id
+        );
+        return view('rims/programs/programCodeNewModal',$data);
+    }
+    public function programCodeEditModal(Request $request){
+        $id = $request->id;
+        $query = EducProgramsCode::where('id',$id)->first();
+        $data = array(
+            'id' => $id,
+            'query' => $query
+        );
+        return view('rims/programs/programCodeEditModal',$data);
     }
 }

@@ -8,17 +8,21 @@
     <div class="modal-body">
         <div class="row">
             <input type="hidden" name="id" value="{{$query->id}}">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label>Course Code</label>
                 <input type="text" class="form-control req" name="code" value="{{$query->code}}">
             </div>
-            <div class="col-md-7">
+            <div class="col-md-8">
                 <label>Descriptive Title</label>
                 <input type="text" class="form-control req" name="name" value="{{$query->name}}">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <label>Units</label>
                 <input type="number" class="form-control req" name="units" value="{{$query->units}}">
+            </div>
+            <div class="col-md-4">
+                <label>Lab</label>
+                <input type="number" class="form-control req" name="lab" value="{{$query->lab}}">
             </div>
             <div class="col-md-12">
                 <br>

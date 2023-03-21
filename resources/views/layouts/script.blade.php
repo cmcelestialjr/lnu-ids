@@ -4,11 +4,12 @@
 <!-- Font Awesome -->
 <script src="{{ asset('_adminLTE/plugins/fontawesome-free/js/all.min.js') }}"></script> 
 <!-- Boostrap Table -->
+<script src="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/export/tableExport.min.js') }}"></script>
 <script src="{{ asset('_adminLTE/plugins/bootstrap-table/bootstrap-table.min.js') }}"></script>
 <script src="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js') }}"></script>
 <script src="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/fixed-columns/bootstrap-table-fixed-columns.min.js') }}"></script>
-<!-- <script src="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/sticky-header/bootstrap-table-sticky-header.min.js') }}"></script> -->
 <script src="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/filter-control/bootstrap-table-filter-control.min.js') }}"></script>
+<script src="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/mobile/bootstrap-table-mobile.min.js') }}"></script>
 <!-- Bootstrap4 Duallistbox -->
 <script src="{{ asset('_adminLTE/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js') }}"></script>
 <!-- InputMask -->

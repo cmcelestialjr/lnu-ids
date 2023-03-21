@@ -21,18 +21,20 @@
                         $curriculumStatus = '';
                     }
                 @endphp
-                @if($curriculum->status_id==1)
-                    <button type="button" class="btn btn-success btn-success-scan {{$curriculumStatus}}"
-                        data-id="{{$curriculum->id}}"> Open</button>
-                @else
-                    <button type="button" class="btn btn-danger btn-danger-scan {{$curriculumStatus}}"
-                        data-id="{{$curriculum->id}}"> Close</button>
+                @if($curriculum!=NULL)
+                    @if($curriculum->status_id==1)
+                        <button type="button" class="btn btn-success btn-success-scan {{$curriculumStatus}}"
+                            data-id="{{$curriculum->id}}"> Open</button>
+                    @else
+                        <button type="button" class="btn btn-danger btn-danger-scan {{$curriculumStatus}}"
+                            data-id="{{$curriculum->id}}"> Close</button>
+                    @endif
                 @endif
             </div>
             <div class="col-md-3">
                 <label>Curriculums</label>
                 <div id="curriculums">
-                <select class="form-control select2-default" name="curriculum">
+                <select class="form-control select2-default curriculumSelects" name="curriculum">
                     @foreach($curriculums as $row)
                         <option value="{{$row->id}}">{{$row->year_from}} - {{$row->year_to}} ({{$row->status->name}})</option>
                     @endforeach
@@ -41,7 +43,7 @@
             </div>
             <div class="col-md-2">
                 <label>Year Level</label>
-                <select class="form-control select2-default" multiple name="year_level[]">
+                <select class="form-control select2-default curriculumSelects" multiple name="year_level[]">
                     @foreach($year_level as $row)
                         <option value="{{$row->id}}">{{$row->name}}</option>
                     @endforeach
@@ -49,15 +51,11 @@
             </div>
             <div class="col-md-2">
                 <label>Status Courses</label>
-                <select class="form-control select2-default" multiple name="status_course[]">
+                <select class="form-control select2-default curriculumSelects" multiple name="status_course[]">
                     @foreach($status as $row)
                         <option value="{{$row->id}}">{{$row->name}}</option>
                     @endforeach
                 </select>
-            </div>
-            <div class="col-md-1">
-                &nbsp;<br>
-                <button class="btn btn-primary btn-primary-scan" name="submit"><span class="fa fa-check"></span></button>
             </div>
             <div class="col-lg-12">
                 <br>

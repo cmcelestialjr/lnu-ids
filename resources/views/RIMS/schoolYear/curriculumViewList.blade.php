@@ -1,4 +1,5 @@
-<div class="row" id="curriculumTable">
+<br>
+<div class="row">
     @foreach($year_level as $level)    
     <div class="col-lg-12"> 
         <div class="card card-primary card-outline">
@@ -7,17 +8,13 @@
         <div class="table-responsive" style="height: 250px;">
             <div class="row">
                 @foreach($period as $per)
-                    @if($per->name=='Year')
-                        <div class="col-lg-12">  
-                    @else
-                        <div class="col-lg-6">  
-                    @endif
+                    <div class="col-lg-12">
                     @php
                     $lab_total = 0;
                     $unit_total = 0;
-                    foreach($per->courses as $course){
-                        if($level->id==$course->grade_level_id){
-                            $lab_total += $course->lab;
+                    foreach($offered_courses as $course){
+                        if($level->id==$course->course->grade_level_id){
+                            $lab_total += $course->course->lab;
                         }
                     }
                     @endphp
@@ -42,27 +39,22 @@
                                     @endif                                    
                                 </thead>
                                 <tbody>
-                                    @foreach($per->courses as $course)
-                                        @if($level->id==$course->grade_level_id)
+                                    @foreach($offered_courses as $course)
+                                        @if($level->id==$course->course->grade_level_id)
                                         <tr>
                                             <td class="center">
-                                                @if($user_access_level==1 || $user_access_level==2)
-                                                    <button class="btn btn-primary btn-primary-scan btn-sm courseUpdate"
-                                                            data-id="{{$course->id}}">{{$course->code}}</button>
-                                                @else
-                                                    {{$course->code}}
-                                                @endif
+                                                {{$course->course->code}}
                                             </td>
-                                            <td>{{$course->name}}</td>
-                                            <td class="center">{{$course->units}}</td>
+                                            <td>{{$course->course->name}}</td>
+                                            <td class="center">{{$course->course->units}}</td>
                                             @if($lab_total>0)
-                                            <td class="center">{{$course->lab}}</td>
+                                            <td class="center">{{$course->course->lab}}</td>
                                             @endif
-                                            <td class="center">{{$course->pre_name}}</td>
+                                            <td class="center">{{$course->course->pre_name}}</td>
                                             <td class="center">
                                                 @php
                                                     if($user_access_level==1 || $user_access_level==2){
-                                                        $courseStatus = 'courseStatus';
+                                                        $courseStatus = 'courseStatusModal';
                                                     }else{
                                                         $courseStatus = '';
                                                     }
@@ -77,7 +69,7 @@
                                             </td>
                                         </tr>
                                         @php
-                                            $unit_total += $course->units;
+                                            $unit_total += $course->course->units;
                                         @endphp
                                         @endif
                                     @endforeach

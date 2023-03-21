@@ -1,4 +1,5 @@
-<div class="row" id="curriculumTable">
+<br>
+<div class="row">
     @foreach($year_level as $level)    
     <div class="col-lg-12"> 
         <div class="card card-primary card-outline">
@@ -7,11 +8,7 @@
         <div class="table-responsive" style="height: 250px;">
             <div class="row">
                 @foreach($period as $per)
-                    @if($per->name=='Year')
-                        <div class="col-lg-12">  
-                    @else
-                        <div class="col-lg-6">  
-                    @endif
+                    <div class="col-lg-12"> 
                     @php
                     $lab_total = 0;
                     $unit_total = 0;
@@ -46,12 +43,7 @@
                                         @if($level->id==$course->grade_level_id)
                                         <tr>
                                             <td class="center">
-                                                @if($user_access_level==1 || $user_access_level==2)
-                                                    <button class="btn btn-primary btn-primary-scan btn-sm courseUpdate"
-                                                            data-id="{{$course->id}}">{{$course->code}}</button>
-                                                @else
-                                                    {{$course->code}}
-                                                @endif
+                                                {{$course->code}}
                                             </td>
                                             <td>{{$course->name}}</td>
                                             <td class="center">{{$course->units}}</td>
