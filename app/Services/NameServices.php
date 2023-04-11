@@ -11,7 +11,7 @@ class NameServices
             $extname = ' '.$extname;
         }
         $name = $firstname.$middlename.' '.$lastname.$extname;
-        return $name;
+        return $this->capitalize_first($name); 
     }
     public function lastname($lastname,$firstname,$middlename,$extname){
         if($middlename!=''){
@@ -20,8 +20,11 @@ class NameServices
         if($extname!=''){
             $extname = ' '.$extname;
         }
-        $name = $lastname.', '.$firstname.$middlename.$extname;
-        return $name;
+        $name = $lastname.', '.$firstname.$extname.$middlename;
+        return $this->capitalize_first($name);
+    }
+    private function capitalize_first($name){
+        return mb_convert_case(mb_strtolower($name), MB_CASE_TITLE, "UTF-8");
     }
 }
 

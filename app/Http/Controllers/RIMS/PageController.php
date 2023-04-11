@@ -29,7 +29,7 @@ class PageController extends Controller
         return view($this->page.'/departments/departments',$data);
     }
     public function programs($data){   
-        $data['statuses'] = EducCourseStatus::get();     
+        $data['statuses'] = EducCourseStatus::get();
         return view($this->page.'/programs/programs',$data);
     }
     public function courses_list($data){        
@@ -42,6 +42,14 @@ class PageController extends Controller
     public function school_year($data){        
         $data['grade_period'] = EducGradePeriod::get();
         return view($this->page.'/schoolYear/school_year',$data);
+    }
+    public function enrollment($data){
+        $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
+        return view($this->page.'/enrollment/enrollment',$data);
+    }
+    public function schedule($data){
+        $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
+        return view($this->page.'/schedule/schedule',$data);
     }
     // public function grades($data){
     //     $level_ids = array(1,2,3); 

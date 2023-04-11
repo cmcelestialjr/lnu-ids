@@ -38,37 +38,42 @@
                       <div id="programsSelectDiv"></div>
                     </div>
                     <div class="col-lg-12">
-                        @if($user_access->level_id==1 || $user_access->level_id==2)
-                          <button class="btn btn-primary btn-primary-scan sectionNewModal" style="float:right">
-                            <span class="fa fa-plus-square"></span> New Section
-                          </button>
-                          <br><br>
-                        @endif
-                        <table id="viewTable" class="table table-bordered table-fixed"
-                                    data-toggle="table"
-                                    data-search="true"
-                                    data-height="600"
-                                    data-buttons-class="primary"
-                                    data-show-export="true"
-                                    data-show-columns-toggle-all="true"
-                                    data-mobile-responsive="true"
-                                    data-pagination="true"
-                                    data-page-size="10"
-                                    data-page-list="[10, 50, 100, All]"
-                                    data-loading-template="loadingTemplate"
-                                    data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
-                            <thead>
-                                <tr>
-                                    <th data-field="f1" data-sortable="true" data-align="center">#</th>
-                                    <th data-field="f2" data-sortable="true" data-align="center">Grade Level</th>
-                                    <th data-field="f3" data-sortable="true" data-align="center">Section</th>
-                                    <th data-field="f4" data-sortable="true" data-align="center">Code</th>
-                                    <th data-field="f5" data-sortable="true" data-align="center">Curriculum</th>
-                                    <th data-field="f6" data-sortable="true" data-align="center">Status</th>
-                                    <th data-field="f7" data-sortable="true" data-align="center">Courses</th>
-                                </tr>
-                            </thead>
-                        </table>
+                    </div>
+                    <div class="col-lg-12">
+                      <br>
+                      <div class="card card-info card-outline">
+                        <div class="card-body table-responsive">
+                          @if($user_access->level_id==1 || $user_access->level_id==2)                          
+                            <button class="btn btn-primary btn-primary-scan sectionNewModal" style="float:right">
+                              <span class="fa fa-plus-square"></span> New Section
+                            </button>
+                            <br><br>
+                          @endif
+                          <table id="viewTable" class="table table-bordered table-fixed"
+                                      data-toggle="table"
+                                      data-search="true"
+                                      data-height="600"
+                                      data-buttons-class="primary"
+                                      data-show-export="true"
+                                      data-show-columns-toggle-all="true"
+                                      data-mobile-responsive="true"
+                                      data-pagination="true"
+                                      data-page-size="10"
+                                      data-page-list="[10, 50, 100, All]"
+                                      data-loading-template="loadingTemplate"
+                                      data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
+                              <thead>
+                                  <tr>
+                                      <th data-field="f1" data-sortable="true" data-align="center">#</th>
+                                      <th data-field="f2" data-sortable="true" data-align="center">Curriculum</th>
+                                      <th data-field="f3" data-sortable="true" data-align="center">Grade Level</th>
+                                      <th data-field="f4" data-sortable="true" data-align="center">No of Section</th>
+                                      <th data-field="f5" data-sortable="true" data-align="center">View</th>
+                                  </tr>
+                              </thead>
+                          </table>
+                        </div>
+                      </div>
                     </div>
                 </div>
             </div>
@@ -78,5 +83,11 @@
 <!-- /.Content -->
 
 @include('layouts.script')
-<script src="{{ asset('assets/js/rims/sections.js') }}"></script>
+<script src="{{ asset('assets/js/rims/sections/_function.js') }}"></script>
+<script src="{{ asset('assets/js/rims/sections/view.js') }}"></script>
+<script src="{{ asset('assets/js/rims/sections/new.js') }}"></script>
+<script src="{{ asset('assets/js/rims/sections/update.js') }}"></script>
+<script src="{{ asset('assets/js/rims/sections/delete.js') }}"></script>
+<script src="{{ asset('assets/js/rims/sections/modal.js') }}"></script>
+
 @endsection

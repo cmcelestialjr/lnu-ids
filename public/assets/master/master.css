@@ -1,3 +1,6 @@
+.table{
+  font-size: 14px;
+}
 .table th{
   text-align: center;
 }
@@ -10,9 +13,16 @@
 .white{
     color: white;
 }
+.blue{
+  color: #007bff;
+}
 .border-require{
   border: 1px solid;
   border-color: red !important;
+}
+.bg-success-light{
+  background-color:#3CB371 !important;
+  color:white !important;
 }
 .text-require{
   color: red !important;
@@ -29,8 +39,15 @@
 .fade-out{
     animation: fade-out 1s;
 }
+.legend-box{
+  height:20px;
+  width:20px
+}
 .modal-xxl{
     max-width: 1480px;
+}
+.modal-xxxl{
+  max-width: 1824px;
 }
 .sidebar-blue-lapis{
   background-color: #00008b;
@@ -96,6 +113,10 @@
     background-size: 25px 25px;
     background-position:right center;
     background-repeat: no-repeat;
+}
+.bg-lightgreen1{
+  background-color: #3CB371;
+  color:white;
 }
 .btn-no-design{
   background: none;
@@ -263,3 +284,30 @@
 .opacity6{
   opacity: .6;
 }
+.table-sched{
+  width: 100%;
+  border:1px solid;
+  border-color: lightgray;
+  table-layout: fixed;
+}
+.table-sched td{
+  border:1px solid;
+  text-align: center;
+  border-color: lightgray;
+}
+.table-sched th {
+  border:1px solid;
+  text-align: center;
+  border-color: lightgray;
+}
+.table-sched thead{
+  background-color: #f2f2f2;
+  position: sticky;
+  top: 0;
+}
+@media only screen and (max-width: 700px) {
+  .table-sched{
+    width: 800px !important;
+  }
+}
+

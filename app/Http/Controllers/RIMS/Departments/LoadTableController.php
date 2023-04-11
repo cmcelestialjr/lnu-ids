@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\RIMS\Departments;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\EducDepartments;
 use App\Models\EducPrograms;
 

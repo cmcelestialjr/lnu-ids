@@ -51,16 +51,13 @@ class LoadViewController extends Controller
                     ->$where_level('grade_level_id',$value_level)
                     ->$where_status('status_id',$value_status)
                     ->orderBy('grade_period_id','ASC')
-                    ->orderBy('grade_level_id','ASC')->get();        
-        $get_ids = EducCourses::where('curriculum_id',$id)
-                    ->$where_level('grade_level_id',$value_level)
-                    ->$where_status('status_id',$value_status)->pluck('grade_level_id','grade_period_id')->toArray();
-        $year_level_ids = [];
-        $period_ids = [];
-        foreach($get_ids as $key => $row){
-            $year_level_ids[] = $row;
-            $period_ids[] = $key;
-        }
+                    ->orderBy('grade_level_id','ASC')->get();
+        $period_ids = EducCourses::where('curriculum_id',$id)
+                        ->$where_level('grade_level_id',$value_level)
+                        ->$where_status('status_id',$value_status)->pluck('grade_period_id')->toArray();
+        $year_level_ids = EducCourses::where('curriculum_id',$id)
+                        ->$where_level('grade_level_id',$value_level)
+                        ->$where_status('status_id',$value_status)->pluck('grade_level_id')->toArray();
         $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
         if($query->count()>0){
             $period = EducGradePeriod::with(['courses' => function ($query) 
@@ -113,15 +110,13 @@ class LoadViewController extends Controller
                     ->$where_status('status_id',$value_status)
                     ->orderBy('grade_period_id','ASC')
                     ->orderBy('grade_level_id','ASC')->get();
-        $get_ids = EducCourses::where('curriculum_id',$id)
-                    ->$where_level('grade_level_id',$value_level)
-                    ->$where_status('status_id',$value_status)->pluck('grade_level_id','grade_period_id')->toArray();
-        $year_level_ids = [];
-        $period_ids = [];
-        foreach($get_ids as $key => $row){
-            $year_level_ids[] = $row;
-            $period_ids[] = $key;
-        }
+        $period_ids = EducCourses::where('curriculum_id',$id)
+                        ->$where_level('grade_level_id',$value_level)
+                        ->$where_status('status_id',$value_status)->pluck('grade_period_id')->toArray();
+        $year_level_ids = EducCourses::where('curriculum_id',$id)
+                        ->$where_level('grade_level_id',$value_level)
+                        ->$where_status('status_id',$value_status)->pluck('grade_level_id')->toArray();
+       
         $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
         $period = EducGradePeriod::with(['courses' => function ($query) 
                             use ($where_status,$id,$value_status) {
@@ -150,13 +145,8 @@ class LoadViewController extends Controller
                     ->where('curriculum_id',$id)
                     ->orderBy('grade_period_id','ASC')
                     ->orderBy('grade_level_id','ASC')->get();
-        $get_ids = EducCourses::where('curriculum_id',$id)->pluck('grade_level_id','grade_period_id')->toArray();
-        $year_level_ids = [];
-        $period_ids = [];
-        foreach($get_ids as $key => $row){
-            $year_level_ids[] = $row;
-            $period_ids[] = $key;
-        }
+        $period_ids = EducCourses::where('curriculum_id',$id)->pluck('grade_period_id')->toArray();
+        $year_level_ids = EducCourses::where('curriculum_id',$id)->pluck('grade_level_id')->toArray();
         $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
         $period = EducGradePeriod::with(['courses' => function ($query) 
                             use ($id,$course_id) {

@@ -2,7 +2,7 @@
 <div class="modal-content" id="newCourseModal">
     <div class="modal-header">
         <h4 class="modal-title">
-            {{$curriculum->year_from}} - {{$curriculum->year_to}} ({{$curriculum->status->name}})
+            {{$curriculum->year_from}} - {{$curriculum->year_to}} ({{$curriculum->code}}) ({{$curriculum->status->name}})
         </h4>
     </div>
     <div class="modal-body">

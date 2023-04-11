@@ -67,5 +67,10 @@
 <!-- /.Content -->
 
 @include('layouts.script')
-<script src="{{ asset('assets/js/rims/departments.js') }}"></script>
+<script src="{{ asset('assets/js/rims/departments/_function.js') }}"></script>
+<script src="{{ asset('assets/js/rims/departments/view.js') }}"></script>
+<script src="{{ asset('assets/js/rims/departments/modal.js') }}"></script>
+<script src="{{ asset('assets/js/rims/departments/new.js') }}"></script>
+<script src="{{ asset('assets/js/rims/departments/update.js') }}"></script>
+<script src="{{ asset('assets/js/rims/departments/delete.js') }}"></script>
 @endsection

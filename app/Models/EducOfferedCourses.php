@@ -20,4 +20,16 @@ class EducOfferedCourses extends Model
     {
         return $this->belongsTo(EducCourseStatus::class, 'status_id', 'id')->withDefault();
     }
+    public function instructor()
+    {
+        return $this->belongsTo(Users::class, 'instructor_id', 'id')->withDefault();
+    }
+    public function students()
+    {
+        return $this->hasMany(StudentsCourses::class, 'offered_course_id', 'id');
+    }
+    public function schedule()
+    {
+        return $this->hasMany(EducOfferedSchedule::class, 'offered_course_id', 'id')->orderBy('time_from','ASC');
+    }
 }

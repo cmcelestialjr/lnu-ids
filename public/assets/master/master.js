@@ -66,6 +66,17 @@ $('.datetimepicker').daterangepicker({
       format: 'YYYY-MM-DD'
     }
 });
+$('.timepicker').timepicker({
+  timeFormat: 'hh:mmp',
+  interval: 15,
+  minTime: '07',
+  maxTime: '11:00pm',
+  defaultTime: '07',
+  startTime: '07:00',
+  dynamic: false,
+  dropdown: true,
+  scrollbar: true
+}); 
 $('.dateRange').daterangepicker();
 $('.date-range').daterangepicker({
     locale: {
@@ -170,10 +181,10 @@ function loadModal(form_data,thisBtn){
               format: 'YYYY-MM-DD',
               showDropdowns: true
             }
-        });
+          });
           $('.summernote-modal').summernote({
             height: 200
-          });          
+          });        
           setTimeout(function() {
             thisBtn.removeClass('input-success');
             thisBtn.removeClass('input-error');

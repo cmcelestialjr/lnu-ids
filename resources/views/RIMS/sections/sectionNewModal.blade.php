@@ -11,7 +11,7 @@
                 <label>Curriculum</label>
                 <select class="form-control select2-default" name="curriculum">
                     @foreach($curriculum as $row)
-                        <option value="{{$row->id}}">{{$row->curriculum->year_from}} - {{$row->curriculum->year_to}}</option>
+                        <option value="{{$row->id}}">{{$row->curriculum->year_from}} - {{$row->curriculum->year_to}} ({{$row->curriculum->code}})</option>
                     @endforeach
                 </select>
             </div>

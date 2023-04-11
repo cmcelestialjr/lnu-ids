@@ -63,9 +63,21 @@ Route::group(['middleware' => ['HTTPS']], function(){
             Route::post('/systemsNavSubView', 'USERS\SystemsController@navSubView');            
         });
         
-        Route::group(['prefix'=>'rims'], function(){            
+        Route::group(['prefix'=>'search'], function(){
+            Route::post('/courseCode', 'SEARCH\CourseCodeController@courseCode');
+            Route::post('/courseDesc', 'SEARCH\CourseDescController@courseDesc');
+            Route::post('/sectionCode', 'SEARCH\SectionCodeController@sectionCode');
+            Route::post('/instructor', 'SEARCH\InstructorController@instructor');
+            Route::post('/room', 'SEARCH\RoomController@room');
+        });
+
+        Route::group(['prefix'=>'rims'], function(){
+            Route::group(['prefix'=>'student'], function(){
+                Route::post('/searchStudent', 'RIMS\Student\LoadViewController@searchStudent');
+            });
+
             Route::group(['prefix'=>'departments'], function(){
-                Route::post('/viewTable', 'RIMS\Departments\LoadTableController@viewTable');                
+                Route::post('/viewTable', 'RIMS\Departments\LoadTableController@viewTable');
                 Route::post('/programsList', 'RIMS\Departments\LoadTableController@programsList');
                 Route::post('/programAddList', 'RIMS\Departments\LoadTableController@programAddList');
 
@@ -74,7 +86,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/programsModal', 'RIMS\Departments\ModalController@programsModal');
                 Route::post('/programAddModal', 'RIMS\Departments\ModalController@programAddModal');
 
-                Route::post('/newModalSubmit', 'RIMS\Departments\UpdateController@newModalSubmit');
+                Route::post('/newModalSubmit', 'RIMS\Departments\NewController@newModalSubmit');
+
                 Route::post('/editModalSubmit', 'RIMS\Departments\UpdateController@editModalSubmit');
                 Route::post('/programsAddSubmit', 'RIMS\Departments\UpdateController@programsAddSubmit');
             });
@@ -96,31 +109,21 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/programCodeNewModal', 'RIMS\Programs\ModalController@programCodeNewModal');
                 Route::post('/programCodeEditModal', 'RIMS\Programs\ModalController@programCodeEditModal');
 
-                Route::post('/courseStatus', 'RIMS\Programs\UpdateController@courseStatus');
-                Route::post('/newCourseSubmit', 'RIMS\Programs\UpdateController@newCourseSubmit');
+                Route::post('/newCourseSubmit', 'RIMS\Programs\NewController@newCourseSubmit');
+                Route::post('/curriculumNewSubmit', 'RIMS\Programs\NewController@curriculumNewSubmit');
+                Route::post('/programsNewSubmit', 'RIMS\Programs\NewController@programsNewSubmit');
+                Route::post('/programCodeNewSubmit', 'RIMS\Programs\NewController@programCodeNewSubmit');
+
+                Route::post('/courseStatus', 'RIMS\Programs\UpdateController@courseStatus');                
                 Route::post('/courseUpdateSubmit', 'RIMS\Programs\UpdateController@courseUpdateSubmit');
-                Route::post('/curriculumNewSubmit', 'RIMS\Programs\UpdateController@curriculumNewSubmit');
                 Route::post('/curriculumStatus', 'RIMS\Programs\UpdateController@curriculumStatus');
                 Route::post('/programStatusSubmit', 'RIMS\Programs\UpdateController@programStatusSubmit');
-                Route::post('/programsNewSubmit', 'RIMS\Programs\UpdateController@programsNewSubmit');
-                Route::post('/programCodeNewSubmit', 'RIMS\Programs\UpdateController@programCodeNewSubmit');
                 Route::post('/programCodeEditSubmit', 'RIMS\Programs\UpdateController@programCodeEditSubmit');
                 Route::post('/programCodeStatus', 'RIMS\Programs\UpdateController@programCodeStatus');
             });
-            Route::group(['prefix'=>'sections'], function(){
-                Route::post('/viewTable', 'RIMS\Sections\LoadTableController@viewTable');
-                
-                Route::post('/programsSelect', 'RIMS\Sections\LoadViewController@programsSelect');
-                Route::post('/gradeLevelSelect', 'RIMS\Sections\LoadViewController@gradeLevelSelect');
-                
-                Route::post('/sectionNewModal', 'RIMS\Sections\ModalController@sectionNewModal');
-                
-                Route::post('/sectionNewSubmit', 'RIMS\Sections\UpdateController@sectionNewSubmit');
-                
-            });
             Route::group(['prefix'=>'schoolYear'], function(){
                 Route::post('/viewTable', 'RIMS\SchoolYear\LoadTableController@viewTable');
-                Route::post('/programsViewTable', 'RIMS\SchoolYear\LoadTableController@programsViewTable');
+                Route::post('/programsViewTable', 'RIMS\SchoolYear\LoadTableController@programsViewTable');                
 
                 Route::post('/coursesOpenDiv', 'RIMS\SchoolYear\LoadViewController@coursesOpenDiv');
                 Route::post('/curriculumSelect', 'RIMS\SchoolYear\LoadViewController@curriculumSelect');
@@ -134,11 +137,67 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/coursesViewModal', 'RIMS\SchoolYear\ModalController@coursesViewModal');
                 Route::post('/courseViewStatusModal', 'RIMS\SchoolYear\ModalController@courseViewStatusModal');
                 
-                Route::post('/new', 'RIMS\SchoolYear\UpdateController@new');                
-                Route::post('/moveProgram', 'RIMS\SchoolYear\UpdateController@moveProgram');
-                Route::post('/offerPrograms', 'RIMS\SchoolYear\UpdateController@offerPrograms');
+                Route::post('/new', 'RIMS\SchoolYear\NewController@new');
+                Route::post('/offerPrograms', 'RIMS\SchoolYear\NewController@offerPrograms');
+                
+                Route::post('/moveProgram', 'RIMS\SchoolYear\UpdateController@moveProgram');                
                 Route::post('/courseStatus', 'RIMS\SchoolYear\UpdateController@courseStatus');
                 Route::post('/courseViewStatusSubmit', 'RIMS\SchoolYear\UpdateController@courseViewStatusSubmit');
+            });
+            Route::group(['prefix'=>'sections'], function(){
+                Route::post('/scheduleRemoveDay', 'RIMS\Sections\DeleteController@scheduleRemoveDay');
+                Route::post('/scheduleRemove', 'RIMS\Sections\DeleteController@scheduleRemove');
+
+                Route::post('/viewTable', 'RIMS\Sections\LoadTableController@viewTable');
+                Route::post('/sectionViewTable', 'RIMS\Sections\LoadTableController@sectionViewTable');
+                Route::post('/courseViewTable', 'RIMS\Sections\LoadTableController@courseViewTable');                
+                
+                Route::post('/programsSelect', 'RIMS\Sections\LoadViewController@programsSelect');
+                Route::post('/gradeLevelSelect', 'RIMS\Sections\LoadViewController@gradeLevelSelect');
+                Route::post('/courseSchedRmDetails', 'RIMS\Sections\LoadViewController@courseSchedRmDetails');
+                Route::post('/courseSchedRmSchedule', 'RIMS\Sections\LoadViewController@courseSchedRmSchedule');
+                Route::post('/courseSchedRmInstructor', 'RIMS\Sections\LoadViewController@courseSchedRmInstructor');   
+                Route::post('/courseSchedRmTable', 'RIMS\Sections\LoadViewController@courseSchedRmTable');             
+                
+                Route::post('/sectionNewModal', 'RIMS\Sections\ModalController@sectionNewModal');
+                Route::post('/sectionViewModal', 'RIMS\Sections\ModalController@sectionViewModal');
+                Route::post('/courseViewModal', 'RIMS\Sections\ModalController@courseViewModal');
+                Route::post('/courseSchedRmModal', 'RIMS\Sections\ModalController@courseSchedRmModal');
+                
+                Route::post('/sectionNewSubmit', 'RIMS\Sections\NewController@sectionNewSubmit');
+
+                Route::post('/courseSchedRmInstructorUpdate', 'RIMS\Sections\UpdateController@courseSchedRmInstructorUpdate');
+                Route::post('/scheduleTimeUpdate', 'RIMS\Sections\UpdateController@scheduleTimeUpdate');
+            });
+            Route::group(['prefix'=>'enrollment'], function(){
+                Route::post('/enrollmentTable', 'RIMS\Enrollment\LoadTableController@enrollmentTable');
+                Route::post('/courseAnotherTable', 'RIMS\Enrollment\LoadTableController@courseAnotherTable');
+                
+                Route::post('/studentInformationDiv', 'RIMS\Enrollment\LoadViewController@studentInformationDiv');
+                Route::post('/programCodeDiv', 'RIMS\Enrollment\LoadViewController@programCodeDiv');
+                Route::post('/programCurriculumDiv', 'RIMS\Enrollment\LoadViewController@programCurriculumDiv');
+                Route::post('/programSectionDiv', 'RIMS\Enrollment\LoadViewController@programSectionDiv');
+                Route::post('/programCoursesDiv', 'RIMS\Enrollment\LoadViewController@programCoursesDiv');
+                Route::post('/programAddSelect', 'RIMS\Enrollment\LoadViewController@programAddSelect');
+                Route::post('/programAddCourseDiv', 'RIMS\Enrollment\LoadViewController@programAddCourseDiv');
+
+                Route::post('/enrollModal', 'RIMS\Enrollment\ModalController@enrollModal');
+                Route::post('/courseAnotherModal', 'RIMS\Enrollment\ModalController@courseAnotherModal');
+                Route::post('/courseAddModal', 'RIMS\Enrollment\ModalController@courseAddModal');
+
+                Route::post('/courseAnotherSubmit', 'RIMS\Enrollment\UpdateController@courseAnotherSubmit');
+                
+            });
+            
+            Route::group(['prefix'=>'schedule'], function(){
+                Route::post('/viewTable', 'RIMS\Schedule\LoadTableController@viewTable');
+                Route::post('/searchTable', 'RIMS\Schedule\LoadTableController@searchTable');
+                Route::post('/schedWoTable', 'RIMS\Schedule\LoadTableController@schedWoTable');
+                
+                Route::post('/searchDiv', 'RIMS\Schedule\LoadViewController@searchDiv');
+
+                Route::post('/searchCourseSched', 'RIMS\Schedule\ModalController@searchCourseSched');                
+                
             });
         });
         

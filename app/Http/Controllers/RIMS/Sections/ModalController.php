@@ -11,9 +11,26 @@ use App\Models\EducCurriculum;
 use App\Models\EducOfferedPrograms;
 use App\Models\EducPrograms;
 use App\Models\EducYearLevel;
+use DateInterval;
+use DatePeriod;
+use DateTime;
 
 class ModalController extends Controller
 {
+    public function sectionViewModal(Request $request){
+        $id = $request->id;
+        $level = $request->level;
+        $query = EducOfferedCourses::with('curriculum.curriculum',
+                                          'curriculum.offered_program.program',
+                                          'course.grade_level')
+                        ->where('offered_curriculum_id',$id)
+                        ->where('year_level',$level)->first();
+        $data = array(
+            'id' => $id,
+            'query' => $query
+        );
+        return view('rims/sections/sectionViewModal',$data);
+    }
     public function sectionNewModal(Request $request){
         $id = $request->id;
         $program_id = $request->program_id;
@@ -36,5 +53,31 @@ class ModalController extends Controller
             'curriculum' => $curriculum
         );
         return view('rims/sections/sectionNewModal',$data);
+    }
+    public function courseViewModal(Request $request){
+        $id = $request->id;
+        $query = EducOfferedCourses::where('id',$id)->first(['section','section_code']);
+        $data = array(
+            'query' => $query
+        );
+        return view('rims/sections/courseViewModal',$data);
+    }
+    public function courseSchedRmModal(Request $request){
+        $id = $request->id;
+        $query = EducOfferedCourses::where('id',$id)->first();
+        
+        $time_from = $query->curriculum->offered_program->school_year->time_from;
+        $time_to = date('H:i:s',strtotime('+15 minutes',strtotime($query->curriculum->offered_program->school_year->time_to)));
+        $start = new DateTime($time_from);
+        $end = new DateTime($time_to);
+        $interval = DateInterval::createFromDateString('15 minutes');
+        $time_period = new DatePeriod($start, $interval, $end);
+        
+        $data = array(
+            'id' => $id,
+            'query' => $query,            
+            'time_period' => $time_period
+        );
+        return view('rims/sections/courseSchedRmModal',$data);
     }
 }

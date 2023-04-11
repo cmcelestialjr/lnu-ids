@@ -158,5 +158,10 @@
 <!-- /.Content -->
 
 @include('layouts.script')
-<script src="{{ asset('assets/js/rims/school_year.js') }}"></script>
+<script src="{{ asset('assets/js/rims/school_year/_function.js') }}"></script>
+<script src="{{ asset('assets/js/rims/school_year/view.js') }}"></script>
+<script src="{{ asset('assets/js/rims/school_year/modal.js') }}"></script>
+<script src="{{ asset('assets/js/rims/school_year/new.js') }}"></script>
+<script src="{{ asset('assets/js/rims/school_year/update.js') }}"></script>
+<script src="{{ asset('assets/js/rims/school_year/delete.js') }}"></script>
 @endsection
