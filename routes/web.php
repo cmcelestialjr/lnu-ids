@@ -70,10 +70,23 @@ Route::group(['middleware' => ['HTTPS']], function(){
             Route::post('/instructor', 'SEARCH\InstructorController@instructor');
             Route::post('/room', 'SEARCH\RoomController@room');
         });
-
+        
         Route::group(['prefix'=>'rims'], function(){
             Route::group(['prefix'=>'student'], function(){
+                Route::post('/studentTable', 'RIMS\Student\LoadTableController@studentTable');
+                Route::post('/studentSchoolYearTable', 'RIMS\Student\LoadTableController@studentSchoolYearTable');
+                Route::post('/studentCoursesTable', 'RIMS\Student\LoadTableController@studentCoursesTable');  
+
                 Route::post('/searchStudent', 'RIMS\Student\LoadViewController@searchStudent');
+                Route::post('/searchStudents', 'RIMS\Student\LoadViewController@searchStudents');
+                Route::post('/studentTORDiv', 'RIMS\Student\LoadViewController@studentTORDiv');
+                Route::post('/studentCurriculumDiv', 'RIMS\Student\LoadViewController@studentCurriculumDiv');
+
+                Route::post('/studentViewModal', 'RIMS\Student\ModalController@studentViewModal');
+                Route::post('/studentTORModal', 'RIMS\Student\ModalController@studentTORModal');
+                Route::post('/studentCurriculumModal', 'RIMS\Student\ModalController@studentCurriculumModal');
+                Route::post('/studentCoursesModal', 'RIMS\Student\ModalController@studentCoursesModal');
+                
             });
 
             Route::group(['prefix'=>'departments'], function(){
@@ -172,6 +185,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
             Route::group(['prefix'=>'enrollment'], function(){
                 Route::post('/enrollmentTable', 'RIMS\Enrollment\LoadTableController@enrollmentTable');
                 Route::post('/courseAnotherTable', 'RIMS\Enrollment\LoadTableController@courseAnotherTable');
+                Route::post('/enrollmentViewTable', 'RIMS\Enrollment\LoadTableController@enrollmentViewTable');
+                Route::post('/coursesViewTable', 'RIMS\Enrollment\LoadTableController@coursesViewTable');
                 
                 Route::post('/studentInformationDiv', 'RIMS\Enrollment\LoadViewController@studentInformationDiv');
                 Route::post('/programCodeDiv', 'RIMS\Enrollment\LoadViewController@programCodeDiv');
@@ -184,8 +199,12 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/enrollModal', 'RIMS\Enrollment\ModalController@enrollModal');
                 Route::post('/courseAnotherModal', 'RIMS\Enrollment\ModalController@courseAnotherModal');
                 Route::post('/courseAddModal', 'RIMS\Enrollment\ModalController@courseAddModal');
-
+                Route::post('/enrollmentViewModal', 'RIMS\Enrollment\ModalController@enrollmentViewModal');
+                Route::post('/coursesViewModal', 'RIMS\Enrollment\ModalController@coursesViewModal');
+                
                 Route::post('/courseAnotherSubmit', 'RIMS\Enrollment\UpdateController@courseAnotherSubmit');
+                Route::post('/courseAddSubmit', 'RIMS\Enrollment\UpdateController@courseAddSubmit');
+                Route::post('/enrollSubmit', 'RIMS\Enrollment\UpdateController@enrollSubmit');
                 
             });
             

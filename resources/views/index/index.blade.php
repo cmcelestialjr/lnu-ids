@@ -422,6 +422,8 @@
   <script src="{{ asset('_adminLTE/plugins/daterangepicker/daterangepicker.js') }}"></script>
   <!-- date-picker -->
   <script src="{{ asset('_adminLTE/plugins/datepicker/bootstrap-datepicker.min.js') }}"></script>
+  <!-- timepicker -->
+  <script src="{{ asset('_adminLTE/plugins/timepicker/jquery.timepicker.min.js') }}"></script>
   <!-- Toastr -->
   <script src="{{ asset('_adminLTE/plugins/toastr/toastr.min.js') }}"></script>
   <!-- Main -->

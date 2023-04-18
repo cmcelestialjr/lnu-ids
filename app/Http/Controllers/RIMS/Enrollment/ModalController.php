@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\RIMS\Enrollment;
 use App\Http\Controllers\Controller;
 use App\Models\EducOfferedCourses;
+use App\Models\EducOfferedCurriculum;
 use App\Models\EducOfferedPrograms;
 use App\Models\EducOfferedSchoolYear;
+use App\Models\StudentsInfo;
 use App\Services\NameServices;
 use Illuminate\Http\Request;
 
@@ -41,5 +43,35 @@ class ModalController extends Controller
             'query' => $query
         );
         return view('rims/enrollment/courseAddModal',$data);
+    }
+    public function enrollmentViewModal(Request $request){
+        $id = $request->id;
+        $query = EducOfferedPrograms::where('id',$id)->first();
+        $curriculum = EducOfferedCurriculum::where('offered_program_id',$id)->orderBy('curriculum_id')->get();
+        $section = EducOfferedCourses::whereHas('curriculum', function ($query) use ($id) {
+                        $query->where('offered_program_id',$id);
+                    })->select('section')
+                    ->groupBy('section')
+                    ->orderBy('section')
+                    ->get();
+        $data = array(
+            'id' => $id,
+            'query' => $query,
+            'curriculum' => $curriculum,
+            'section' => $section
+        );
+        return view('rims/enrollment/enrollmentViewModal',$data);
+    }
+    public function coursesViewModal(Request $request){
+        $name_services = new NameServices;
+        $id = $request->id;
+        $query = StudentsInfo::where('user_id',$id)->first();        
+        $name = $name_services->lastname($query->info->lastname,$query->info->firstname,$query->info->middlename,$query->info->extname);
+        $data = array(
+            'id' => $id,
+            'query' => $query,
+            'name' => $name
+        );
+        return view('rims/enrollment/coursesViewModal',$data);
     }
 }

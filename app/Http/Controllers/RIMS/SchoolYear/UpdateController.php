@@ -55,20 +55,24 @@ class UpdateController extends Controller
         $id = $request->id;
         $course_id = $request->course_id;
         $program_id = $request->program_id;
-        $curriculum_id = $request->curriculum_id;
+        $curriculum_id = $request->curriculum_id;        
+        $time_max = EducTimeMax::first();
         $result = 'error';
         $btn_class = '';
         $btn_html = '';
-        $time_max = EducTimeMax::first();
+        $program_table = '';
         if($user_access_level==1 || $user_access_level==2){
             try{
                 $course = EducCourses::with('grade_level')->where('id',$course_id)->first();
                 $program = EducProgramsCode::with('program')->where('id',$program_id)->first();
                 $offered_program_ids = EducOfferedPrograms::where('school_year_id', $id)->pluck('id')->toArray();
-                $offered_curriculum_ids = EducOfferedCurriculum::whereIn('offered_program_id', $offered_program_ids)->pluck('id')->toArray();
-                $offered_course = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)->where('course_id',$course_id)->first();
+                $offered_curriculum_ids = EducOfferedCurriculum::whereIn('offered_program_id', $offered_program_ids)
+                            ->pluck('id')->toArray();
+                $offered_course = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
+                            ->where('course_id',$course_id)->first();
                 if($offered_course!=NULL){
-                    $delete = EducOfferedCourses::where('offered_curriculum_id',$offered_course->offered_curriculum_id)->where('course_id',$course_id)->delete();
+                    $delete = EducOfferedCourses::where('offered_curriculum_id',$offered_course->offered_curriculum_id)
+                            ->where('course_id',$course_id)->delete();
                     $auto_increment = DB::update("ALTER TABLE educ__offered_courses AUTO_INCREMENT = 0;");
                     $check_offered_curriculum = EducOfferedCourses::where('offered_curriculum_id',$offered_course->offered_curriculum_id)->first();
                     if($check_offered_curriculum==NULL){
@@ -85,8 +89,10 @@ class UpdateController extends Controller
                     $btn_class = 'btn-danger btn-danger-scan';
                     $btn_html = ' Closed';
                 }else{
-                    $offered_program = EducOfferedPrograms::where('school_year_id', $id)->where('program_code_id',$program_id)->first();
-                    $offered_curriculum = EducOfferedCurriculum::whereIn('offered_program_id', $offered_program_ids)->where('curriculum_id',$curriculum_id)->first();
+                    $offered_program = EducOfferedPrograms::where('school_year_id', $id)
+                            ->where('program_code_id',$program_id)->first();
+                    $offered_curriculum = EducOfferedCurriculum::whereIn('offered_program_id', $offered_program_ids)
+                            ->where('curriculum_id',$curriculum_id)->first();
                     if ($offered_program==NULL) {
                         $insert = new EducOfferedPrograms(); 
                         $insert->school_year_id = $id;
@@ -96,15 +102,29 @@ class UpdateController extends Controller
                         $insert->name = $program->name;
                         $insert->updated_by = $updated_by;
                         $insert->save();
-                        $offered_program_id = $insert->id;                        
+                        $offered_program_id = $insert->id;
+                        $program_table = $offered_program_id;
                     }else{
                         $offered_program_id = $offered_program->id;                        
                     }
-                    
+                    $offered_program = EducOfferedPrograms::where('id', $offered_program_id)->first();
+                    $check_dept = EducOfferedDepartment::where('school_year_id',$id)
+                            ->where('department_id',$offered_program->program->department_id)->first();
+                    if($check_dept==NULL){
+                        $insert = new EducOfferedDepartment; 
+                        $insert->school_year_id = $id;
+                        $insert->department_id = $offered_program->program->department_id;
+                        $insert->name = $offered_program->program->departments->name;
+                        $insert->shorten = $offered_program->program->departments->shorten;
+                        $insert->code = $offered_program->program->departments->code;
+                        $insert->updated_by = $updated_by;
+                        $insert->save();
+                    }
                     if ($offered_curriculum==NULL) {
                         $insert = new EducOfferedCurriculum; 
                         $insert->offered_program_id = $offered_program_id;
                         $insert->curriculum_id = $course->curriculum_id;
+                        $insert->code = $course->curriculum->code;
                         $insert->updated_by = $updated_by;
                         $insert->save();
                         $offered_curriculum_id = $insert->id;
@@ -128,15 +148,15 @@ class UpdateController extends Controller
                         $btn_html = ' Open';
                     }
                 }
-                $result = 'success';
-                  
+                $result = 'success';                
             }catch(Exception $e){
                     
             }
         }
         $response = array('result' => $result,
                           'btn_class' => $btn_class,
-                          'btn_html' => $btn_html);
+                          'btn_html' => $btn_html,
+                          'program' => $program_table);
         return response()->json($response);
     }
     public function courseViewStatusSubmit(Request $request){
@@ -155,7 +175,7 @@ class UpdateController extends Controller
                                     ]);
                 $result = 'success';
             }catch(Exception $e){
-                        
+                
             }
         }
         $response = array('result' => $result);

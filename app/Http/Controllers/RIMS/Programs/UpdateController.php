@@ -163,6 +163,10 @@ class UpdateController extends Controller
                                 ->update(['status_id' => $status_id,
                                         'updated_by' => $updated_by,
                                         'updated_at' => date('Y-m-d H:i:s')]);
+                    EducProgramsCode::where('program_id', $id)
+                                ->update(['status_id' => $status_id,
+                                        'updated_by' => $updated_by,
+                                        'updated_at' => date('Y-m-d H:i:s')]);
                     EducCurriculum::where('program_id', $id)
                                 ->update(['status_id' => $status_id,
                                         'updated_by' => $updated_by,

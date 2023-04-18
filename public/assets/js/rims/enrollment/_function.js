@@ -181,6 +181,7 @@ function program_courses(){
             }else{
                 toastr.success('Success');
                 $('#enrollModal #studentInformationDiv #programCoursesDiv').html(data);
+                course_unit_total();
             }
         },
         error: function (){
@@ -195,7 +196,7 @@ function program_add_curriculum(){
     var program_id = $('#courseAddModal select[name="program"]').val();
     var student_id = $('#enrollModal select[name="student"] option:selected').val();
     var curriculum_id_selected = $('#enrollModal #studentInformationDiv #programCurriculumDiv select[name="program_curriculum"] option:selected').val();
-    var section_selected = $('#enrollModal #studentInformationDiv #programSectionDiv select[name="program_section"] option:selected').val();
+    var section_selected = $('#enrollModal #studentInformationDiv #programSectionDiv select[name="program_section"] option:selected').val();    
     var form_data = {
         program_id:program_id,
         student_id:student_id,
@@ -219,8 +220,7 @@ function program_add_curriculum(){
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            if(data.result=='success'){
-                toastr.success('Success');                              
+            if(data.result=='success'){                             
                 $.each(data.curriculum, function(index, value) {
                     $('#courseAddModal select[name="curriculum"]').append($('<option>', {
                         value: value['id'],
@@ -234,13 +234,18 @@ function program_add_curriculum(){
                     }));
                 });
                 var school_year_id = $('#enrollmentDiv select[name="school_year"] option:selected').val();
+                var courses = [];
+                $('#enrollModal #studentInformationDiv #courseAddedDiv .courseCheck:checked').each(function () {
+                    courses.push($(this).data('id'));
+                }); 
                 var form_data = {
                     student_id:student_id,
                     school_year_id:school_year_id,
                     curriculum_id_selected:curriculum_id_selected,
                     section_selected:section_selected,
                     curriculum_id:data.curriculum_id,
-                    section:1        
+                    section:1,
+                    courses:courses      
                 };
                 program_add_courses(form_data);
             }else if(data.result=='blank'){
@@ -288,4 +293,73 @@ function program_add_courses(form_data){
             $('#courseAddModal #programAddCourseDiv').removeClass('opacity6');
         }
     });
+}
+function course_unit_total(){
+    var units = 0;
+    $('#enrollModal #studentInformationDiv .courseCheck:checked').each(function() {
+        units += parseInt($(this).data('u'));
+    });
+    $('#enrollModal #studentInformationDiv #courseTotalUnits').html(units);
+}
+function student_information(){
+    var thisBtn = $('#enrollModal select[name="student"]');
+    var id = thisBtn.val();
+    var school_year_id = $('#enrollmentDiv select[name="school_year"] option:selected').val();
+    var form_data = {
+        id:id,
+        school_year_id:school_year_id
+    };
+    $.ajax({
+        url: base_url+'/rims/enrollment/studentInformationDiv',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisBtn.addClass('input-loading');            
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading');
+            if(data=='error'){
+                toastr.error('Error.');
+                thisBtn.addClass('input-error');                
+            }else{
+                thisBtn.addClass('input-success');
+                $('#enrollModal #courseAddModal').removeClass('hide');
+                $('#enrollModal #studentInformationDiv').html(data);
+                program_curriculum();
+                $(".select2-student").select2({
+                    dropdownParent: $("#studentInformationDiv")
+                });
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+}
+function student_list(){
+    var thisBtn = $('#enrollmentViewModal select');    
+    var id = $('#enrollmentViewModal input[name="id"]').val();
+    var curriculum = $('#enrollmentViewModal select[name="curriculum"] option:selected').val();
+    var section = $('#enrollmentViewModal select[name="section"] option:selected').val();
+    var form_data = {
+        url_table:base_url+'/rims/enrollment/enrollmentViewTable',
+        tid:'enrollmentViewTable',
+        id:id,
+        curriculum:curriculum,
+        section:section
+    };
+    loadTablewLoader(form_data,thisBtn);
 }

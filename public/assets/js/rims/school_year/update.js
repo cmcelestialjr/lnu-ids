@@ -226,6 +226,14 @@ $(document).on('click', '#coursesOpenModal #curriculumListDiv .courseStatus', fu
                 thisBtn.removeClass('btn-success btn-success-scan');
                 thisBtn.addClass(data.btn_class);
                 thisBtn.html(data.btn_html);
+                if(data.program!=''){
+                    var form_data = {
+                        url_table:base_url+'/rims/schoolYear/programsViewTable',
+                        tid:'programsViewTable',
+                        id:id
+                    };
+                    loadTable(form_data);
+                }
             }
             setTimeout(function() {
                 thisBtn.removeClass('input-success');

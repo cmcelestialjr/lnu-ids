@@ -9,6 +9,8 @@ use App\Models\EducPrograms;
 use App\Models\EducOfferedSchoolYear;
 use App\Models\EducGradePeriod;
 use App\Models\EducCourseStatus;
+use App\Models\EducProgramLevel;
+use App\Models\StudentsProgram;
 
 class PageController extends Controller
 {
@@ -22,8 +24,11 @@ class PageController extends Controller
     public function home($data){
         return view($this->page.'/home',$data);
     }
-    public function students($data){        
-        return view($this->page.'/students',$data);
+    public function students($data){
+        $data['program_level'] = EducProgramLevel::get();
+        $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
+        $data['date_graduate'] = StudentsProgram::select('date_graduate')->orderBy('date_graduate','DESC')->groupBy('date_graduate')->get();
+        return view($this->page.'/student/student',$data);
     }
     public function departments($data){   
         return view($this->page.'/departments/departments',$data);

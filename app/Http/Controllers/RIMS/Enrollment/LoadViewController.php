@@ -77,16 +77,20 @@ class LoadViewController extends Controller
         $curriculum_ids = EducOfferedCurriculum::where('id',$curriculum_id)
                             ->pluck('curriculum_id')
                             ->toArray();
-        $program_courses = EducCourses::whereIn('curriculum_id',$curriculum_ids)
-                            ->where('grade_period_id',$unit_limit->offered_program->school_year->grade_period_id)
-                            ->select('grade_level_id')
+        $program_courses = EducCourses::whereIn('curriculum_id',$curriculum_ids);
+        if($unit_limit->offered_program->school_year->grade_period_id!=4){
+            $program_courses = $program_courses->where('grade_period_id',$unit_limit->offered_program->school_year->grade_period_id);
+        }
+        $program_courses = $program_courses->select('grade_level_id')
                             ->groupBy('grade_level_id')
                             ->orderBy('grade_level_id','ASC')
                             ->get()
                             ->map(function($query) use ($curriculum_id,$section,$student_id,$student,$name_services,$unit_limit) {
-                                $courses = EducCourses::where('grade_level_id',$query->grade_level_id)
-                                            ->where('grade_period_id',$unit_limit->offered_program->school_year->grade_period_id)
-                                            ->where('curriculum_id',$unit_limit->curriculum_id)->get()
+                                $courses = EducCourses::where('grade_level_id',$query->grade_level_id);
+                                if($unit_limit->offered_program->school_year->grade_period_id!=4){
+                                    $courses = $courses->where('grade_period_id',$unit_limit->offered_program->school_year->grade_period_id);
+                                }
+                                $courses = $courses->where('curriculum_id',$unit_limit->curriculum_id)->get()
                                             ->map(function($course) use ($student,$student_id,$name_services,$curriculum_id,$section) {
                                                 $availability = 0;
                                                 $availability_name = 'Available';
@@ -106,6 +110,11 @@ class LoadViewController extends Controller
                                                 $taken = StudentsCourses::where('course_id',$course->id)
                                                             ->where('user_id',$student_id)
                                                             ->where('student_course_status_id',1)
+                                                            ->orderBy('year_from','DESC')
+                                                            ->first();
+                                                $ongoing = StudentsCourses::where('course_id',$course->id)
+                                                            ->where('user_id',$student_id)
+                                                            ->where('student_course_status_id',NULL)
                                                             ->orderBy('year_from','DESC')
                                                             ->first();
                                                 $offered_course_ids = EducOfferedCourses::where('course_id','<>',$course->id)
@@ -146,6 +155,10 @@ class LoadViewController extends Controller
                                                         $availability = 2;
                                                         $availability_name = 'Done';
                                                     }
+                                                    if($ongoing!=NULL){
+                                                        $availability = 2;
+                                                        $availability_name = 'Ongoing';
+                                                    }
                                                     if(count($offered_course->schedule)>0){
                                                         foreach($offered_course->schedule as $row){
                                                             $days = array();
@@ -161,43 +174,10 @@ class LoadViewController extends Controller
                                                             $rooms[] = $room;
                                                             $schedules[] = date('h:ia',strtotime($row->time_from)).'-'.
                                                                                 date('h:ia',strtotime($row->time_to)).' '.$days1;
-
-                                                            $conflict = EducOfferedSchedule::with('course')->whereIn('offered_course_id',$offered_course_ids)
-                                                                ->where('id','<>',$row->id)
-                                                                ->where(function ($query) use ($row) {
-                                                                    $query->where(function ($query) use ($row) {
-                                                                        $query->where('time_from','>=',$row->time_from)
-                                                                        ->where('time_to','<=',$row->time_from);
-                                                                    });
-                                                                    $query->orWhere(function ($query) use ($row) {
-                                                                        $query->where('time_from','<=',$row->time_from)
-                                                                        ->where('time_to','>',$row->time_from);
-                                                                    });
-                                                                    $query->orWhere(function ($query) use ($row) {
-                                                                        $query->where('time_from','<',$row->time_to)
-                                                                        ->where('time_to','>=',$row->time_to);
-                                                                    });
-                                                                    $query->orWhere(function ($query) use ($row) {
-                                                                        $query->where('time_from','>=',$row->time_from)
-                                                                        ->where('time_to','<=',$row->time_to);
-                                                                    });
-                                                                })
-                                                                ->whereHas('days', function ($query) use ($days) {
-                                                                    $query->whereIn('day', $days);
-                                                                })
-                                                                ->pluck('offered_course_id')->toArray();
-                                                            if(count($conflict)>0){     
-                                                                $conflict_codes = EducOfferedCourses::whereIn('id',$conflict)
-                                                                                ->pluck('code')->toArray();                                                       
-                                                                foreach($conflict_codes as $con){
-                                                                    $course_con[] = $con;
-                                                                }
-                                                                $course_conflict = implode(', ',$course_con);
-                                                            }
+                                                            $course_conflict = $this->course_conflict($offered_course_ids,$row,$days);
                                                         }
                                                         $schedule_implode = implode('<br>',$schedules);
-                                                        $room_implode = implode('<br>',$rooms);
-                                                        
+                                                        $room_implode = implode('<br>',$rooms);                                                        
                                                     }
                                                 }else{
                                                     $availability = 3;
@@ -287,6 +267,10 @@ class LoadViewController extends Controller
         $section_selected = $request->section_selected;
         $curriculum_id = $request->curriculum_id;
         $section = $request->section;
+        $courses_sel = $request->courses;
+        if($courses_sel==''){
+            $courses_sel = [];
+        }
         $unit_limit = EducOfferedCurriculum::where('id',$curriculum_id)->first();
         $program_courses = EducOfferedCourses::where('offered_curriculum_id',$curriculum_id)
                             ->select('year_level')
@@ -295,10 +279,12 @@ class LoadViewController extends Controller
                             ->get()
                             ->map(function($query) 
                                     use ($name_services,$curriculum_id,$student_id,$section,
-                                        $unit_limit,$curriculum_id_selected,$section_selected) {
+                                        $unit_limit,$curriculum_id_selected,$section_selected,
+                                        $courses_sel) {
                                 $courses = EducOfferedCourses::where('offered_curriculum_id',$curriculum_id)
                                             ->where('year_level',$query->year_level)
                                             ->where('section',$section)
+                                            ->whereNotIn('id',$courses_sel)
                                             ->get()
                                             ->map(function($course) 
                                                     use ($name_services,$curriculum_id,$student_id,$section,
@@ -317,6 +303,11 @@ class LoadViewController extends Controller
                                                 $taken = StudentsCourses::where('course_id',$course->id)
                                                             ->where('user_id',$student_id)
                                                             ->where('student_course_status_id',1)
+                                                            ->orderBy('year_from','DESC')
+                                                            ->first();
+                                                $ongoing = StudentsCourses::where('course_id',$course->id)
+                                                            ->where('user_id',$student_id)
+                                                            ->where('student_course_status_id',NULL)
                                                             ->orderBy('year_from','DESC')
                                                             ->first();
                                                 $offered_course_ids1 = EducOfferedCourses::where('course_id','<>',$course->id)
@@ -347,6 +338,10 @@ class LoadViewController extends Controller
                                                     $availability = 2;
                                                     $availability_name = 'Done';
                                                 }
+                                                if($ongoing!=NULL){
+                                                    $availability = 2;
+                                                    $availability_name = 'Ongoing';
+                                                }
                                                 if(count($course->schedule)>0){
                                                     foreach($course->schedule as $row){
                                                         $days = array();
@@ -362,42 +357,10 @@ class LoadViewController extends Controller
                                                         $rooms[] = $room;
                                                         $schedules[] = date('h:ia',strtotime($row->time_from)).'-'.
                                                                         date('h:ia',strtotime($row->time_to)).' '.$days1;
-
-                                                        $conflict = EducOfferedSchedule::with('course')->whereIn('offered_course_id',$offered_course_ids)
-                                                            ->where('id','<>',$row->id)
-                                                            ->where(function ($query) use ($row) {
-                                                                $query->where(function ($query) use ($row) {
-                                                                    $query->where('time_from','>=',$row->time_from)
-                                                                    ->where('time_to','<=',$row->time_from);
-                                                                });
-                                                                $query->orWhere(function ($query) use ($row) {
-                                                                    $query->where('time_from','<=',$row->time_from)
-                                                                    ->where('time_to','>',$row->time_from);
-                                                                });
-                                                                $query->orWhere(function ($query) use ($row) {
-                                                                    $query->where('time_from','<',$row->time_to)
-                                                                    ->where('time_to','>=',$row->time_to);
-                                                                });
-                                                                $query->orWhere(function ($query) use ($row) {
-                                                                    $query->where('time_from','>=',$row->time_from)
-                                                                    ->where('time_to','<=',$row->time_to);
-                                                                });
-                                                            })
-                                                            ->whereHas('days', function ($query) use ($days) {
-                                                                $query->whereIn('day', $days);
-                                                            })
-                                                            ->pluck('offered_course_id')->toArray();
-                                                        if(count($conflict)>0){     
-                                                            $conflict_codes = EducOfferedCourses::whereIn('id',$conflict)
-                                                                            ->pluck('code')->toArray();                                                       
-                                                            foreach($conflict_codes as $con){
-                                                                $course_con[] = $con;
-                                                            }
-                                                            $course_conflict = implode(', ',$course_con);
-                                                        }
+                                                        $course_conflict = $this->course_conflict($offered_course_ids,$row,$days);
                                                     }
                                                     $schedule_implode = implode('<br>',$schedules);
-                                                    $room_implode = implode('<br>',$rooms);                                                    
+                                                    $room_implode = implode('<br>',$rooms);
                                                 }
                                                 return [
                                                     'offered_course_id' => $offered_course_id,
@@ -426,5 +389,41 @@ class LoadViewController extends Controller
             'type' => 'add'
         );
         return view('rims/enrollment/programCoursesDiv',$data);
+    }
+    private function course_conflict($offered_course_ids,$row,$days){
+        $course_conflict = '';
+        $conflict = EducOfferedSchedule::with('course')->whereIn('offered_course_id',$offered_course_ids)
+                                                            ->where('id','<>',$row->id)
+                                                            ->where(function ($query) use ($row) {
+                                                                $query->where(function ($query) use ($row) {
+                                                                    $query->where('time_from','>=',$row->time_from)
+                                                                    ->where('time_to','<=',$row->time_from);
+                                                                });
+                                                                $query->orWhere(function ($query) use ($row) {
+                                                                    $query->where('time_from','<=',$row->time_from)
+                                                                    ->where('time_to','>',$row->time_from);
+                                                                });
+                                                                $query->orWhere(function ($query) use ($row) {
+                                                                    $query->where('time_from','<',$row->time_to)
+                                                                    ->where('time_to','>=',$row->time_to);
+                                                                });
+                                                                $query->orWhere(function ($query) use ($row) {
+                                                                    $query->where('time_from','>=',$row->time_from)
+                                                                    ->where('time_to','<=',$row->time_to);
+                                                                });
+                                                            })
+                                                            ->whereHas('days', function ($query) use ($days) {
+                                                                $query->whereIn('day', $days);
+                                                            })
+                                                            ->pluck('offered_course_id')->toArray();
+        if(count($conflict)>0){     
+            $conflict_codes = EducOfferedCourses::whereIn('id',$conflict)
+                    ->pluck('code')->toArray();                                                       
+            foreach($conflict_codes as $con){
+                $course_con[] = $con;
+            }
+            $course_conflict = implode(', ',$course_con);
+        }
+        return $course_conflict;
     }
 }

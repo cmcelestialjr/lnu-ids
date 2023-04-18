@@ -36,24 +36,39 @@ class LoadViewController extends Controller
         $curriculum = $request->curriculum;
         $user_access_level = $request->session()->get('user_access_level');
         $school_year = EducOfferedSchoolYear::where('id',$id)->first();
+        $school_year_period = $school_year->grade_period_id;
         $offered_curriculum_ids = EducOfferedCurriculum::where('curriculum_id',$curriculum)
                                     ->pluck('id')->toArray();
         $offered_course_ids = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
                                     ->pluck('course_id')->toArray();
-        $year_level_ids = EducCourses::where('curriculum_id',$curriculum)
-                                    ->where('status_id','<>',1)
-                                    ->whereNotIn('id',$offered_course_ids)
-                                    ->pluck('grade_level_id')->toArray();
+        $year_level_ids = EducCourses::where('curriculum_id',$curriculum)                                    
+                                    ->whereNotIn('id',$offered_course_ids);
+        if($school_year_period==4){
+            $year_level_ids = $year_level_ids->where('status_id','>=',1);
+        }else{
+            $year_level_ids = $year_level_ids->where('status_id','<>',1);
+        }
+        $year_level_ids = $year_level_ids->pluck('grade_level_id')->toArray();
       
         $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
         $period = EducGradePeriod::with(['courses' => function ($query) 
-                            use ($curriculum,$offered_course_ids) {
+                            use ($curriculum,$offered_course_ids,$school_year_period) {
                             $query->where('curriculum_id', $curriculum);
                             $query->whereNotIn('id',$offered_course_ids);
-                            $query->where('status_id','<>',1);
+                            if($school_year_period==4){
+                                $query->where('status_id','>=',1);
+                            }else{
+                                $query->where('status_id','<>',1);
+                            }
                             $query->orderBy('grade_period_id','ASC');
                             $query->orderBy('grade_level_id','ASC');
-                        }])->where('id',$school_year->grade_period_id)->get();
+                        }]);
+        if($school_year_period==4){
+            $period = $period->where('id','<>',4)->get();
+        }else{
+            $period = $period->where('id',$school_year_period)->get();
+        }
+        
         $data = array(
             'id' => $id,
             'user_access_level' => $user_access_level,

@@ -63,8 +63,9 @@
                                       <th data-field="f1" data-sortable="true" data-align="center">#</th>
                                       <th data-field="f2" data-sortable="true" data-align="center">Department</th>
                                       <th data-field="f3" data-sortable="true" data-align="center">Program</th>
-                                      <th data-field="f4" data-sortable="true" data-align="center">No of Enrollee</th>
-                                      <th data-field="f5" data-sortable="true" data-align="center">View</th>
+                                      <th data-field="f4" data-sortable="true" data-align="center">Code</th>
+                                      <th data-field="f5" data-sortable="true" data-align="center">No of Enrollee</th>
+                                      <th data-field="f6" data-sortable="true" data-align="center">View</th>
                                   </tr>
                               </thead>
                           </table>
