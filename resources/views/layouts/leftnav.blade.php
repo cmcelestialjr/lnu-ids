@@ -40,11 +40,11 @@
             @endphp
             <li class="nav-item {{$system_menu_open}}">
                 <a href="#" class="nav-link {{$system_active}}">
-                <i class="nav-icon {{$row->icon}} {{$system_text}}"></i>
-                <p class="ml-2">
-                    {{$row->shorten}}
-                    <i class="right fas fa-angle-left"></i>
-                </p>
+                    <i class="nav-icon {{$row->icon}} {{$system_text}}"></i>
+                    <p class="ml-2">
+                        {{$row->shorten}}
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
                 </a>
                 <ul class="nav nav-treeview">
                     @foreach($row->navs as $nav)
@@ -168,6 +168,7 @@
                     </li>
                 </ul>
             </li>
+            <br><br>
           @endif         
         </ul>
       </nav>

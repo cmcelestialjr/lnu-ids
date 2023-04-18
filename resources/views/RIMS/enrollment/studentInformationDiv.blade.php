@@ -1,12 +1,16 @@
 <br>
 <div class="row">    
-    <div class="col-lg-4">
+    <div class="col-lg-3">
         <label>Program</label>
         <select class="form-control select2-student" name="program">
             @foreach($programs as $row)
                 <option value="{{$row->id}}" selected>{{$row->name}} ({{$row->shorten}})</option>
             @endforeach
         </select>
+    </div>
+    <div class="col-lg-1">
+        <label>Year</label>
+        <input type="text" class="form-control" value="1" readonly>
     </div>
     <div class="col-lg-8">
         <div class="row">

@@ -21,7 +21,7 @@
 
 /* FORMS */
 
-.form-control{
+#login-form .form-control{
   margin-top: 10px;
   border: none;
   border-bottom: 2px solid #eee;
@@ -29,11 +29,11 @@
   font-weight: 500;
 }
 
-.form-control:placeholder-shown{
+#login-form .form-control:placeholder-shown{
   border-bottom: 2px solid #eee;
 }
 
-.form-control:not(placeholder-shown){
+#login-form .form-control:not(placeholder-shown){
   border-bottom: 2px solid #4385F5;
 }
 
@@ -51,7 +51,7 @@
 
 /* BUTTONS */
 
-.btn-primary{
+#login-form .btn-primary{
   font-size: 14px;
   font-family: 'Raleway', sans-serif;
   font-weight: 600;
@@ -292,29 +292,29 @@ p.default-desc{
   color: #666666;
 }
 
-.nav-item{
+.nav-sidebar .nav-item{
   margin: 15px 0px;
   font-weight: 400;
 }
 
-.nav-link{
+.nav-sidebar .nav-link{
   color: #f2f2f2 !important;
   transition: 0.2s !important;
 }
 
-.nav-link:hover{
+.nav-sidebar .nav-link:hover{
   background-color: #666666 !important;
   transition: 0.2s !important;
 }
 
-.nav-sidebar>.nav-item>.nav-link.active{
+.nav-sidebar .nav-item>.nav-link.active{
   background-color: #333333 !important;
   box-shadow: none !important;
   font-weight: 600;
   transition: 0.5s;
 }
 
-.nav-treeview>.nav-item>.nav-link.active{
+.nav-sidebar .nav-treeview>.nav-item>.nav-link.active{
   box-shadow: none !important;
   background-color: #4D4D4D !important;
   font-weight: 500;
@@ -500,16 +500,16 @@ p.default-desc{
   height:100%;
   width:100%;
 }
+.btn-info-scan-click {
+  color: #17a2b8;
+  border-color: #17a2b8;
+  background-color: white;
+}
 .btn-info-scan:before,
 .btn-info-scan:after {
   border-color: #17a2b8;
 }
 .btn-info-scan:hover {
-  color: #17a2b8;
-  border-color: currentColor;
-  background-color: white;
-}
-.btn-info-scan-click {
   color: #17a2b8;
   border-color: #17a2b8;
   background-color: white;
