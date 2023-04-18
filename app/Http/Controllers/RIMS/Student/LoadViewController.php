@@ -115,8 +115,11 @@ class LoadViewController extends Controller
     } 
     public function studentCurriculumDiv(Request $request){
         $id = $request->id;
-        $program_level = $request->program_level;
-        
+        $program_level_id = $request->program_level;
+        $query = StudentsProgram::where('user_id',$id)
+            ->where('program_level_id',$program_level_id)
+            ->orderBy('year_from','DESC')
+            ->first();
         $data = array(
             'id' => $id
         );
