@@ -511,7 +511,7 @@ p.default-desc{
 }
 .btn-info-scan-click {
   color: #17a2b8;
-  border-color: currentColor;
+  border-color: #17a2b8;
   background-color: white;
 }
 .btn-primary-scan:before,
@@ -520,7 +520,7 @@ p.default-desc{
 }
 .btn-primary-scan:hover {
   color: #007bff;
-  border-color: currentColor;
+  border-color: #007bff;
   background-color: white;
 }
 .btn-success-scan:before,
@@ -529,7 +529,7 @@ p.default-desc{
 }
 .btn-success-scan:hover {
   color: #28a745;
-  border-color: currentColor;
+  border-color: #28a745;
   background-color: white;
 }
 .btn-warning-scan:before,
@@ -538,7 +538,7 @@ p.default-desc{
 }
 .btn-warning-scan:hover {
   color: #ffc107;
-  border-color: currentColor;
+  border-color: #ffc107;
   background-color: white;
 }
 .btn-danger-scan:before,
@@ -547,32 +547,32 @@ p.default-desc{
 }
 .btn-danger-scan:hover {
   color: #dc3545;
-  border-color: currentColor;
+  border-color: #dc3545;
   background-color: white;
 }
 .btn-info-scan-active {
   color: #17a2b8;
-  border-color: currentColor;
+  border-color: #17a2b8;
   background-color: white;
 }
 .btn-primary-scan-active {
   color: #007bff;
-  border-color: currentColor;
+  border-color: #007bff;
   background-color: white;
 }
 .btn-success-scan-active {
   color: #28a745;
-  border-color: currentColor;
+  border-color: #28a745;
   background-color: white;
 }
 .btn-danger-scan-active{
   color: #dc3545;
-  border-color: currentColor;
+  border-color: #dc3545;
   background-color: white;
 }
 .btn-warning-scan-active {
   color: #ffc107;
-  border-color: currentColor;
+  border-color: #ffc107;
   background-color: white;
 }
 .file-drop-area {
