@@ -23,7 +23,7 @@
            </div>
         </div>
     </div>
-    <div class="modal-footer justify-content-between">
+    <div class="modal-footer justify-content-between" id="enroll">
         <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-times"></span> Close</button>
         <button class="btn btn-success btn-success-scan" name="submit"><span class="fa fa-check"></span> Submit</button>
     </div>

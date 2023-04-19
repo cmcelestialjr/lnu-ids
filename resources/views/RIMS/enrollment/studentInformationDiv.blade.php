@@ -19,10 +19,14 @@
                 </select>
             </div>
             <div class="col-lg-5" id="programCurriculumDiv">
-                
+                <label>Curriculum</label>
+                <select class="form-control select2-student">
+                </select>
             </div>
             <div class="col-lg-3" id="programSectionDiv">
-                
+                <label>Section</label>
+                <select class="form-control select2-student">
+                </select>
             </div>
         </div>
     </div>

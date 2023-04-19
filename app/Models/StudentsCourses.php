@@ -8,9 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class StudentsCourses extends Model
 {
     protected $table = 'students_courses';
+    public function school_year()
+    {
+        return $this->belongsTo(EducOfferedSchoolYear::class, 'school_year_id', 'id')->withDefault();
+    }
     public function course()
     {
         return $this->belongsTo(EducOfferedCourses::class, 'offered_course_id', 'id')->withDefault();
+    }
+    public function program()
+    {
+        return $this->belongsTo(StudentsProgram::class, 'student_program_id', 'id')->withDefault();
+    }
+    public function grade_level()
+    {
+        return $this->belongsTo(EducYearLevel::class, 'grade_level_id', 'id')->withDefault();
     }
     public function status()
     {

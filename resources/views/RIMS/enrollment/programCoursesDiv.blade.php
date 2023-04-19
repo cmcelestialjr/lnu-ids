@@ -4,8 +4,24 @@
     $year_level = '';
     $course_units = 0;
 @endphp
-<label>Courses</label>
-<div id="courseAddedDiv"></div>
+<label>Courses</label> 
+@if($type!='add')
+    <label class="text-primary" style="float:right">Total Unit: 
+        <span id="courseTotalUnits"></span></label>
+@endif
+<table class="table table-bordered hide" style="font-size:11px;" id="courseAddedDiv">
+    <thead>
+        <th style="width: 10%">Program</th>
+        <th style="width: 10%">Section</th>
+        <th style="width: 10%">Course</th>
+        <th style="width: 5%">Units</th>
+        <th style="width: 25%">Schedule</th>
+        <th style="width: 10%">Room</th>
+        <th style="width: 20%">Instructor</th>
+        <th style="width: 5%"></th>
+        <th style="width: 5%"></th>
+    </thead>
+</table>
 @foreach($program_courses as $row)
 <div class="card card-primary card-outline">
     <div class="card-body">
@@ -56,6 +72,7 @@
                                             id="course_checked{{$list['offered_course_id']}}"
                                             value="{{$row['year_level1']}}"
                                             data-id="{{$list['offered_course_id']}}"
+                                            data-u="{{$list['units']}}"
                                             data-cid="">
                                     </td>
                                     <td><button class="btn btn-info btn-info-scan btn-xs courseAnotherModal"
@@ -63,14 +80,17 @@
                                         <span class="fa fa-refresh"></span> Another</button></td>
                                 @else
                                     <td></td>
+                                    <td></td>
                                 @endif
                             @elseif($list['availability']==2)
                                 <td class="center"><button class="btn btn-primary btn-primary-scan btn-xs">
                                         {{$list['availability_name']}}</button></td>
                                 <td></td>
+                                <td></td>
                             @elseif($list['availability']==3)
                                 <td class="center"><button class="btn btn-danger btn-danger-scan btn-xs">
                                         {{$list['availability_name']}}</button></td>
+                                <td></td>
                                 <td></td>
                             @else
                                 <td class="center"><button class="btn btn-success btn-success-scan btn-xs">
@@ -88,6 +108,7 @@
                                                 id="course_checked{{$list['offered_course_id']}}"
                                                 value="{{$row['year_level1']}}"
                                                 data-id="{{$list['offered_course_id']}}"
+                                                data-u="{{$list['units']}}"
                                                 data-cid=""
                                                 checked>
                                         @else
@@ -95,6 +116,7 @@
                                                 id="course_checked{{$list['offered_course_id']}}"
                                                 value="{{$row['year_level1']}}"
                                                 data-id="{{$list['offered_course_id']}}"
+                                                data-u="{{$list['units']}}"
                                                 data-cid="">
                                         @endif
                                     @else
@@ -102,6 +124,7 @@
                                             id="course_checked{{$list['offered_course_id']}}"
                                             value="{{$row['year_level1']}}"
                                             data-id="{{$list['offered_course_id']}}"
+                                            data-u="{{$list['units']}}"
                                             data-cid="">
                                     @endif
                                 </td>
@@ -113,7 +136,7 @@
                                 </td>                                
                             @endif
                             @php
-                                if($list['course_conflict']!='' && $list['availability']==0 && $availability_check==''){
+                                if(($list['course_conflict']!='' && $list['availability']==0 && $availability_check=='') || $list['availability_name']=='Ongoing'){
                                     $year_level = $row['year_level1'];
                                     $availability_check = 1;
                                 }
