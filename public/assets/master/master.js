@@ -210,7 +210,7 @@ function loadModal(form_data,thisBtn){
   });
 }
 function loadingTemplate(message) {
-    var img = base_url+"/assets/images/loader/loader-gear.gif";
+    var img = base_url+"/assets/images/loader/loader_gif.gif";
     return '<span class="loading-wrap"><img src="'+img+'" alt="Loader" class="loaderTable"></span>';
 }
 function loadTable(form_data){

@@ -1,9 +1,10 @@
 <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #00308f;">
+  <aside class="main-sidebar sidebar-dark-primary" style="background-color: #1A1A1A;">
     <!-- Brand Logo -->
     <a href="" class="brand-link">
-      <img src="{{ asset('assets/images/logo/lnu_logo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">LNU - IDS</span>
+      <img src="{{ asset('assets/images/logo/ids_logo_dark.png') }}" alt="IDS logo" class="brand-image">
+      <span class="brand-text font-weight-light brand-wordmark">LNU IDS V1.0</span>
+      <hr class="mt-4 mb-0" style="background: #333333;">
     </a>
 
     <!-- Sidebar -->
@@ -11,15 +12,17 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{{ asset($profile_url) }}" class="img-circle elevation-2" alt="User Image">
+          <img src="{{ asset($profile_url) }}" class="img-circle" alt="User Image">
         </div>
         <div class="info">
           <a href="#" class="d-block">{{$name}}</a>
         </div>
       </div>
+      <hr class="mt-0 mb-4" style="background: #333333;">
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
+        <p class="brand-text left-sidebar-header">My Modules</p>
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
@@ -38,7 +41,7 @@
             <li class="nav-item {{$system_menu_open}}">
                 <a href="#" class="nav-link {{$system_active}}">
                 <i class="nav-icon {{$row->icon}} {{$system_text}}"></i>
-                <p>
+                <p class="ml-2">
                     {{$row->shorten}}
                     <i class="right fas fa-angle-left"></i>
                 </p>
@@ -75,7 +78,7 @@
                         <li class="nav-item {{$system_nav_menu_open}}">
                             <a href="{{$system_nav_href}}" class="nav-link {{$system_nav_active}}">
                                 &nbsp; <i class="{{$nav->icon}} text-info nav-icon"></i>
-                                    <p>{{$nav->name}}</p>
+                                    <p class="ml-3">{{$nav->name}}</p>
                                 @if(count($nav->navSubs)>=1)
                                     <i class="fas fa-angle-left right"></i>
                                 @endif
@@ -129,6 +132,7 @@
                 $system_nav_sub_active_default = '';
             }
             @endphp
+            <p class="brand-text left-sidebar-header mt-4">Settings</p>
             <li class="nav-item {{$system_menu_open}}">
                 <a href="#" class="nav-link {{$system_active}}">
                     <i class="nav-icon fa fa-users"></i>

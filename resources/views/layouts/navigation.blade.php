@@ -115,17 +115,19 @@
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-user"></i>
         </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right text-center">
           <a href="#" class="dropdown-item">
-            <center>
-              <img src="{{ asset($profile_url) }}" alt="User Avatar" class="mr-3 img-circle" style="height:100px;width:100px;border:1px solid;border: 2px solid #26619c;">
+              <p class="dropdown-item-header">My Account</p>
+              <img src="{{ asset($profile_url) }}" alt="User Avatar" class="mr-3 img-circle" style="height:100px;width:100px;">
               <h4 class="dropdown-item-title">
                 {{$name}}
               </h4>
-            </center>
+            <hr class="mb-0">
           </a>
+          <div class="container p-3">
+          <a href="{{url('logout')}}" class="dropdown-item-button btn-primary ">Logout</a>
+          </div>
           <div class="dropdown-divider"></div>
-          <a href="{{url('logout')}}" class="dropdown-item dropdown-footer">Logout</a>
         </div>
       </li>
 

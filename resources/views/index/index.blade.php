@@ -335,7 +335,7 @@
     <div class="modal-dialog modal-md" id="login-form">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">LOGIN FORM</h4>
+          <h4 class="modal-title">User Login</h4>
         </div>
         <div class="modal-body">
           <div class="row">
@@ -345,26 +345,28 @@
                   <option value="{{$row->id}}">{{$row->name}}</option>
                 @endforeach
               </select>
-              <b>Username</b>
-              <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fa fa-user"></i></span>
-                <input type="text" class="form-control" name="username" placeholder="Username" value="">
+              <b class="input-header">Username</b>
+              <div class="input input-group mb-4">
+                <input type="text" class="form-control" name="username" placeholder="Enter your username" value="">
               </div>
-              <b>Password</b>
-              <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fa fa-lock"></i></span>
-                <input type="password" class="form-control" name="password" id="password" placeholder="Password" value="">
-                <span class="input-group-text" style="cursor: pointer">
+              <b class="input-header">Password</b>
+              <div class="input input-group mb-4">
+                <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" value="">
+                <span class="input-group-text" style="cursor: pointer" tooltip="Show Password">
                   <i class="fa fa-eye" id="togglePassword"></i>
                 </span>
               </div>
               <button type="button" class="btn btn-default" name="forgot" id="forgot" data-toggle="modal" data-target="#modal-forgot">Forgot password?</button>
+              <br>
+              <br>
+              <button type="button" class="btn btn-primary btn-primary-scan" name="login">Login</button>
+              <hr class="mb-0">
+              <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary btn-primary-scan" name="login"><span class="fa fa-check"></span> Login</button>
+          
         </div>
       </div>
       <!-- /.modal-content -->
@@ -374,24 +376,20 @@
   <!-- /.modal -->
   <div class="modal fade" id="modal-forgot">
     <div class="modal-dialog modal-md" id="forgot-form">
-      <div class="modal-content bg-primary">
+      <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title white">Forgot Password</h4>
+          <h4 class="modal-title">Reset Account Password</h4>
         </div>
         <div class="modal-body">
           <div class="row">
             <br>
-            <label class="white">Username</label>
-            <input type="text" class="form-control" name="username">
-            <button class="btn btn-info btn-info-scan"><span class="fa fa-check"></span> Submit</button>
-            <b class="white">
-            <br>Your reset password link will be sent to your email address. Thank you!
-            <br><br>
-            </b>            
+            <label class="input-header">Username</label>
+            <input type="text" class="form-control" name="username" placeholder="Enter your username">
+            <button class="btn btn-primary">Reset Password</button>
+            <br>
+            <p class="mt-4" style="font-size: 14px; font-weight: 500; text-align:center;">A password reset link will be sent to your email address.</p>
+            <br>            
           </div>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default white" data-dismiss="modal">Close</button>
         </div>
       </div>
       <!-- /.modal-content -->

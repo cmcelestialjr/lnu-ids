@@ -157,7 +157,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/courseSchedRmDetails', 'RIMS\Sections\LoadViewController@courseSchedRmDetails');
                 Route::post('/courseSchedRmSchedule', 'RIMS\Sections\LoadViewController@courseSchedRmSchedule');
                 Route::post('/courseSchedRmInstructor', 'RIMS\Sections\LoadViewController@courseSchedRmInstructor');   
-                Route::post('/courseSchedRmTable', 'RIMS\Sections\LoadViewController@courseSchedRmTable');             
+                Route::post('/courseSchedRmTable', 'RIMS\Sections\LoadViewController@courseSchedRmTable');
                 
                 Route::post('/sectionNewModal', 'RIMS\Sections\ModalController@sectionNewModal');
                 Route::post('/sectionViewModal', 'RIMS\Sections\ModalController@sectionViewModal');

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>LNU - Integrated Data System</title>
+  <title>LNU IDS V1.0</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -32,10 +32,11 @@
 .content-wrapper {
   width: 100%;
   height: 100vh;
-  background: url('../../assets/images/background/buidling.jpg') top center;
+  background: url('../../assets/images/background/systems_bg.jpg') center;
   background-size: cover;
   position: relative;
 }
+
 #title{
     font-size: 20px;
     font-weight: bold;
@@ -45,32 +46,55 @@
     text-shadow: -1px -1px 3px #f8f9fa, 
         2px 2px 4px #f8f9fa;
 }
-.title{
-    margin-left:20px;
+.button-nav{
+  background: #ffffff;
+  font-weight: 600;
+  margin-bottom: 30px !important;
 }
-#logout{
-    float:right;
-    margin-top:10px;
-    margin-right:40px;
-}
-.button-info {
+.button-info{
+  color: #17a2b8;
   background: #17a2b8;
+  border-radius: 10px;
+  transition: 0.5s;
 }
 .button-primary {
-  background: #007bff;
+  color: #4385F5;
+  background: #4385F5;
+  border-radius: 10px;
+  transition: 0.5s;
 }
 .button-success {
-  background: #28a745;
+  color: #109D59;
+  background: #109D59;
+  border-radius: 10px;
+  transition: 0.5s;
 }
 .button-warning {
-  background: #ffc107;
+  color: #F5B400;
+  background: #F5B400;
+  border-radius: 10px;
+  transition: 0.5s;
 }
 .button-danger {
-  background: #dc3545;
+  color: #DC4437;
+  background: #DC4437;
+  border-radius: 10px;
+  transition: 0.5s;
+}
+.button-desc{
+  color: #808080;
+  font-size: 16px !important;
 }
 .small-box{
+    margin: 10px;
+    padding: 10px;
     color:white;
+    border-radius: 10px;
+    border: 1px solid #f5f5f5;
+    box-shadow: none;
+    transition: 0.5s;
 }
+
 #row-size{
     padding-left:100px;
     padding-right:100px;
@@ -86,17 +110,16 @@
     <div class="wrapper">
         <nav class="main-header navbar navbar-expand-md navbar-light navbar-light">
             <div style="width:100%;">
-                <a class="btn-no-design title" href="#">
-                    <img src="{{ asset('assets/images/logo/lnu_logo.png') }}"  id="logo" alt="">
-                            <span id="title"> &nbsp;LNU-Integrated Data System(IDS)</span>                                    
-                </a>
-                <a class="btn-no-design" href="{{ url('logout') }}" id="logout"><span class="fa fa-reply-all"></span> Logout</a>
+                <img src="{{ asset('assets/images/logo/ids_logo_full_light.png') }}"  id="logo" alt="">   
+                <a class="btn btn-primary" href="{{ url('logout') }}" id="logout">Logout</a>
             </div>
         </nav>
         <div class="content-wrapper">
                 <br><br>
             <section class="content">
                 <div class="container-fluid">
+                    <h1 class="default-header">My Modules</h1>
+                    <p class="default-desc">Choose the module that you want to use.</p>
                     <!-- Small boxes (Stat box) -->
                     <div class="row" id="row-size">                        
                         @if($count_systems<=2)
@@ -112,16 +135,16 @@
                             @endphp                    
                             <div class="col-lg-3 col-6">
                                 <!-- small box -->
-                                <div class="small-box {{$row->button}}">
+                                <div class="small-box button-nav">
                                     <div class="inner">
-                                        <h3>{{$row->shorten}}</h3>
-
-                                        <p>{{$row->name}}</p>
+                                        <h3 class="button-nav {{$row->button}}" style="background: none !important; font-size: 55px;">{{$row->shorten}}</h3>
+                                        <p class="button-desc">{{$row->name}}</p>
                                     </div>
                                     <div class="icon">
                                         <i class="{{$row->icon}}"></i>
                                     </div>
-                                    <a href="{{$url}}" class="small-box-footer">Proceed <i class="fas fa-arrow-circle-right"></i></a>
+                                    <a href="{{$url}}" class="{{$row->button}}" style="display: block; width: 100% !important; 
+                                    color: #f5f5f5; text-align: center; padding: 10px 5px; border-radius: 5px;">Proceed</a>
                                 </div>
                             </div> 
                             @php
@@ -133,6 +156,8 @@
             </section>
         </div>
     </div>
+    @extends('layouts.footer')
+    
 </body>
     
     <!-- jQuery -->

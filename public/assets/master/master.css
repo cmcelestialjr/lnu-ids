@@ -1,3 +1,332 @@
+/** 
+    Main CSS File for Default UI Styling
+
+*/
+
+/* HEADER ELEMENTS */
+/** Systems Header **/
+
+#logo{
+  margin: 5px 130px;
+  padding: 5px;
+  width: 10% !important;
+  height: auto !important;
+}
+
+#logout{
+  float:right;
+  margin: 40px 120px; 
+  padding: 10px 20px;
+}
+
+/* FORMS */
+
+.form-control{
+  margin-top: 10px;
+  border: none;
+  border-bottom: 2px solid #eee;
+  border-radius: 0px;
+  font-weight: 500;
+}
+
+.form-control:placeholder-shown{
+  border-bottom: 2px solid #eee;
+}
+
+.form-control:not(placeholder-shown){
+  border-bottom: 2px solid #4385F5;
+}
+
+.input-header{
+  font-weight: 600;
+  color: #808080;
+}
+
+.input-group-text{
+  background-color: transparent;
+  border: none;
+  color: #808080;
+}
+
+
+/* BUTTONS */
+
+.btn-primary{
+  font-size: 14px;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 600;
+  border-radius: 10px;
+  background-color: #4385F5;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  transition: 0.2s;
+}
+
+.btn-cancel{
+  font-size: 14px;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 500;
+  color: #DC4437;
+  border-radius: 10px;
+  border: 2px solid #DC4437;
+  padding: 10px 20px;
+  transition: 0.2s;
+}
+
+/* TEXT ELEMENTS */
+
+.default-header{
+  font-weight: 600;
+}
+
+.default-desc{
+  font-weight: 500;
+}
+
+.header-text{
+  font-family: "Raleway", sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  padding-bottom: 20px;
+  color: #242424;
+}
+
+.breadcrumb-item{
+  font-family: "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: caapitalize;
+  color: rgb(146, 146, 146) !important;
+  letter-spacing: 1px;
+}
+
+.breadcrumb-item a{
+  color: rgb(2, 110, 252)!important;
+}
+
+/* MODALS */
+
+#modal-default{
+  background-color: rgba(0, 0, 0, 0.192);
+}
+
+.modal-body{
+  margin-top: 20px;
+}
+
+.modal-content{
+  padding: 10px;
+  border: none;
+}
+
+.modal-title{
+  font-size: 26px;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+
+/* BODY ELEMENTS */
+
+body{
+  font-family: 'Raleway', sans-serif;
+}
+
+.content-wrapper{
+  padding: 20px;
+}
+
+.card{
+  border: 1px solid rgba(146, 146, 146, 0.2);
+  box-shadow: none;
+}
+
+.main-footer{
+  font-family: 'Raleway', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 20px 30px;
+}
+
+.main-footer p{
+  display: inline-block;
+  margin-bottom: 0px;
+  font-weight: 600;
+  color: #666666;
+}
+
+.footer-logo{
+  display: inline-block;
+  width: 3%;
+  margin-right: 10px;
+}
+
+/** Systems Elements **/
+
+h1.default-header{
+  margin: 0px 100px 10px 110px;
+}
+
+p.default-desc{
+  margin: 0px 100px 50px 110px;
+}
+
+
+.small-box:hover{
+  box-shadow: 5px 10px 15px #88888870 !important;
+  transition: 0.5s;
+}
+
+.button-info:hover, .button-primary:hover, .button-success:hover, 
+.button-warning:hover, .button-danger:hover{
+  filter: saturate(250%) !important;
+  transition: 0.5s;
+}
+
+/** Login Form Elements **/
+
+#forgot{
+  float: left;
+  padding: 0px;
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #4385F5;
+}
+
+#login-form .btn-primary{
+  margin-top: 15px;
+  width: 100%;
+}
+
+#login-form .btn-primary:hover{
+  background-color: #77A7FB;
+  color: #fff;
+  transition: 0.2s;
+}
+
+#login-form .btn-cancel{
+  margin-top: 15px;
+  width: 100%;
+}
+
+#login-form .btn-cancel:hover{
+  background-color: #DC4437;
+  color: #fff;
+  transition: 0.2s;
+}
+
+/** Reset Password Form Elements **/
+
+#forgot-form .btn-primary{
+  margin-top: 20px;
+}
+
+#forgot-form .btn-primary:hover{
+  background-color: #77A7FB;
+  color: #fff;
+  transition: 0.2s;
+}
+
+/** Top Navbar **/
+
+.navbar-nav .nav-link{
+  color: #666666 !important;
+}
+
+.navbar-nav .nav-link:hover{
+  color: #f2f2f2 !important;
+  background-color: #666666 !important;
+}
+
+.dropdown-menu-lg .dropdown-item{
+  padding: 30px 0px 10px 0px;
+}
+
+.dropdown-menu-lg .dropdown-item-header{
+  margin: 0px 0px 20px 0px;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.dropdown-menu-lg .dropdown-item-title{
+  margin: 30px 0px 0px 0px;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.dropdown-item-button.btn-primary{
+  margin: auto;
+  width: 100%;
+  padding: 10px 0px;
+  text-align: center;
+}
+
+/** Left Nav Elements **/
+
+.brand-link{
+  margin: 10px 0px;
+  border-bottom: none !important;
+}
+
+.brand-wordmark{
+  margin-left: 10px;
+  font-weight: 600 !important;
+}
+
+.user-panel{
+  border-bottom: none !important;
+}
+
+.info .d-block{
+  margin-left: 5px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #f2f2f2;
+}
+
+.left-sidebar-header{
+  margin: 0px 0px 0px 20px;
+  padding: 0px;
+  font-weight: 600;
+  color: #666666;
+}
+
+.nav-item{
+  margin: 15px 0px;
+  font-weight: 400;
+}
+
+.nav-link{
+  color: #f2f2f2 !important;
+  transition: 0.2s !important;
+}
+
+.nav-link:hover{
+  background-color: #666666 !important;
+  transition: 0.2s !important;
+}
+
+.nav-sidebar>.nav-item>.nav-link.active{
+  background-color: #333333 !important;
+  box-shadow: none !important;
+  font-weight: 600;
+  transition: 0.5s;
+}
+
+.nav-treeview>.nav-item>.nav-link.active{
+  box-shadow: none !important;
+  background-color: #4D4D4D !important;
+  font-weight: 500;
+}
+
+.nav-sidebar .nav-treeview>.nav-item>.nav-link>.nav-icon{
+  color: #77A7FB !important;
+}
+
+
+/* TABLE ELEMENTS */
+
 .table{
   font-size: 14px;
 }
@@ -309,5 +638,11 @@
   .table-sched{
     width: 800px !important;
   }
+}
+
+/* SIDEBAR */
+
+.main-sidebar{
+  box-shadow: none !important;
 }
 
