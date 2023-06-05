@@ -72,5 +72,4 @@
 <script src="{{ asset('assets/js/rims/departments/modal.js') }}"></script>
 <script src="{{ asset('assets/js/rims/departments/new.js') }}"></script>
 <script src="{{ asset('assets/js/rims/departments/update.js') }}"></script>
-<script src="{{ asset('assets/js/rims/departments/delete.js') }}"></script>
 @endsection

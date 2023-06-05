@@ -34,23 +34,23 @@
                                         <td><label>{{$query->id_no}}</label></td>
                                         <td>Birthdate:</td>
                                         <td><label>
-                                            {{-- {{$query->info->personal_info->dob}} --}}
+                                            {{$query->info->personal_info->dob}}
                                         </label></td>
                                     </tr>
                                     <tr>
                                         <td>Contact:</td>
                                         <td><label>
-                                            {{-- {{$query->info->personal_info->contact}} --}}
+                                            {{$query->info->personal_info->contact}}
                                             </label></td>
                                         <td>Email:</td>
                                         <td><label>
-                                            {{-- {{$query->info->personal_info->email}} --}}
+                                            {{$query->info->personal_info->email}}
                                             </label></td>
                                     </tr>
                                     <tr>
                                         <td>Sex:</td>
                                         <td><label>
-                                            {{-- {{$query->info->personal_info->sex}} --}}
+                                            {{$query->info->personal_info->sex}}
                                             </label></td>
                                         <td>Department:</td>
                                         <td><label>

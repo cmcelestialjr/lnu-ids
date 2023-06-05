@@ -81,5 +81,4 @@
 <script src="{{ asset('assets/js/rims/programs/modal.js') }}"></script>
 <script src="{{ asset('assets/js/rims/programs/new.js') }}"></script>
 <script src="{{ asset('assets/js/rims/programs/update.js') }}"></script>
-<script src="{{ asset('assets/js/rims/programs/delete.js') }}"></script>
 @endsection

@@ -49,7 +49,7 @@ $(document).on('change', '#usersAccessDiv .accessSelect', function (e) {
                 thisBtn.addClass('input-success');
                 var form_data = {
                     id:id,
-                    system_id:system_id,
+                    system_id:data.system_id,
                     val:val,
                     from:data.from
                 };

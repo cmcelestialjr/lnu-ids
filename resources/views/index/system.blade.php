@@ -130,26 +130,26 @@
                         $x = 1;
                         @endphp
                         @foreach($systems as $row)
-                            @php                  
-                                $url = url('/ids/'.mb_strtolower($row->shorten).'/home/n');
-                            @endphp                    
+                            @php
+                                $url = url('/ids/'.mb_strtolower($row['shorten']).$row['nav_url']);
+                            @endphp
                             <div class="col-lg-3 col-6">
                                 <!-- small box -->
                                 <div class="small-box button-nav">
                                     <div class="inner">
-                                        <h3 class="button-nav {{$row->button}}" style="background: none !important; font-size: 55px;">{{$row->shorten}}</h3>
-                                        <p class="button-desc">{{$row->name}}</p>
+                                        <h3 class="button-nav {{$row['button']}}" style="background: none !important; font-size: 55px;">{{$row['shorten']}}</h3>
+                                        <p class="button-desc">{{$row['name']}}</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="{{$row->icon}}"></i>
+                                        <i class="{{$row['icon']}}"></i>
                                     </div>
-                                    <a href="{{$url}}" class="{{$row->button}}" style="display: block; width: 100% !important; 
+                                    <a href="{{$url}}" class="{{$row['button']}}" style="display: block; width: 100% !important; 
                                     color: #f5f5f5; text-align: center; padding: 10px 5px; border-radius: 5px;">Proceed</a>
                                 </div>
                             </div> 
                             @php
                             $x++;
-                            @endphp                      
+                            @endphp
                         @endforeach
                     </div>
                 </div>

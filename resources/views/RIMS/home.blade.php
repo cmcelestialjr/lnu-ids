@@ -29,7 +29,27 @@
             <div class="card-header">
             </div>
             <div class="card-body">
-              
+              @php
+              header('Content-Type: image/png');
+              @endphp
+              <table class="table table-bordered">
+              {{-- @foreach($user_details123 as $row)
+                <tr>
+                  <td>{{$row['uid']}}</td>
+                  <td>{{$row['userid']}}</td>
+                  <td>{{$row['password']}}</td>
+                </tr>
+              @endforeach --}}
+              @foreach($attendace as $row)
+                <tr>
+                  <td>{{$row['uid']}}</td>
+                  <td>{{$row['id']}}</td>
+                  <td>{{$row['state']}}</td>
+                  <td>{{$row['timestamp']}}</td>
+                  <td>{{$row['type']}}</td> 
+                </tr>
+              @endforeach
+              </table>
             </div>
             <div class="card-footer">
                 

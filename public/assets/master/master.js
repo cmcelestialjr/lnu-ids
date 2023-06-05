@@ -9,10 +9,11 @@ toastr.options = {
     "progressBar": true,
     "positionClass": "toast-top-right",
     "preventDuplicates": false,
+    "preventOpenDuplicates": false,
     "onclick": null,
     "showDuration": "300",
     "hideDuration": "300",
-    "timeOut": "3000",
+    "timeOut": "2000",
     "extendedTimeOut": "800",
     "showEasing": "swing",
     "hideEasing": "linear",
@@ -154,15 +155,15 @@ function loadModal(form_data,thisBtn){
               dropdownParent: $("#modal-"+form_data.modal)
           });
           $(".contact").inputmask('999-999-9999');
-          $(".account_num").inputmask('9999-9999-99');
-          $(".tin_num").inputmask('999-999-999');
-          $(".gsis_bp_num").inputmask('9999999999');
-          $(".philhealth_num").inputmask('99-999999999-9');
+          $(".bank_account_no").inputmask('9999-9999-99');
+          $(".tin_no").inputmask('999-999-999');
+          $(".gsis_bp_no").inputmask('9999999999');
+          $(".philhealth_no").inputmask('99-999999999-9');
           $(".sss_no").inputmask('99-9999999-9');
-          $(".pagibig_num").inputmask('9999-9999-9999');          
+          $(".pagibig_no").inputmask('9999-9999-9999');
           $(".year").inputmask('9999');          
-          $(".datePicker").inputmask('mm/dd/yyyy');
           $('.yearpicker').inputmask({'mask': '9999'});
+          $(".datePicker").inputmask('mm/dd/yyyy');
           $('.datePicker').daterangepicker({
             locale: {
                 format: 'MM/DD/YYYY',
@@ -296,10 +297,26 @@ function loadDivwLoader(form_data,thisBtn){
       thisBtn.attr('disabled','disabled');
       thisBtn.addClass('input-loading');
     },
-    success : function(data){      
+    success : function(data){
+      $('#'+form_data.tid).html('');
       $('#'+form_data.tid).html(data);
+      $(".contact").inputmask('999-999-9999');
+      $(".bank_account_no").inputmask('9999-9999-99');
+      $(".tin_no").inputmask('999-999-999');
+      $(".gsis_bp_no").inputmask('9999999999');
+      $(".philhealth_no").inputmask('99-999999999-9');
+      $(".sss_no").inputmask('99-9999999-9');
+      $(".pagibig_no").inputmask('9999-9999-9999');
+      $(".datePicker").inputmask('mm/dd/yyyy');
+      $('.datePicker').daterangepicker({
+        locale: {
+          format: 'MM/DD/YYYY',
+        },
+        singleDatePicker: true,
+        showDropdowns: true
+      });
       $(".select2-div").select2({
-        dropdownParent: $("#modal-"+form_data.modal)
+        dropdownParent: $("#"+form_data.tid)
       });
       thisBtn.removeAttr('disabled');
       thisBtn.removeClass('input-loading');
@@ -316,4 +333,4 @@ function loadDivwLoader(form_data,thisBtn){
       toastr.error('Error!');
     }
   });
-} 
+}

@@ -21,19 +21,26 @@ class TableController extends Controller
         if($user->level_id==1){
             if($val=='Employee'){
                 $role_id = 2;
+                $query = Users::with('statuses')
+                        ->whereHas('user_role', function($query) use ($role_id){
+                            $query->where('role_id', $role_id);
+                            $query->orWhere('role_id', 3);
+                        })
+                        ->get();
             }elseif($val=='Student'){
                 $role_id = 1;
-            }
-            $query = Users::with('statuses')
+                $query = Users::with('statuses')
                         ->whereHas('user_role', function($query) use ($role_id){
                             $query->where('role_id', $role_id);
                         })
                         ->get();
+            }
         }else{
             $role_id = 2;
             $query = Users::with('statuses')
                         ->whereHas('user_role', function($query) use ($role_id){
                             $query->where('role_id', $role_id);
+                            $query->orWhere('role_id', 3);
                         })
                         ->where('level_id','>',1)->get();
         }

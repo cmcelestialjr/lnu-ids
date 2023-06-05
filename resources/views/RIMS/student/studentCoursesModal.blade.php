@@ -31,10 +31,13 @@
                                     <th data-field="f5" data-sortable="true" data-align="center">Level</th>
                                     <th data-field="f6" data-sortable="true" data-align="center">Section</th>
                                     <th data-field="f7" data-sortable="true" data-align="center">Units</th>
-                                    <th data-field="f8" data-sortable="true" data-align="center">Schedule</th>
-                                    <th data-field="f9" data-sortable="true" data-align="center">Room</th>
-                                    <th data-field="f10" data-sortable="true" data-align="center">Instructor</th>
-                                    <th data-field="f11" data-sortable="true" data-align="center">Status</th>
+                                    @if($lab_units>0)
+                                    <th data-field="f8" data-sortable="true" data-align="center">Lab</th>
+                                    @endif
+                                    <th data-field="f9" data-sortable="true" data-align="center">Schedule</th>
+                                    <th data-field="f10" data-sortable="true" data-align="center">Room</th>
+                                    <th data-field="f11" data-sortable="true" data-align="center">Instructor</th>
+                                    <th data-field="f12" data-sortable="true" data-align="center">Status</th>
                                 </tr>
                             </thead>
                         </table>

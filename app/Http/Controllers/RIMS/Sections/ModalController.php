@@ -56,7 +56,7 @@ class ModalController extends Controller
     }
     public function courseViewModal(Request $request){
         $id = $request->id;
-        $query = EducOfferedCourses::where('id',$id)->first(['section','section_code']);
+        $query = EducOfferedCourses::where('id',$id)->first();
         $data = array(
             'query' => $query
         );
@@ -79,5 +79,14 @@ class ModalController extends Controller
             'time_period' => $time_period
         );
         return view('rims/sections/courseSchedRmModal',$data);
+    }
+    public function minMaxModal(Request $request){
+        $id = $request->id;
+        $query = EducOfferedCourses::where('id',$id)->first();
+        $data = array(
+            'query' => $query,
+            'id' => $id
+        );
+        return view('rims/sections/minMaxModal',$data);
     }
 }

@@ -1,4 +1,4 @@
-<div class="table-responsive" style="height: 400px;">
+<div class="table-responsive" style="height: 600px;">
 <table class="table-sched">
     <thead>
         <tr class="{{$scheduleRemoveDayTr}}" id="scheduleRemoveDayTr">
@@ -65,6 +65,13 @@
         @foreach ($time_period as $time)                
             @php
                 $time_list = $time->format('h:ia');
+                $time_check['0'] = 0;
+                $time_check['1'] = 0;
+                $time_check['2'] = 0;
+                $time_check['3'] = 0;
+                $time_check['4'] = 0;
+                $time_check['5'] = 0;
+                $time_check['6'] = 0;                
                 $d['0'] = '<button class="btn-no-design scheduleTimeUpdate blank"
                                 id="dayTime'.$count_x.'7"
                                 data-t="'.$time_list.'"
@@ -144,6 +151,7 @@
                                 if($sched_time_from<$time_list && $sched_time_to>$time_list){
                                     $d[$day_no] = '<button class="bg-info btn-no-design" style="height:100%;width:100%;"
                                                         id="dayTime'.$count_x.$day->no.'">&nbsp;&nbsp;</button>';
+                                    $time_check[$day_no] = 1;
                                 }
                             }
                         }
@@ -188,6 +196,7 @@
                                     if($sched_time_from<$time_list && $sched_time_to>$time_list){
                                         $d[$day_no] = '<button class="bg-warning btn-no-design" style="height:100%;width:100%;"
                                                             id="dayTime'.$count_x.$day->no.'">&nbsp;&nbsp;</button>';
+                                        $time_check[$day_no] = 1;
                                     }
                                 }
                             }
@@ -233,6 +242,7 @@
                                     if($sched_time_from<$time_list && $sched_time_to>$time_list){
                                         $d[$day_no] = '<button class="bg-primary btn-no-design" style="height:100%;width:100%;"
                                                             id="dayTime'.$count_x.$day->no.'">&nbsp;&nbsp;</button>';
+                                        $time_check[$day_no] = 1;
                                     }
                                 }
                             }
@@ -275,6 +285,7 @@
                             $d[$day_no] = '<button class="bg-success-light btn-no-design" 
                                                 style="height:100%;width:100%;"
                                                 id="dayTime'.$count_x.$day->no.'">&nbsp;&nbsp;</button>';
+                            $time_check[$day_no] = 1;
                         }
                     }
                 }
@@ -358,6 +369,7 @@
                                     if($sched_time_from<$time_list && $sched_time_to>$time_list){
                                         $d[$day_no] = '<button class="bg-danger btn-no-design" style="height:100%;width:100%;"
                                                             id="dayTime'.$count_x.$day->no.'">&nbsp;&nbsp;</button>';
+                                        $time_check[$day_no] = 1;
                                     }
                                 }
                             }
@@ -384,20 +396,28 @@
                                 $d[$day_no] = '<button class="bg-danger btn-no-design" style="height:100%;width:100%;"
                                                     id="dayTime'.$count_x.$day->no.'">'.
                                                     $row->course->code.'</button>';
+                                $time_check[$day_no] = 1;
                             }
                             if($sched_time_to==$time_list){
                                 $d[$day_no] = '<button class="bg-danger btn-no-design" style="height:100%;width:100%;"
                                                     id="dayTime'.$count_x.$day->no.'">'.$row->course->code.'</button>';
+                                $time_check[$day_no] = 1;
                             }
                             if($sched_time_from<$time_list && $sched_time_to>$time_list){
                                 $d[$day_no] = '<button class="bg-danger btn-no-design" style="height:100%;width:100%;"
                                                     id="dayTime'.$count_x.$day->no.'">&nbsp;&nbsp;</button>';
+                                $time_check[$day_no] = 1;
                             }
                         }
                     }
                 }
             }
             $count_x++;
+            for ($i=0; $i < 7; $i++) { 
+                if($time_check[$i]==0){
+                    $time_day[$i][] = $time_list;
+                }
+            }
             @endphp
             <tr>
                 <td class="center">{{$time_list}}</td>
@@ -413,3 +433,44 @@
     </tbody>
 </table>
 </div>
+@php
+for ($h=0; $h < 7; $h++) { 
+    $times = $time_day[$h];
+    $count = count($times);
+    for ($i = 0; $i < $count - 1; $i++) {
+        $time_next = $times[$i+1];
+        $time_1 = strtotime($times[$i]);
+        $time_2 = strtotime($time_next);            
+        $diff_in_seconds_ = abs($time_2 - $time_1);
+        $diff_in_minutes_ = $diff_in_seconds_ / 60;
+        $diff_in_minutes_total = 15;
+        $x = 1;
+        for ($j = $i + 1; $j < $count; $j++) {
+            $time1 = strtotime($times[$i]);
+            $time2 = strtotime($times[$j]);                
+            $diff_in_seconds = abs($time2 - $time1);
+            $diff_in_minutes = $diff_in_seconds / 60;
+            $diff_in_hours = $diff_in_seconds / 3600;
+
+            if (in_array($times[$j], $time_day[$h]) && $diff_in_minutes==$x*15){
+                if ($diff_in_minutes_ == 15) {
+                    if ($diff_in_hours == $hours+($minutes/60)) {
+                        if($h==0){
+                            $day = 7;
+                        }else{
+                            $day = $h;
+                        }
+                        echo '<input type="hidden" name="schedDayTime[]" class="schedDayTimeInput"
+                                data-d="'.$day.'"
+                                data-t="'.$times[$i].'-'.$times[$j].'"
+                                value="'.$times[$i].'-'.$times[$j].'">';
+                    }
+                }
+            }
+            $x++;
+            $diff_in_minutes_total+=$diff_in_minutes;
+        }
+    }
+}
+@endphp
+<script src="{{ asset('assets/js/rims/schedule/_select_day_time.js') }}"></script>

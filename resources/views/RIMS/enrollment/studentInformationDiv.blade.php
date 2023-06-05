@@ -10,7 +10,8 @@
     </div>
     <div class="col-lg-1">
         <label>Year</label>
-        <input type="text" class="form-control" value="1" readonly>
+        <input type="text" class="form-control" 
+            value="{{$student->grade_level->name}}" readonly>
     </div>
     <div class="col-lg-8">
         <div class="row">

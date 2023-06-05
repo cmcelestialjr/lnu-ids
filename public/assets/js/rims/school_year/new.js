@@ -40,7 +40,7 @@ $(document).on('click', '#schoolYearDiv #new button[name="submit"]', function (e
                 thisBtn.removeClass('input-loading'); 
                 if(data.result=='success'){
                     toastr.success('Success');
-                    view_programs(data.id,thisBtn);
+                    //view_programs(data.id,thisBtn);
                 }else if(data.result=='exists'){
                     toastr.error('School Year and Semester Exists!');
                 }else{

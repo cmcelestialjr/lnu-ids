@@ -22,31 +22,36 @@ class UpdateController extends Controller
         $user = Auth::user();
         $updated_by = $user->id;
         $result = 'error';
-        
+        $schedule_id = $request->schedule_id;
+        $sched_name = 'New';
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
             $id = $request->id;
             $room_id = $request->room_id;
-            $instructor_id = $request->instructor_id;
-            $schedule_id = $request->schedule_id;
+            $instructor_id = $request->instructor_id;            
             try{
                 $room_schedule = 'success';
                 $instructor_schedule = 'success';
                 $instructor_schedule_check = NULL;
+                $result = 'success';
                 if($instructor_id=='TBA'){
                     $instructor_id = NULL;
                 }
                 if($room_id=='TBA'){
                     $room_id = NULL;
                 }
+                $schedule_id = $this->schedDayTime($request,$updated_by);
                 if($schedule_id!='new'){
                     $course = EducOfferedCourses::where('id',$id)->first();
-                    $schedule = EducOfferedSchedule::where('id',$schedule_id)->first();
-                    $schedule_days = EducOfferedScheduleDay::where('offered_schedule_id',$schedule->id)->pluck('day')->toArray();
+                    $schedule = EducOfferedSchedule::where('id',$schedule_id)->first();                    
                     $school_year_id = $course->curriculum->offered_program->school_year_id;
                     $offered_program_ids = EducOfferedPrograms::where('school_year_id',$school_year_id)->pluck('id')->toArray();
                     $offered_curriculum_ids = EducOfferedCurriculum::whereIn('offered_program_id',$offered_program_ids)->pluck('id')->toArray();
                     $offered_course_ids = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)->pluck('id')->toArray();
-
+                    if($schedule==NULL){
+                        $schedule_days = NULL;
+                    }else{
+                        $schedule_days = EducOfferedScheduleDay::where('offered_schedule_id',$schedule->id)->pluck('day')->toArray();                        
+                    }
                     $datas['offered_course_ids'] = $offered_course_ids;
                     $datas['schedule_id'] = $schedule_id;
                     $datas['room_id'] = $room_id;
@@ -55,17 +60,19 @@ class UpdateController extends Controller
                     $datas['time_to'] = $schedule->time_to;
                     $datas['schedule_days'] = $schedule_days;
                     $datas['room_schedule'] = $room_schedule;
-
-                    if($room_id!=NULL){
-                       $room_schedule = $this->room_schedule_check($datas);
+                    if($schedule!=NULL){
+                        $sched_name = date('h:ia',strtotime($schedule->time_from)).'-'.date('h:ia',strtotime($schedule->time_to));
+                        if($room_id!=NULL){
+                            $room_schedule = $this->room_schedule_check($datas);
+                        }
+                        if($room_schedule=='success'){
+                            EducOfferedSchedule::where('id', $schedule_id)
+                                        ->update(['room_id' => $room_id,
+                                                'updated_by' => $updated_by,
+                                                'updated_at' => date('Y-m-d H:i:s'),
+                                                ]);
+                        }
                     }
-                    if($room_schedule=='success'){
-                        EducOfferedSchedule::where('id', $schedule_id)
-                                    ->update(['room_id' => $room_id,
-                                            'updated_by' => $updated_by,
-                                            'updated_at' => date('Y-m-d H:i:s'),
-                                            ]);
-                    }                
                     if($instructor_id!=NULL){
                         $datas['instructor_id'] = $instructor_id;
                         $instructor_schedule_check = $this->instructor_schedule_check($datas);
@@ -86,9 +93,55 @@ class UpdateController extends Controller
                     $result = 'Room Conflict. Please check below';
                 }elseif($room_schedule=='success' && $instructor_schedule=='error'){
                     $result = 'Instructor Conflict. Please check below';
-                }else{
-                    $result = 'success';
                 }
+            }catch(Exception $e){
+                        
+            }
+        }
+        $response = array('result' => $result,
+                          'schedule_id' => $schedule_id,
+                          'sched_name' => $sched_name);
+        return response()->json($response);
+    }
+    public function typeUpdate(Request $request){        
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $result = 'error';
+        $schedule_id = $request->schedule_id;
+        $type = $request->type;
+        if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
+            try{
+                EducOfferedSchedule::where('id', $schedule_id)
+                    ->update(['type' => $type,
+                        'updated_by' => $updated_by,
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+                $result = 'success';
+            }catch(Exception $e){
+                        
+            }
+        }
+        $response = array('result' => $result);
+        return response()->json($response);
+    }
+    public function minMaxSubmit(Request $request){
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $result = 'error';
+        $id = $request->id;
+        $min_student = $request->min_student;
+        $max_student = $request->max_student;
+        if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
+            try{
+                EducOfferedCourses::where('id', $id)
+                    ->update(['min_student' => $min_student,
+                        'max_student' => $max_student,
+                        'updated_by' => $updated_by,
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+                $result = 'success';
             }catch(Exception $e){
                         
             }
@@ -104,6 +157,9 @@ class UpdateController extends Controller
         $time_to = date('H:i:s',strtotime($request->time_to));
         $type = $request->type;
         $day = $request->d;
+        $room_id = $request->room_id;
+        $hours = $request->hours;
+        $minutes = $request->minutes;
         $result = 'error';
         $sched_name = NULL;
         $list_x = array();
@@ -131,6 +187,9 @@ class UpdateController extends Controller
                 $result = 'school_to';
                 $x++;
             }
+            if($room_id=='TBA'){
+                $room_id = NULL;
+            }
             if($x==0){
                 $user = Auth::user();
                 $updated_by = $user->id;
@@ -141,6 +200,9 @@ class UpdateController extends Controller
                         $insert->time_from = $time_from;
                         $insert->time_to = $time_to;
                         $insert->type = $type;
+                        $insert->room_id = $room_id;
+                        $insert->hours = $hours;
+                        $insert->minutes = $minutes;
                         $insert->updated_by = $updated_by;
                         $insert->save();
                         $schedule_id = $insert->id; 
@@ -203,6 +265,9 @@ class UpdateController extends Controller
                                             ->update(['time_from' => $time_from,
                                                     'time_to' => $time_to,
                                                     'type' => $type,
+                                                    'room_id' => $room_id,
+                                                    'hours' => $hours,
+                                                    'minutes' => $minutes,
                                                     'updated_by' => $updated_by,
                                                     'updated_at' => date('Y-m-d H:i:s'),
                                                     ]);
@@ -348,8 +413,6 @@ class UpdateController extends Controller
     private function instructor_schedule_check($datas){
         $offered_course_ids = $datas['offered_course_ids'];
         $schedule_id = $datas['schedule_id'];
-        $room_id = $datas['room_id'];
-        $schedule = $datas['schedule'];
         $time_from = $datas['time_from'];
         $time_to = $datas['time_to'];
         $schedule_days = $datas['schedule_days'];
@@ -382,6 +445,91 @@ class UpdateController extends Controller
                                             })
                                             ->first();
         return $instructor_schedule_check;
+    }
+    private function schedDayTime($request,$updated_by){
+        $id = $request->id;
+        $schedule_id = $request->schedule_id; 
+        $type = $request->type;
+        $hours = $request->hours;
+        $minutes = $request->minutes;
+        $check = EducOfferedSchedule::where('id',$schedule_id)->first();
+        $x = 0;
+        EducOfferedCourses::where('id', $id)
+                        ->update(['hours' => $hours,
+                                'minutes' => $minutes,
+                                'updated_by' => $updated_by,
+                                'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+        if($check!=NULL){
+            if($check->hours!=$request->hours || $check->minutes!=$request->minutes){
+                EducOfferedSchedule::where('id', $schedule_id)
+                        ->update(['offered_course_id' => $id,
+                                'type' => $type,
+                                'hours' => $hours,
+                                'minutes' => $minutes,
+                                'updated_by' => $updated_by,
+                                'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+                $delete = EducOfferedScheduleDay::where('offered_schedule_id',$schedule_id)->delete();
+                $auto_increment = DB::update("ALTER TABLE educ__offered_schedule_day AUTO_INCREMENT = 0;");
+                $delete = EducOfferedSchedule::where('id',$schedule_id)->delete();
+                $auto_increment = DB::update("ALTER TABLE educ__offered_schedule AUTO_INCREMENT = 0;");
+                $schedule_id = 'new';
+                $x++;
+            }
+        }
+        if($x==0){
+            if($request->days!='' && $request->time!='TBA'){
+                $check = EducOfferedSchedule::where('id',$schedule_id)->first();
+                $time = explode('-',$request->time);
+                $time_from = date('H:i:s',strtotime($time[0]));
+                $time_to = date('H:i:s',strtotime($time[1]));                           
+                if($check!=NULL){
+                    EducOfferedSchedule::where('id', $schedule_id)
+                        ->update(['offered_course_id' => $id,
+                                'time_from' => $time_from,
+                                'time_to' => $time_to,
+                                'type' => $type,
+                                'hours' => $hours,
+                                'minutes' => $minutes,
+                                'updated_by' => $updated_by,
+                                'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+                }else{
+                    $insert = new EducOfferedSchedule(); 
+                    $insert->offered_course_id = $id;
+                    $insert->time_from = $time_from;
+                    $insert->time_to = $time_to;
+                    $insert->type = $type;
+                    $insert->hours = $hours;
+                    $insert->minutes = $minutes;
+                    $insert->updated_by = $updated_by;
+                    $insert->save(); 
+                    $schedule_id = $insert->id;
+                }
+                $delete = EducOfferedScheduleDay::where('offered_schedule_id',$schedule_id)->delete();
+                $auto_increment = DB::update("ALTER TABLE educ__offered_schedule_day AUTO_INCREMENT = 0;");
+                foreach($request->days as $day){
+                    $day_letter = $this->daysLetter($day);
+                    $insert = new EducOfferedScheduleDay(); 
+                    $insert->offered_schedule_id = $schedule_id;
+                    $insert->day = $day_letter;
+                    $insert->no = $day;
+                    $insert->updated_by = $updated_by;
+                    $insert->save();
+                }
+            }else{
+                if($request->time=='TBA' || $request->days==''){
+                    $delete = EducOfferedScheduleDay::where('offered_schedule_id',$schedule_id)->delete();
+                    $auto_increment = DB::update("ALTER TABLE educ__offered_schedule_day AUTO_INCREMENT = 0;");
+                    $delete = EducOfferedSchedule::where('id',$schedule_id)->delete();
+                    $auto_increment = DB::update("ALTER TABLE educ__offered_schedule AUTO_INCREMENT = 0;");
+                    $schedule_id = 'new';
+                }
+                
+            }
+        }
+        return $schedule_id;
     }
     private function daysLetter($day){
         $day_letter = 'error';

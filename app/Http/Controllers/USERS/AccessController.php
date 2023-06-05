@@ -173,22 +173,23 @@ class AccessController extends Controller
         }
         if($error==0){
             try {
+                $role_id = $user_selected->employee_default->role_id;
                 if($level_id==''){
                     $delete = UsersSystems::where('system_id', $system_id)
                                 ->where('user_id', $id)
-                                ->where('role_id', 1)->delete();
+                                ->where('role_id', $role_id)->delete();
                     $auto_increment = DB::update("ALTER TABLE users_systems AUTO_INCREMENT = 0;");
                 }else{
                     if($level_id==1){
                         $delete = UsersSystems::where('user_id', $id)
-                                        ->where('role_id', 1)->delete();
+                                        ->where('role_id', $role_id)->delete();
                         $auto_increment = DB::update("ALTER TABLE users_systems AUTO_INCREMENT = 0;");
                         $query = Systems::get()
-                                        ->map(function($query) use ($id,$updated_by) {
+                                        ->map(function($query) use ($id,$updated_by,$role_id) {
                                         return [
                                             'user_id' => $id,
                                             'system_id' => $query->id,
-                                            'role_id' => 1,
+                                            'role_id' => $role_id,
                                             'level_id' => 1,
                                             'updated_by' => $updated_by,
                                             'created_at' => date('Y-m-d H:i:s'),
@@ -199,19 +200,19 @@ class AccessController extends Controller
                     }else{
                         $check  = UsersSystems::where('system_id', $system_id)
                                     ->where('user_id', $id)
-                                    ->where('role_id', 1)->first();
+                                    ->where('role_id', $role_id)->first();
                         if($check==NULL){
                             $insert = new UsersSystems; 
                             $insert->user_id = $id;
                             $insert->system_id = $system_id;
-                            $insert->role_id = 1;
+                            $insert->role_id = $role_id;
                             $insert->level_id = $level_id;
                             $insert->updated_by = $user->id;                        
                             $insert->save();
                         }else{
                             UsersSystems::where('system_id', $system_id)
                             ->where('user_id', $id)
-                            ->where('role_id', 1)
+                            ->where('role_id', $role_id)
                             ->update(['level_id' => $level_id]);
                         }
                     }
@@ -241,21 +242,22 @@ class AccessController extends Controller
         }
         if($error==0){
             try{
+                $role_id = $user_selected->employee_default->role_id;
                 if($from=='system'){
                     $system_nav_ids = SystemsNav::where('system_id',$system_id)->pluck('id')->toArray();
                     if($level_id=='' || $level_id==1 || $level_id==2){                        
                         $delete = UsersSystemsNav::whereIn('system_nav_id', $system_nav_ids)
                                     ->where('user_id', $id)
-                                    ->where('role_id', 1)->delete();
+                                    ->where('role_id', $role_id)->delete();
                         $auto_increment = DB::update("ALTER TABLE users_systems_nav AUTO_INCREMENT = 0;");
                         if($level_id==2){
                             $query = SystemsNav::where('system_id',$system_id)
                                         ->get()
-                                        ->map(function($query) use ($id,$updated_by) {
+                                        ->map(function($query) use ($id,$updated_by,$role_id) {
                                         return [
                                             'user_id' => $id,
                                             'system_nav_id' => $query->id,
-                                            'role_id' => 1,
+                                            'role_id' => $role_id,
                                             'level_id' => 2,
                                             'updated_by' => $updated_by,
                                             'created_at' => date('Y-m-d H:i:s'),
@@ -265,14 +267,14 @@ class AccessController extends Controller
                             UsersSystemsNav::insert($query);
                         }elseif($level_id==1){                                                        
                             $delete = UsersSystemsNav::where('user_id', $id)
-                                        ->where('role_id', 1)->delete();
+                                        ->where('role_id', $role_id)->delete();
                             $auto_increment = DB::update("ALTER TABLE users_systems_nav AUTO_INCREMENT = 0;");
                             $query = SystemsNav::get()
-                                        ->map(function($query) use ($id,$updated_by) {
+                                        ->map(function($query) use ($id,$updated_by,$role_id) {
                                         return [
                                             'user_id' => $id,
                                             'system_nav_id' => $query->id,
-                                            'role_id' => 1,
+                                            'role_id' => $role_id,
                                             'level_id' => 1,
                                             'updated_by' => $updated_by,
                                             'created_at' => date('Y-m-d H:i:s'),
@@ -284,21 +286,21 @@ class AccessController extends Controller
                     }else{
                         UsersSystemsNav::whereIn('system_nav_id', $system_nav_ids)
                             ->where('user_id', $id)
-                            ->where('role_id', 1)
+                            ->where('role_id', $role_id)
                             ->update(['level_id' => $level_id]);
                     }
                     $this->update_nav_sub($request,'system');
                 }else{
                     if($level_id==1){
                         $delete = UsersSystems::where('user_id', $id)
-                                    ->where('role_id', 1)->delete();
+                                    ->where('role_id', $role_id)->delete();
                         $auto_increment = DB::update("ALTER TABLE users_systems AUTO_INCREMENT = 0;");
                         $query = Systems::get()
-                                            ->map(function($query) use ($id,$updated_by) {
+                                            ->map(function($query) use ($id,$updated_by,$role_id) {
                                             return [
                                                 'user_id' => $id,
                                                 'system_id' => $query->id,
-                                                'role_id' => 1,
+                                                'role_id' => $role_id,
                                                 'level_id' => 1,
                                                 'updated_by' => $updated_by,
                                                 'created_at' => date('Y-m-d H:i:s'),
@@ -307,14 +309,14 @@ class AccessController extends Controller
                                         })->toArray();
                         UsersSystems::insert($query);
                         $delete = UsersSystemsNav::where('user_id', $id)
-                                        ->where('role_id', 1)->delete();
+                                        ->where('role_id', $role_id)->delete();
                         $auto_increment = DB::update("ALTER TABLE users_systems_nav AUTO_INCREMENT = 0;");
                         $query = SystemsNav::get()
-                                        ->map(function($query) use ($id,$updated_by) {
+                                        ->map(function($query) use ($id,$updated_by,$role_id) {
                                         return [
                                             'user_id' => $id,
                                             'system_nav_id' => $query->id,
-                                            'role_id' => 1,
+                                            'role_id' => $role_id,
                                             'level_id' => 1,
                                             'updated_by' => $updated_by,
                                             'created_at' => date('Y-m-d H:i:s'),
@@ -322,15 +324,23 @@ class AccessController extends Controller
                                         ];
                                     })->toArray();
                         UsersSystemsNav::insert($query);
-                    }elseif($level_id==''){               
+                    }elseif($level_id==''){
                         $delete = UsersSystemsNav::where('system_nav_id', $system_id)
                                     ->where('user_id', $id)
-                                    ->where('role_id', 1)->delete();
+                                    ->where('role_id', $role_id)->delete();
                         $auto_increment = DB::update("ALTER TABLE users_systems_nav AUTO_INCREMENT = 0;");
+                    }else{
+                        $insert = new UsersSystemsNav();
+                        $insert->user_id = $id;
+                        $insert->system_nav_id = $system_id;
+                        $insert->role_id = $role_id;
+                        $insert->level_id = $level_id;
+                        $insert->updated_by = $updated_by;
+                        $insert->save();
                     }
                     UsersSystemsNav::where('system_nav_id', $system_id)
                             ->where('user_id', $id)
-                            ->where('role_id', 1)
+                            ->where('role_id', $role_id)
                             ->update(['level_id' => $level_id]);
                     $this->update_nav_sub($request,'nav');
                 }
@@ -358,6 +368,7 @@ class AccessController extends Controller
         }
         if($error==0){
             try{
+                $role_id = $user_selected->employee_default->role_id;
                 if($from=='system' || $from=='nav'){
                     if($from=='nav'){
                         $system_nav_ids = SystemsNav::where('id',$system_id)->pluck('id')->toArray();
@@ -365,36 +376,21 @@ class AccessController extends Controller
                         $system_nav_ids = SystemsNav::where('system_id',$system_id)->pluck('id')->toArray();
                     }                    
                     $system_nav_sub_ids = SystemsNavSub::whereIn('system_nav_id',$system_nav_ids)->pluck('id')->toArray();
-                    if($level_id=='' || $level_id==1 || $level_id==2){
+                    if($level_id=='' || $level_id==1){
                         $delete = UsersSystemsNavSub::whereIn('system_nav_sub_id', $system_nav_sub_ids)
                                     ->where('user_id', $id)
-                                    ->where('role_id', 1)->delete();
+                                    ->where('role_id', $role_id)->delete();
                         $auto_increment = DB::update("ALTER TABLE users_systems_nav_sub AUTO_INCREMENT = 0;");
-                        if($level_id==2){
-                            $query = SystemsNavSub::whereIn('id', $system_nav_sub_ids)
-                                        ->get()
-                                        ->map(function($query) use ($id,$updated_by) {
-                                        return [
-                                            'user_id' => $id,
-                                            'system_nav_sub_id' => $query->id,
-                                            'role_id' => 1,
-                                            'level_id' => 2,
-                                            'updated_by' => $updated_by,
-                                            'created_at' => date('Y-m-d H:i:s'),
-                                            'updated_at' => date('Y-m-d H:i:s')
-                                        ];
-                                    })->toArray();
-                            UsersSystemsNavSub::insert($query);
-                        }elseif($level_id==1){
+                        if($level_id==1){
                             $delete = UsersSystemsNavSub::where('user_id', $id)
-                                        ->where('role_id', 1)->delete();
+                                        ->where('role_id', $role_id)->delete();
                             $auto_increment = DB::update("ALTER TABLE users_systems_nav_sub AUTO_INCREMENT = 0;");
                             $query = SystemsNavSub::get()
-                                        ->map(function($query) use ($id,$updated_by) {
+                                        ->map(function($query) use ($id,$updated_by,$role_id) {
                                         return [
                                             'user_id' => $id,
                                             'system_nav_sub_id' => $query->id,
-                                            'role_id' => 1,
+                                            'role_id' => $role_id,
                                             'level_id' => 1,
                                             'updated_by' => $updated_by,
                                             'created_at' => date('Y-m-d H:i:s'),
@@ -404,21 +400,35 @@ class AccessController extends Controller
                             UsersSystemsNavSub::insert($query);
                         }
                     }else{
-                        UsersSystemsNavSub::whereIn('system_nav_sub_id', $system_nav_sub_ids)
-                            ->where('user_id', $id)
-                            ->where('role_id', 1)
-                            ->update(['level_id' => $level_id]);
+                        $delete = UsersSystemsNavSub::whereIn('system_nav_sub_id', $system_nav_sub_ids)
+                                    ->where('user_id', $id)
+                                    ->where('role_id', $role_id)->delete();
+                        $auto_increment = DB::update("ALTER TABLE users_systems_nav_sub AUTO_INCREMENT = 0;");
+                        $query = SystemsNavSub::whereIn('id', $system_nav_sub_ids)
+                                        ->get()
+                                        ->map(function($query) use ($id,$updated_by,$role_id,$level_id) {
+                                        return [
+                                            'user_id' => $id,
+                                            'system_nav_sub_id' => $query->id,
+                                            'role_id' => $role_id,
+                                            'level_id' => $level_id,
+                                            'updated_by' => $updated_by,
+                                            'created_at' => date('Y-m-d H:i:s'),
+                                            'updated_at' => date('Y-m-d H:i:s')
+                                        ];
+                                    })->toArray();
+                         UsersSystemsNavSub::insert($query);
                     }
                 }else{
-                    if($level_id==''){               
+                    if($level_id==''){
                         $delete = UsersSystemsNavSub::where('system_nav_sub_id', $system_id)
                                     ->where('user_id', $id)
-                                    ->where('role_id', 1)->delete();
+                                    ->where('role_id', $role_id)->delete();
                         $auto_increment = DB::update("ALTER TABLE users_systems_nav_sub AUTO_INCREMENT = 0;");
                     }
                     UsersSystemsNavSub::where('system_nav_sub_id', $system_id)
                             ->where('user_id', $id)
-                            ->where('role_id', 1)
+                            ->where('role_id', $role_id)
                             ->update(['level_id' => $level_id]);
                 }
                 $result = 'success';

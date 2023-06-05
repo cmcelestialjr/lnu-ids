@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EducOfferedCourses;
 use App\Models\EducOfferedCurriculum;
 use App\Models\StudentsCourses;
+use App\Models\StudentsCoursesAdvise;
 use App\Models\StudentsInfo;
 use App\Models\StudentsProgram;
 use App\Services\NameServices;
@@ -125,16 +126,37 @@ class UpdateController extends Controller
                         );
         return response()->json($response);
     }
+    public function enrollAdvisedSubmit(Request $request){
+        $courses = $request->courses;
+        $cid = $request->cid;
+        $query = StudentsCoursesAdvise::where('id',$courses[count($courses)-1])->first();
+        $offered_course_id = StudentsCoursesAdvise::whereIn('id',$courses)->pluck('offered_course_id')->toArray();
+        $student_id = $query->user_id;
+        $program_id = $query->program_id;
+        $curriculum_id = $query->offered_curriculum_id;
+        $response = $this->enrollSubmitStudent($request,$student_id,$program_id,$curriculum_id,$offered_course_id,$cid);
+        if($response['result']=='success'){
+            StudentsCoursesAdvise::whereIn('id',$courses)
+                                ->update(['status' => 1,
+                                        'updated_at' => date('Y-m-d H:i:s')]);
+        }
+        return response()->json($response);
+    }
     public function enrollSubmit(Request $request){
-        $user_access_level = $request->session()->get('user_access_level');
-        $user = Auth::user();
-        $updated_by = $user->id;
-        $result = 'error';
         $student_id = $request->student_id;
         $program_id = $request->program_id;
         $curriculum_id = $request->curriculum_id;
         $courses = $request->courses;
         $cid = $request->cid;
+        $response = $this->enrollSubmitStudent($request,$student_id,$program_id,$curriculum_id,$courses,$cid);
+        return response()->json($response);
+    }
+    private function enrollSubmitStudent($request,$student_id,$program_id,$curriculum_id,$courses,$cid){
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $result = 'error';
+        
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
             if(count($courses)>=1){                
                 $student = StudentsInfo::where('user_id',$student_id)->first();
@@ -159,6 +181,7 @@ class UpdateController extends Controller
                     $insert->course_code = $query->code;
                     $insert->course_desc = $query->course->name;
                     $insert->course_units = $query->course->units;
+                    $insert->lab_units = $query->course->lab;
                     $insert->school_name = 'Leyte Normal University';
                     $insert->year_from = $query->curriculum->offered_program->school_year->year_from;
                     $insert->year_to = $query->curriculum->offered_program->school_year->year_to;
@@ -212,6 +235,7 @@ class UpdateController extends Controller
                                         'curriculum_id' => $curriculum->curriculum_id,
                                         'grade_level_id' => $grade_level_id,
                                         'student_status_id' => $student_status_id,
+                                        'program_level_id' => $student_program->program_level_id,
                                         'updated_by' => $updated_by,
                                         'updated_at' => date('Y-m-d H:i:s')]);
 
@@ -221,6 +245,6 @@ class UpdateController extends Controller
         $response = array('result' => $result,
                           'courses' => $grade_level_id
                         );
-        return response()->json($response);
+        return $response;        
     }
 }

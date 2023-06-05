@@ -181,6 +181,7 @@ function program_courses(){
             }else{
                 toastr.success('Success');
                 $('#enrollModal #studentInformationDiv #programCoursesDiv').html(data);
+                $('#enrollModal #studentInformationDiv #advisedTable').bootstrapTable();
                 course_unit_total();
             }
         },

@@ -20,7 +20,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
         Route::get('/', 'IndexController@view')->name('indexpage');
         Route::post('/login', 'LoginController@check');        
     });
-    
+    Route::get('/monitor1', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@monitor1');
+    Route::post('/monitor1/display', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@display');
     Route::group(['middleware' => ['auth','Login','PreventBackHistory']], function(){
         Route::get('/logout', 'LoginController@logout');
         Route::get('/system', 'IndexController@systempage')->name('systempage');
@@ -69,8 +70,51 @@ Route::group(['middleware' => ['HTTPS']], function(){
             Route::post('/sectionCode', 'SEARCH\SectionCodeController@sectionCode');
             Route::post('/instructor', 'SEARCH\InstructorController@instructor');
             Route::post('/room', 'SEARCH\RoomController@room');
+            Route::post('/psgcBrgys', 'SEARCH\PSGCController@brgys');
+            Route::post('/psgcCityMuns', 'SEARCH\PSGCController@cityMuns');
+            Route::post('/psgcProvinces', 'SEARCH\PSGCController@provinces');
+            Route::post('/positionList', 'SEARCH\PositionController@list');
+            Route::post('/designationList', 'SEARCH\DesignationController@list');
+            Route::post('/ludongStudent', 'SEARCH\LudongController@student');
         });
-        
+        Route::group(['prefix'=>'sims'], function(){
+            Route::group(['prefix'=>'pre_enroll'], function(){
+                Route::post('/preEnrollCourses', 'SIMS\Preenroll\LoadViewController@preEnrollCourses');
+            });
+        });
+        Route::group(['prefix'=>'fis'], function(){
+            Route::group(['prefix'=>'students'], function(){                
+                Route::post('/studentsTable', 'FAMS\Students\LoadTableController@studentsTable');
+                Route::post('/studentSchoolYearTable', 'FAMS\Students\LoadTableController@studentSchoolYearTable');
+
+                Route::post('/gradeLevel', 'FAMS\Students\LoadViewController@gradeLevel');
+
+                Route::post('/studentViewModal', 'FAMS\Students\ModalController@studentViewModal');
+            });
+            Route::group(['prefix'=>'subjects'], function(){
+                Route::post('/subjectsTable', 'FAMS\Subjects\LoadTableController@subjectsTable');
+                Route::post('/studentsListTable', 'FAMS\Subjects\LoadTableController@studentsListTable');
+                
+                Route::post('/studentsListModal', 'FAMS\Subjects\ModalController@studentsListModal');
+                Route::post('/studentGradeModal', 'FAMS\Subjects\ModalController@studentGradeModal');
+
+                Route::post('/studentGradeSubmit', 'FAMS\Subjects\UpdateController@studentGradeSubmit');
+                
+            });
+            Route::group(['prefix'=>'schedule'], function(){
+                Route::post('/scheduleTable', 'FAMS\Schedule\LoadViewController@scheduleTable');
+                
+            });
+            Route::group(['prefix'=>'advisement'], function(){
+                Route::post('/studentInfo', 'FAMS\Advisement\LoadViewController@studentInfo');
+                Route::post('/curriculumSelect', 'FAMS\Advisement\LoadViewController@curriculumSelect');
+                Route::post('/studentAdvisement', 'FAMS\Advisement\LoadViewController@studentAdvisement');
+                Route::post('/sectionSelect', 'FAMS\Advisement\LoadViewController@sectionSelect');
+
+                Route::post('/advisementSubmit', 'FAMS\Advisement\UpdateController@advisementSubmit');
+                
+            });
+        });
         Route::group(['prefix'=>'rims'], function(){
             Route::group(['prefix'=>'student'], function(){
                 Route::post('/studentTable', 'RIMS\Student\LoadTableController@studentTable');
@@ -176,11 +220,14 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/sectionViewModal', 'RIMS\Sections\ModalController@sectionViewModal');
                 Route::post('/courseViewModal', 'RIMS\Sections\ModalController@courseViewModal');
                 Route::post('/courseSchedRmModal', 'RIMS\Sections\ModalController@courseSchedRmModal');
+                Route::post('/minMaxModal', 'RIMS\Sections\ModalController@minMaxModal');
                 
                 Route::post('/sectionNewSubmit', 'RIMS\Sections\NewController@sectionNewSubmit');
 
                 Route::post('/courseSchedRmInstructorUpdate', 'RIMS\Sections\UpdateController@courseSchedRmInstructorUpdate');
                 Route::post('/scheduleTimeUpdate', 'RIMS\Sections\UpdateController@scheduleTimeUpdate');
+                Route::post('/typeUpdate', 'RIMS\Sections\UpdateController@typeUpdate');
+                Route::post('/minMaxSubmit', 'RIMS\Sections\UpdateController@minMaxSubmit');                
             });
             Route::group(['prefix'=>'enrollment'], function(){
                 Route::post('/enrollmentTable', 'RIMS\Enrollment\LoadTableController@enrollmentTable');
@@ -205,6 +252,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/courseAnotherSubmit', 'RIMS\Enrollment\UpdateController@courseAnotherSubmit');
                 Route::post('/courseAddSubmit', 'RIMS\Enrollment\UpdateController@courseAddSubmit');
                 Route::post('/enrollSubmit', 'RIMS\Enrollment\UpdateController@enrollSubmit');
+                Route::post('/enrollAdvisedSubmit', 'RIMS\Enrollment\UpdateController@enrollAdvisedSubmit');
                 
             });
             
@@ -217,9 +265,130 @@ Route::group(['middleware' => ['HTTPS']], function(){
 
                 Route::post('/searchCourseSched', 'RIMS\Schedule\ModalController@searchCourseSched');                
                 
+                Route::post('/selectRoom', 'RIMS\Schedule\_SelectRoomController@selectRoom');
+                Route::post('/selectInstructor', 'RIMS\Schedule\_SelectInstructorController@selectInstructor');
+                Route::post('/selectDays', 'RIMS\Schedule\_SelectDays@selectDays');
+                Route::post('/selectTime', 'RIMS\Schedule\_SelectTime@selectTime');
+            });
+            Route::group(['prefix'=>'ludong'], function(){
+                Route::post('/studentTable', 'RIMS\Ludong\StudentController@table');
             });
         });
         
+        Route::group(['prefix'=>'hrims'], function(){
+            Route::group(['prefix'=>'employee'], function(){
+                Route::post('/employeeTable', 'HRIMS\Employee\EmployeeController@employeeTable');
+                Route::post('/employeeStat', 'HRIMS\Employee\EmployeeController@employeeStat');
+                Route::post('/employeeView', 'HRIMS\Employee\EmployeeController@employeeView');
+                Route::post('/employeeNewSubmit', 'HRIMS\Employee\EmployeeController@employeeNewSubmit');
+                Route::post('/employeeInformation', 'HRIMS\Employee\EmployeeController@employeeInformation');
+                Route::post('/uploadImage', 'HRIMS\Employee\EmployeeController@uploadImage');
+                Route::post('/workTable', 'HRIMS\Employee\WorkController@workTable');
+                
+                Route::post('/personalInfo', 'HRIMS\Employee\Information\PersonalInfoController@personalInfo');
+                Route::post('/schedule', 'HRIMS\Employee\Information\ScheduleController@schedule');
+                Route::post('/employeeStatus', 'HRIMS\Employee\StatusController@status');
+                Route::post('/employeeStatusSubmit', 'HRIMS\Employee\StatusController@submit');
+                
+                
+                Route::group(['prefix'=>'information'], function(){
+                    Route::post('/infoSubmit', 'HRIMS\Employee\Information\PersonalInfoController@infoSubmit');
+                    Route::post('/addressSubmit', 'HRIMS\Employee\Information\PersonalInfoController@addressSubmit');
+                    Route::post('/idNoSubmit', 'HRIMS\Employee\Information\PersonalInfoController@idNoSubmit');   
+                    
+                    Route::group(['prefix'=>'schedule'], function(){
+                        Route::post('/schedNewModal', 'HRIMS\Employee\Information\ScheduleController@schedNewModal');
+                        Route::post('/schedNewDaysList', 'HRIMS\Employee\Information\ScheduleController@schedNewDaysList');
+                        Route::post('/schedNewSubmit', 'HRIMS\Employee\Information\ScheduleController@schedNewSubmit');
+                        
+                        Route::post('/schedEditModal', 'HRIMS\Employee\Information\ScheduleController@schedEditModal');
+                        Route::post('/schedEditDaysList', 'HRIMS\Employee\Information\ScheduleController@schedEditDaysList');
+                        Route::post('/schedEditSubmit', 'HRIMS\Employee\Information\ScheduleController@schedEditSubmit');
+                        Route::post('/schedDeleteModal', 'HRIMS\Employee\Information\ScheduleController@schedDeleteModal');
+                        Route::post('/schedDeleteSubmit', 'HRIMS\Employee\Information\ScheduleController@schedDeleteSubmit');
+                    });
+                });
+                Route::group(['prefix'=>'work'], function(){
+                    Route::post('/newModal', 'HRIMS\Employee\WorkController@newModal');
+                    Route::post('/editModal', 'HRIMS\Employee\WorkController@editModal');
+                    Route::post('/positionShortenGet', 'HRIMS\Employee\WorkController@positionShortenGet');
+                    Route::post('/newSubmit', 'HRIMS\Employee\WorkController@newSubmit');
+                    Route::post('/editSubmit', 'HRIMS\Employee\WorkController@editSubmit');
+                });
+            });
+            Route::group(['prefix'=>'position'], function(){
+                Route::post('/positionTable', 'HRIMS\Position\PositionController@positionTable');
+                Route::post('/positionNew', 'HRIMS\Position\PositionController@new');
+                Route::post('/positionNewSubmit', 'HRIMS\Position\PositionController@newSubmit');
+                Route::post('/positionEdit', 'HRIMS\Position\PositionController@edit');
+                Route::post('/positionEditSubmit', 'HRIMS\Position\PositionController@editSubmit');
+                Route::post('/positionView', 'HRIMS\Position\PositionController@view');
+                Route::post('/positionViewTable', 'HRIMS\Position\PositionController@viewTable');
+            });
+            Route::group(['prefix'=>'dtr'], function(){
+                Route::post('/employeeTable', 'HRIMS\DTR\AllController@table');
+                Route::post('/holidayTable', 'HRIMS\DTR\HolidayController@table');
+                Route::post('/holidayNewModal', 'HRIMS\DTR\HolidayController@newModal');
+                Route::post('/holidayNewSubmit', 'HRIMS\DTR\HolidayController@newSubmit');
+                
+                Route::post('/dtrView', 'HRIMS\DTR\AllController@dtrView');
+                
+                Route::get('/pdf/{year}/{month}/{id_no}/{range}', 'HRIMS\DTR\PDFController@PDF');
+                Route::post('/individual', 'HRIMS\DTR\IndividualController@individual');
+                Route::post('/dtrInputModal', 'HRIMS\DTR\IndividualController@dtrInputModal');
+                Route::post('/dtrInputTable', 'HRIMS\DTR\IndividualController@dtrInputTable');
+                Route::post('/dtrInputSubmit', 'HRIMS\DTR\IndividualController@dtrInputSubmit');
+                Route::post('/dtrInputDurationModal', 'HRIMS\DTR\IndividualController@dtrInputDurationModal');
+                Route::post('/dtrInputDurationSubmit', 'HRIMS\DTR\IndividualController@dtrInputDurationSubmit');
+            });
+
+            Route::group(['prefix'=>'deduction'], function(){
+                Route::group(['prefix'=>'list'], function(){
+                    Route::post('/table', 'HRIMS\Deduction\ListController@table');
+                    Route::post('/newModal', 'HRIMS\Deduction\ListController@newModal');
+                    Route::post('/newSubmit', 'HRIMS\Deduction\ListController@newSubmit');
+                });
+                Route::group(['prefix'=>'group'], function(){
+                    Route::post('/table', 'HRIMS\Deduction\GroupController@table');
+                    Route::post('/newModal', 'HRIMS\Deduction\GroupController@newModal');
+                    Route::post('/newSubmit', 'HRIMS\Deduction\GroupController@newSubmit');
+                    Route::post('/viewModal', 'HRIMS\Deduction\GroupController@viewModal');
+                    Route::post('/viewModalTable', 'HRIMS\Deduction\GroupController@viewModalTable');
+                    Route::post('/updateModal', 'HRIMS\Deduction\GroupController@updateModal');
+                    Route::post('/updateSubmit', 'HRIMS\Deduction\GroupController@updateSubmit');
+                });
+            });
+        });
+
+        Route::group(['prefix'=>'fms'], function(){
+            Route::group(['prefix'=>'accounting'], function(){
+                Route::group(['prefix'=>'fund'], function(){
+                    Route::group(['prefix'=>'cluster'], function(){
+                        Route::post('/table', 'FMS\Accounting\Fund\ClusterController@table');
+                        Route::post('/newModal', 'FMS\Accounting\Fund\ClusterController@newModal');
+                        Route::post('/newSubmit', 'FMS\Accounting\Fund\ClusterController@newSubmit');
+                        Route::post('/updateModal', 'FMS\Accounting\Fund\ClusterController@updateModal');
+                        Route::post('/updateSubmit', 'FMS\Accounting\Fund\ClusterController@updateSubmit');
+                        Route::post('/viewModal', 'FMS\Accounting\Fund\ClusterController@viewModal');
+                        Route::post('/viewTable', 'FMS\Accounting\Fund\ClusterController@viewTable');
+                    });
+                    Route::group(['prefix'=>'source'], function(){
+                        Route::post('/table', 'FMS\Accounting\Fund\SourceController@table');
+                        Route::post('/newModal', 'FMS\Accounting\Fund\SourceController@newModal');
+                        Route::post('/newSubmit', 'FMS\Accounting\Fund\SourceController@newSubmit');
+                        Route::post('/updateModal', 'FMS\Accounting\Fund\SourceController@updateModal');
+                        Route::post('/updateSubmit', 'FMS\Accounting\Fund\SourceController@updateSubmit');
+                    });
+                    Route::group(['prefix'=>'financing'], function(){
+                        Route::post('/table', 'FMS\Accounting\Fund\FinancingController@table');
+                        Route::post('/newModal', 'FMS\Accounting\Fund\FinancingController@newModal');
+                        Route::post('/newSubmit', 'FMS\Accounting\Fund\FinancingController@newSubmit');
+                        Route::post('/updateModal', 'FMS\Accounting\Fund\FinancingController@updateModal');
+                        Route::post('/updateSubmit', 'FMS\Accounting\Fund\FinancingController@updateSubmit');
+                    });
+                });
+            });
+        });
     });
 });
 

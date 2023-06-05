@@ -15,7 +15,7 @@
             </div>
             <div class="col-lg-12">
                 <br>
-                <div class="card card-primary card-outline">
+                <div class="card card-success card-outline">
                     <div class="card-body table-responsive" id="studentCurriculumDiv">
                         
                     </div>

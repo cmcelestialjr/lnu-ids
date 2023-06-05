@@ -138,6 +138,8 @@ class UpdateController extends Controller
                         $insert->min_student = $time_max->min_student;
                         $insert->max_student = $time_max->max_student;
                         $insert->code = $course->code;
+                        $insert->hours = $course->units;
+                        $insert->minutes = 0;
                         $insert->status_id = 1;
                         $insert->year_level = $course->grade_level->level;
                         $insert->section = 1;

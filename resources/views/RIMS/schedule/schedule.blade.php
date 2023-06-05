@@ -61,7 +61,7 @@
                                         <div class="col-lg-12">
                                             <br>
                                             <div class="card card-info card-outline">
-                                                <div class="card-body table-responsive">
+                                                <div class="card-body">
                                                     <table id="viewTable" class="table table-bordered table-fixed"
                                                                 data-toggle="table"
                                                                 data-search="true"
@@ -207,7 +207,7 @@
 <!-- /.Content -->
 
 @include('layouts.script')
-<script src="{{ asset('assets/js/rims/sections/_function.js') }}"></script>
+
 <script src="{{ asset('assets/js/rims/schedule/_function.js') }}"></script>
 <script src="{{ asset('assets/js/rims/schedule/view.js') }}"></script>
 <script src="{{ asset('assets/js/rims/schedule/new.js') }}"></script>

@@ -54,6 +54,22 @@ $(document).on('click', '#sectionViewModal .courseViewModal', function (e) {
     };
     loadModal(form_data,thisBtn);
 });
+$(document).on('click', '#courseViewModal .minMaxModal', function (e) {
+    var thisBtn = $(this);
+    var id = thisBtn.data('id');
+    var url = base_url+'/rims/sections/minMaxModal';
+    var modal = 'info';
+    var modal_size = 'modal-md';
+    var form_data = {
+        url:url,
+        modal:modal,
+        modal_size:modal_size,
+        static:'',
+        w_table:'wo',
+        id:id
+    };
+    loadModal(form_data,thisBtn);
+});
 $(document).on('click', '#courseViewModal .courseSchedRmModal', function (e) {
     var thisBtn = $(this);
     var id = thisBtn.data('id');

@@ -35,4 +35,13 @@
 <script src="{{ asset('_adminLTE/dist/js/adminlte.js') }}"></script>
 <!-- Master -->
 <script src="{{ asset('assets/master/master.js') }}"></script>
+<script src="{{ asset('assets/master/navigation_scroll.js') }}"></script>
+
+
+
+
+
+
+
+
 @livewireScripts

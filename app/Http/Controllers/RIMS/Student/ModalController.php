@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RIMS\Student;
 use App\Http\Controllers\Controller;
 use App\Models\EducOfferedSchoolYear;
 use App\Models\EducProgramLevel;
+use App\Models\StudentsCourses;
 use App\Models\StudentsInfo;
 use App\Models\StudentsProgram;
 use Illuminate\Http\Request;
@@ -55,9 +56,12 @@ class ModalController extends Controller
         $id = $request->id;
         $school_year_id = $request->school_year_id;
         $query = EducOfferedSchoolYear::where('id',$school_year_id)->first();
+        $lab_units = StudentsCourses::where('user_id',$id)
+            ->where('school_year_id',$school_year_id)->sum('lab_units');
         $data = array(
             'id' => $id,
-            'query' => $query
+            'query' => $query,
+            'lab_units' => $lab_units
         );
         return view('rims/student/studentCoursesModal',$data);
     }

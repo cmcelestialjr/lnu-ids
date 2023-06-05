@@ -163,5 +163,4 @@
 <script src="{{ asset('assets/js/rims/school_year/modal.js') }}"></script>
 <script src="{{ asset('assets/js/rims/school_year/new.js') }}"></script>
 <script src="{{ asset('assets/js/rims/school_year/update.js') }}"></script>
-<script src="{{ asset('assets/js/rims/school_year/delete.js') }}"></script>
 @endsection

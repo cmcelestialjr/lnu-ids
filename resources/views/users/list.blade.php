@@ -52,7 +52,7 @@
                      </form>
                     <table id="viewTable" class="table table-bordered table-fixed"
                             data-toggle="table"
-                            data-search="false"
+                            data-search="true"
                             data-height="700"
                             data-buttons-class="primary"
                             data-show-export="true"

@@ -32,9 +32,20 @@ class LoadTableController extends Controller
                     });
         }else{
             $school_year_id = $request->school_year;
-            $query = $query->whereHas('courses', function ($query) use ($school_year_id) {
-                        $query->where('school_year_id', $school_year_id);
-                    });
+            if($option=='unenrolled'){
+                $school_year = EducOfferedSchoolYear::where('id',$school_year_id)->first();
+                $school_year = $school_year->year_from;
+                $query = $query->whereDoesntHave('courses', function ($query) use ($school_year_id) {
+                    $query->where('school_year_id',$school_year_id);
+                });
+                $query = $query->whereHas('student_program', function ($query) use ($school_year) {
+                    $query->whereYear('date_admitted',$school_year);
+                });
+            }else{
+                $query = $query->whereHas('courses', function ($query) use ($school_year_id) {
+                            $query->where('school_year_id', $school_year_id);
+                        });
+            }
             if($option=='Graduating'){
                 $query = $query->whereHas('student_program', function ($query) {
                     $query->where('date_graduate', NULL);
@@ -153,7 +164,7 @@ class LoadTableController extends Controller
                                 $room = implode('<br>',$rooms);
                             }
                             if($query->status->name==NULL){
-                                $status = 'Ongoing';
+                                $status = 'NG';
                             }else{
                                 $status = $query->status->name;
                             }
@@ -164,6 +175,7 @@ class LoadTableController extends Controller
                                 'code' => $query->course->code,
                                 'grade_level' => $query->course->course->grade_level->name,
                                 'units' => $query->course->course->units,
+                                'lab' => $query->course->course->lab,
                                 'section' => $query->course->section,
                                 'schedule' => $schedule,
                                 'room' => $room,
@@ -184,10 +196,11 @@ class LoadTableController extends Controller
                 $data_list['f5'] = $r['grade_level'];
                 $data_list['f6'] = $r['section'];
                 $data_list['f7'] = $r['units'];
-                $data_list['f8'] = $r['schedule'];
-                $data_list['f9'] = $r['room'];
-                $data_list['f10'] = $r['instructor'];
-                $data_list['f11'] = $r['status'];
+                $data_list['f8'] = $r['lab'];
+                $data_list['f9'] = $r['schedule'];
+                $data_list['f10'] = $r['room'];
+                $data_list['f11'] = $r['instructor'];
+                $data_list['f12'] = $r['status'];
                 array_push($data,$data_list);
                 $x++;
             }

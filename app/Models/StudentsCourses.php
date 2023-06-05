@@ -28,6 +28,10 @@ class StudentsCourses extends Model
     {
         return $this->belongsTo(StudentsCourseStatus::class, 'student_course_status_id', 'id')->withDefault();
     }
+    public function student_info()
+    {
+        return $this->belongsTo(StudentsInfo::class, 'user_id', 'user_id')->withDefault();
+    }
     public function info()
     {
         return $this->belongsTo(Users::class, 'user_id', 'id')->withDefault();

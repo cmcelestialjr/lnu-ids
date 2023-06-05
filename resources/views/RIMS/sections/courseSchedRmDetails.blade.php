@@ -1,4 +1,4 @@
-<table class="table">
+<table class="table" style="font-size: 18px;">
     <tr>
         <td>Units:</td>
         <td><label>{{$query->course->units}}</label></td>

@@ -15,17 +15,14 @@
                 </select>
            </div>
            <div class="col-lg-8">
-                <button class="btn btn-info btn-info-scan hide" id="courseAddModal" style="float:right;">
-                    <span class="fa fa-plus-square"></span> Add Course
-                </button>
+                
            </div>
            <div class="col-lg-12" id="studentInformationDiv">
            </div>
         </div>
     </div>
     <div class="modal-footer justify-content-between" id="enroll">
-        <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-times"></span> Close</button>
-        <button class="btn btn-success btn-success-scan" name="submit"><span class="fa fa-check"></span> Submit</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-times"></span> Close</button>        
     </div>
 </div>
 <!-- /.modal-content -->

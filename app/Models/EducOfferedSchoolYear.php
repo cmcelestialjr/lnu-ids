@@ -12,5 +12,8 @@ class EducOfferedSchoolYear extends Model
     {
         return $this->belongsTo(EducGradePeriod::class, 'grade_period_id', 'id')->withDefault();
     }
-
+    public function offered_program()
+    {
+        return $this->hasMany(EducOfferedPrograms::class, 'school_year_id', 'id');
+    }
 }

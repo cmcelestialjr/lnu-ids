@@ -10,6 +10,7 @@ use App\Models\EducOfferedPrograms;
 use App\Models\EducOfferedSchedule;
 use App\Models\EducPrograms;
 use App\Models\StudentsCourses;
+use App\Models\StudentsCoursesAdvise;
 use App\Models\StudentsInfo;
 use App\Services\NameServices;
 use Illuminate\Http\Request;
@@ -74,6 +75,8 @@ class LoadViewController extends Controller
         $section = $request->section;
         $student = StudentsInfo::where('user_id',$student_id)->first();
         $unit_limit = EducOfferedCurriculum::where('id',$curriculum_id)->first();
+        $school_year_id = $unit_limit->offered_program->school_year_id;
+        
         $curriculum_ids = EducOfferedCurriculum::where('id',$curriculum_id)
                             ->pluck('curriculum_id')
                             ->toArray();
@@ -157,7 +160,7 @@ class LoadViewController extends Controller
                                                     }
                                                     if($ongoing!=NULL){
                                                         $availability = 2;
-                                                        $availability_name = 'Ongoing';
+                                                        $availability_name = 'NG';
                                                     }
                                                     if(count($offered_course->schedule)>0){
                                                         foreach($offered_course->schedule as $row){
@@ -205,9 +208,67 @@ class LoadViewController extends Controller
                                     'courses' => $courses                                    
                                 ];
                             })->toArray();
+        $advised = StudentsCoursesAdvise::where('school_year_id',$school_year_id)
+            ->where('user_id',$student_id)
+            ->get()
+            ->map(function($course) use ($name_services) {
+                $instructor = 'TBA';
+                $schedule_implode = 'TBA';
+                $room_implode = 'TBA';
+                $advised_by = $name_services->firstname($course->advised_by->lastname,
+                    $course->advised_by->firstname,
+                    $course->advised_by->middlename,
+                    $course->advised_by->extname);
+                if($course->course->instructor_id!=NULL){
+                    $instructor = $name_services->firstname($course->course->instructor->lastname,
+                        $course->course->instructor->firstname,
+                        $course->course->instructor->middlename,
+                        $course->course->instructor->extname);
+                }
+                if(count($course->course->schedule)>0){
+                    foreach($course->course->schedule as $row){
+                        $days = array();
+                        if($row->room_id==NULL){
+                            $room = 'TBA';
+                        }else{
+                            $room = $row->room->name;
+                        }
+                        foreach($row->days as $day){
+                            $days[] = $day->day;
+                        }
+                        $days1 = implode('',$days);
+                        $rooms[] = $room;
+                        $schedules[] = date('h:ia',strtotime($row->time_from)).'-'.
+                                        date('h:ia',strtotime($row->time_to)).' '.$days1;
+                    }
+                    $schedule_implode = implode('<br>',$schedules);
+                    $room_implode = implode('<br>',$rooms);
+                }
+                if($course->credit_course_id==NULL){
+                    $credit_course_id = $course->course->course_id;
+                }else{
+                    $credit_course_id = $course->credit_course_id;
+                }
+                return [
+                    'id' => $course->id,
+                    'program' => $course->course->curriculum->offered_program->name.'-'.$course->course->curriculum->offered_program->program->shorten,
+                    'section_code' => $course->course->section_code,
+                    'course_code' => $course->course->code,
+                    'units' => $course->course->course->units,
+                    'schedule' => $schedule_implode,
+                    'room' => $room_implode,
+                    'instructor' => $instructor,
+                    'advised_by' => $advised_by,
+                    'date_time' => date('M d, Y h:i: a',strtotime($course->created_at)),
+                    'status' => $course->status,
+                    'credit_course_id' => $credit_course_id
+                ];
+            })->toArray();
         $data = array(
             'program_courses' => $program_courses,
-            'type' => 'course'
+            'type' => 'course',
+            'student' => $student,
+            'advised' => $advised
         );
         return view('rims/enrollment/programCoursesDiv',$data);
     }
@@ -271,6 +332,7 @@ class LoadViewController extends Controller
         if($courses_sel==''){
             $courses_sel = [];
         }
+        $student = StudentsInfo::where('user_id',$student_id)->first();
         $unit_limit = EducOfferedCurriculum::where('id',$curriculum_id)->first();
         $program_courses = EducOfferedCourses::where('offered_curriculum_id',$curriculum_id)
                             ->select('year_level')
@@ -340,7 +402,7 @@ class LoadViewController extends Controller
                                                 }
                                                 if($ongoing!=NULL){
                                                     $availability = 2;
-                                                    $availability_name = 'Ongoing';
+                                                    $availability_name = 'NG';
                                                 }
                                                 if(count($course->schedule)>0){
                                                     foreach($course->schedule as $row){
@@ -386,7 +448,8 @@ class LoadViewController extends Controller
                             })->toArray();
         $data = array(
             'program_courses' => $program_courses,
-            'type' => 'add'
+            'type' => 'add',
+            'student' => $student
         );
         return view('rims/enrollment/programCoursesDiv',$data);
     }

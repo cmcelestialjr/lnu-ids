@@ -10,7 +10,7 @@ class PSGCBrgys extends Model
     protected $table = 'psgc_brgys';
     public function city_muns()
     {
-        return $this->belongsTo(PSGCCityMuns::class, 'uacs', 'uacs')->withDefault();
+        return $this->belongsTo(PSGCCityMuns::class, 'city_mun_uacs', 'uacs')->withDefault();
     }
 }
 

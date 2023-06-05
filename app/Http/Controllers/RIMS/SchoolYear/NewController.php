@@ -70,6 +70,7 @@ class NewController extends Controller
                 $insert->updated_by = $updated_by;
                 $insert->save();
                 $id = $insert->id;
+                $this->offerProgramsSubmit($id);
                 //$id = 17;
                 $result = 'success';
             }catch(Exception $e){
@@ -81,7 +82,131 @@ class NewController extends Controller
         $response = array('result' => $result,
                           'id' => $id);
         return response()->json($response);
-    }    
+    }  
+    private function offerProgramsSubmit($id){
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $time_max = EducTimeMax::first();
+        $result = 'error';
+        try{
+            $school_year = EducOfferedSchoolYear::with('grade_period')->where('id',$id)->first();
+            $grade_period = $school_year->grade_period_id;
+            $grade_period_period = $school_year->grade_period->period;
+            $program_level_ids = EducProgramLevel::where('period',$grade_period_period)->pluck('id')->toArray();
+
+            // $curriculum_ids = EducCourses::where('status_id','1')->pluck('curriculum_id')->toArray();
+            // if(!empty($curriculum_ids)){
+            //     $program_idss = EducCurriculum::where('id',$curriculum_ids)->pluck('program_id')->toArray();                
+                $query = EducProgramsCode::with('program')->where('status_id', 1)
+                                                ->whereHas('program', function($query) use ($program_level_ids){
+                                                    $query->whereIn('program_level_id', $program_level_ids);
+                                                })
+                                                //->whereIn('program_id',$program_idss)
+                                                ->get()
+                                                ->map(function($query) use ($id,$updated_by) {
+                                                return [
+                                                    'school_year_id' => $id,
+                                                    'program_id' => $query->program_id,
+                                                    'program_code_id' => $query->id,
+                                                    'department_id' => $query->program->department_id,
+                                                    'name' => $query->name,
+                                                    'updated_by' => $updated_by,
+                                                    'created_at' => date('Y-m-d H:i:s'),
+                                                    'updated_at' => date('Y-m-d H:i:s')
+                                                ];
+                                            })->toArray();
+                EducOfferedPrograms::insert($query);
+                
+                $programs_id = EducOfferedPrograms::where('school_year_id',$id)->pluck('id')->toArray();
+                $department_ids = EducOfferedPrograms::where('school_year_id',$id)->pluck('department_id')->toArray();
+                
+                $query = EducDepartments::whereIn('id',$department_ids)->get()
+                                            ->map(function($query) use ($id,$updated_by) {
+                                            return [
+                                                    'school_year_id' => $id,
+                                                    'department_id' => $query->id,
+                                                    'name' => $query->name,
+                                                    'shorten' => $query->shorten,
+                                                    'code' => $query->code,
+                                                    'updated_by' => $updated_by,
+                                                    'created_at' => date('Y-m-d H:i:s'),
+                                                    'updated_at' => date('Y-m-d H:i:s')
+                                            ];
+                                        })->toArray();
+                EducOfferedDepartment::insert($query);
+
+                $query = EducOfferedPrograms::join('educ_curriculum', 'educ__offered_programs.program_id', '=', 'educ_curriculum.program_id')
+                                            ->select('educ_curriculum.id',
+                                                    'educ_curriculum.code', 
+                                                    DB::raw('educ__offered_programs.id as offered_program_id'))
+                                            ->where('educ__offered_programs.school_year_id', $id)
+                                            ->where('educ_curriculum.status_id',1)
+                                            ->get()
+                                            ->map(function($query) use ($updated_by) {
+                                            return [
+                                                    'offered_program_id' => $query->offered_program_id,
+                                                    'curriculum_id' => $query->id,
+                                                    'code' => $query->code,
+                                                    'updated_by' => $updated_by,
+                                                    'created_at' => date('Y-m-d H:i:s'),
+                                                    'updated_at' => date('Y-m-d H:i:s')
+                                            ];
+                                        })->toArray();
+                EducOfferedCurriculum::insert($query);
+                                        
+                // $query = EducOfferedCurriculum::with('offered_program','courses')
+                //                             ->whereIn('offered_program_id', $programs_id)
+                //                             ->get()
+                //                             ->map(function($query) use ($time_max,$updated_by,$grade_period) {
+                //                                 foreach($query->courses as $row){
+                //                                     //if($row->status_id==1 && $row->grade_period_id==$grade_period){
+                //                                         return [
+                //                                                 'offered_curriculum_id' => $query->id,
+                //                                                 'course_id' => $row->id,
+                //                                                 'min_student' => $time_max->min_student,
+                //                                                 'max_student' => $time_max->max_student,
+                //                                                 'code' => $row->code,
+                //                                                 'status_id' => $row->status_id,
+                //                                                 'section' => 1,
+                //                                                 'section_code' => $query->offered_program->name.'1'.$row->grade_level->level,
+                //                                                 'updated_by' => $updated_by,
+                //                                                 'created_at' => date('Y-m-d H:i:s'),
+                //                                                 'updated_at' => date('Y-m-d H:i:s')
+                //                                         ];
+                //                                     //}
+                //                                 }    
+                //                         })->toArray();
+
+                $query = EducOfferedCurriculum::with('offered_program')->whereIn('offered_program_id', $programs_id)
+                            ->get();
+                foreach($query as $row){
+                    $courses = EducCourses::with('grade_level')->where('curriculum_id', $row->curriculum_id)
+                                    ->where('grade_period_id',$grade_period)
+                                    ->get();
+                    foreach($courses as $course){
+                        $datas[] = [
+                                    'offered_curriculum_id' => $row->id,
+                                    'course_id' => $course->id,
+                                    'min_student' => $time_max->min_student,
+                                    'max_student' => $time_max->max_student,
+                                    'code' => $course->code,
+                                    'status_id' => $course->status_id,
+                                    'year_level' => $course->grade_level->level,
+                                    'section' => 1,
+                                    'section_code' => $row->code.$row->offered_program->name.'1'.$course->grade_level->level,
+                                    'updated_by' => $updated_by,
+                                    'created_at' => date('Y-m-d H:i:s'),
+                                    'updated_at' => date('Y-m-d H:i:s')
+                            ];
+                    }
+                }
+                EducOfferedCourses::insert($datas);
+            //}
+            $result = 'success';
+        }catch(Exception $e){
+            
+        }
+    }
     public function offerPrograms(Request $request){
         $user = Auth::user();
         $updated_by = $user->id;

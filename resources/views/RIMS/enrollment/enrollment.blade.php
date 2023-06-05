@@ -38,7 +38,7 @@
                     <div class="col-lg-12">
                       <br>
                       <div class="card card-info card-outline">
-                        <div class="card-body table-responsive">
+                        <div class="card-body">
                           @if($user_access->level_id==1 || $user_access->level_id==2 || $user_access->level_id==3)                          
                             <button class="btn btn-primary btn-primary-scan" name="enroll" style="float:right">
                               <span class="fa fa-plus-square"></span> Enroll
@@ -83,7 +83,5 @@
 <script src="{{ asset('assets/js/rims/enrollment/_function.js') }}"></script>
 <script src="{{ asset('assets/js/rims/enrollment/view.js') }}"></script>
 <script src="{{ asset('assets/js/rims/enrollment/modal.js') }}"></script>
-<script src="{{ asset('assets/js/rims/enrollment/new.js') }}"></script>
 <script src="{{ asset('assets/js/rims/enrollment/update.js') }}"></script>
-<script src="{{ asset('assets/js/rims/enrollment/delete.js') }}"></script>
 @endsection

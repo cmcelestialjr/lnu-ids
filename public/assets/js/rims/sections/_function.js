@@ -63,8 +63,10 @@ function course_sched_rm_details(){
 function course_sched_rm_schedule(){
     var thisBtn = $('#courseSchedRmModal .schdrm');
     var id = $('#courseSchedRmModal input[name="id"]').val();
+    var schedule_id = $('#courseSchedRmModal #schedule select[name="schedule"] option:selected').val();
     var form_data = {
-        id:id
+        id:id,
+        schedule_id:schedule_id
     };
     $.ajax({
         url: base_url+'/rims/sections/courseSchedRmSchedule',
@@ -193,6 +195,178 @@ function view_sections(){
             thisBtn.removeAttr('disabled');
             thisBtn.removeClass('input-success');
             thisBtn.removeClass('input-error');
+        }
+    });
+}
+function rm_instructor_update(){
+    var thisBtn = $('#courseSchedRmModal #rm_instructor .select2-rm_instructor');
+    var id = $('#courseSchedRmModal input[name="id"]').val();
+    var instructor_id = $('#courseSchedRmModal #rm_instructor select[name="instructor"] option:selected').val();
+    var schedule_id = $('#courseSchedRmModal #schedule select[name="schedule"] option:selected').val();
+    var room_id = $('#courseSchedRmModal #rm_instructor select[name="room"] option:selected').val();
+    var hours = parseInt($('#courseSchedRmModal #rm_instructor input[name="hours"]').val());
+    var minutes = $('#courseSchedRmModal #rm_instructor select[name="minutes"] option:selected').val();
+    var time = $('#courseSchedRmModal #rm_instructor select[name="time"] option:selected').val();
+    var type = $('#courseSchedRmModal #rm_instructor input[name="type"]:checked').val();
+    var days = [];
+    var x = 0;
+    if(hours<0 || hours>=8){
+        $('#courseSchedRmModal #rm_instructor input[name="hours"]').addClass('border-require');
+        toastr.error('Hours must be lower than 8');
+        x++;
+    }
+    if(x==0){
+        $('#courseSchedRmModal #rm_instructor select[name="days[]"] option:selected').each(function () {
+            days.push($(this).val());
+        }); 
+        var form_data = {
+            id:id,
+            instructor_id:instructor_id,
+            room_id:room_id,
+            schedule_id:schedule_id,
+            hours:hours,
+            minutes:minutes,
+            days:days,
+            time:time,
+            type:type
+        };
+        $.ajax({
+            url: base_url+'/rims/sections/courseSchedRmInstructorUpdate',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN
+            },
+            data:form_data,
+            cache: false,
+            dataType: 'json',
+            beforeSend: function() {
+                thisBtn.attr('disabled','disabled'); 
+                thisBtn.addClass('input-loading');
+            },
+            success : function(data){                
+                thisBtn.removeClass('input-loading'); 
+                if(data.result=='success'){
+                    toastr.success('Success');
+                    thisBtn.addClass('input-success');
+                    if(data.schedule_id=='new'){
+                        $('#courseSchedRmModal #rm_instructor select[name="time"]').val("TBA");
+                        $('#courseSchedRmModal #schedule select[name="schedule"]').val("new");
+                    }
+                    $('#courseSchedRmModal #schedule select[name="schedule"] option[value="' + data.schedule_id + '"]').remove();
+                    $('#courseSchedRmModal #schedule select[name="schedule"]').append($('<option value="'+data.schedule_id+'" selected>'+data.sched_name+'</option>'));
+                    course_sched_rm_details();
+                    course_sched_rm_schedule();
+                    setTimeout(function() {
+                        thisBtn.removeAttr('disabled');
+                        course_sched_rm_table();
+                    }, 1000)
+                }else if(data.result=='error'){
+                    thisBtn.removeAttr('disabled');
+                    toastr.error('Error.');
+                    thisBtn.addClass('input-error');                
+                }else{
+                    thisBtn.removeAttr('disabled');
+                    toastr.error(data.result);
+                    thisBtn.addClass('input-error');
+                    course_sched_rm_table();
+                }
+                setTimeout(function() {
+                    thisBtn.removeClass('input-success');
+                    thisBtn.removeClass('input-error');
+                }, 3000);
+            },
+            error: function (){
+                toastr.error('Error!');
+                thisBtn.removeAttr('disabled');
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }
+        });
+    }
+}
+function course_view_table(id,thisBtn){
+    var form_data = {
+        url_table:base_url+'/rims/sections/courseViewTable',
+        tid:'courseViewTable',
+        id:id
+    };
+    loadTable(form_data,thisBtn);
+}
+function select_day(){
+    var get_time = [];
+    var get_day = [];
+    var select_days = [];
+    var schedule_id = $('#courseSchedRmModal #schedule select[name="schedule"] option:selected').val();
+    var select_time = $('#courseSchedRmModal #rm_instructor select[name="time"] option:selected').val();
+    $('#courseSchedRmModal #courseSchedRmTable .schedDayTimeInput').each(function () {
+        get_time.push($(this).data('t'));
+        get_day.push($(this).data('d'));
+    }); 
+    $('#courseSchedRmModal #rm_instructor select[name="days[]"] option:selected').each(function () {
+        select_days.push($(this).val());
+    });
+    $('#courseSchedRmModal #rm_instructor select[name="days[]"]').select2({
+        dropdownParent: $("#rm_instructor"),
+        ajax: { 
+        url: base_url+'/rims/schedule/selectDays',
+        type: "post",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+            return {
+                _token: CSRF_TOKEN,
+                schedule_id:schedule_id,
+                get_day:get_day,
+                get_time:get_time,                
+                select_days:select_days,
+                select_time:select_time,
+                search: params.term
+            };
+        },
+        processResults: function (response) {
+            return {
+            results: response
+            };
+        },
+        cache: true
+        }
+    });
+}
+function select_time(){
+    var get_time = [];
+    var get_day = [];
+    var select_days = [];
+    var schedule_id = $('#courseSchedRmModal #schedule select[name="schedule"] option:selected').val();
+    $('#courseSchedRmModal #courseSchedRmTable .schedDayTimeInput').each(function () {
+        get_time.push($(this).data('t'));
+        get_day.push($(this).data('d'));
+    }); 
+    $('#courseSchedRmModal #rm_instructor select[name="days[]"] option:selected').each(function () {
+        select_days.push($(this).val());
+    });
+    $('#courseSchedRmModal #rm_instructor select[name="time"]').select2({
+        dropdownParent: $("#rm_instructor"),
+        ajax: { 
+        url: base_url+'/rims/schedule/selectTime',
+        type: "post",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+            return {
+                _token: CSRF_TOKEN,
+                schedule_id:schedule_id,
+                get_day:get_day,
+                select_days:select_days,
+                get_time:get_time,
+                search: params.term
+            };
+        },
+        processResults: function (response) {
+            return {
+            results: response
+            };
+        },
+        cache: true
         }
     });
 }

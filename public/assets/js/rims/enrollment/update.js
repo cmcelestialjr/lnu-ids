@@ -33,6 +33,7 @@ $(document).on('click', '#courseAnotherModal button[name="submit"]', function (e
                     $('#enrollModal #studentInformationDiv #programCoursesDiv #course_conflict'+course_id).addClass('btn-primary btn-primary-scan');
                     $('#enrollModal #studentInformationDiv #programCoursesDiv #course_checked'+course_id).removeClass('hide');
                     $('#enrollModal #studentInformationDiv #programCoursesDiv #course_checked'+course_id).attr('checked', 'checked');
+                    $('#enrollModal #studentInformationDiv #programCoursesDiv #course_checked'+course_id).data('id', course_id_another);
                     $('#enrollModal #studentInformationDiv #programCoursesDiv #course_checked'+course_id).data('cid', course_id_another1);
                     $('#enrollModal #studentInformationDiv #programCoursesDiv #course_code'+course_id).html('<br>'+data.code);
                     $('#enrollModal #studentInformationDiv #programCoursesDiv #course_name'+course_id).html('<br>'+data.name);
@@ -128,7 +129,7 @@ $(document).on('click', '#courseAddModal button[name="submit"]', function (e) {
         toastr.error('Please select a course');
     }
 });
-$(document).on('click', '#enrollModal #enroll button[name="submit"]', function (e) {
+$(document).on('click', '#enrollModal #studentInformationDiv #programCoursesDiv button[name="submit_curriculum"]', function (e) {
     var thisBtn = $(this);    
     var student_id = $('#enrollModal select[name="student"] option:selected').val();
     var program_id = $('#enrollModal #studentInformationDiv select[name="program"] option:selected').val();
@@ -151,6 +152,60 @@ $(document).on('click', '#enrollModal #enroll button[name="submit"]', function (
         };
         $.ajax({
             url: base_url+'/rims/enrollment/enrollSubmit',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN
+            },
+            data:form_data,
+            cache: false,
+            dataType: 'json',
+            beforeSend: function() {
+                thisBtn.attr('disabled','disabled'); 
+                thisBtn.addClass('input-loading');
+            },
+            success : function(data){
+                thisBtn.removeAttr('disabled');
+                thisBtn.removeClass('input-loading');
+                if(data.result=='success'){
+                    toastr.success('Success');
+                    thisBtn.addClass('input-success');
+                    $('#modal-default').modal('hide');
+                    enrollment();
+                }else{
+                    toastr.error('Error.');
+                    thisBtn.addClass('input-error');
+                }
+                setTimeout(function() {
+                    thisBtn.removeClass('input-success');
+                    thisBtn.removeClass('input-error');
+                }, 3000);
+            },
+            error: function (){
+                toastr.error('Error!');
+                thisBtn.removeAttr('disabled');
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }
+        });
+    }else{
+        toastr.error('Please select a course');
+    }
+});
+$(document).on('click', '#enrollModal #studentInformationDiv #programCoursesDiv button[name="submit_advisement"]', function (e) {
+    var thisBtn = $(this);    
+    var courses = [];
+    var cid = [];
+    $('#enrollModal .advisedCourseCheck:checked').each(function () {
+        courses.push($(this).data('id'));
+        cid.push($(this).data('cid'));
+    }); 
+    if(courses!=''){
+        var form_data = {
+            courses:courses,
+            cid:cid
+        };
+        $.ajax({
+            url: base_url+'/rims/enrollment/enrollAdvisedSubmit',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': CSRF_TOKEN

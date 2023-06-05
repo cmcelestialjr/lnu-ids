@@ -38,12 +38,43 @@ class IndexController extends Controller
     }
     public function systems(){
         $user = Auth::user();
-        $roles = UsersRoleList::where('user_id',$user->id)->pluck('role_id')->toArray();
-        $user_systems = UsersSystems::where('user_id',$user->id)->pluck('system_id')->toArray();
+        $user_id = $user->id;
+        $roles = UsersRoleList::where('user_id',$user_id)->pluck('role_id')->toArray();
+        $user_systems = UsersSystems::where('user_id',$user_id)->pluck('system_id')->toArray();
         
-        $systems = Systems::whereIn('id',$user_systems)->orderBy('order','ASC')->get();
-        $count_systems = $systems->count();
-        $encrypt = Crypt::encryptString('1234'.Hash::make('sample').'1234');
+        $systems = Systems::whereIn('id',$user_systems)
+            ->orderBy('order','ASC')
+            ->get()
+            ->map(function($query) use ($user_id) {
+                $nav = SystemsNav::where('system_id',$query->id)
+                    ->whereHas('user_nav', function ($query) use ($user_id) {
+                        $query->where('user_id',$user_id);
+                    })->orderBy('order','ASC')->first();
+                $nav_url = '/home/n';
+                if($nav!=NULL){
+                    $nav_id = $nav->id;
+                    $nav_sub = SystemsNavSub::where('system_nav_id',$nav_id)
+                        ->whereHas('user_nav_sub', function ($query) use ($user_id) {
+                            $query->where('user_id',$user_id);
+                        })->orderBy('order','ASC')->first();
+                    $nav_url = '/'.$nav->url.'/n';
+                    if($nav_sub!=NULL){
+                        $nav_url = '/'.$nav_sub->url.'/s';
+                    }
+                }
+                return [
+                    'id' => $query->id,
+                    'name' => $query->name,
+                    'shorten' => $query->shorten,
+                    'icon' => $query->icon,
+                    'button' => $query->button,
+                    'order' => $query->order,
+                    'nav_url' => $nav_url
+
+                ];
+            })->toArray();
+        $count_systems = count($systems);
+        $encrypt = Crypt::encryptString('1234'.Hash::make('josh').'1234');
         $data = array(
             'user' => $user,
             'roles' => $roles,
@@ -85,16 +116,19 @@ class IndexController extends Controller
                     $nav_selecteds = SystemsNav::where('system_id',$systems_selected->id)->where('url',$nav_selected)->first();
                     $user_access = UsersSystemsNav::where('user_id',$user->id)
                                                 ->where('system_nav_id',$nav_selecteds->id)->first();
+                    $nav_selecteds_name = $user_access->name;
                     $request->session()->put('user_access_level',$user_access->level_id);
                 }else{
                     $nav_ids = SystemsNav::where('system_id',$systems_selected->id)->pluck('id')->toArray();
                     $nav_selecteds = SystemsNavSub::whereIn('system_nav_id',$nav_ids)->where('url',$nav_selected)->first();
+                    $nav_selecteds_name = $nav_selecteds->system_nav->name;
                     $user_access = UsersSystemsNavSub::where('user_id',$user->id)
                                             ->where('system_nav_sub_id',$nav_selecteds->id)->first();
                     $request->session()->put('user_access_level',$user_access->level_id);
-                }
+                }                
             }else{
                 $user_access = '';
+                $nav_selecteds_name = '';
                 $request->session()->put('user_access_level','');
             }
             $data = array(
@@ -111,7 +145,15 @@ class IndexController extends Controller
             if($system_selected=='USERS' && $nav_selected=='list'){
                 return app('App\Http\Controllers\USERS\UserController')->user($data);
             }else{
-                return app(str_replace('"',"",'App\Http\Controllers\"'.$system_selected.'\PageController'))->$nav_selected($data);
+                // if($system_selected=='FMS'){
+                //     if($nav_selected=='home_fms'){
+                //         return app(str_replace('"',"",'App\Http\Controllers\"'.$system_selected.'\PageController'))->$nav_selected($data);
+                //     }else{
+                //         return app(str_replace('"',"",'App\Http\Controllers\"'.$system_selected.'\"'.$nav_selecteds_name.'\PageController'))->$nav_selected($data);
+                //     }
+                // }else{
+                    return app(str_replace('"',"",'App\Http\Controllers\"'.$system_selected.'\PageController'))->$nav_selected($data);
+                //}
             }
         }catch(Exception $e){
             return view('layouts/error/404');

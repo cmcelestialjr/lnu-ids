@@ -10,7 +10,7 @@ class PSGCRegions extends Model
     protected $table = 'psgc_regions';
     public function provinces()
     {
-        return $this->hasMany(PSGCProvinces::class, 'uacs', 'uacs');
+        return $this->hasMany(PSGCProvinces::class, 'region_uacs', 'uacs');
     }
 }
 

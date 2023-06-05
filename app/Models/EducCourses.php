@@ -28,4 +28,8 @@ class EducCourses extends Model
     {
         return $this->hasMany(EducCoursesPre::class, 'course_id', 'id');
     }
+    public function courses()
+    {
+        return $this->hasMany(EducOfferedCourses::class, 'course_id', 'id');
+    }
 }

@@ -14,10 +14,10 @@
                 <div class="card card-info card-outline">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-lg-4" id="schedule">
+                            <div class="col-lg-10" id="schedule">
                                 
                             </div>
-                            <div class="col-lg-8">
+                            <div class="col-lg-12">
                                 <div class="row" id="rm_instructor">
                                     
                                 </div>

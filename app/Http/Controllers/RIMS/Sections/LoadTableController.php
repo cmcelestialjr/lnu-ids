@@ -159,6 +159,7 @@ class LoadTableController extends Controller
             foreach($query as $r){
                 $schedule = $r['schedule'];
                 $room = $r['room'];
+                $min_max = $r['min_max'];
                 if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
                     $schedule = '<button class="btn btn-primary btn-primary-scan btn-sm courseSchedRmModal"
                                     data-id="'.$r['id'].'">
@@ -166,12 +167,15 @@ class LoadTableController extends Controller
                     $room = '<button class="btn btn-info btn-info-scan btn-sm courseSchedRmModal"
                                     data-id="'.$r['id'].'">
                                     '.$r['room'].'</button>';
+                    $min_max = '<button class="btn btn-primary btn-primary-scan btn-xs minMaxModal"
+                                    data-id="'.$r['id'].'">
+                                    '.$r['min_max'].'</button>';
                 }
                 $data_list['f1'] = $x;
                 $data_list['f2'] = $r['name'];
                 $data_list['f3'] = $r['code'];
                 $data_list['f4'] = $r['units'];
-                $data_list['f5'] = $r['min_max'];
+                $data_list['f5'] = $min_max;
                 $data_list['f6'] = $r['no_students'];
                 $data_list['f7'] = $schedule;
                 $data_list['f8'] = $room;

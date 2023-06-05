@@ -80,10 +80,21 @@ class LoadViewController extends Controller
     }
     public function courseSchedRmSchedule(Request $request){
         $id = $request->id;
+        $schedule_id = $request->schedule_id;
         $query = EducOfferedSchedule::where('offered_course_id',$id)->orderBy('time_from')->get();
+        if($schedule_id=='new'){
+            $selected1 = 'selected';
+            $selected2 = '';
+        }else{
+            $selected1 = '';
+            $selected2 = 'selected';
+        }
         $data = array(
             'id' => $id,
-            'query' => $query
+            'query' => $query,
+            'selected1' => $selected1,
+            'selected2' => $selected2,
+            'schedule_id' => $schedule_id
         );
         return view('rims/sections/courseSchedRmSchedule',$data);
     }
@@ -99,10 +110,12 @@ class LoadViewController extends Controller
         }
         $query = EducOfferedCourses::where('id',$id)->first();
         $room = EducOfferedSchedule::where('id',$schedule_id)->first();
-        $rooms = EducRoom::get();
-        $instructors = UsersRoleList::where('role_id',3)->get();
         if($room!=NULL){
+            $hours = $room->hours;
+            $minutes = $room->minutes;
             $room_id = $room->room_id;
+            $time_sched = date('h:ia',strtotime($room->time_from)).'-'.date('h:ia',strtotime($room->time_to));
+            $days_sched = EducOfferedScheduleDay::where('offered_schedule_id',$room->id)->get();
             if($room->type=='Lab'){
                 $lec = '';
                 $lab = 'checked';
@@ -111,15 +124,31 @@ class LoadViewController extends Controller
                 $lab = '';                
             }
         }else{
+            $room_id = '';
+            $time_sched = '';
+            $days_sched = '';
             $lec = 'checked';
             $lab = '';
-            $room_id = '';
+            $hours = $query->hours;
+            $minutes = $query->minutes;
+        }        
+        $instructors = UsersRoleList::where('role_id',3)->where('user_id',$query->instructor_id)->first();
+        if($room_id==''){
+            $rooms = NULL;
+        }else{
+            $rooms = EducRoom::where('id',$room_id)->first();
         }
+        $minutes_list = array(0,15,30,45);
         $data = array(
             'id' => $id,
             'query' => $query,
+            'hours' => $hours,
+            'minutes' => $minutes,
+            'minutes_list' => $minutes_list,
             'rooms' => $rooms,
             'room_id' => $room_id,
+            'time_sched' => $time_sched,
+            'days_sched' => $days_sched,
             'schedule_id' => $schedule_id,
             'instructors' => $instructors,
             'instructor_id' => $query->instructor_id,
@@ -167,6 +196,9 @@ class LoadViewController extends Controller
             $room_id = NULL;
         }else{
             $room_id = $room_id_course;
+        }
+        if($request->room_id!=NULL && $request->room_id!='TBA'){
+            $room_id = $request->room_id;
         }
         if(($instructor_id==NULL && $instructor_course==NULL) || $instructor_id=='TBA'){
             $instructor_id = NULL;
@@ -223,13 +255,18 @@ class LoadViewController extends Controller
             if($request->instructor_id!=NULL && $request->instructor_id!='TBA'){
                 $instructor_schedule_conflict = $this->instructor_schedule_conflict($datas);
             }
-        }
-        if($schedule!=NULL){
             $scheduleRemoveDayTr = '';
+            $hours = $schedule->hours;
+            $minutes = $schedule->minutes;
         }else{
             $scheduleRemoveDayTr = 'hide';
+            $hours = $query->hours;
+            $minutes = $query->minutes;
         }
+        
         $data = array(
+            'hours' => $hours,
+            'minutes' => $minutes,            
             'time_period' => $time_period,
             'schedule' => $schedule,
             'course_curriculum' => $course_curriculum,
@@ -311,5 +348,9 @@ class LoadViewController extends Controller
                                             })
                                             ->get();
         return $instructor_schedule_conflict;
+    }
+    private function days_list($days_sched){
+        $days_array = array('SU','M','T','W','TH','F','S');
+        return $days_array;
     }
 }

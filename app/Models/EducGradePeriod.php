@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class EducGradePeriod extends Model
 {
     protected $table = 'educ_grade_period';
-    public function courses()
-    {
+    public function courses(){
         return $this->hasMany(EducCourses::class, 'grade_period_id', 'id')
                 ->orderBy('grade_level_id','ASC')
                 ->orderBy('grade_period_id','ASC')
                 ->orderBy('id','ASC');
+    }
+    public function month(){
+        return $this->hasMany(EducPeriodMonth::class, 'grade_period_id', 'id');
     }
 }

@@ -54,15 +54,6 @@ $(document).on('change', '#sectionNewModal select[name="curriculum"]', function 
 $(document).on('change', '#courseSchedRmModal #schedule select[name="schedule"]', function (e) {
     var thisBtn = $(this);
     var schedule = $('#courseSchedRmModal #schedule select[name="schedule"] option:selected').text();
-    if(schedule=='New'){
-        $('#courseSchedRmModal #schedule input[name="time_from"]').val('07:30am');
-        $('#courseSchedRmModal #schedule input[name="time_to"]').val('09:00am');
-    }else{
-        console.log(schedule);
-        var sched = schedule.split('-');
-        $('#courseSchedRmModal #schedule input[name="time_from"]').val(sched[0]);
-        $('#courseSchedRmModal #schedule input[name="time_to"]').val(sched[1]);
-    }
     course_sched_rm_rm_instructor();
     course_sched_rm_table();
 });
