@@ -20,6 +20,10 @@ class EducPrograms extends Model
     {
         return $this->belongsTo(EducCourseStatus::class, 'status_id', 'id')->withDefault();
     }
+    public function branch()
+    {
+        return $this->belongsTo(EducBranch::class, 'branch_id', 'id')->withDefault();
+    }
     public function codes()
     {
         return $this->hasMany(EducProgramsCode::class, 'program_id', 'id');
@@ -27,5 +31,9 @@ class EducPrograms extends Model
     public function curriculum()
     {
         return $this->hasMany(EducCurriculum::class, 'program_id', 'id')->orderBy('year_from','DESC');
+    }
+    public function offered_program()
+    {
+        return $this->hasMany(EducOfferedPrograms::class, 'program_id', 'id');
     }
 }

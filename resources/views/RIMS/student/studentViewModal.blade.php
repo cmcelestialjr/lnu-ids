@@ -2,6 +2,7 @@
 <div class="modal-content" id="studentViewModal">
     <div class="modal-header">
         <h4 class="modal-title"></h4>
+        <span class="fa fa-times btn-no-design" data-dismiss="modal">x</span>
     </div>
     <div class="modal-body">
         <div class="row">
@@ -15,7 +16,7 @@
                             <div class="col-lg-4 center"><br>
                                 <img src="{{ asset('assets/images/icons/png/user.png') }}" class="profile-picture" alt="Student Image">
                             </div>
-                            <div class="col-lg-8 table-responsive"><br>
+                            <div class="col-lg-8 table-responsive">
                                 <table class="table">
                                     <tr>
                                         <td style="width: 10%">Lastname:</td>
@@ -50,7 +51,9 @@
                                     <tr>
                                         <td>Sex:</td>
                                         <td><label>
-                                            {{$query->info->personal_info->sex}}
+                                            @if($query->info->personal_info->sex!=NULL)
+                                            {{$query->info->personal_info->sexs->name}}
+                                            @endif
                                             </label></td>
                                         <td>Department:</td>
                                         <td><label>
@@ -79,7 +82,11 @@
                         <button class="btn btn-primary btn-primary-scan" id="tor">
                             <span class="fa fa-graduation-cap"></span> TOR</button> &nbsp;
                         <button class="btn btn-info btn-info-scan" id="curriculum">
-                            <span class="fa fa-list"></span> Curriculum</button>
+                            <span class="fa fa-list"></span> Curriculum</button> 
+                        @if($program_level>=6) &nbsp;
+                            <button class="btn btn-primary btn-primary-scan" id="shift">
+                                <span class="fa fa-rotate-right"></span> Shift</button>
+                        @endif
                         <table id="studentSchoolYearTable" class="table table-bordered table-fixed"
                                 data-toggle="table"
                                 data-search="true"

@@ -227,3 +227,56 @@ $(document).on('change', '#courseSchedRmModal #rm_instructor .select2-rm_instruc
 $(document).on('blur', '#courseSchedRmModal #rm_instructor .input-rm_instructor', function (e) {
     rm_instructor_update();
 });
+$(document).on('blur', '.min_max_section', function (e) {
+    var thisBtn = $(this);
+    var val = thisBtn.val();
+    var id = thisBtn.data('id');
+    var t = thisBtn.data('t');
+    if(val<=0){
+        thisBtn.addClass('border-require');
+        thisBtn.addClass('input-error');
+    }else{
+        var form_data = {
+            id:id,
+            type:t,
+            val:val
+        };
+        $.ajax({
+            url: base_url+'/rims/sections/minMaxStudent',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN
+            },
+            data:form_data,
+            cache: false,
+            dataType: 'json',
+            beforeSend: function() {
+                thisBtn.attr('disabled','disabled'); 
+                thisBtn.removeClass('input-error');
+                thisBtn.addClass('input-loading');
+                thisBtn.removeClass('border-require');
+            },
+            success : function(data){
+                thisBtn.removeAttr('disabled');
+                thisBtn.removeClass('input-loading'); 
+                if(data.result=='success'){
+                    toastr.success('Success');
+                    thisBtn.addClass('input-success');
+                }else{
+                    toastr.error('Error.');
+                    thisBtn.addClass('input-error');
+                }
+                setTimeout(function() {
+                    thisBtn.removeClass('input-success');
+                    thisBtn.removeClass('input-error');
+                }, 3000);
+            },
+            error: function (){
+                toastr.error('Error!');
+                thisBtn.removeAttr('disabled');
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }
+        });
+    }    
+});

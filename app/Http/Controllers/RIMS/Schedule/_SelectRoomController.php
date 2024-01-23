@@ -10,43 +10,49 @@ class _SelectRoomController extends Controller
 {
     public function selectRoom(Request $request){
         $search = $request->input('search');
-        $course_id = $request->course_id;
-        $schedule_id = $request->schedule_id;
-        $schedule = EducOfferedSchedule::where('id',$schedule_id)->first();
-        $room_ids = EducRoom::
-            whereHas('rooms', function ($query) use ($course_id,$schedule) {
-                $query->where('offered_course_id',$course_id);
-                if($schedule!=NULL){
-                    $query->where(function ($query) use ($schedule) {
-                        $query->where(function ($query) use ($schedule) {
-                            $query->where('time_from','>=',$schedule->time_from)
-                            ->where('time_to','<=',$schedule->time_from);
+        $course_id = $request->id;
+        
+        $select_days = $request->select_days;
+        $select_time = $request->select_time;
+        $time_from = NULL;
+        $time_to = NULL;
+        if($select_time!='TBA'){
+            $exp_time = explode('-',$select_time);
+            $time_from = date('H:i',strtotime($exp_time[0]));
+            $time_to = date('H:i',strtotime($exp_time[1]));
+        }
+        $results = EducRoom::where('name','like','%'.$search.'%')
+            ->where(function ($query) use ($course_id,$select_time,$select_days,$time_from,$time_to) {
+                if($select_time!='TBA' && $select_days!='TBA'){
+                    $query->WhereDoesntHave('rooms', function ($query) use ($course_id,$select_days,$time_from,$time_to) {
+                        $query->where('offered_course_id','<>',$course_id);
+                        $query->where(function ($query) use ($time_from,$time_to) {
+                            $query->where(function ($query) use ($time_from) {
+                                $query->where('time_from','>=',$time_from)
+                                ->where('time_to','<=',$time_from);
+                            });
+                            $query->orWhere(function ($query) use ($time_from) {
+                                $query->where('time_from','<=',$time_from)
+                                ->where('time_to','>',$time_from);
+                            });
+                            $query->orWhere(function ($query) use ($time_to) {
+                                $query->where('time_from','<',$time_to)
+                                ->where('time_to','>=',$time_to);
+                            });
+                            $query->orWhere(function ($query) use ($time_from) {
+                                $query->where('time_from','>=',$time_from)
+                                ->where('time_to','<=',$time_from);
+                            });
                         });
-                        $query->orWhere(function ($query) use ($schedule) {
-                            $query->where('time_from','<=',$schedule->time_from)
-                            ->where('time_to','>',$schedule->time_from);
+                        $query->whereHas('days', function ($query) use ($select_days) {
+                            $query->whereIn('no', $select_days);
                         });
-                        $query->orWhere(function ($query) use ($schedule) {
-                            $query->where('time_from','<',$schedule->time_to)
-                            ->where('time_to','>=',$schedule->time_to);
-                        });
-                        $query->orWhere(function ($query) use ($schedule) {
-                            $query->where('time_from','>=',$schedule->time_from)
-                            ->where('time_to','<=',$schedule->time_from);
-                        });
-                    });                
-                    if(count($schedule->days)>0){
-                        foreach($schedule->days as $day){
-                            $days[] = $day->day;
-                        }
-                        $query->whereHas('days', function ($query) use ($days) {
-                            $query->whereIn('day', $days);
-                        });
-                    }
+                    });
+                }else{
+                    $query->whereHas('rooms');
                 }
-            })->pluck('id')->toarray();
-        $results = EducRoom::whereNotIn('id',$room_ids)
-            ->where('name','like','%'.$search.'%')
+                $query->orWhereDoesntHave('rooms');
+            })
             ->limit(20)
             ->get();
         $data = [];

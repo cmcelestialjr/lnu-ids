@@ -1,7 +1,7 @@
-function courseSearch(school_year){
+function instructorSearch(){
     $(document).ready(function() {
-        $(".instructor").select2({
-            dropdownParent: $("#instructor"),
+        $(".instructor-select").select2({
+            dropdownParent: $("#instructor-div"),
             ajax: { 
             url: base_url+'/search/instructor',
             type: "post",
@@ -10,7 +10,6 @@ function courseSearch(school_year){
             data: function (params) {
                 return {
                 _token: CSRF_TOKEN,
-                school_year:school_year,
                 search: params.term
                 };
             },

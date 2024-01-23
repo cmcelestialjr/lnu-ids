@@ -26,6 +26,10 @@
                 </div>
             </div>
             <div class="col-md-12">
+                <label>Name</label>
+                <input type="text" class="form-control" name="name">
+            </div>
+            <div class="col-md-12">
                 <label>Remarks</label>
                 <textarea class="form-control" name="remarks"></textarea>
             </div>

@@ -3,51 +3,58 @@ $(document).on('click', '#curriculumNewModal button[name="submit"]', function (e
     var id = $('#curriculumNewModal input[name="id"]').val();
     var year_from = $('#curriculumNewModal input[name="year_from"]').val();
     var year_to = $('#curriculumNewModal input[name="year_to"]').val();
+    var name = $('#curriculumNewModal input[name="name"]').val();
     var remarks = $('#curriculumNewModal input[name="remarks"]').val();
-    var form_data = {
-        id:id,
-        year_from:year_from,
-        year_to:year_to,
-        remarks:remarks
-    };
-    $.ajax({
-        url: base_url+'/rims/programs/curriculumNewSubmit',
-        type: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': CSRF_TOKEN
-        },
-        data:form_data,
-        cache: false,
-        beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
-            thisBtn.addClass('input-loading');
-        },
-        success : function(data){
-            thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
-            if(data=='error'){
-                toastr.error('Error.');
-                thisBtn.addClass('input-error');                
-            }else{
-                toastr.success('Success');
-                thisBtn.addClass('input-success');
-                $('#curriculumModal #curriculumDiv #curriculums').html(data);
-                $(".select2-default").select2({
-                    dropdownParent: $("#curriculums")
-                });
-            }
-            setTimeout(function() {
+    if(name==''){
+        toastr.error('Please input name');
+        $('#curriculumNewModal input[name="name"]').addClass('border-require');
+    }else{
+        var form_data = {
+            id:id,
+            year_from:year_from,
+            year_to:year_to,
+            name:name,
+            remarks:remarks
+        };
+        $.ajax({
+            url: base_url+'/rims/programs/curriculumNewSubmit',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN
+            },
+            data:form_data,
+            cache: false,
+            beforeSend: function() {
+                thisBtn.attr('disabled','disabled'); 
+                thisBtn.addClass('input-loading');
+            },
+            success : function(data){
+                thisBtn.removeAttr('disabled');
+                thisBtn.removeClass('input-loading'); 
+                if(data=='error'){
+                    toastr.error('Error.');
+                    thisBtn.addClass('input-error');                
+                }else{
+                    toastr.success('Success');
+                    thisBtn.addClass('input-success');
+                    $('#curriculumModal #curriculumDiv #curriculums').html(data);
+                    $(".select2-default").select2({
+                        dropdownParent: $("#curriculums")
+                    });
+                }
+                setTimeout(function() {
+                    thisBtn.removeClass('input-success');
+                    thisBtn.removeClass('input-error');
+                }, 3000);
+            },
+            error: function (){
+                toastr.error('Error!');
+                thisBtn.removeAttr('disabled');
                 thisBtn.removeClass('input-success');
                 thisBtn.removeClass('input-error');
-            }, 3000);
-        },
-        error: function (){
-            toastr.error('Error!');
-            thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-success');
-            thisBtn.removeClass('input-error');
-        }
-    });
+            }
+        });
+    }
 });
 $(document).on('click', '#newCourseModal button[name="submit"]', function (e) {
     var thisBtn = $(this);
@@ -55,11 +62,14 @@ $(document).on('click', '#newCourseModal button[name="submit"]', function (e) {
     var id = $('#curriculumModal #curriculumDiv select[name="curriculum"] option:selected').val();
     var grade_period = $('#newCourseModal select[name="grade_period"] option:selected').val();
     var year_level = $('#newCourseModal select[name="year_level"] option:selected').val();
+    var lab_group = $('#newCourseModal select[name="lab_group"] option:selected').val();
+    var course_type = $('#newCourseModal select[name="course_type"] option:selected').val();
     var code = $('#newCourseModal input[name="code"]').val();
     var name = $('#newCourseModal input[name="name"]').val();
     var units = $('#newCourseModal input[name="units"]').val();
     var pre_name = $('#newCourseModal input[name="pre_name"]').val();
     var lab = $('#newCourseModal input[name="lab"]').val();
+    var pay_units = $('#newCourseModal input[name="pay_units"]').val();
     var courses = [];
     $('#newCourseModal .courses:checked').each(function() {
         courses.push($(this).val());
@@ -94,7 +104,10 @@ $(document).on('click', '#newCourseModal button[name="submit"]', function (e) {
             units:units,
             pre_name:pre_name,
             courses:courses,
-            lab:lab
+            lab:lab,
+            pay_units:pay_units,
+            lab_group:lab_group,
+            course_type:course_type
         };
         $.ajax({
             url: base_url+'/rims/programs/newCourseSubmit',
@@ -126,200 +139,6 @@ $(document).on('click', '#newCourseModal button[name="submit"]', function (e) {
                     toastr.error('Course Code or Descriptive Title already exists!');
                     thisBtn.addClass('input-error');
                 }else{                    
-                    toastr.error('Error.');
-                    thisBtn.addClass('input-error');
-                }
-                setTimeout(function() {
-                    thisBtn.removeClass('input-success');
-                    thisBtn.removeClass('input-error');
-                }, 3000);
-            },
-            error: function (){
-                toastr.error('Error!');
-                thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-success');
-                thisBtn.removeClass('input-error');
-            }
-        });
-    }
-});
-$(document).on('click', '#programCodeNewModal button[name="submit"]', function (e) {
-    var thisBtn = $(this);
-    var id = $('#programCodeNewModal input[name="id"]').val();
-    var name = $('#programCodeNewModal input[name="name"]').val();
-    var remarks = $('#programCodeNewModal textarea[name="remarks"]').val();
-    var x = 0;
-    if(name==''){
-        $('#programCodeNewModal input[name="name"]').addClass('border-require');
-        x++;
-    }
-    if(x==0){
-        var form_data = {
-            id:id,
-            name:name,
-            remarks:remarks
-        };
-        $.ajax({
-            url: base_url+'/rims/programs/programCodeNewSubmit',
-            type: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': CSRF_TOKEN
-            },
-            data:form_data,
-            cache: false,
-            dataType: 'json',
-            beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
-                thisBtn.addClass('input-loading');
-            },
-            success : function(data){
-                thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading');
-                if(data.result=='success'){
-                    toastr.success('Success');
-                    thisBtn.addClass('input-success');
-                    $('#modal-primary').modal('hide');
-                    view_program_code(id);
-                }else if(data.result=='exists'){
-                    toastr.error('Code already exists!');
-                    thisBtn.addClass('input-error');
-                }else{
-                    toastr.error('Error.');
-                    thisBtn.addClass('input-error');
-                }
-                setTimeout(function() {
-                    thisBtn.removeClass('input-success');
-                    thisBtn.removeClass('input-error');
-                }, 3000);
-            },
-            error: function (){
-                toastr.error('Error!');
-                thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-success');
-                thisBtn.removeClass('input-error');
-            }
-        });
-    }
-});
-$(document).on('click', '#programsNewModal button[name="submit"]', function (e) {
-    var thisBtn = $(this);
-    var level = $('#programsNewModal select[name="level"] option:selected').val();
-    var department = $('#programsNewModal select[name="department"] option:selected').val();
-    var name = $('#programsNewModal input[name="name"]').val();
-    var shorten = $('#programsNewModal input[name="shorten"]').val();
-    var code = $('#programsNewModal input[name="code"]').val();
-    var x = 0;
-    if(name==''){
-        $('#programsNewModal input[name="name"]').addClass('border-require');
-        x++;
-    }
-    if(shorten==''){
-        $('#programsNewModal input[name="shorten"]').addClass('border-require');
-        x++;
-    }
-    if(code==''){
-        $('#programsNewModal input[name="code"]').addClass('border-require');
-        x++;
-    }
-    if(x==0){
-        var form_data = {
-            level:level,
-            department:department,
-            name:name,
-            shorten:shorten,
-            code:code
-        };
-        $.ajax({
-            url: base_url+'/rims/programs/programsNewSubmit',
-            type: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': CSRF_TOKEN
-            },
-            data:form_data,
-            cache: false,
-            dataType: 'json',
-            beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
-                thisBtn.addClass('input-loading');
-            },
-            success : function(data){
-                thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading');
-                if(data.result=='success'){
-                    toastr.success('Success');
-                    thisBtn.addClass('input-success');
-                    $('#modal-primary').modal('hide');  
-                    view_programs();               
-                }else if(data.result=='exists'){
-                    toastr.error('Name/Shorten/Code already exists!');
-                    thisBtn.addClass('input-error');
-                }else{
-                    toastr.error('Error.');
-                    thisBtn.addClass('input-error');
-                }
-                setTimeout(function() {
-                    thisBtn.removeClass('input-success');
-                    thisBtn.removeClass('input-error');
-                }, 3000);
-            },
-            error: function (){
-                toastr.error('Error!');
-                thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-success');
-                thisBtn.removeClass('input-error');
-            }
-        });
-    }
-});
-$(document).on('click', '#newModal button[name="submit"]', function (e) {
-    var thisBtn = $(this);
-    var name = $('#newModal input[name="name"]').val();
-    var shorten = $('#newModal input[name="shorten"]').val();
-    var code = $('#newModal input[name="code"]').val();
-    var x = 0;
-    if(name==''){
-        $('#newModal input[name="name"]').addClass('border-require');
-        x++;
-    }
-    if(shorten==''){
-        $('#newModal input[name="shorten"]').addClass('border-require');
-        x++;
-    }
-    if(code==''){
-        $('#newModal input[name="code"]').addClass('border-require');
-        x++;
-    }
-    if(x==0){
-        var form_data = {
-            name:name,
-            shorten:shorten,
-            code:code
-        };
-        $.ajax({
-            url: base_url+'/rims/departments/newModalSubmit',
-            type: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': CSRF_TOKEN
-            },
-            data:form_data,
-            cache: false,
-            dataType: 'json',
-            beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
-                thisBtn.addClass('input-loading');
-            },
-            success : function(data){
-                thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
-                if(data.result=='success'){
-                    toastr.success('Success');
-                    thisBtn.addClass('input-success');
-                    $('#modal-primary').modal('hide');
-                    view_departments();
-                }else if(data.result=='exists'){
-                    toastr.error('Name/Shorten/Code already exists!');
-                    thisBtn.addClass('input-error');
-                }else{
                     toastr.error('Error.');
                     thisBtn.addClass('input-error');
                 }

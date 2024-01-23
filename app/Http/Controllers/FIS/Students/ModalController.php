@@ -13,7 +13,7 @@ class ModalController extends Controller
         $query = StudentsInfo::where('user_id',$id)->first();
         $program_level = StudentsProgram::where('user_id',$id)
                 ->select('program_level_id','curriculum_id')
-                ->orderBy('program_level_id','DESC')->first();
+                ->orderBy('year_from','DESC')->first();
         $data = array(
             'id' => $id,
             'query' => $query,

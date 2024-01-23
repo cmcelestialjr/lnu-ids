@@ -4,12 +4,13 @@ namespace App\Http\Controllers\HRIMS\Position;
 use App\Http\Controllers\Controller;
 use App\Models\_Work;
 use App\Models\EmploymentStatus;
+use App\Models\FundServices;
 use App\Models\FundSource;
 use App\Models\HRDesignation;
 use App\Models\HRPosition;
 use App\Models\HRPositionSched;
-use App\Models\HRPositionStatus;
 use App\Models\HRPositionType;
+use App\Models\Status;
 use App\Models\Users;
 use App\Models\UsersRole;
 use App\Services\NameServices;
@@ -43,7 +44,12 @@ class PositionController extends Controller
         $data = array();
         $type = $request->type;
         $status = $request->status;
-        $query = HRPosition::where('status_id',$status);
+        $query = HRPosition::with('designation',
+                                  'emp_stat',
+                                  'fund_source',
+                                  'role',
+                                  'type')
+            ->where('status_id',$status);
         if($type!='All'){
             $query = $query->where('type_id',$type);
         }
@@ -149,9 +155,12 @@ class PositionController extends Controller
         return  response()->json($data);
     }
     private function _new($request){
-        $status = HRPositionStatus::get();
+        $status = Status::whereHas('status_list', function ($query) {
+                $query->where('table','position');
+            })->get();
         $emp_stat = EmploymentStatus::get();
         $fund_source = FundSource::get();
+        $fund_services = FundServices::get();
         $sched = HRPositionSched::get();
         $role = UsersRole::where('id','>',1)->get();
 
@@ -159,6 +168,7 @@ class PositionController extends Controller
             'status' => $status,
             'emp_stat' => $emp_stat,
             'fund_source' => $fund_source,
+            'fund_services' => $fund_services,
             'sched' => $sched,
             'role' => $role
         );
@@ -166,9 +176,12 @@ class PositionController extends Controller
     }
     private function _edit($request){
         $query = HRPosition::where('id',$request->id)->first();
-        $status = HRPositionStatus::get();
+        $status = Status::whereHas('status_list', function ($query) {
+            $query->where('table','position');
+        })->get();
         $emp_stat = EmploymentStatus::get();
         $fund_source = FundSource::get();
+        $fund_services = FundServices::get();
         $sched = HRPositionSched::get();
         $role = UsersRole::where('id','>',1)->get();
 
@@ -176,6 +189,7 @@ class PositionController extends Controller
             'status' => $status,
             'emp_stat' => $emp_stat,
             'fund_source' => $fund_source,
+            'fund_services' => $fund_services,
             'role' => $role,
             'sched' => $sched,
             'query' => $query
@@ -205,6 +219,7 @@ class PositionController extends Controller
             $designation = $request->designation;
             $emp_stat = $request->emp_stat;
             $fund_source = $request->fund_source;
+            $fund_services = $request->fund_services;
             $role = $request->role;
             $status = $request->status;
             $sched =$request->sched;
@@ -222,6 +237,9 @@ class PositionController extends Controller
                 if($fund_source==''){
                     $fund_source = NULL;
                 }
+                if($fund_services==''){
+                    $fund_services = NULL;
+                }
                 $insert = new HRPosition(); 
                 $insert->item_no = $item_no;
                 $insert->name = $name;
@@ -235,6 +253,7 @@ class PositionController extends Controller
                 $insert->designation_id = $designation;
                 $insert->emp_stat_id = $emp_stat;
                 $insert->fund_source_id = $fund_source;
+                $insert->fund_services_id = $fund_services;
                 $insert->role_id = $role;
                 $insert->type_id = 2;
                 $insert->status_id = $status;
@@ -265,6 +284,7 @@ class PositionController extends Controller
             $designation = $request->designation;
             $emp_stat = $request->emp_stat;
             $fund_source = $request->fund_source;
+            $fund_services = $request->fund_services;
             $role = $request->role;
             $status = $request->status;
             $sched = $request->sched;
@@ -281,6 +301,9 @@ class PositionController extends Controller
                 }
                 if($fund_source==''){
                     $fund_source = NULL;
+                }
+                if($fund_services==''){
+                    $fund_services = NULL;
                 }
                 $get = _Work::where('position_id',$id)->where('date_to','present')->first();
                 $type_id = 2;
@@ -299,6 +322,7 @@ class PositionController extends Controller
                         'designation_id' => $designation,
                         'emp_stat_id' => $emp_stat,
                         'fund_source_id' => $fund_source,
+                        'fund_services_id' => $fund_services,
                         'role_id' => $role,
                         'type_id' => $type_id,
                         'status_id' => $status,

@@ -11,10 +11,18 @@ use App\Models\StudentsInfo;
 use App\Models\Users;
 use App\Services\NameServices;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LoadTableController extends Controller
-{
+{  
     public function enrollmentTable(Request $request){
+        if($request->by=='program'){
+            return $this->enrollmentTableProgram($request);
+        }else{
+            return $this->enrollmentTableDate($request);
+        }
+    }
+    private function enrollmentTableProgram(Request $request){
         $data = array();
         $id = $request->id;
         $query = EducOfferedPrograms::where('school_year_id',$id)
@@ -47,11 +55,62 @@ class LoadTableController extends Controller
                 $data_list['f4'] = $r['code'];
                 $data_list['f5'] = $r['count'];
                 $data_list['f6'] = '<button class="btn btn-primary btn-primary-scan enrollmentViewModal"
-                                        data-id="'.$r['id'].'"
-                                        <span class="fa fa-eye"></span> View
+                                        data-id="'.$r['id'].'">
+                                        <span class="fa fa-eye"></span>View
                                     </button>';
                 array_push($data,$data_list);
                 $x++;
+            }
+        }
+        return  response()->json($data);
+    }
+    private function enrollmentTableDate(Request $request){
+        $name_services = new NameServices;
+        $data = array();
+        $id = $request->id;
+        $date = $request->date;
+        if($data!=''){
+            DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+            $query = StudentsCourses::where('school_year_id',$id)
+                        ->whereDate('created_at',$date)
+                        ->groupBy('user_id')
+                        ->orderBy('created_at','DESC')->get()
+                        ->map(function($query) use ($name_services) {
+                            $name = $name_services->lastname($query->student_info->info->lastname,$query->student_info->info->firstname,$query->student_info->info->middlename,$query->student_info->info->extname);
+
+                            return [
+                                'id' => $query->user_id,
+                                'id_no' => $query->student_info->id_no,
+                                'name' => $name,
+                                'department' => $query->student_info->program->departments->shorten,
+                                'program' => $query->student_info->program->shorten,
+                                'level' => $query->student_info->grade_level->name,
+                                'status' => $query->student_info->status->name,
+                                'student_program_id' => $query->student_program_id,
+                                'school_year' => $query->school_year->year_from.'-'.$query->school_year->year_to,
+                                'school_period' => str_replace(' ','-',$query->school_year->grade_period->name)
+                            ];
+                        })->toArray();
+            if(count($query)>0){
+                $x = 1;
+                foreach($query as $r){
+                    $data_list['f1'] = $x;
+                    $data_list['f2'] = $r['id_no'];
+                    $data_list['f3'] = $r['name'];
+                    $data_list['f4'] = $r['department'];
+                    $data_list['f5'] = $r['program'];
+                    $data_list['f6'] = $r['level'];
+                    $data_list['f7'] = $r['status'];
+                    $data_list['f8'] = '<button class="btn btn-info btn-info-scan btn-xs coursesViewModal"
+                                            data-id="'.$r['id'].'"
+                                            data-spid="'.$r['student_program_id'].'"><span class="fa fa-eye"></span></button>';
+                    $data_list['f9'] = '<a class="btn btn-primary btn-primary-scan btn-xs view"
+                                            href="/enrollment_form/'.$r['id_no'].'/'.$r['school_year'].'/'.$r['school_period'].'" target="_blank">
+                                            <span class="fa fa-file"></span>
+                                        </a>';
+                    array_push($data,$data_list);
+                    $x++;
+                }
             }
         }
         return  response()->json($data);

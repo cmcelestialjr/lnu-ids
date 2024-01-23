@@ -9,8 +9,10 @@ use App\Models\EducOfferedCurriculum;
 use App\Models\EducOfferedPrograms;
 use App\Models\EducOfferedSchedule;
 use App\Models\EducOfferedSchoolYear;
+use App\Models\EducYearLevel;
 use App\Models\StudentsCourses;
 use App\Models\StudentsCoursesAdvise;
+use App\Models\StudentsCourseStatus;
 use App\Models\StudentsInfo;
 use App\Services\NameServices;
 use Illuminate\Http\Request;
@@ -47,9 +49,12 @@ class LoadViewController extends Controller
         return response()->json($response);
     }
     public function curriculumSelect(Request $request){
+        $student_program = StudentsInfo::where('user_id',$request->id)->first();
         $code = $request->code;
         $result = 'error';
         $curriculum = EducOfferedCurriculum::where('offered_program_id',$code)
+            ->where('curriculum_id',$student_program->curriculum_id)
+                ->orderBy('code','DESC')
                 ->get()
                 ->map(function($query) {
                     return [
@@ -78,11 +83,22 @@ class LoadViewController extends Controller
                         'name' => $query->section
                     ];
                 })->toArray();
+        $get_grade_level = EducOfferedCourses::where('offered_curriculum_id',$curriculum)->first();
+        $grade_level_id = $get_grade_level->course->grade_level->program_level_id;
+        $grade_level = EducYearLevel::where('program_level_id',$grade_level_id)
+                ->get()
+                ->map(function($query) {
+                    return [
+                        'id' => $query->id,
+                        'name' => $query->name
+                    ];
+                })->toArray();
         if(count($section)>0){
             $result = 'success';
         }
         $response = array('result' => $result,
-                          'section' => $section
+                          'section' => $section,
+                          'grade_level' => $grade_level
                         );
         return response()->json($response);
     }
@@ -95,19 +111,40 @@ class LoadViewController extends Controller
         $code = $request->code;
         $offered_curriculum_id = $request->curriculum;
         $section = $request->section;
+        $grade_level = $request->grade_level;
         $student_program = StudentsInfo::where('user_id',$student_id)->first();
         $query_school_year = EducOfferedSchoolYear::where('id',$school_year)->first();
         $curriculum_id = $student_program->curriculum_id;
-        $program_id = $student_program->program_id;        
-        $query = EducCourses::where('curriculum_id',$curriculum_id)
-            ->select('grade_level_id')
+        $program_id = $student_program->program_id;     
+        $program_code_id = $student_program->program_code_id;   
+        $grade_period_id = $query_school_year->grade_period_id;
+
+        $courses = EducOfferedCourses::
+            whereHas('curriculum', function ($query) use ($program_id,$program_code_id,$curriculum_id,$school_year) {
+                $query->where('curriculum_id',$curriculum_id);
+                $query->whereHas('offered_program', function ($query) use ($program_id,$program_code_id,$school_year) {
+                    $query->where('program_id',$program_id);
+                    $query->where('program_code_id',$program_code_id);
+                    $query->where('school_year_id',$school_year);
+                });
+            })
+            ->where('section',$section)
+            ->first();
+        $offered_curriculum_id = $courses->offered_curriculum_id;
+
+        $query = EducCourses::where('curriculum_id',$curriculum_id);
+        if($grade_level!=''){
+            $query = $query->where('grade_level_id',$grade_level);
+        }
+        $query = $query->select('grade_level_id')
             ->groupBy('grade_level_id')
             ->orderBy('grade_level_id','ASC')
             ->get()
-            ->map(function($query) use ($student_id,$curriculum_id,$school_year,$offered_curriculum_id,$section,$student_program,$name_services) {
+            ->map(function($query) use ($student_id,$curriculum_id,$school_year,$offered_curriculum_id,$section,$student_program,$name_services,$grade_period_id) {
                 $grade_level_id = $query->grade_level_id;
                 $grade_period = EducCourses::where('curriculum_id',$curriculum_id)
                     ->select('grade_period_id')
+                    ->where('grade_period_id',$grade_period_id)
                     ->groupBy('grade_period_id')
                     ->orderBy('grade_period_id','ASC')
                     ->get()
@@ -116,19 +153,28 @@ class LoadViewController extends Controller
                         $courses = EducCourses::where('curriculum_id',$curriculum_id)
                             ->where('grade_level_id',$grade_level_id)
                             ->where('grade_period_id',$grade_period_id)
+                            ->where(function ($query) use ($student_program){
+                                $query->where('specialization_name',$student_program->specialization_name);
+                                $query->orWhere('specialization_name',NULL);
+                                $query->orWhere('specialization_name','');
+                            })
                             ->get()
                             ->map(function($query) use ($student_id,$school_year,$offered_curriculum_id,$section,$student_program,$name_services) {
                                 $course_id = $query->id;
-                                $status = '<button class="btn btn-default btn-xs">Untaken</button>';
+                                $status = '<button class="btn btn-default btn-xs">Required</button>';
+                                $passed_statuses = StudentsCourseStatus::where('option',1)->pluck('id')->toArray();
                                 $check = StudentsCourses::where('user_id',$student_id)
-                                    ->where('course_id',$course_id)
+                                    ->where(function ($query) use ($course_id){
+                                        $query->where('course_id',$course_id)
+                                        ->orWhere('credit_course_id',$course_id);
+                                    })
                                     ->orderBy('year_from','DESC')
                                     ->first();
                                 if($check!=NULL){
                                     if($check->student_course_status_id==NULL){
                                         $status = '<button class="btn btn-info btn-info-scan btn-xs">NG</button>';
                                     }else{
-                                        if($check->student_course_status_id==1){
+                                        if($check->status->option==1){
                                             $status = '<button class="btn btn-success btn-success-scan btn-xs">'.$check->status->name.'</button>';
                                         }else{
                                             $status = '<button class="btn btn-danger btn-danger-scan btn-xs">'.$check->status->name.'</button>';
@@ -144,15 +190,23 @@ class LoadViewController extends Controller
                                 $offered_course_id = NULL;
                                 $pre_req_ids = EducCoursesPre::where('course_id',$course_id)
                                     ->pluck('pre_id')->toArray();                                                                                               
-                                $pre_req = StudentsCourses::whereIn('course_id',$pre_req_ids)
+                                $pre_req = StudentsCourses::where(function ($query) use ($pre_req_ids){
+                                        $query->whereIn('course_id',$pre_req_ids)
+                                        ->orWhereIn('credit_course_id',$pre_req_ids);
+                                    })
+                                    ->whereIn('student_course_status_id',$passed_statuses)
                                     ->where('user_id',$student_id)
                                     ->get()->count();
-                                $pre_req1 = StudentsCourses::whereIn('credit_course_id',$pre_req_ids)
+                                // $pre_req1 = StudentsCourses::whereIn('credit_course_id',$pre_req_ids)
+                                //     ->whereIn('student_course_status_id',$passed_statuses)
+                                //     ->where('user_id',$student_id)
+                                //     ->get()->count();
+                                $taken = StudentsCourses::where(function ($query) use ($course_id){
+                                        $query->where('course_id',$course_id)
+                                        ->orWhere('credit_course_id',$course_id);
+                                    })
                                     ->where('user_id',$student_id)
-                                    ->get()->count();
-                                $taken = StudentsCourses::where('course_id',$course_id)
-                                    ->where('user_id',$student_id)
-                                    ->where('student_course_status_id',1)
+                                    ->whereIn('student_course_status_id',$passed_statuses)
                                     ->orderBy('year_from','DESC')
                                     ->first();
                                 $ongoing = StudentsCourses::where('course_id',$course_id)
@@ -164,7 +218,7 @@ class LoadViewController extends Controller
                                     ->where('offered_curriculum_id',$offered_curriculum_id)
                                     ->where('section',$section)
                                     ->pluck('id')->toArray();
-                                if(($pre_req+$pre_req1)!=count($pre_req_ids)){
+                                if($pre_req!=count($pre_req_ids)){
                                     $availability = 1;
                                     $availability_name = 'Pre Requisite';
                                 }
@@ -241,7 +295,7 @@ class LoadViewController extends Controller
                                     $advised = 1;
                                     $credit_course_id = $advise->credit_course_id;
                                     $advised_by = $advise->updated_by;
-                                    $advised_by_name = $name_services->lastname($advise->advised_by->lastname,$advise->advised_by->firstname,$advise->advised_by->middlename,$advise->advised_by->extname);
+                                    $advised_by_name = $advise->option.'<br>'.$name_services->lastname($advise->advised_by->lastname,$advise->advised_by->firstname,$advise->advised_by->middlename,$advise->advised_by->extname);
                                     $advised_status = $advise->status;
                                 }
                                 return [
@@ -319,7 +373,7 @@ class LoadViewController extends Controller
                     'instructor' => $instructor,
                     'status' => $query->status,
                     'advised_by' => $query->updated_by,
-                    'advised_by_name' => $name_services->lastname($query->advised_by->lastname,$query->advised_by->firstname,$query->advised_by->middlename,$query->advised_by->extname)
+                    'advised_by_name' => $query->option.'<br>'.$name_services->lastname($query->advised_by->lastname,$query->advised_by->firstname,$query->advised_by->middlename,$query->advised_by->extname)
                 ];
             })->toArray();
         $data = array(

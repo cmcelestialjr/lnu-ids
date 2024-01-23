@@ -1,10 +1,10 @@
 function pre_enroll_div(){
     var thisBtn = $('#preEnrollDiv select');
-    var section = $('#preEnrollDiv select[name="section"] option:selected').val();
+    // var section = $('#preEnrollDiv select[name="section"] option:selected').val();
     var form_data = {
         url_table:base_url+'/sims/pre_enroll/preEnrollCourses',
         tid:'preEnrollCourses',
-        section:section
+        // section:section
     };
     loadDivwLoader(form_data,thisBtn);
     setTimeout(function() {

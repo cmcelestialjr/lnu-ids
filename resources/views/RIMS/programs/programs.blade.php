@@ -1,29 +1,8 @@
 @extends('layouts.header')
 @section('content')
-<!-- Content Header (Page header) -->
-<div class="content-header">
-  <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6">
-          <h1 class="m-0"></h1>
-        </div><!-- /.col -->
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="#">{{$system_selected}}</a></li>
-            <li class="breadcrumb-item active">{{mb_strtoupper($nav_selected)}}</li>
-          </ol>
-        </div><!-- /.col -->
-      </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
-</div>
-<!-- /.content-header -->
-
-
-<!-- Content -->
-<div class="content" id="programsDiv">
-  <!-- Container-fluid -->
-    <div class="container-fluid">
-        <div class="card card-primary card-tabs">
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card card-primary card-outline" id="programsDiv">
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-3">
@@ -35,12 +14,12 @@
                         </select>
                     </div>
                     <div class="col-lg-12">
-                      @if($user_access->level_id==1 || $user_access->level_id==2)
-                      <button class="btn btn-primary btn-primary-scan programNewModal" style="float:right">
+                        @if($user_access->level_id==1 || $user_access->level_id==2)
+                        <button class="btn btn-primary btn-primary-scan programNewModal" style="float:right">
                         <span class="fa fa-plus-square"></span> New Program
-                      </button>
-                      <br><br>
-                      @endif
+                        </button>
+                        <br><br>
+                        @endif
                         <table id="viewTable" class="table table-bordered table-fixed"
                                     data-toggle="table"
                                     data-search="true"
@@ -50,8 +29,8 @@
                                     data-show-columns-toggle-all="true"
                                     data-mobile-responsive="true"
                                     data-pagination="true"
-                                    data-page-size="10"
-                                    data-page-list="[10, 50, 100, All]"
+                                    data-page-size="15"
+                                    data-page-list="[15, 10, 50, 100, All]"
                                     data-loading-template="loadingTemplate"
                                     data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
                             <thead>
@@ -61,9 +40,10 @@
                                     <th data-field="f3" data-sortable="true" data-align="center">Department</th>
                                     <th data-field="f4" data-sortable="true" data-align="center">Programs</th>
                                     <th data-field="f5" data-sortable="true" data-align="center">Shorten</th>                                    
-                                    <th data-field="f6" data-sortable="true" data-align="center">Code</th>
+                                    <th data-field="f6" data-sortable="true" data-align="center">Edit</th>
                                     <th data-field="f7" data-sortable="true" data-align="center">Status</th>
                                     <th data-field="f8" data-sortable="true" data-align="center">View</th>
+                                    <th data-field="f9" data-sortable="true" data-align="center">Branch</th>
                                 </tr>
                             </thead>
                         </table>
@@ -71,9 +51,8 @@
                 </div>
             </div>
         </div>
-    </div><!-- /.container-fluid -->
+    </div>
 </div>
-<!-- /.Content -->
 
 @include('layouts.script')
 <script src="{{ asset('assets/js/rims/programs/_function.js') }}"></script>
@@ -81,4 +60,7 @@
 <script src="{{ asset('assets/js/rims/programs/modal.js') }}"></script>
 <script src="{{ asset('assets/js/rims/programs/new.js') }}"></script>
 <script src="{{ asset('assets/js/rims/programs/update.js') }}"></script>
+<script src="{{ asset('assets/js/rims/programs/program.js') }}"></script>
+<script src="{{ asset('assets/js/rims/programs/branch.js') }}"></script>
+<script src="{{ asset('assets/js/search/unitByDepartment.js') }}"></script>
 @endsection

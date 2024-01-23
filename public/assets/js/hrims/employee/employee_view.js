@@ -31,7 +31,7 @@ function employee_view(thisBtn){
     var id = thisBtn.data('id');
     var url = base_url+'/hrims/employee/employeeView';
     var modal = 'default';
-    var modal_size = 'modal-xxl';
+    var modal_size = 'modal-xl';
     var form_data = {
         url:url,
         modal:modal,

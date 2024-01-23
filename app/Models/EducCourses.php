@@ -24,6 +24,10 @@ class EducCourses extends Model
     {
         return $this->belongsTo(EducCourseStatus::class, 'status_id', 'id')->withDefault();
     }
+    public function course_type()
+    {
+        return $this->belongsTo(EducCoursesType::class, 'course_type_id', 'id')->withDefault();
+    }
     public function pre_req()
     {
         return $this->hasMany(EducCoursesPre::class, 'course_id', 'id');

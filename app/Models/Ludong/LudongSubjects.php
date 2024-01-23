@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LudongSubjects extends Model
 {
+    protected $connection = 'student';
     protected $table = 'ludong_subjects';
     public function grade()
     {

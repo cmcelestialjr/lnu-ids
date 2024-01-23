@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\HRIMS\DTR;
 use App\Http\Controllers\Controller;
 use App\Models\_Work;
+use App\Models\DTRlogs;
 use App\Models\DTRtimeType;
+use App\Models\EducDepartments;
 use App\Models\EducOfferedSchedule;
 use App\Models\EducOfferedScheduleDay;
 use App\Models\Holidays;
@@ -11,10 +13,12 @@ use App\Models\Users;
 use App\Models\UsersDTR;
 use App\Models\UsersRoleList;
 use App\Models\UsersSchedDays;
+use App\Models\UsersSchedTime;
 use App\Services\NameServices;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use PDF;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -23,7 +27,7 @@ class IndividualController extends Controller
 {   
     public function individual(Request $request,Users $users,
         _Work $_work, UsersDTR $usersDtr, Holidays $_holidays,
-        UsersSchedDays $usersSchedDays, EducOfferedScheduleDay $educOfferedScheduleDay,
+        UsersSchedDays $usersSchedDays, UsersSchedTime $usersSchedTime, EducOfferedScheduleDay $educOfferedScheduleDay,
         EducOfferedSchedule $educOfferedSchedule){
         $user_access_level = $request->session()->get('user_access_level');
         $user = Auth::user();
@@ -33,10 +37,13 @@ class IndividualController extends Controller
         $month = $request->month;
         $range = $request->range;
         $dtr_type = $request->dtr_type;
+        $url = explode('/',url()->previous());
+        $current_url = $url[5];
         $result = 'error';
-        if($dtr_type==0 && ($user_access_level==1 || $user_access_level==2)){
+        if($current_url=='dtr' && ($user_access_level==1 || $user_access_level==2)){
             $id_no = $id_no_req;
         }
+        $this->updateDtrIndividual($id_no_req,$year,$month);
         $check = UsersDTR::where('id_no',$id_no)
             ->whereYear('date',$year)
             ->whereMonth('date',$month)->first();
@@ -45,6 +52,9 @@ class IndividualController extends Controller
             $name_services = new NameServices;
             $user = Users::where('id_no',$id_no)->first();
             $name = mb_strtoupper($name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname));
+            $check_user_role = UsersRoleList::where('user_id',$user->id)
+                ->where('role_id',3)
+                ->first();
             $data = array(
                 'id_no' => $id_no,
                 'name' => $name,
@@ -56,13 +66,134 @@ class IndividualController extends Controller
                 'usersDtr' => $usersDtr,
                 '_holidays' => $_holidays,
                 'usersSchedDays' => $usersSchedDays,
+                'usersSchedTime' => $usersSchedTime,
                 'educOfferedScheduleDay' => $educOfferedScheduleDay,
-                'educOfferedSchedule' => $educOfferedSchedule
+                'educOfferedSchedule' => $educOfferedSchedule,
+                'current_url' => $current_url,
+                'check_user_role' => $check_user_role
             );
             return view('hrims/dtr/individual_view',$data);
         }else{
             return $result;
-        } 
+        }
+    }
+    private function updateDtrIndividual($user_id,$year,$month){
+        $dtr_logs = DTRlogs::where('id_no',$user_id)
+            ->whereYear('dateTime',$year)
+            ->whereMonth('dateTime',$month)
+            ->where('link',0)
+            ->orderBy('dateTime','ASC')
+            ->get();
+        if($dtr_logs->count()>0){
+            $dtr_log_ids = [];
+            foreach($dtr_logs as $row){
+                $dtr_log_id = $row->id;
+                $dateTime = $row->dateTime;
+                $state = $row->state;
+                $type = $row->type;
+                $ipaddress = $row->ipaddress;
+
+                $time = date('H:i',strtotime($dateTime));
+                $date = date('Y-m-d',strtotime($dateTime));
+                $check = UsersDTR::where('id_no',$user_id)
+                    ->where('date',$date)->first();
+                if($time<'12:00'){
+                    if($type==0 || $type==3){
+                        $column = 'time_in_am';
+                        $state_column = 'state_in_am';
+                        $ip_column = 'ipaddress_in_am';
+                    }else{
+                        $column = 'time_out_am';
+                        $state_column = 'state_out_am';
+                        $ip_column = 'ipaddress_out_am';
+                    }
+                }elseif($time>='12:00' && $time<='13:00'){
+                    if($type==0 || $type==3){
+                        $column = 'time_in_pm';
+                        $state_column = 'state_in_pm';
+                        $ip_column = 'ipaddress_in_pm';
+                    }else{
+                        $column = 'time_out_am';
+                        $state_column = 'state_out_am';
+                        $ip_column = 'ipaddress_out_am';
+                    }
+                }else{
+                    if($type==0 || $type==3){
+                        $column = 'time_in_pm';
+                        $state_column = 'state_in_pm';
+                        $ip_column = 'ipaddress_in_pm';
+                    }else{
+                        $column = 'time_out_pm';
+                        $state_column = 'state_out_pm';
+                        $ip_column = 'ipaddress_out_pm';
+                    }
+                }
+                if($check==NULL){
+                    $insert = new UsersDTR();
+                    $insert->id_no = $user_id;
+                    $insert->date = $date;
+                    $insert->$column = $dateTime;
+                    $insert->$state_column = $state;
+                    $insert->$ip_column = $ipaddress;
+                    $insert->ipaddress = $ipaddress;
+                    $insert->dateTime = $dateTime;
+                    $insert->save();
+                }else{
+                    if($time>='12:00' && $check->time_in_pm>$dateTime && $check->time_out_am==NULL && $check->time_in_pm!=NULL && $type==1){
+                        $column = 'time_out_pm';
+                        $state_column = 'state_out_pm';
+                    }elseif($time<'12:00' && $check->time_in_am>=$dateTime && $check->time_out_am==NULL && $check->time_in_am!=NULL && $type==1){
+                        $column = 'time_in_am';
+                        $state_column = 'state_in_am';
+                    }
+                    if($time!=date('H:i',strtotime($check->$column)) && $check->$column==NULL){
+                        UsersDTR::where('id_no',$user_id)
+                                ->where('date',$date)
+                                ->update([$column => $dateTime,
+                                        $state_column => $state,
+                                        $ip_column => $ipaddress,
+                                        'ipaddress' => $ipaddress,
+                                        'dateTime' => $dateTime,
+                                        'updated_at' => date('Y-m-d H:i:s')]);
+                    }
+                    UsersDTR::where('id_no',$user_id)
+                                ->where('date',$date)
+                                ->update(['ipaddress' => $ipaddress,
+                                        'dateTime' => $dateTime,
+                                        'time_type' => NULL,
+                                        'updated_at' => date('Y-m-d H:i:s')]);
+                }
+                $check = UsersDTR::where('id_no',$user_id)
+                    ->where('date',$date)->first();
+                if($check){
+                    if($check->time_out_am<=$check->time_in_am && $check->time_in_am!=NULL && $check->time_out_am!=NULL){
+                        UsersDTR::where('id_no',$user_id)
+                            ->where('date',$date)
+                            ->update(['time_out_am' => NULL,
+                                    'state_out_am' => NULL,
+                                    'ipaddress_out_am' => NULL]);
+                    }
+                    if($check->time_in_pm<=$check->time_out_am && $check->time_in_pm!=NULL && $check->time_out_am!=NULL){
+                        UsersDTR::where('id_no',$user_id)
+                            ->where('date',$date)
+                            ->update(['time_in_pm' => NULL,
+                                    'state_in_pm' => NULL,
+                                    'ipaddress_in_pm' => NULL]);
+                    }
+                    if($check->time_out_pm<=$check->time_in_pm && $check->time_out_pm!=NULL && $check->time_in_pm!=NULL){
+                        UsersDTR::where('id_no',$user_id)
+                            ->where('date',$date)
+                            ->update(['time_out_pm' => NULL,
+                                    'state_out_pm' => NULL,
+                                    'ipaddress_out_pm' => NULL]);
+                    }
+                }
+                $dtr_log_ids[] = $dtr_log_id;                
+            }
+            DTRlogs::whereIn('id',$dtr_log_ids)
+                    ->update(['link' => 1,
+                              'updated_at' => date('Y-m-d H:i:s')]);
+        }
     }
     public function dtrInputModal(Request $request){
         $user_access_level = $request->session()->get('user_access_level');
@@ -202,7 +333,31 @@ class IndividualController extends Controller
             'time_type_' => $time_type_
          );
         return view('hrims/dtr/dtrInputDurationModal',$data);
-    }    
+    }
+    public function schedule(Request $request){
+        $id_no = $request->id_no;
+        $query = Users::where('id_no',$id_no)
+            ->first();
+        $id = $query->id;
+        $data = array(
+            'query' => $query
+        );
+        return view('hrims/dtr/scheduleModal',$data);
+    }
+    public function department(Request $request){
+        $id = $request->id;
+        $query = Users::find($id);
+        $departments = EducDepartments::get();
+        $user_role = UsersRoleList::where('user_id',$id)
+                ->where('role_id',3)
+                ->first();
+        $data = array(
+            'query' => $query,
+            'departments' => $departments,
+            'user_role' => $user_role
+        );
+        return view('hrims/dtr/department',$data);
+    }
     public function dtrInputSubmit(Request $request){
         $result = 'error';
         $user_access_level = $request->session()->get('user_access_level');
@@ -486,6 +641,28 @@ class IndividualController extends Controller
                     $result = 'success';
                 }
             }
+        }
+        $response = array('result' => $result
+                        );
+        return response()->json($response);
+    }
+    public function departmentSubmit(Request $request){
+        $result = 'error';
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $updated_by = $user->id;
+        if($user_access_level==1 || $user_access_level==2){
+            $id = $request->id;
+            $department = $request->department;
+            if($department==''){
+                $department = NULL;
+            }
+            $datas['department_id'] = $department;
+            $datas['updated_by'] = $updated_by;            
+            UsersRoleList::where('user_id',$id)
+                ->where('role_id',3)
+                ->update($datas);
+            $result = 'success';
         }
         $response = array('result' => $result
                         );

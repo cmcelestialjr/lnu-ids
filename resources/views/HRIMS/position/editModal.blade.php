@@ -82,6 +82,18 @@
                         </select>
                     </div>
                     <div class="col-lg-4">
+                        <label>Fund Services<span class="text-require">*</span></label>
+                        <select class="form-control select2-default" name="fund_services">
+                            @foreach($fund_services as $row)
+                                @if($query->fund_services_id==$row->id)
+                                    <option value="{{$row->id}}" selected>{{$row->shorten}} - {{$row->name}}</option>
+                                @else
+                                    <option value="{{$row->id}}">{{$row->shorten}} - {{$row->name}}</option>
+                                @endif 
+                            @endforeach 
+                        </select>
+                    </div>
+                    <div class="col-lg-4">
                         <label>Role<span class="text-require">*</span></label>
                         <select class="form-control select2-default" name="role">
                             @foreach($role as $row)

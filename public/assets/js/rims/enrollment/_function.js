@@ -1,11 +1,66 @@
 function enrollment(){
     var id = $('#enrollmentDiv select[name="school_year"] option:selected').val();
+    var by = $('#enrollmentDiv select[name="by"] option:selected').val();
+    var date = $('#enrollmentDiv select[name="date"] option:selected').val();
+
+    $('#enrollmentDiv #enrollmentDivprogram').addClass('hide');
+    $('#enrollmentDiv #enrollmentDivdate').addClass('hide');
+    $('#enrollmentDiv #enrollmentDiv'+by).removeClass('hide');
+    var tid = 'enrollmentTable'+by;
     var form_data = {
         url_table:base_url+'/rims/enrollment/enrollmentTable',
-        tid:'enrollmentTable',
-        id:id
+        tid:tid,
+        id:id,
+        by:by,
+        date:date
     };
     loadTable(form_data);
+}
+function date_list(){
+    var thisBtn = $('#enrollModal select');
+    var school_year_id = $('#enrollmentDiv select[name="school_year"] option:selected').val();
+    var form_data = {
+        school_year_id:school_year_id
+    };
+    $.ajax({
+        url: base_url+'/rims/enrollment/dateList',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading');
+            if(data.result=='success'){
+                thisBtn.addClass('input-success');
+                $('#enrollmentDiv select[name="date"]').empty();
+                $.each(data.dates, function(index, option) {
+                    var newOption = new Option(option.text, option.id);
+                    $('#enrollmentDiv select[name="date"]').append(newOption);
+                });
+                // After appending new options, trigger the 'change' event to update Select2's UI
+                $('#enrollmentDiv select[name="date"]').trigger('change');
+                enrollment();
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
 }
 function program_code(){
     var thisBtn = $('#enrollModal select');
@@ -354,6 +409,20 @@ function student_list(){
     var thisBtn = $('#enrollmentViewModal select');    
     var id = $('#enrollmentViewModal input[name="id"]').val();
     var curriculum = $('#enrollmentViewModal select[name="curriculum"] option:selected').val();
+    var section = $('#enrollmentViewModal select[name="section"] option:selected').val();
+    var form_data = {
+        url_table:base_url+'/rims/enrollment/enrollmentViewTable',
+        tid:'enrollmentViewTable',
+        id:id,
+        curriculum:curriculum,
+        section:section
+    };
+    loadTablewLoader(form_data,thisBtn);
+}
+function regIreg_list(){
+    var thisBtn = $('#regIreg select[name="type"]');    
+    var id = $('#enrollmentViewModal input[name="id"]').val();
+    var curriculum = $('#regIreg select[name="type"] option:selected').val();
     var section = $('#enrollmentViewModal select[name="section"] option:selected').val();
     var form_data = {
         url_table:base_url+'/rims/enrollment/enrollmentViewTable',

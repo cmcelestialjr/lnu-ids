@@ -1,5 +1,5 @@
 
-<div class="modal-content bg-info" id="editDiv">
+<div class="modal-content" id="schoolYearEditDiv">
     <div class="modal-header">
         <h4 class="modal-title">{{$query->year_from}} - {{$query->year_to}} ({{$query->grade_period->name}}) 
             <br> School Year</h4>
@@ -49,6 +49,17 @@
               <div class="col-lg-4">
                 <label>Extension</label>
                 <input type="text" class="form-control datepicker" name="add_dropping_extension" value="{{$query->add_dropping_extension}}">
+              </div>
+              <div class="col-lg-12"><br>
+                <label>Default Time of Class</label>
+              </div>
+              <div class="col-lg-4">
+                <label>Time From</label>
+                <input type="time" class="form-control" name="time_from" value="{{$query->time_from}}">
+              </div>
+              <div class="col-lg-4">
+                <label>Time To</label>
+                <input type="time" class="form-control" name="time_to" value="{{$query->time_to}}">
               </div>
         </div>
     </div>

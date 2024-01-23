@@ -12,7 +12,7 @@ class _WorkType extends Model
     {
         return $this->hasMany(_Work::class, 'course_id', 'id');
     }
-    public function updated_by()
+    public function updated_by_info()
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id');
     }

@@ -15,8 +15,8 @@ class LoadTableController extends Controller
         $name_services = new NameServices;
         $school_year = $request->school_year;
         $level = $request->level;
-        $query = StudentsInfo::
-            whereHas('courses', function ($query) use ($school_year,$level) {
+        $query = StudentsInfo::with('info','program.program_level','grade_level')
+            ->whereHas('courses', function ($query) use ($school_year,$level) {
                 $query->where('school_year_id',$school_year);
                 if($level==NULL){
                     $query->where('program_level_id','>',0);
@@ -53,7 +53,7 @@ class LoadTableController extends Controller
             }
         }
         return  response()->json($data);
-    }
+    }    
     public function studentSchoolYearTable(Request $request){
         $data = array();
         $id = $request->id;
@@ -62,11 +62,13 @@ class LoadTableController extends Controller
             ->groupBY('school_year_id')
             ->pluck('school_year_id')
             ->toArray();
-        $query = EducOfferedSchoolYear::whereIn('id',$school_year_ids)
+        $query = EducOfferedSchoolYear::with('grade_period')
+            ->whereIn('id',$school_year_ids)
             ->orderBy('year_from','DESC')
             ->get()
             ->map(function($query) use ($id) {
-                $course = StudentsCourses::where('user_id',$id)
+                $course = StudentsCourses::with('program.program_level','program.program_info','grade_level')
+                    ->where('user_id',$id)
                     ->where('school_year_id',$query->id);
                 $course_count = $course->count();
                 $course_first = $course->first();

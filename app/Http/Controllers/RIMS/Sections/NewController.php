@@ -24,7 +24,7 @@ class NewController extends Controller
                             ->orderBy('section','DESC')->first();
                 $start_section = $check->section+1;
                 for($i=$start_section;$i<$start_section+$no;$i++){
-                    $query = EducOfferedCourses::with('curriculum.offered_program')
+                    $query = EducOfferedCourses::with('curriculum.offered_program.program')
                                     ->where('offered_curriculum_id',$curriculum)
                                     ->where('year_level',$grade_level)
                                     ->where('section',$check->section)
@@ -38,7 +38,7 @@ class NewController extends Controller
                                             'code' => $query->code,
                                             'year_level' => $grade_level,
                                             'section' => $i,
-                                            'section_code' => $query->curriculum->code.$query->curriculum->offered_program->name.$i.$grade_level,
+                                            'section_code' => $query->curriculum->offered_program->name.$query->curriculum->offered_program->program->code.$i.$grade_level.$query->curriculum->code,
                                             'status_id' => 1,
                                             'updated_by' => $updated_by,
                                             'created_at' => date('Y-m-d H:i:s'),

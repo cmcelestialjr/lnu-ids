@@ -39,7 +39,7 @@
                                       <th data-sortable="true" data-align="center">Schedule</th>
                                       <th data-sortable="true" data-align="center">Room</th>
                                       <th data-sortable="true" data-align="center">Instructor</th>
-                                      <th data-sortable="true" data-align="center">Advised by</th>
+                                      <th data-sortable="true" data-align="center">Advised/Pre-enroll by</th>
                                       <th data-sortable="true" data-align="center">DateTime</th>
                                       <th data-align="center">
                                         &nbsp; &nbsp;

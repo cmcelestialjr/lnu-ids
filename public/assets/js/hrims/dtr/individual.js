@@ -18,12 +18,24 @@ $(document).off('click', '#dtrDiv button[name="fill_duration"]').on('click', '#d
     var thisBtn = $(this);
     dtr_input_duration(thisBtn); 
 });
+$(document).off('click', '#dtrDiv button[name="schedule"]').on('click', '#dtrDiv button[name="schedule"]', function (e) {
+    var thisBtn = $(this);
+    schedule(thisBtn); 
+});
 $(document).off('blur', '#dtrInputDurationModal input').on('blur', '#dtrInputDurationModal input', function (e) {
     dtr_input_duration_check(); 
 });
 $(document).off('click', '#dtrInputDurationModal button[name="submit"]').on('click', '#dtrInputDurationModal button[name="submit"]', function (e) {
     var thisBtn = $(this);
-    dtr_input_duration_submit(thisBtn); 
+    dtr_input_duration_submit(thisBtn);
+});
+$(document).off('click', '#dtrDiv button[name="department"]').on('click', '#dtrDiv button[name="department"]', function (e) {
+    var thisBtn = $(this);
+    department(thisBtn); 
+});
+$(document).off('click', '#departmentModal button[name="submit"]').on('click', '#departmentModal button[name="submit"]', function (e) {
+    var thisBtn = $(this);
+    department_submit(thisBtn); 
 });
 $(document).off('click', '#dtrInputModal #dtrInputTable .change_travel').on('click', '#dtrInputModal #dtrInputTable .change_travel', function (e) {
     var thisBtn = $(this);
@@ -265,6 +277,36 @@ function dtr_input_duration(thisBtn){
     };
     loadModal(form_data,thisBtn);
 }
+function schedule(thisBtn){
+    var id_no = $('input[name="id_no"]').val();
+    var url = base_url+'/hrims/dtr/schedule';
+    var modal = 'primary';
+    var modal_size = 'modal-lg';
+    var form_data = {
+        url:url,
+        modal:modal,
+        modal_size:modal_size,
+        static:'',
+        w_table:'wo',
+        id_no:id_no
+    };
+    loadModal(form_data,thisBtn);
+}
+function department(thisBtn){
+    var id = $('input[name="user_information"]').val();
+    var url = base_url+'/hrims/dtr/department';
+    var modal = 'primary';
+    var modal_size = 'modal-md';
+    var form_data = {
+        url:url,
+        modal:modal,
+        modal_size:modal_size,
+        static:'',
+        w_table:'wo',
+        id:id
+    };
+    loadModal(form_data,thisBtn);
+}
 function dtr_input_duration_check(){
     var day_from = $('#dtrInputDurationModal input[name="day_from"]').val();
     var day_to = $('#dtrInputDurationModal input[name="day_to"]').val();
@@ -344,4 +386,46 @@ function dtr_input_duration_submit(thisBtn){
             }
         });
     }
+}
+function department_submit(thisBtn){
+    var id = $('input[name="user_information"]').val();
+    var department = $('#departmentModal select[name="department"] option:selected').val();
+    var form_data = {
+        id:id,
+        department:department
+    };
+    $.ajax({
+        url: base_url+'/hrims/dtr/departmentSubmit',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading'); 
+            if(data.result=='success'){
+                $('#modal-primary').modal('hide');
+            }else{
+                toastr.error('Error.');
+                thisBtn.addClass('input-error');                
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
 }

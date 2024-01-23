@@ -60,7 +60,14 @@
                         </select>
                     </div>
                     <div class="col-lg-12"><br>
-                    </div>                    
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Gov't?<span class="text-require">*</span></label>
+                        <select class="form-control select2-primary" name="gov_service" disabled>
+                            <option value="Y">Yes</option>
+                            <option value="N">No</option>
+                        </select>
+                    </div>
                     <div class="col-lg-3">
                         <label>Fund Source<span class="text-require">*</span></label>
                         <select class="form-control select2-primary" name="fund_source" disabled>
@@ -71,12 +78,14 @@
                         </select>
                     </div>
                     <div class="col-lg-3">
-                        <label>Gov't?<span class="text-require">*</span></label>
-                        <select class="form-control select2-primary" name="gov_service" disabled>
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
+                        <label>Fund Services<span class="text-require">*</span></label>
+                        <select class="form-control select2-primary" name="fund_services" disabled>
+                            <option value="none">None</option>
+                            @foreach($fund_services as $row)
+                            <option value="{{$row->id}}">{{$row->shorten}} ({{$row->name}})</option>
+                            @endforeach
                         </select>
-                    </div>
+                    </div>                    
                     <div class="col-lg-3">
                         <label>Designation</label>
                         <div id="designationList">
@@ -85,6 +94,8 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-lg-12"><br>
+                    </div>  
                     <div class="col-lg-3">
                         <label>Designation Type<span class="text-require">*</span></label>
                         <select class="form-control select2-primary" name="credit_type" disabled>
@@ -93,8 +104,6 @@
                             <option value="{{$row->id}}">{{$row->name}}</option>
                             @endforeach
                         </select>
-                    </div>
-                    <div class="col-lg-12"><br>
                     </div>
                     <div class="col-lg-3">
                         <label>Option<span class="text-require">*</span></label>
@@ -108,6 +117,8 @@
                         <label>Office<span class="text-require">*</span></label>
                         <input type="text" class="form-control" name="office" value="LNU">
                     </div>
+                    <div class="col-lg-12"><br>
+                    </div>                    
                     <div class="col-lg-3">
                         <label>Separation Cause</label>
                         <input type="text" class="form-control" name="separation">
@@ -115,8 +126,6 @@
                     <div class="col-lg-3">
                         <label>Separation Date</label>
                         <input type="text" class="form-control" name="date_separation">
-                    </div>
-                    <div class="col-lg-12"><br>
                     </div>
                     <div class="col-lg-3">
                         <label>Type<span class="text-require">*</span></label>
@@ -126,6 +135,8 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="col-lg-12"><br>
+                    </div>                    
                     <div class="col-lg-4">
                         <label>LWOP</label>
                         <textarea name="lwop" style="width: 100%"></textarea>

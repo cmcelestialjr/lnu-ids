@@ -26,7 +26,7 @@ class RouteServiceProvider extends ServiceProvider
      * @var string
      */
     public const HOME = '/home';
-
+    
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
      */
@@ -65,6 +65,22 @@ class RouteServiceProvider extends ServiceProvider
     {
         // resolve(\Illuminate\Routing\UrlGenerator::class)->forceScheme('https');
         parent::boot();
+        $this->configureRateLimiting();
+    }
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+        RateLimiter::for('global', function (Request $request) {
+            return $request->user()
+                ? Limit::perMinute(100)->by($request->user()->id)
+                : Limit::perMinute(20)->by($request->ip());
+        });
+        
+        RateLimiter::for('downloads', function (Request $request) {
+            return Limit::perMinute(10)->by($request->user()->id);
+        });
     }
 
     /**
@@ -104,9 +120,14 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
+        $this->mapPassportRoutes();
         Route::prefix('api')
             ->middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/api.php'));
+    }
+    protected function mapPassportRoutes()
+    {
+        Route::prefix('v1')->middleware('api')->namespace($this->namespace)->group(base_path('routes/passport.php'));
     }
 }

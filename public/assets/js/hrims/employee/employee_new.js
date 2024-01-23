@@ -21,6 +21,7 @@ $(document).off('click', 'button[name="submit_new_employee"]').on('click', 'butt
     var step = $('input[name="step"]').val();    
     var emp_stat = $('select[name="emp_stat"] option:selected').val();
     var fund_source = $('select[name="fund_source"] option:selected').val();
+    var fund_services = $('select[name="fund_services"] option:selected').val();
     var gov_service = $('select[name="gov_service"] option:selected').val();
     var designation = $('select[name="designation"] option:selected').val();
     var credit_type = $('select[name="credit_type"] option:selected').val();
@@ -91,6 +92,7 @@ $(document).off('click', 'button[name="submit_new_employee"]').on('click', 'butt
             step:step,
             emp_stat:emp_stat,
             fund_source:fund_source,
+            fund_services:fund_services,
             gov_service:gov_service,
             designation:designation,
             credit_type:credit_type,

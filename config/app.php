@@ -204,7 +204,12 @@ return [
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
         //ImageIntervention
         Intervention\Image\ImageServiceProvider::class,
-        
+        //Progressive Web Apps (PWA)
+        Ladumor\LaravelPwa\PWAServiceProvider::class,
+        //Passport
+        Laravel\Passport\PassportServiceProvider::class,
+        //CSP
+        Spatie\Csp\CspServiceProvider::class,
 
     ],
 
@@ -227,6 +232,7 @@ return [
         'PDFMerger' => Webklex\PDFMerger\Facades\PDFMergerFacade::class,
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
         'Image' => Intervention\Image\Facades\Image::class,
+        'LaravelPwa' => \Ladumor\LaravelPwa\LaravelPwa::class,
     ])->toArray(),
 
 ];

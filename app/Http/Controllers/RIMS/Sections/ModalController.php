@@ -33,17 +33,30 @@ class ModalController extends Controller
     }
     public function sectionNewModal(Request $request){
         $id = $request->id;
+        $branch_id = $request->branch_id;
         $program_id = $request->program_id;
-        $offered_curriculum_ids = EducOfferedCurriculum::where('offered_program_id',$program_id)->pluck('curriculum_id')->toArray();
-        $curriculum = EducCurriculum::whereIn('id',$offered_curriculum_ids)->orderBy('year_from','DESC')->first();
-        $curriculum_id = $curriculum->id;
-        $offered_curriculum = EducOfferedCurriculum::where('offered_program_id',$program_id)->where('curriculum_id',$curriculum_id)->first();
-        $offered_curriculum_id = $offered_curriculum->id;
-        $offered_courses_ids = EducOfferedCourses::where('offered_curriculum_id',$offered_curriculum_id)->pluck('course_id')->toArray();
-        $courses_grade_level_id = EducCourses::whereIn('id',$offered_courses_ids)->pluck('grade_level_id')->toArray();
-        $grade_level = EducYearLevel::whereIn('id',$courses_grade_level_id)->get();
-        $query = EducOfferedPrograms::with('program')->where('id',$program_id)->first();
-        $curriculum = EducOfferedCurriculum::with('curriculum')->where('offered_program_id',$program_id)->get()
+        
+        $grade_level = EducYearLevel::
+                whereHas('courses', function ($subQuery) use ($id,$program_id,$branch_id) {
+                    $subQuery->whereHas('courses.curriculum.offered_program', function ($subQuery) use ($id,$program_id,$branch_id) {
+                        $subQuery->where('school_year_id', $id);
+                        $subQuery->where('program_id', $program_id);
+                        $subQuery->where('branch_id', $branch_id);
+                    });
+                })
+                ->get();
+        
+        $query = EducOfferedPrograms::with('program')
+            ->where('school_year_id',$id)
+            ->where('program_id',$program_id)
+            ->where('branch_id',$branch_id)
+            ->first();
+        $curriculum = EducOfferedCurriculum::with('curriculum')
+                    ->whereHas('offered_program', function ($subQuery) use ($id,$program_id,$branch_id) {
+                        $subQuery->where('school_year_id', $id);
+                        $subQuery->where('program_id', $program_id);
+                        $subQuery->where('branch_id', $branch_id);
+                    })->get()
                             ->sortByDesc(function($query, $key) {
                                 return $query->curriculum->year_from;
                             });
@@ -61,25 +74,7 @@ class ModalController extends Controller
             'query' => $query
         );
         return view('rims/sections/courseViewModal',$data);
-    }
-    public function courseSchedRmModal(Request $request){
-        $id = $request->id;
-        $query = EducOfferedCourses::where('id',$id)->first();
-        
-        $time_from = $query->curriculum->offered_program->school_year->time_from;
-        $time_to = date('H:i:s',strtotime('+15 minutes',strtotime($query->curriculum->offered_program->school_year->time_to)));
-        $start = new DateTime($time_from);
-        $end = new DateTime($time_to);
-        $interval = DateInterval::createFromDateString('15 minutes');
-        $time_period = new DatePeriod($start, $interval, $end);
-        
-        $data = array(
-            'id' => $id,
-            'query' => $query,            
-            'time_period' => $time_period
-        );
-        return view('rims/sections/courseSchedRmModal',$data);
-    }
+    }    
     public function minMaxModal(Request $request){
         $id = $request->id;
         $query = EducOfferedCourses::where('id',$id)->first();

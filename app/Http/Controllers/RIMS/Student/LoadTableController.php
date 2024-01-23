@@ -15,7 +15,7 @@ class LoadTableController extends Controller
         $name_services = new NameServices;
         $data = array();
         $option = $request->option;        
-        $query = StudentsInfo::orderBy('grade_level_id','DESC');
+        $query = StudentsInfo::with('info', 'program.program_level', 'grade_level')->orderBy('grade_level_id','DESC');
         if($request->level!=''){
             foreach($request->level as $row){
                 $level[] = $row;
@@ -25,38 +25,39 @@ class LoadTableController extends Controller
                     });
         }
         if($option=='Graduated'){
-            $date_graduate = $request->date_graduate;
-            $query = $query->whereHas('student_program', function ($query) use ($date_graduate) {
-                        $query->where('date_graduate', $date_graduate);
+            $year_graduate = $request->year_graduate;
+            $query = $query->whereHas('student_program', function ($query) use ($year_graduate) {
+                        $query->whereYear('date_graduate', $year_graduate);
                         $query->where('date_graduate','<>',NULL);
                     });
         }else{
             $school_year_id = $request->school_year;
             if($option=='unenrolled'){
-                $school_year = EducOfferedSchoolYear::where('id',$school_year_id)->first();
-                $school_year = $school_year->year_from;
+                // $school_year = EducOfferedSchoolYear::where('id',$school_year_id)->first();
+                // $school_year = $school_year->year_from;
                 $query = $query->whereDoesntHave('courses', function ($query) use ($school_year_id) {
                     $query->where('school_year_id',$school_year_id);
-                });
-                $query = $query->whereHas('student_program', function ($query) use ($school_year) {
-                    $query->whereYear('date_admitted',$school_year);
-                });
+                })->whereIn('student_status_id',[1,2,3,4]);
+                // $query = $query->whereHas('student_program', function ($query) use ($school_year) {
+                //     $query->whereYear('date_admitted',$school_year);
+                // });
+            }elseif($option=='Graduating'){
+                $query = $query->whereHas('student_program', function ($query) {
+                        $query->where('date_graduate', NULL);
+                    })->whereHas('courses', function ($query) use ($school_year_id) {
+                        $query->where('school_year_id', $school_year_id);
+                    });
             }else{
                 $query = $query->whereHas('courses', function ($query) use ($school_year_id) {
                             $query->where('school_year_id', $school_year_id);
                         });
-            }
-            if($option=='Graduating'){
-                $query = $query->whereHas('student_program', function ($query) {
-                    $query->where('date_graduate', NULL);
-                });
             }
         }
         $query = $query->get()
                     ->map(function($query) use ($name_services) {
                         $name = $name_services->lastname($query->info->lastname,$query->info->firstname,$query->info->middlename,$query->info->extname);
                         return [
-                            'id' => $query->id,
+                            'id' => $query->user_id,
                             'program_level' => $query->program->program_level->name,                            
                             'program' => $query->program->name.' ('.$query->program->shorten.')',
                             'name' => $name,
@@ -74,7 +75,7 @@ class LoadTableController extends Controller
                 $data_list['f5'] = $r['program'];
                 $data_list['f6'] = $r['level'];
                 $data_list['f7'] = '<button class="btn btn-primary btn-primary-scan studentView"
-                                        data-id="'.$r['id'].'"
+                                        data-id="'.$r['id'].'">
                                         <span class="fa fa-eye"></span> View
                                     </button>';
                 array_push($data,$data_list);
@@ -86,32 +87,36 @@ class LoadTableController extends Controller
     public function studentSchoolYearTable(Request $request){
         $data = array();
         $id = $request->id;
-        $school_year_ids = StudentsCourses::where('user_id',$id)
-            ->select('school_year_id')
-            ->groupBY('school_year_id')
-            ->pluck('school_year_id')
-            ->toArray();
-        $query = EducOfferedSchoolYear::whereIn('id',$school_year_ids)
+        $query = EducOfferedSchoolYear::with('grade_period',
+                        'student_courses.program.program_level',
+                        'student_courses.program.program_info',
+                        'student_courses.grade_level')
+            ->whereHas('student_courses', function ($query) use ($id) {
+                $query->where('user_id', $id);
+            })
             ->orderBy('year_from','DESC')
             ->get()
             ->map(function($query) use ($id) {
-                $course = StudentsCourses::where('user_id',$id)
-                    ->where('school_year_id',$query->id);
-                $course_count = $course->count();
-                $course_first = $course->first();
+                $course_count = count($query->student_courses);
+                foreach($query->student_courses as $courses){
+                    $program_level = $courses->program->program_level->name;
+                    $program_info_name = $courses->program->program_info->name;
+                    $program_info_shorten = $courses->program->program_info->shorten;
+                    $grade_level = $courses->grade_level->name;
+                }
                 return [
                     'id' => $query->id,
                     'school_year' => $query->year_from.'-'.$query->year_to.' ('.$query->grade_period->name.')',                            
-                    'program_level' => $course_first->program->program_level->name,
-                    'program' => $course_first->program->program_info->name.' ('.$course_first->program->program_info->shorten.')',
-                    'grade_level' => $course_first->grade_level->name,
+                    'program_level' => $program_level,
+                    'program' => $program_info_name.' ('.$program_info_shorten.')',
+                    'grade_level' => $grade_level,
                     'course_count' => $course_count
                 ];
             })->toArray();
         if(count($query)>0){
             $x = 1;
             foreach($query as $r){
-                $data_list['f1'] = $x;                
+                $data_list['f1'] = $x;
                 $data_list['f2'] = $r['school_year'];
                 $data_list['f3'] = $r['program_level'];
                 $data_list['f4'] = $r['program'];
@@ -131,7 +136,14 @@ class LoadTableController extends Controller
         $data = array();
         $id = $request->id;
         $school_year_id = $request->school_year_id;
-        $query = StudentsCourses::where('user_id',$id)
+        $query = StudentsCourses::with('course.instructor',
+                                    'course.schedule.room',
+                                    'course.schedule.days',
+                                    'course.curriculum.curriculum',                                    
+                                    'course.course.grade_level',
+                                    'course.curriculum.offered_program.program',
+                                    'status')
+                        ->where('user_id',$id)
                         ->where('school_year_id',$school_year_id)
                         ->get()
                         ->map(function($query) use ($name_services) {
@@ -205,7 +217,6 @@ class LoadTableController extends Controller
                 $x++;
             }
         }
-        return  response()->json($data);
         return  response()->json($data);
     }
 }

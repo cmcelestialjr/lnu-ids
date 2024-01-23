@@ -13,11 +13,15 @@ use App\Models\EducCourseStatus;
 use App\Models\EducProgramLevel;
 use App\Models\Ludong\LudongGradeLog;
 use App\Models\Ludong\LudongStudents;
+use App\Models\Status;
+use App\Models\StudentsCourses;
 use App\Models\StudentsProgram;
+use App\Models\Users;
 //use Laradevsbd\Zkteco\Http\Library\ZktecoLib;
 use Rats\Zkteco\Lib\ZKTeco;
 use Intervention\Image\Facades\Image;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class PageController extends Controller
 {
@@ -29,39 +33,106 @@ class PageController extends Controller
         $this->validate = new ValidateAccessServices;
     }
     public function home($data){
-        $user_details123 = [];
-        $attendace = [];
-        try{
-            //$zk = new ZKTeco('10.5.205.8',4370);
-            //$zk = new ZKTeco('10.5.205.181',4370);
-            //if ($zk->connect()){
-                    //$zk->clearAdmin();
-                    //$zk->setUser(5,5,'cesar','',1);
-                    //$user_details123 = $zk->specificUser(5);
-                    //$zk->clearAttendance(5);
-                //$attendace = $zk->getAttendance();
-                // foreach($attendace as $row){
-                //     $insert = new DTRlogs();
-                //     $insert->user_id = $row['id'];
-                //     $insert->state = $row['state'];
-                //     $insert->dateTime = $row['timestamp'];
-                //     $insert->type = $row['type'];
-                //     $insert->save();
-                // }
-                    //$attendace = $zk->getAttendanceSpecific();
-                // $zk->setUser(1,230209,'Celestial, Cesar Jr. M.',NULL,0,0);
-            //}
-        }catch(Exception $e){
+        
+        $connectionName = 'sis_student';
+        $connectionSIScourses = 'sis_courses';
+        $connectionCpanel = 'cpanel';
+        $datas = [];
+        $students_data = [];
+        $query = '';
+        try {
+           // DB::connection($connectionName)->getPdo();
 
+            // $datas1[] = [
+            //     'stud_id' => '2303906',
+            //     'enroll_status' => 'New',
+            //     'surname' => 'Buscano',
+            //     'first_name' => 'Angelika',
+            //     'middle_name' => 'L',
+            //     'qualifier' => '',
+            //     'is_case_sensitive' => 'N',
+            //     'source' => 'sias'
+            // ];
+
+            // DB::connection($connectionName)->table('info')->insert($datas1);
+
+            // $poes_ids = DB::connection($connectionCpanel)->table('tbl_profile')
+            //             ->pluck('student_number')->toArray();
+            // $query1 = DB::connection($connectionName)->table('info')
+            //     ->where('source','sias')
+            //     ->where('stud_id','>=','2300001')
+            //     ->whereRaw('LENGTH(stud_id) = ?', [7])
+            //     ->whereNotIn('stud_id',$poes_ids)
+            //     ->get();
+            // $sis_ids = [];
+            // if($query1->count()>0){
+            //     foreach($query1 as $r){
+            //         $datas[] = [
+            //             'student_number' => $r->stud_id,
+            //             'firstname' => $r->first_name,
+            //             'middlename' => $r->middle_name,
+            //             'lastname' => $r->surname,
+            //             'extname' => $r->qualifier,
+            //             'birthday' => '1990-01-01',
+            //             'sex' => '',
+            //             'civil_status' => '',
+            //             'nationality' => '',
+            //             'contact_number' => '',
+            //             'email_address' => '',
+            //             'zip_code' => '6500',
+            //             'home_address' => '',
+            //             'guardian_name' => '',
+            //             'guardian_contact' => '',
+            //             'student_type' => '',
+            //             'upload_payment' => '',
+            //             'created_at' => date('Y-m-d H:i:s')
+            //         ];
+            //     }
+            //     DB::connection($connectionCpanel)->table('tbl_profile')->insert($datas);
+            // }
+            // $users_temp_id = Users::where('stud_id','!=',NULL)->pluck('stud_id')->toArray();
+            // $query_ = DB::connection($connectionName)->table('info')
+            //     ->whereIn('stud_id',$users_temp_id)
+            //     ->get();
+            // if($query_->count()){
+            //     foreach($query_ as $row){
+            //         $stud_id = $row->stud_id;
+            //         $get_program_student = DB::connection($connectionName)->table('course')
+            //             ->where('stud_id',$stud_id)
+            //             ->orderBy('sy','DESC')
+            //             ->orderBy('terms','DESC')
+            //             ->orderBy('term','DESC')
+            //             ->first();
+            //         // $course_id = $get_program_student->course;
+            //         // $get_program = DB::connection($connectionSIScourses)->table('info')
+            //         //     ->where('course_id',$course_id)
+            //         //     ->first();
+            //         // $get_program_curriculum = DB::connection($connectionSIScourses)->table('info')
+            //         //     ->where('course_id',$course_id)
+            //         //     ->first();
+            //     }
+
+            //     // DB::table('students_program')->insert($data_program);
+            // }
+            // $users = Users::where('stud_id','!=',NULL)->pluck('stud_id')->toArray();  
+            // $users_student = DB::connection($connectionName)->table('info')
+            //             ->whereNotIn('stud_id',$users)
+            //             ->get();
+            // $students_data = $users_student;
+            //$query = "Connection to $connectionName is established.";
+            //$query = $query1->count();
+
+        } catch (Exception $e) {
+            $query = "Connection to $connectionName failed: " . $e->getMessage();
         }
-        $data['user_details123'] = $user_details123;
-        $data['attendace'] = $attendace;
+        $data['query'] = $query;
+        $data['students_data'] = $students_data;
         return view($this->page.'/home',$data);
     }
     public function students($data){
         $data['program_level'] = EducProgramLevel::get();
         $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
-        $data['date_graduate'] = StudentsProgram::select('date_graduate')->orderBy('date_graduate','DESC')->groupBy('date_graduate')->get();
+        $data['date_graduate'] = StudentsProgram::select(DB::raw('YEAR(date_graduate) as year'))->orderBy('year','DESC')->groupBy('year')->get();
         return view($this->page.'/student/student',$data);
     }
     public function departments($data){   
@@ -70,6 +141,18 @@ class PageController extends Controller
     public function programs($data){   
         $data['statuses'] = EducCourseStatus::get();
         return view($this->page.'/programs/programs',$data);
+    }
+    public function buildings($data){
+        $data['statuses'] = Status::whereHas('status_list', function ($query) {
+                $query->where('table','bldg_rm');
+            })->get();
+        return view($this->page.'/buildings/buildings',$data);
+    }
+    public function rooms($data){
+        $data['statuses'] = Status::whereHas('status_list', function ($query) {
+                $query->where('table','bldg_rm');
+            })->get();
+        return view($this->page.'/rooms/rooms',$data);
     }
     public function courses_list($data){        
         return view($this->page.'/courses_list',$data);
@@ -84,11 +167,17 @@ class PageController extends Controller
     }
     public function enrollment($data){
         $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
+        $data['program_level'] = EducProgramLevel::get();
         return view($this->page.'/enrollment/enrollment',$data);
     }
     public function schedule($data){
         $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
         return view($this->page.'/schedule/schedule',$data);
+    }
+    public function add_drop($data){
+        $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
+        $data['school_year_detail'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->first();
+        return view($this->page.'/addDrop/addDrop',$data);
     }
     public function student_ludong($data){
         $data['ludong_year'] = LudongGradeLog::select('sy')

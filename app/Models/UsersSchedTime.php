@@ -12,6 +12,10 @@ class UsersSchedTime extends Model
     {
         return $this->belongsTo(Users::class, 'user_id', 'id')->withDefault();
     }
+    public function option()
+    {
+        return $this->belongsTo(UsersSchedTimeOption::class, 'option_id', 'id')->withDefault();
+    }
     public function updated_by()
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id')->withDefault();

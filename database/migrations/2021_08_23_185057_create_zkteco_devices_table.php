@@ -13,7 +13,7 @@ class CreateZktecoDevicesTable extends Migration
      */
     public function up()
     {
-        Schema::create('zkteco_devices', function (Blueprint $table) {
+        Schema::create('devices', function (Blueprint $table) {
             $table->id();
             $table->ipAddress('ip');
             $table->string('port',10);
@@ -30,6 +30,6 @@ class CreateZktecoDevicesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('zkteco_devices');
+        Schema::dropIfExists('devices');
     }
 }

@@ -32,6 +32,14 @@ class EducOfferedCourses extends Model
     {
         return $this->hasMany(StudentsCourses::class, 'offered_course_id', 'id');
     }
+    public function w_grade()
+    {
+        return $this->hasMany(StudentsCourses::class, 'offered_course_id', 'id')->where('student_course_status_id','!=',NULL);
+    }
+    public function wo_grade()
+    {
+        return $this->hasMany(StudentsCourses::class, 'offered_course_id', 'id')->where('student_course_status_id',NULL);
+    }
     public function schedule()
     {
         return $this->hasMany(EducOfferedSchedule::class, 'offered_course_id', 'id')->orderBy('time_from','ASC');

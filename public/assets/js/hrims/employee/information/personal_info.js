@@ -136,7 +136,9 @@ function same_res(thisBtn){
     }
 }
 function infoSubmit(thisBtn){
-    var id_no = $('#employeeInformationModal input[name="id_no"]').val();
+    var id_no = $('#employeeInformationModal input[name="id_no"]').val();    
+    var honorific = $('#info input[name="honorific"]').val();
+    var post_nominal = $('#info input[name="post_nominal"]').val();
     var lastname = $('#info input[name="lastname"]').val();
     var firstname = $('#info input[name="firstname"]').val();
     var middlename = $('#info input[name="middlename"]').val();
@@ -183,6 +185,8 @@ function infoSubmit(thisBtn){
     if(x==0){
         var form_data = {
             id_no:id_no,
+            honorific:honorific,
+            post_nominal:post_nominal,
             lastname:lastname,
             firstname:firstname,
             middlename:middlename,

@@ -129,18 +129,22 @@ $(document).on('click', '#courseAddModal button[name="submit"]', function (e) {
         toastr.error('Please select a course');
     }
 });
-$(document).on('click', '#advisementDiv #studentAdvisement button[name="submit_advisement"]', function (e) {
+$(document).on('click', '#preEnrollDiv button[name="submit_advisement"]', function (e) {
     var thisBtn = $(this);    
-    var school_year_id = $('#advisementDiv select[name="school_year"] option:selected').val();
-    var student_id = $('#advisementDiv select[name="student"] option:selected').val();
-    var code = $('#advisementDiv select[name="code"] option:selected').val();
-    var curriculum_id = $('#advisementDiv select[name="curriculum"] option:selected').val();
-    var section = $('#advisementDiv select[name="section"] option:selected').val();
+    var school_year_id = $('#preEnrollDiv input[name="school_year_id"]').val();
+    var student_id = $('#preEnrollDiv input[name="id"]').val();
+    var code = $('#preEnrollDiv input[name="code"]').val();
+    var curriculum_id = $('#preEnrollDiv input[name="curriculum"]').val();
+    var section = $('#preEnrollDiv select[name="section"] option:selected').val();
     var courses = [];
     var cid = [];
-    $('#advisementDiv .courseCheck:checked').each(function () {
+    var course_id = [];
+    var course_option = [];
+    $('#preEnrollDiv .courseCheck:checked').each(function () {
         courses.push($(this).data('id'));
         cid.push($(this).data('cid'));
+        course_id.push($(this).data('ci'));
+        course_option.push($(this).data('op'));
     });
     if(courses!=''){
         var form_data = {
@@ -150,10 +154,13 @@ $(document).on('click', '#advisementDiv #studentAdvisement button[name="submit_a
             curriculum_id:curriculum_id,
             section:section,
             courses:courses,
-            cid:cid
+            cid:cid,
+            option:'Pre-enroll by',
+            course_id:course_id,
+            course_option:course_option
         };
         $.ajax({
-            url: base_url+'/fms/advisement/advisementSubmit',
+            url: base_url+'/sims/pre_enroll/preenrollSubmit',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': CSRF_TOKEN
@@ -171,7 +178,7 @@ $(document).on('click', '#advisementDiv #studentAdvisement button[name="submit_a
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
-                    advisement_table();
+                    pre_enroll_div();
                 }else{
                     toastr.error('Error.');
                     thisBtn.addClass('input-error');

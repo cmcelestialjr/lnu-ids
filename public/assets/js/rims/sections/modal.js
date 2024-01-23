@@ -1,6 +1,7 @@
 $(document).on('click', '#sectionDiv .sectionNewModal', function (e) {
     var thisBtn = $(this);
     var program_id = $('#sectionDiv #programsSelectDiv select[name="program"]').val();
+    var branch_id = $('#sectionDiv #programsSelectDiv select[name="branch"]').val();
     var id = $('#sectionDiv select[name="school_year"]').val();
     var url = base_url+'/rims/sections/sectionNewModal';
     var modal = 'default';
@@ -12,7 +13,8 @@ $(document).on('click', '#sectionDiv .sectionNewModal', function (e) {
         static:'',
         w_table:'wo',
         id:id,
-        program_id:program_id
+        program_id:program_id,
+        branch_id:branch_id
     };
     loadModal(form_data,thisBtn);
 });

@@ -6,6 +6,18 @@
     <div class="modal-body">
         <div class="row">
             <div class="col-lg-6">
+                <label>Option</label>
+                <select class="form-control select2-info" name="option">
+                    @foreach($sched_option as $row)
+                        <option value="{{$row->id}}">{{$row->name}}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-lg-6">
+                <label>Duration</label>
+                <input type="text" class="form-control dateRange duration" name="duration">
+            </div>
+            <div class="col-lg-6">
                 <label>Time From</label>
                 <input type="time" class="form-control time_input" name="time_from">
             </div>

@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers\SIMS;
 use App\Http\Controllers\Controller;
+use App\Models\_EducationBg;
+use App\Models\_FamilyBg;
 use App\Models\EducCurriculum;
+use App\Models\EducDepartments;
 use App\Models\EducOfferedCourses;
 use App\Models\EducOfferedSchoolYear;
+use App\Models\EducProgramLevel;
+use App\Models\StudentsCourses;
+use App\Models\StudentsCourseStatus;
 use App\Models\StudentsInfo;
+use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ValidateAccessServices;
@@ -14,37 +21,115 @@ class PageController extends Controller
 {
     private $page;
     private $validate;
+    private $student_user_id;
     public function __construct()
     {
+        $user = Auth::user();
+        $user_id = $user->id;
         $this->page = 'sims';
         $this->validate = new ValidateAccessServices;
+        $this->student_user_id = $user_id;
     }
     public function home($data){
         return view($this->page.'/home',$data);
     }
-    public function profile($data){        
-        return view($this->page.'/profile/profile',$data);
+    public function information($data){
+        $user_id = $this->student_user_id;
+
+        $info = Users::with('personal_info.sexs',
+                            'personal_info.religion',
+                            'personal_info.civil_statuses')
+            ->where('id',$user_id)->first();
+
+        $education_level = EducProgramLevel::with(['education_bg' => function ($query) use ($user_id){
+                $query->where('user_id',$user_id);
+            }])
+            ->whereHas('education_bg', function ($query) use ($user_id) {
+                $query->where('user_id',$user_id);
+            })->orderBy('id','DESC')->get();
+
+        $program_level = EducProgramLevel::whereHas('student_programs', function ($query) use ($user_id) {
+                $query->where('user_id',$user_id);
+            })->orderBy('id','DESC')->get();
+
+        $family_bg = _FamilyBg::with('fam_relation')
+            ->where('user_id',$user_id)
+            ->orderBy('relation_id','ASC')
+            ->get();
+        
+        $data['info'] = $info;
+        $data['education_level'] = $education_level;
+        $data['program_level'] = $program_level;
+        $data['family_bg'] = $family_bg;
+        
+        return view($this->page.'/information/information',$data);
     }
     public function students($data){        
         return view($this->page.'/students/students',$data);
     }
     public function teachers($data){
-        return view($this->page.'/home',$data);
+        $user_id = $this->student_user_id;
+
+        $program_level = EducProgramLevel::whereHas('students_courses', function ($query) use ($user_id) {
+            $query->where('user_id',$user_id);
+        })->orderBy('id','DESC')->get();
+
+        $school_year = EducOfferedSchoolYear::with('grade_period')
+            ->whereHas('student_courses', function ($query) use ($user_id) {
+                $query->where('user_id',$user_id);
+            })->orderBy('year_from','DESC')
+            ->orderBy('grade_period_id','DESC')
+            ->get()->map(function($query)  {
+                return [
+                    'id' => $query->id,
+                    'name' => $query->year_from.'-'.$query->year_to.' '.$query->grade_period->name_no
+                ];
+            })->toArray();
+
+        $data['program_level'] = $program_level;
+        $data['school_year'] = $school_year;
+
+        return view($this->page.'/teachers/teachers',$data);
     }
-    public function info($data){
-        return view($this->page.'/home',$data);
-    }
-    public function grades($data){
-        return view($this->page.'/home',$data);
+    public function list($data){
+        $user_id = $this->student_user_id;
+        $course_status = StudentsCourseStatus::whereHas('students', function ($query) use ($user_id) {
+                $query->where('user_id',$user_id);
+            })->get();
+        $program_level = EducProgramLevel::whereHas('students_courses', function ($query) use ($user_id) {
+                $query->where('user_id',$user_id);
+            })->get();
+
+        $data['course_status'] = $course_status;
+        $data['program_level'] = $program_level;
+        
+        return view($this->page.'/courses/list',$data);
     }
     public function schedule($data){
-        return view($this->page.'/home',$data);
+        $user_id = $this->student_user_id;
+
+        $school_year = EducOfferedSchoolYear::with('grade_period','student_courses')
+            ->whereHas('student_courses', function ($query) use ($user_id) {
+                $query->where('user_id',$user_id);
+            })->orderBy('year_from','DESC')
+            ->orderBy('grade_period_id','DESC')
+            ->get()->map(function($query)  {
+                foreach($query->student_courses as $row){
+                    $program_level = $row->program_level->name;
+                }
+                return [
+                    'id' => $query->id,
+                    'name' => $query->year_from.'-'.$query->year_to.' '.$query->grade_period->name_no
+                ];
+            })->toArray();
+
+        $data['school_year'] = $school_year;
+        return view($this->page.'/courses/schedule',$data);
     }
     public function pre_enroll($data){
-        $user = Auth::user();
-        $user_id = $user->id;
+        $user_id = $this->student_user_id;
         $school_year = EducOfferedSchoolYear::orderBy('grade_period_id','DESC')->orderBy('grade_period_id','DESC')->first();
-        $student_info = StudentsInfo::where('user_id',$user_id)->first();        
+        $student_info = StudentsInfo::with('program', 'program_code', 'grade_level')->where('user_id',$user_id)->first();        
         $program_id = $student_info->program_id;
         $program_code_id = $student_info->program_code_id;
         $curriculum_id = $student_info->curriculum_id;

@@ -82,7 +82,7 @@ class PDFController extends Controller
             }
         }else{
             return view('layouts/error/404');
-        } 
+        }
     }
     private function generateQR($id_no,$year,$month,$range){
         error_reporting(E_ERROR);
@@ -94,7 +94,7 @@ class PDFController extends Controller
                     ->eyeColor(2, /*outer*/ 212,175,55, /*inner*/ 0, 0, 128, 0, 0)
                     ->size(300)
                     ->errorCorrection('H')
-                    ->generate(url('hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range));
+                    ->generate('hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range);
         $imageName = $id_no.'_'.$year.'_'.$month.'_'.$range.'.png';
         $path = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/';
         File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
@@ -474,30 +474,30 @@ class PDFController extends Controller
             
             $y = 6;
             $y_add = 14;
-            $pdf::SetXY(24+$x_add, $y+$y_add+5);
-            $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
+            // $pdf::SetXY(24+$x_add, $y+$y_add+5);
+            // $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
 
-            $pdf::SetXY(62+$x_add, $y+$y_add+5);
-            $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
-            for($k=1;$k<=3;$k++){
-                $y_add = $y_add+40;
-                $pdf::SetXY(5+$x_add, $y+$y_add);
-                $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
+            // $pdf::SetXY(62+$x_add, $y+$y_add+5);
+            // $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
+            // for($k=1;$k<=3;$k++){
+            //     $y_add = $y_add+40;
+            //     $pdf::SetXY(5+$x_add, $y+$y_add);
+            //     $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
 
-                $pdf::SetXY(42+$x_add, $y+$y_add);
-                $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
+            //     $pdf::SetXY(42+$x_add, $y+$y_add);
+            //     $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
 
-                $pdf::SetXY(80+$x_add, $y+$y_add);
-                $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
+            //     $pdf::SetXY(80+$x_add, $y+$y_add);
+            //     $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
 
-                $y_add = $y_add+40;
+            //     $y_add = $y_add+40;
 
-                $pdf::SetXY(24+$x_add, $y+$y_add);
-                $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
+            //     $pdf::SetXY(24+$x_add, $y+$y_add);
+            //     $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
 
-                $pdf::SetXY(62+$x_add, $y+$y_add);
-                $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
-            }
+            //     $pdf::SetXY(62+$x_add, $y+$y_add);
+            //     $pdf::Image($logo_blur, '', '', 20, 20, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
+            // }
 
             $pdf::SetXY(72+$x_add, $y-4);
             $pdf::Image($qrcode, '', '', 30, 26, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
@@ -543,7 +543,7 @@ class PDFController extends Controller
             
             $pdf::setCellPaddings(0, 1, 0, 1);
             $pdf::SetXY(5+$x_add, $y+40);
-            $pdf::SetFont('typewritingsmall','',9);            
+            $pdf::SetFont('typewritingsmall','',9);
             $pdf::Cell(10, '', '', 1, 1, 'L', 0, '', 1);
 
             $x_tr_add = 10;
@@ -733,7 +733,11 @@ class PDFController extends Controller
                                             $pdf::Cell(15, '', '------', 1, 1, 'C', 0, '', 1);
                                         }else{
                                             $pdf::SetXY(5+$x_tr_add+$x_add, $y+40);
-                                            $pdf::Cell(15, '', $dtr[$j]['out_am'], 1, 1, 'C', 0, '', 1);
+                                            $dtr_out_am = $dtr[$j]['out_am'];
+                                            if($dtr[$j]['out_am']==NULL && $dtr[$j]['in_am']!=NULL){
+                                                $dtr_out_am = '12:00pm*';
+                                            }
+                                            $pdf::Cell(15, '', $dtr_out_am, 1, 1, 'C', 0, '', 1);
                                         }
                                     }
                                     $x_tr_add = $x_tr_add+15;
@@ -782,7 +786,11 @@ class PDFController extends Controller
                                             $pdf::Cell(15, '', '-----', 1, 1, 'C', 0, '', 1);
                                         }else{
                                             $pdf::SetXY(5+$x_tr_add+$x_add, $y+40);
-                                            $pdf::Cell(15, '', $dtr[$j]['in_pm'], 1, 1, 'C', 0, '', 1);
+                                            $dtr_in_pm = $dtr[$j]['in_pm'];
+                                            if($dtr[$j]['in_pm']==NULL && $dtr[$j]['in_am']!=NULL){
+                                                $dtr_in_pm = '01:00pm*';
+                                            }
+                                            $pdf::Cell(15, '', $dtr_in_pm, 1, 1, 'C', 0, '', 1);
                                         }
                                     }
                                     $x_tr_add = $x_tr_add+15;

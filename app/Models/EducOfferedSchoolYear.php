@@ -16,4 +16,8 @@ class EducOfferedSchoolYear extends Model
     {
         return $this->hasMany(EducOfferedPrograms::class, 'school_year_id', 'id');
     }
+    public function student_courses()
+    {
+        return $this->hasMany(StudentsCourses::class, 'school_year_id', 'id');
+    }
 }

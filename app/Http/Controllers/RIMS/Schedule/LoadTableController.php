@@ -16,15 +16,26 @@ class LoadTableController extends Controller
     }    
     public function viewTable(Request $request){
         $name_services = new NameServices;
-        $data = array();
-        $program = $request->program;
+        $data = array();        
         $school_year = $request->school_year;
-        $offered_program_ids = EducOfferedPrograms::where('school_year_id',$school_year)
-                                ->where('id',$program)->pluck('id')->toArray();
-        $offered_curriculum_ids = EducOfferedCurriculum::whereIn('offered_program_id',$offered_program_ids)
-                                ->pluck('id')->toArray();
-        $query = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                    ->orderBy('section_code')
+        $branch = $request->branch;
+        $program = $request->program;
+        $query = EducOfferedCourses::with('schedule.days',
+                                        'schedule.room',
+                                        'instructor',
+                                        'curriculum.offered_program.program',
+                                        'curriculum.curriculum',
+                                        'course.grade_level')
+                    ->whereHas('curriculum', function ($subQuery) use ($school_year,$program,$branch) {
+                        $subQuery->whereHas('offered_program', function ($subQuery) use ($school_year,$program,$branch) {
+                            $subQuery->where('branch_id', $branch);
+                            $subQuery->where('program_id', $program);
+                            $subQuery->where('school_year_id', $school_year);
+                        });
+                    })
+                    ->orderBy('year_level','ASC')
+                    ->orderBy('section_code','DESC')
+                    ->orderBy('id','DESC') 
                     ->get()
                     ->sortBy('curriculum.offered_program.program.shorten')
                     ->sortBy('curriculum.offered_program.name')
@@ -37,7 +48,7 @@ class LoadTableController extends Controller
                         }
                         if(count($query->schedule)>0){
                             foreach($query->schedule as $row){   
-                                $days = array();                             
+                                $days = array();
                                 foreach($row->days as $day){
                                     $days[] = $day->day;
                                 }
@@ -68,16 +79,17 @@ class LoadTableController extends Controller
         if(count($query)>0){
             $x = 1;
             foreach($query as $r){
+                $id = $r['id'];
                 $data_list['f1'] = $x;
                 $data_list['f2'] = $r['curriculum'];
                 $data_list['f3'] = $r['section_code'];
                 $data_list['f4'] = $r['course_code'];
                 $data_list['f5'] = $r['grade_level'];                
-                $data_list['f6'] = '<span id="searchCourseSched'.$x.'">'.$r['schedule'].'</span>';
-                $data_list['f7'] = '<span id="searchCourseRoom'.$x.'">'.$r['room'].'</span>';
-                $data_list['f8'] = '<span id="searchCourseInstructor'.$x.'">'.$r['instructor'].'</span>';
-                $data_list['f9'] = '<button class="btn btn-primary btn-primary-scan searchCourseSched"
-                                        data-id="'.$r['id'].'">
+                $data_list['f6'] = '<span id="courseSchedule'.$id.'">'.$r['schedule'].'</span>';
+                $data_list['f7'] = '<span id="courseRoom'.$id.'">'.$r['room'].'</span>';
+                $data_list['f8'] = '<span id="courseInstructor'.$id.'">'.$r['instructor'].'</span>';
+                $data_list['f9'] = '<button class="btn btn-primary btn-primary-scan scheduleCourseModal"
+                                        data-id="'.$id.'">
                                         <span class="fa fa-calendar"></span> Sched
                                     </button>';
                 array_push($data,$data_list);
@@ -91,34 +103,41 @@ class LoadTableController extends Controller
         $data = array();
         $option = $request->option;
         $school_year = $request->school_year;
-        $offered_program_ids = EducOfferedPrograms::where('school_year_id',$school_year)->pluck('id')->toArray();
-        $offered_curriculum_ids = EducOfferedCurriculum::whereIn('offered_program_id',$offered_program_ids)
-                    ->pluck('id')->toArray();
-        $schedule_ids = array();
-        $instructor_ids = array();
-        $room_ids = array();
-        if($option!=''){
-            foreach($option as $opt){
-                if($opt=='schedule'){
-                    $schedule_ids = $this->schedule_wo($offered_curriculum_ids);
-                }
-                if($opt=='instructor'){
-                    $instructor_ids = $this->instructor_wo($offered_curriculum_ids);
-                }
-                if($opt=='room'){
-                    $schedule_ids1 = $this->schedule_wo($offered_curriculum_ids);
-                    $room_ids = array_merge($this->room_wo($offered_curriculum_ids),$schedule_ids1);
-                }
-            }
-        }else{
-            $schedule_ids = $this->schedule_wo($offered_curriculum_ids);
-            $instructor_ids = $this->instructor_wo($offered_curriculum_ids);
-            $room_ids = $this->room_wo($offered_curriculum_ids);
-        }
-        $offered_courses_ids = array_merge($schedule_ids, $instructor_ids, $room_ids);
-        $query = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                    ->whereIn('id',$offered_courses_ids)
-                    ->orderBy('section_code')
+        $query = EducOfferedCourses::with('schedule.days',
+                                          'schedule.room',
+                                          'instructor',
+                                          'curriculum.offered_program.program',
+                                          'curriculum.curriculum',
+                                          'course.grade_level')
+                    ->whereHas('curriculum', function ($subQuery) use ($school_year,) {
+                        $subQuery->whereHas('offered_program', function ($subQuery) use ($school_year) {
+                            $subQuery->where('school_year_id', $school_year);
+                        });
+                    })
+                    ->where(function ($subQuery) use ($option) {
+                        if($option!=''){
+                            foreach($option as $opt){
+                                if($opt=='schedule'){
+                                    $subQuery->orwhereDoesntHave('schedule');
+                                }
+                                if($opt=='instructor'){
+                                    $subQuery->orWhere('instructor_id',NULL);
+                                }
+                                if($opt=='room'){
+                                    $subQuery->orwhereDoesntHave('schedule');
+                                    $subQuery->orWhereHas('schedule', function($query){
+                                        $query->where('room_id',NULL);
+                                    });
+                                }
+                            }
+                        }else{
+                            $subQuery->orwhereDoesntHave('schedule');
+                            $subQuery->orWhere('instructor_id',NULL);
+                            $subQuery->orWhereHas('schedule', function($query){
+                                        $query->where('room_id',NULL);
+                                    });
+                        }         
+                    })->orderBy('section_code')
                     ->get()
                     ->sortBy('curriculum.offered_program.program.shorten')
                     ->sortBy('curriculum.offered_program.name')
@@ -168,10 +187,10 @@ class LoadTableController extends Controller
                 $data_list['f4'] = $r['section_code'];
                 $data_list['f5'] = $r['course_code'];
                 $data_list['f6'] = $r['grade_level'];                
-                $data_list['f7'] = '<span id="searchCourseSched'.$x.'">'.$r['schedule'].'</span>';
-                $data_list['f8'] = '<span id="searchCourseRoom'.$x.'">'.$r['room'].'</span>';
-                $data_list['f9'] = '<span id="searchCourseInstructor'.$x.'">'.$r['instructor'].'</span>';
-                $data_list['f10'] = '<button class="btn btn-primary btn-primary-scan searchCourseSched"
+                $data_list['f7'] = '<span id="courseSchedule'.$x.'">'.$r['schedule'].'</span>';
+                $data_list['f8'] = '<span id="courseRoom'.$x.'">'.$r['room'].'</span>';
+                $data_list['f9'] = '<span id="courseInstructor'.$x.'">'.$r['instructor'].'</span>';
+                $data_list['f10'] = '<button class="btn btn-primary btn-primary-scan scheduleCourseModal"
                                         data-id="'.$r['id'].'">
                                         <span class="fa fa-calendar"></span> Sched
                                     </button>';
@@ -180,45 +199,35 @@ class LoadTableController extends Controller
             }
         }
         return $data;
-    }
-    private function schedule_wo($offered_curriculum_ids){
-        return EducOfferedCourses::doesntHave('schedule')
-                ->whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                ->pluck('id')->toArray();
-    }
-    private function instructor_wo($offered_curriculum_ids){
-        return EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                ->where('instructor_id',NULL)
-                ->pluck('id')->toArray();
-    }
-    private function room_wo($offered_curriculum_ids){
-        return EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                ->whereHas('schedule', function($query){
-                    $query->where('room_id',NULL);
-                })
-                ->pluck('id')->toArray();
-    }
+    }    
     private function search($request){
         $name_services = new NameServices;
         $data = array();
         $option = $request->option;
         $school_year = $request->school_year;
         $option_select = $request->option_select;
-        $offered_program_ids = EducOfferedPrograms::where('school_year_id',$school_year)->pluck('id')->toArray();
-        $offered_curriculum_ids = EducOfferedCurriculum::whereIn('offered_program_id',$offered_program_ids)
-                    ->pluck('id')->toArray();
         if($option=='course_code'){
-            $query = $this->courseCode($offered_curriculum_ids,$option_select);
+            $query = $this->courseCode($option_select);
         }elseif($option=='course_desc'){
-            $query = $this->courseDesc($offered_curriculum_ids,$option_select);
+            $query = $this->courseDesc($option_select);
         }elseif($option=='section_code'){
-            $query = $this->sectionCode($offered_curriculum_ids,$option_select);
+            $query = $this->sectionCode($option_select);
         }elseif($option=='instructor'){
-            $query = $this->instructor($offered_curriculum_ids,$option_select);
+            $query = $this->instructor($option_select);
         }elseif($option=='room'){
-            $query = $this->room($offered_curriculum_ids,$option_select);
+            $query = $this->room($option_select);
         }
-        $query = $query->get()
+        $query = $query
+                    ->whereHas('curriculum.offered_program', function ($subQuery) use ($school_year) {
+                            $subQuery->where('school_year_id', $school_year);
+                    })
+                    ->with('schedule.days',
+                            'schedule.room',
+                            'instructor',
+                            'curriculum.offered_program.program',
+                            'curriculum.curriculum',
+                            'course.grade_level')
+                    ->get()
                     ->sortBy('curriculum.offered_program.program.shorten')
                     ->sortBy('curriculum.offered_program.name')
                     ->map(function($query) use ($name_services) {
@@ -267,10 +276,10 @@ class LoadTableController extends Controller
                 $data_list['f4'] = $r['section_code'];
                 $data_list['f5'] = $r['course_code'];
                 $data_list['f6'] = $r['course_desc'];
-                $data_list['f7'] = '<span id="searchCourseSched'.$x.'">'.$r['schedule'].'</span>';
-                $data_list['f8'] = '<span id="searchCourseRoom'.$x.'">'.$r['room'].'</span>';
-                $data_list['f9'] = '<span id="searchCourseInstructor'.$x.'">'.$r['instructor'].'</span>';
-                $data_list['f10'] = '<button class="btn btn-primary btn-primary-scan searchCourseSched"
+                $data_list['f7'] = '<span id="courseSchedule'.$x.'">'.$r['schedule'].'</span>';
+                $data_list['f8'] = '<span id="courseRoom'.$x.'">'.$r['room'].'</span>';
+                $data_list['f9'] = '<span id="courseInstructor'.$x.'">'.$r['instructor'].'</span>';
+                $data_list['f10'] = '<button class="btn btn-primary btn-primary-scan scheduleCourseModal"
                                         data-id="'.$r['id'].'">
                                         <span class="fa fa-calendar"></span> Sched
                                     </button>';
@@ -280,37 +289,31 @@ class LoadTableController extends Controller
         }
         return $data;
     }
-    private function courseCode($offered_curriculum_ids,$option_select){
-        $query = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                    ->where('code', $option_select)
+    private function courseCode($option_select){
+        $query = EducOfferedCourses::where('code', $option_select)
                     ->orderBy('code');
         return $query;
-    }
-    
-    private function courseDesc($offered_curriculum_ids,$option_select){
-        $query = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                    ->whereHas('course', function($query) use ($option_select){
+    }    
+    private function courseDesc($option_select){
+        $query = EducOfferedCourses::whereHas('course', function($query) use ($option_select){
                         $query->where('name', $option_select);
                     })
                     ->orderBy('code');
                     return $query;
     }
-    private function sectionCode($offered_curriculum_ids,$option_select){
-        $query = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                    ->where('section_code', $option_select)
+    private function sectionCode($option_select){
+        $query = EducOfferedCourses::where('section_code', $option_select)
                     ->orderBy('section_code');
         return $query;
     }
-    private function instructor($offered_curriculum_ids,$option_select){
-        $query = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                    ->where('instructor_id', $option_select)
+    private function instructor($option_select){
+        $query = EducOfferedCourses::where('instructor_id', $option_select)
                     ->where('instructor_id','<>',NULL)
                     ->orderBy('section_code');
         return $query;
     }
-    private function room($offered_curriculum_ids,$option_select){
-        $query = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)
-                    ->whereHas('schedule', function($query) use ($option_select){
+    private function room($option_select){
+        $query = EducOfferedCourses::whereHas('schedule', function($query) use ($option_select){
                         $query->where('room_id', $option_select);
                     })
                     ->orderBy('section_code');

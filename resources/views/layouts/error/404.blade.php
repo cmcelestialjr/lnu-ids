@@ -159,7 +159,7 @@ body {
       </div>
       <div class="circles">
         <p>404<br>
-         <small>PAGE NOT FOUND</small>
+         <small>NOT FOUND</small>
         </p>
         <span class="circle big"></span>
         <span class="circle med"></span>

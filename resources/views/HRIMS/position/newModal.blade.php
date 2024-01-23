@@ -71,6 +71,14 @@
                         </select>
                     </div>
                     <div class="col-lg-4">
+                        <label>Fund Services<span class="text-require">*</span></label>
+                        <select class="form-control select2-default" name="fund_services">
+                            @foreach($fund_services as $row)
+                                <option value="{{$row->id}}">{{$row->shorten}} - {{$row->name}}</option>
+                            @endforeach 
+                        </select>
+                    </div>
+                    <div class="col-lg-4">
                         <label>Role<span class="text-require">*</span></label>
                         <select class="form-control select2-default" name="role">
                             @foreach($role as $row)

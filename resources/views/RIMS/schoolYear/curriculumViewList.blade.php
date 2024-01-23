@@ -1,11 +1,17 @@
-<br>
 <div class="row">
+    <div class="col-md-4">
+        <label>Status</label>
+        @php                                                
+        $statusSelect = statusSelect($offered_curriculum->status_id,$offered_curriculum->id,$statuses,'curriculum')
+        @endphp
+        {!!$statusSelect!!}
+    </div>    
     @foreach($year_level as $level)    
     <div class="col-lg-12"> 
         <div class="card card-primary card-outline">
             <div class="card-body">
         <label>{{$level->name}}</label>
-        <div class="table-responsive" style="height: 250px;">
+        <div class="table-responsive">
             <div class="row">
                 @foreach($period as $per)
                     <div class="col-lg-12">
@@ -59,13 +65,10 @@
                                                         $courseStatus = '';
                                                     }
                                                 @endphp
-                                                @if($course->status_id==1)
-                                                    <button class="btn btn-success btn-success-scan btn-sm {{$courseStatus}}"
-                                                            data-id="{{$course->id}}">{{$course->status->name}}</button>
-                                                @else
-                                                    <button class="btn btn-danger btn-danger-scan btn-sm {{$courseStatus}}"
-                                                            data-id="{{$course->id}}">{{$course->status->name}}</button>
-                                                @endif
+                                                @php                                                
+                                                $statusSelect = statusSelect($course->status_id,$course->id,$statuses,'course')
+                                                @endphp
+                                                {!!$statusSelect!!}
                                             </td>
                                         </tr>
                                         @php
@@ -94,3 +97,41 @@
     </div>
     @endforeach
 </div>
+@php
+    function statusSelect($status_selected,$id,$statuses,$from){
+
+        $selectHTML = '<select class="form-control select2-table1 selectStatus" style="width:100%">';        
+        foreach ($statuses as $status) {
+            $color = getStatusColor($status->id);
+            if($status_selected==$status->id){
+                $selectHTML .= '<option value="'.$status->id.'" data-id="'.$id.'" data-from="'.$from.'" data-color="'.$color.'" selected>'.$status->name.'</option>';
+            }else{
+                $selectHTML .= '<option value="'.$status->id.'" data-id="'.$id.'" data-from="'.$from.'" data-color="'.$color.'">'.$status->name.'</option>';
+            }
+        }
+        $selectHTML .= '</select>';
+        
+        return $selectHTML;
+    }
+    function getStatusColor($status){
+        if ($status == 1) {
+            return 'green';
+        } else{
+            return 'red';
+        }
+    }
+@endphp
+<script>
+    $(document).ready(function() {
+        $(".select2-table1").select2({
+            dropdownParent: $("#curriculumViewList"),
+            templateSelection: function(option) {
+                if (!option.id) {
+                    return option.text;
+                }                    
+                var color = $(option.element).data("color");                    
+                return $("<span>").text(option.text).css("color", color);
+            }
+        });
+    });
+</script>

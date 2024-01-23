@@ -36,7 +36,7 @@ class _Work extends Model
     {
         return $this->belongsTo(_WorkType::class, 'type_id', 'id');
     }
-    public function updated_by()
+    public function updated_by_info()
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id');
     }

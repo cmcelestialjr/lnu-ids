@@ -23,6 +23,16 @@ class NameServices
         $name = $lastname.', '.$firstname.$extname.$middlename;
         return $this->capitalize_first($name);
     }
+    public function lastname_full($lastname,$firstname,$middlename,$extname){
+        if($middlename!=''){
+            $middlename = ' '.$middlename;
+        }
+        if($extname!=''){
+            $extname = ' '.$extname;
+        }
+        $name = $lastname.', '.$firstname.$extname.$middlename;
+        return $this->capitalize_first($name);
+    }
     public function firstname_middlename_last($lastname,$firstname,$middlename,$extname){
         if($middlename!=''){
             $middlename = '-'.$middlename;

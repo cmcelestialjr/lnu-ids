@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\SEARCH;
 use App\Http\Controllers\Controller;
+use App\Models\EducCourses;
 use App\Models\EducOfferedCourses;
 use App\Models\EducOfferedCurriculum;
 use App\Models\EducOfferedPrograms;

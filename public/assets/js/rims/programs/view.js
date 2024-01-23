@@ -1,7 +1,3 @@
-view_programs();
-$(document).on('change', '#programsDiv select[name="status"]', function (e) {
-    view_programs();
-});
 $(document).on('change', '#curriculumModal #curriculumDiv .curriculumSelects', function (e) {
     var thisBtn = $(this);
     curriculum_div(thisBtn);
@@ -70,20 +66,11 @@ $(document).on('input', '#newCourseModal .req', function (e) {
         $('#newCourseModal input[name="lab"]').addClass('border-require');
     }
 });
-$(document).on('input', '#programsNewModal', function (e) {
-    var name = $('#programsNewModal input[name="name"]').val();
-    var shorten = $('#programsNewModal input[name="shorten"]').val();
-    var code = $('#programsNewModal input[name="code"]').val();
-    $('#programsNewModal input[name="name"]').removeClass('border-require');
-    $('#programsNewModal input[name="shorten"]').removeClass('border-require');
-    $('#programsNewModal input[name="code"]').removeClass('border-require');
-    if(name==''){
-        $('#programsNewModal input[name="name"]').addClass('border-require');
-    }
-    if(shorten==''){
-        $('#programsNewModal input[name="shorten"]').addClass('border-require');
-    }
-    if(code==''){
-        $('#programsNewModal input[name="code"]').addClass('border-require');
+$(document).off('change', '#specialization_name_select').on('change', '#specialization_name_select', function (e) {
+    var thisBtn = $(this);
+    var val = thisBtn.val();
+    $('#specialization_name_div').addClass('hide');
+    if(val==3){
+        $('#specialization_name_div').removeClass('hide');
     }
 });

@@ -42,13 +42,14 @@
     </div>
     <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-times"></span> Close</button>
-        @if($query!=NULL)
+        <button class="btn btn-success btn-success-scan" name="submit"><span class="fa fa-check"></span> Submit</button>
+        {{-- @if($query!=NULL)
             @if($query->status==NULL)
             <button class="btn btn-success btn-success-scan" name="submit"><span class="fa fa-check"></span> Submit</button>
             @endif
         @else
             <button class="btn btn-success btn-success-scan" name="submit"><span class="fa fa-check"></span> Submit</button>
-        @endif
+        @endif --}}
     </div>
 </div>
 <!-- /.modal-content -->

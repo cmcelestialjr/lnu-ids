@@ -24,6 +24,10 @@ class StudentsInfo extends Model
     {
         return $this->belongsTo(EducCurriculum::class, 'curriculum_id', 'id')->withDefault();
     }
+    public function program_level()
+    {
+        return $this->belongsTo(EducProgramLevel::class, 'program_level_id', 'id')->withDefault();
+    }
     public function grade_level()
     {
         return $this->belongsTo(EducYearLevel::class, 'grade_level_id', 'id')->withDefault();

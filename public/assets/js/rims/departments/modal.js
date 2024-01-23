@@ -3,7 +3,7 @@ $(document).on('click', '#departmentsDiv .programsModal', function (e) {
     var id = thisBtn.data('id');
     var url = base_url+'/rims/departments/programsModal';
     var modal = 'default';
-    var modal_size = 'modal-xl';
+    var modal_size = 'modal-lg';
     var form_data = {
         url:url,
         modal:modal,
@@ -21,7 +21,7 @@ $(document).on('click', '#programsModal .programAddModal', function (e) {
     var id = thisBtn.data('id');
     var url = base_url+'/rims/departments/programAddModal';
     var modal = 'primary';
-    var modal_size = 'modal-xl';
+    var modal_size = 'modal-lg';
     var form_data = {
         url:url,
         modal:modal,

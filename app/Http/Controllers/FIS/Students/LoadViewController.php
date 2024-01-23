@@ -14,19 +14,15 @@ class LoadViewController extends Controller
         $school_year = $request->school_year;
         $program_level = array();
         if($school_year!=NULL){
-            $program_level = EducProgramLevel::whereHas('year_level', function ($query) use ($school_year,$instructor_id) {
-                        $query->whereHas('courses', function ($query) use ($school_year,$instructor_id) {
-                            $query->whereHas('courses', function ($query) use ($school_year,$instructor_id) {
-                                $query->where('instructor_id',$instructor_id);
-                                $query->whereHas('curriculum', function ($query) use ($school_year) {
-                                    $query->whereHas('offered_program', function ($query) use ($school_year) {
-                                        $query->where('school_year_id',$school_year);
-                                    });
-                                });
-                                // $query->whereHas('students', function ($query) use ($school_year) {
-                                //     $query->where('school_year_id',$school_year);
-                                // });
-                            });
+            $program_level = EducProgramLevel::
+                    whereHas('year_level.courses.courses', function ($query) use ($school_year,$instructor_id) {
+                        $query->where('instructor_id',$instructor_id);
+                        $query->whereHas('curriculum.offered_program', function ($query) use ($school_year) {
+                            if($school_year=='all'){
+                                $query->where('school_year_id','>',0);
+                            }else{
+                                $query->where('school_year_id',$school_year);
+                            }
                         });
                     })->get();
         }

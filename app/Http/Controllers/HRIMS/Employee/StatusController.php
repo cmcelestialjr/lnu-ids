@@ -46,7 +46,7 @@ class StatusController extends Controller
         $html = '';
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
             $id = $request->id;
-            $query = Users::where('id',$id)->first();
+            $query = Users::with('employee_default')->where('id',$id)->first();
             if(isset($query->employee_default)){
                 $status = $request->status;
                 $cause = $request->cause;
@@ -63,13 +63,22 @@ class StatusController extends Controller
                     $cause = NULL;
                 }else{
                     $separation_date = date('Y-m-d',strtotime($separation_date));
+                    _Work::where('user_id',$id)
+                        ->where('date_from','<=',$query->employee_default->date_from)
+                        ->update(['status' => $status]);
+
+                    _Work::where('user_id',$id)
+                        ->where('date_to','present')                      
+                        ->update(['date_to' => $separation_date]);
                 }
+                
                 _Work::where('id',$work_id)
                 ->update(['cause' => $cause,
                         'separation' => $separation_date,
                         'date_separation' => $separation_date,
                         'updated_by' => $updated_by,
                         'updated_at' => date('Y-m-d H:i:s')]);
+                
                 $class = 'btn btn-success btn-success-scan';
                 $html = 'Active';
                 if($status==2){

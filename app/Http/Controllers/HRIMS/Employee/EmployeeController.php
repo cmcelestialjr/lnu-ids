@@ -7,6 +7,7 @@ use App\Services\NameServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ValidateAccessServices;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
 class EmployeeController extends Controller
@@ -34,8 +35,8 @@ class EmployeeController extends Controller
         $name_services = new NameServices;
         $option = $request->option;
         $status = $request->status;
-        $query = Users::
-            whereHas('user_role', function ($query) use ($option,$status) {
+        $query = Users::with('employee_info.emp_stat','instructor_info.emp_stat','employee_default.emp_stat')
+            ->whereHas('user_role', function ($query) use ($option,$status) {
                 if($option=='all'){
                     $query->where('role_id','>',1);
                 }else{
@@ -94,8 +95,12 @@ class EmployeeController extends Controller
                 $data_list['f5'] = $r['salary'];
                 $data_list['f6'] = $r['emp_stat'];
                 $data_list['f8'] = '<button class="btn btn-primary btn-primary-scan btn-sm employeeView"
-                                        data-id="'.$r['id'].'"
+                                        data-id="'.$r['id'].'">
                                         <span class="fa fa-eye"></span> View
+                                    </button>';
+                $data_list['f9'] = '<button class="btn btn-info btn-info-scan btn-sm deduction"
+                                        data-id="'.$r['id'].'">
+                                        <span class="fa fa-calculator"></span>
                                     </button>';
                 array_push($data,$data_list);
                 $x++;
@@ -107,10 +112,20 @@ class EmployeeController extends Controller
 
     }
     private function viewModal($request){
+        // $connectionName = 'skyhr';
+        // DB::connection($connectionName)->getPdo();
+        // $employees = DB::connection($connectionName)->table('dbo.tblEmployees')
+        //     ->limit(1)
+        //     ->get();
+        // $data['employees'] = $employees;
         $user_access_level = $request->session()->get('user_access_level');
         $name_services = new NameServices;
         $id = $request->id;
-        $query = Users::where('id',$id)->first();
+        $query = Users::with('personal_info.sexs',
+                             'personal_info.civil_statuses',
+                             'employee_default.emp_stat',
+                             'date_entry')
+            ->find($id);
         if($query->middlename_in_last=='Y'){
             $name = $name_services->lastname_middlename_last($query->lastname,$query->firstname,$query->middlename,$query->extname);
         }else{
@@ -122,6 +137,7 @@ class EmployeeController extends Controller
         }else{
             $class = '';
         }
+        
         $data = array(
             'query' => $query,
             'name' => $name,
@@ -134,7 +150,7 @@ class EmployeeController extends Controller
         $user_access_level = $request->session()->get('user_access_level');
         $name_services = new NameServices;
         $id = $request->id;
-        $query = Users::where('id',$id)->first();
+        $query = Users::find($id);
         if($query->middlename_in_last=='Y'){
             $name = $name_services->lastname_middlename_last($query->lastname,$query->firstname,$query->middlename,$query->extname);
         }else{
@@ -151,8 +167,7 @@ class EmployeeController extends Controller
         $id = $request->id;
         $file = $request->file;
         $result = 'error';
-        $query = Users::where('id', $id)
-                    ->first();
+        $query = Users::find($id);
         if($query!=NULL){
             $imageExtensions = ['jpg','jpeg','png'];
             $imageExtension = strtolower($file->extension());
@@ -181,7 +196,7 @@ class EmployeeController extends Controller
         $data = array('result' => $result);
         return response()->json($data);
     }
-    private function _employeeNewSubmit($request){        
+    private function _employeeNewSubmit($request){
         $lastname = $request->lastname;
         $firstname = $request->firstname;
         $middlename = $request->middlename;
@@ -232,6 +247,7 @@ class EmployeeController extends Controller
         $step = $request->step;
         $emp_stat = $request->emp_stat;
         $fund_source = $request->fund_source;
+        $fund_services = $request->fund_services;
         $gov_service = $request->gov_service;
         $designation = $request->designation;
         $credit_type = $request->credit_type;

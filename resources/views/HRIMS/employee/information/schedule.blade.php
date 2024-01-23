@@ -95,6 +95,30 @@
         </div>
         <div class="tab-pane fade {{$active_table}}" id="table" role="tabpanel">
             <div class="row">
+                <div class="col-lg-2">
+                    <label>Year</label>
+                    <select class="form-control select2-div" name="year" data-id="{{$query->id}}" data-sys="{{$from_sys}}">
+                      @for ($i = date('Y'); $i >= 2023; $i--)
+                        @if($i==$year)
+                            <option value="{{$i}}" selected>{{$i}}</option>
+                        @else
+                            <option value="{{$i}}">{{$i}}</option>
+                        @endif                        
+                      @endfor
+                    </select>
+                  </div>
+                  <div class="col-lg-2">
+                    <label>Month</label>
+                    <select class="form-control select2-div" name="month" data-id="{{$query->id}}" data-sys="{{$from_sys}}">
+                        @for($i=1;$i<=12;$i++)
+                          @if($month==$i)
+                            <option value="{{date('m', strtotime(date('Y').'-'.$i.'-01'))}}" selected>{{date('F', strtotime(date('Y').'-'.$i.'-01'))}}</option>
+                          @else
+                            <option value="{{date('m', strtotime(date('Y').'-'.$i.'-01'))}}">{{date('F', strtotime(date('Y').'-'.$i.'-01'))}}</option>
+                          @endif
+                        @endfor
+                    </select>
+                  </div>
                 <div class="col-lg-12 table-responsive">
                     <button class="btn btn-primary btn-primary-scan btn-sm schedNewModal" style="float:right">
                         <span class="fa fa-plus"></span> New Schedule
@@ -104,6 +128,7 @@
                             <th>#</th>
                             <th>Time</th>
                             <th>Days</th>
+                            <th>Option</th>
                             <th>Remarks</th>
                             <th>Doc</th>
                             @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)
@@ -137,6 +162,7 @@
                                         @endphp
                                         {{$day_disp_array1}}
                                     </td>
+                                    <td>{{$row->option->name}}</td>
                                     <td>{{$row->remarks}}</td>
                                     <td></td>
                                     @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)

@@ -7,6 +7,22 @@
         <input type="hidden" name="time_id" value="{{$query->id}}">
         <div class="row">
             <div class="col-lg-6">
+                <label>Option</label>
+                <select class="form-control select2-info" name="option">
+                    @foreach($sched_option as $row)
+                        @if($query->option_id==$row->id)
+                            <option value="{{$row->id}}" selected>{{$row->name}}</option>
+                        @else
+                            <option value="{{$row->id}}">{{$row->name}}</option>
+                        @endif                        
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-lg-6">
+                <label>Duration</label>
+                <input type="text" class="form-control dateRange" name="duration" value="{{date('m/d/Y',strtotime($query->date_from))}} - {{date('m/d/Y',strtotime($query->date_to))}}">
+            </div>
+            <div class="col-lg-6">
                 <label>Time From</label>
                 <input type="time" class="form-control time_input" name="time_from" value="{{$query->time_from}}">
             </div>

@@ -7,7 +7,44 @@
     </div>
     <div class="modal-body">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-2">
+                <label style="float:right">Courses List</label>
+            </div>
+            <div class="col-md-6">
+                <div id="courseSelect">
+                    <select class="form-control select2-primary courseSelect">
+
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-primary btn-primary-scan" id="courseSelectSubmit">
+                    <span class="fa fa-check"></span>
+                </button>
+            </div>
+        </div>
+        <div class="row" id="courseInfo">
+            <div class="col-md-12">
+                <br>
+            </div>
+            <div class="col-md-3">
+                <label>Course Code</label>
+                <input type="text" class="form-control req" name="code">
+            </div>
+            <div class="col-md-7">
+                <label>Descriptive Title</label>
+                <input type="text" class="form-control req" name="name">
+            </div>
+            <div class="col-md-2">
+                <label>Lab Group</label>
+                <select class="form-control select2-primary" name="lab_group">
+                    <option value="None">None</option>
+                    @foreach($lab_group as $row)
+                        <option value="{{$row->id}}">{{$row->name}}</option>
+                    @endforeach
+                </select>
+            </div>            
+            <div class="col-md-3">
                 <label>Period</label>
                 <select class="form-control select2-primary" name="grade_period">
                     @foreach($grade_period as $row)
@@ -15,21 +52,13 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label>Year Level</label>
                 <select class="form-control select2-primary" name="year_level">
                     @foreach($year_level as $row)
                         <option value="{{$row->id}}">{{$row->name}}</option>
                     @endforeach
                 </select>
-            </div>
-            <div class="col-md-4">
-                <label>Course Code</label>
-                <input type="text" class="form-control req" name="code">
-            </div>
-            <div class="col-md-8">
-                <label>Descriptive Title</label>
-                <input type="text" class="form-control req" name="name">
             </div>
             <div class="col-md-2">
                 <label>Units</label>
@@ -38,6 +67,23 @@
             <div class="col-md-2">
                 <label>Lab</label>
                 <input type="number" class="form-control req" name="lab" value="0">
+            </div>
+            <div class="col-md-2">
+                <label>Pay</label>
+                <input type="number" class="form-control req" name="pay_units" value="0">
+            </div>
+            <div class="col-md-12"></div>
+            <div class="col-md-3">
+                <label>Type</label>
+                <select class="form-control select2-primary" name="course_type" id="specialization_name_select">
+                    @foreach($course_type as $row)
+                        <option value="{{$row->id}}">{{$row->name}} - {{$row->shorten}}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3 hide" id="specialization_name_div">
+                <label>Specialization Name:</label>
+                <input type="text" class="form-control" name="specialization_name">
             </div>
             <div class="col-md-12">
                 <br>
@@ -61,6 +107,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 <div id="curriculumTablePre">
                     
                 </div>
@@ -73,3 +123,4 @@
     </div>
 </div>
 <!-- /.modal-content -->
+<script src="{{ asset('assets/js/search/courseList.js') }}"></script>

@@ -59,7 +59,6 @@ $(document).on('click', '#courseSchedRmModal #courseSchedRmTable .scheduleTimeUp
             success : function(data){
                 thisBtn.removeAttr('disabled');
                 thisB.removeClass('input-loading');
-                console.log(data.result);
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisB.addClass('input-success');
@@ -144,7 +143,6 @@ $(document).on('change', '#courseSchedRmModal #rm_instructor .select2-rm_instruc
         success : function(data){
             thisBtn.removeAttr('disabled');
             thisBtn.removeClass('input-loading'); 
-            console.log(data.result);
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -157,6 +155,199 @@ $(document).on('change', '#courseSchedRmModal #rm_instructor .select2-rm_instruc
                 toastr.error(data.result);
                 thisBtn.addClass('input-error');
                 course_sched_rm_table();
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+});
+$(document).on('click', '#studentShiftModal button[name="submit"]', function (e) {
+    var thisBtn = $(this);
+    var id = $('#studentViewModal input[name="id"]').val();
+    var shift_to = $('#studentShiftModal select[name="shift_to"] option:selected').val();
+    var branch = $('#studentShiftModal select[name="branch"] option:selected').val();
+    var curriculum = $('#studentShiftModal select[name="curriculum"] option:selected').val();
+    var form_data = {
+        id:id,
+        shift_to:shift_to,
+        branch:branch,
+        curriculum:curriculum
+    };
+    $.ajax({
+        url: base_url+'/rims/student/studentShiftModalSubmit',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading'); 
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisBtn.addClass('input-success');
+            }else{
+                toastr.error(data.result);
+                thisBtn.addClass('input-error');
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+});
+$(document).on('click', '#studentPrintModal button[name="submit"]', function (e) {
+    var thisBtn = $(this);
+    var id = $('#studentViewModal input[name="id"]').val();
+    var level = $('#studentPrintModal select[name="level"] option:selected').val();
+    var purpose = $('#studentPrintModal select[name="purpose"] option:selected').val();
+    var remarks = $('#studentPrintModal select[name="remarks"] option:selected').val();
+    var form_data = {
+        id:id,
+        level:level,
+        purpose:purpose,
+        remarks:remarks
+    };
+    $.ajax({
+        url: base_url+'/rims/student/studentPrintSubmit',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading'); 
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisBtn.addClass('input-success');
+                window.open(base_url+'/students/tor/'+data.id_no+'/'+data.level+'/'+data.dateTime, '_blank');
+            }else{
+                toastr.error(data.result);
+                thisBtn.addClass('input-error');
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+});
+$(document).off('click', '#useThisCurriculum').on('click', '#useThisCurriculum', function (e) {
+    var thisBtn = $(this);
+    var id = $('#studentViewModal input[name="id"]').val();
+    var level = $('#studentCurriculumModal select[name="level"] option:selected').val();
+    var program = $('#studentCurriculumModal select[name="program"] option:selected').val();
+    var curriculum = $('#studentCurriculumModal select[name="curriculum"] option:selected').val();
+    var branch = $('#studentCurriculumModal select[name="branch"] option:selected').val();
+    var form_data = {
+        id:id,
+        level:level,
+        program:program,
+        curriculum:curriculum,
+        branch:branch
+    };
+    $.ajax({
+        url: base_url+'/rims/student/useThisCurriculum',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading'); 
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisBtn.addClass('input-success');
+            }else{
+                toastr.error(data.result);
+                thisBtn.addClass('input-error');
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+});
+$(document).off('change', '#specialization_name_select').on('change', '#specialization_name_select', function (e) {
+    var thisBtn = $(this);
+    var id = $('#studentCurriculumModal input[name="id"]').val();
+    var program_level = $('#studentCurriculumModal select[name="level"] option:selected').val();
+    var val = thisBtn.val();
+    var form_data = {
+        id:id,
+        val:val,
+        program_level:program_level
+    };
+    $.ajax({
+        url: base_url+'/rims/student/specializationNameSubmit',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading'); 
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisBtn.addClass('input-success');
+            }else{
+                toastr.error(data.result);
+                thisBtn.addClass('input-error');
             }
             setTimeout(function() {
                 thisBtn.removeClass('input-success');

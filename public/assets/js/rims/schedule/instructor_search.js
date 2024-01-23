@@ -1,0 +1,5 @@
+instructors();
+
+function instructors(){
+    instructorSearch();
+}

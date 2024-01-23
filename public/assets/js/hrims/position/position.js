@@ -71,7 +71,7 @@ function position_view(thisBtn){
     var id = thisBtn.data('id');
     var url = base_url+'/hrims/position/positionView';
     var modal = 'default';
-    var modal_size = 'modal-xxl';
+    var modal_size = 'modal-xl';
     var form_data = {
         url:url,
         modal:modal,
@@ -92,12 +92,13 @@ function position_submit(thisBtn,div,url){
     var shorten = $('#'+div+' input[name="shorten"]').val();
     var salary = $('#'+div+' input[name="salary"]').val();
     var sg = $('#'+div+' input[name="sg"]').val();
-    var level = $('#'+div+' input[name="level"]').val();
+    var level = $('#'+div+' input[name="designation_listlevel"]').val();
     var date_created = $('#'+div+' input[name="date_created"]').val();
     var remarks = $('#'+div+' textarea[name="remarks"]').val();
     var designation = $('#'+div+' select[name="designation"] option:selected').val();
     var emp_stat = $('#'+div+' select[name="emp_stat"] option:selected').val();
     var fund_source = $('#'+div+' select[name="fund_source"] option:selected').val();
+    var fund_services = $('#'+div+' select[name="fund_services"] option:selected').val();
     var role = $('#'+div+' select[name="role"] option:selected').val();
     var status = $('#'+div+' select[name="status"] option:selected').val();
     var sched = $('#'+div+' select[name="sched"] option:selected').val();
@@ -152,6 +153,7 @@ function position_submit(thisBtn,div,url){
             designation:designation,
             emp_stat:emp_stat,
             fund_source:fund_source,
+            fund_services:fund_services,
             role:role,
             status:status,
             sched:sched,

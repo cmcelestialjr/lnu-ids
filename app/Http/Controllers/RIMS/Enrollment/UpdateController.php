@@ -177,12 +177,15 @@ class UpdateController extends Controller
                     $insert->user_id = $student_id;
                     $insert->student_program_id = $student_program->id;
                     $insert->offered_course_id = $course;
+                    $insert->program_level_id = $query->course->curriculum->programs->program_level_id;
                     $insert->course_id = $query->course_id;
                     $insert->course_code = $query->code;
                     $insert->course_desc = $query->course->name;
                     $insert->course_units = $query->course->units;
                     $insert->lab_units = $query->course->lab;
                     $insert->school_name = 'Leyte Normal University';
+                    $insert->program_name = $query->course->curriculum->programs->name;
+                    $insert->program_shorten = $query->course->curriculum->programs->shorten;
                     $insert->year_from = $query->curriculum->offered_program->school_year->year_from;
                     $insert->year_to = $query->curriculum->offered_program->school_year->year_to;
                     $insert->grade_period_id = $query->curriculum->offered_program->school_year->grade_period_id;
@@ -224,6 +227,7 @@ class UpdateController extends Controller
 
                 StudentsProgram::where('id',$student_program->id)
                                 ->update(['curriculum_id' => $curriculum->curriculum_id,
+                                        'grade_level_id' => $grade_level_id,
                                         'year_from' => $year_from->year_from,
                                         'year_to' => $year_to->year_to,
                                         'student_status_id' => $student_status_id,
@@ -245,6 +249,6 @@ class UpdateController extends Controller
         $response = array('result' => $result,
                           'courses' => $grade_level_id
                         );
-        return $response;        
+        return $response;
     }
 }

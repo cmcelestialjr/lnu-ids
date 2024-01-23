@@ -74,9 +74,9 @@ function submitLogin(thisBtn){
                 if(data.result=='success'){
                     toastr.success('Success! You are now login.');
                     thisBtn.addClass('input-success');
-                    setTimeout(function() {
+                    //setTimeout(function() {
                         window.location.replace(base_url+'/system');
-                    }, 1000);
+                    //}, 500);
                 }else if(data.result=='none' || data.result=='wrong'){
                     toastr.error('Wrong Username or Password!');
                     thisBtn.addClass('input-error');
@@ -94,8 +94,18 @@ function submitLogin(thisBtn){
                     thisBtn.removeClass('input-error');
                 }, 3000);
             },
-            error: function (){
-                toastr.error('Error!');
+            error: function (xhr){
+                if (xhr.status === 429) {
+                    toastr.error('Too many requests! Please try again after a minute.');
+                } else {
+                    toastr.error('An error occurred: ' + xhr.statusText);
+                }
+                thisBtn.removeAttr('disabled');
+                thisBtn.removeClass('input-loading');
+                thisBtn.addClass('input-error');
+                setTimeout(function () {
+                    thisBtn.removeClass('input-error');
+                }, 3000);
             }
         });
     }

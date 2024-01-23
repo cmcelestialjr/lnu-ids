@@ -15,14 +15,52 @@
             <div class="col-md-8">
                 <label>Descriptive Title</label>
                 <input type="text" class="form-control req" name="name" value="{{$query->name}}">
+            </div>            
+            <div class="col-md-3">
+                <label>Lab Group</label>
+                <select class="form-control select2-div" name="lab_group">
+                    <option value="None">None</option>
+                    @foreach($lab_group as $row)
+                        @if($row->id==$lab_group_course)
+                            <option value="{{$row->id}}" selected>{{$row->name}}</option>
+                        @else
+                            <option value="{{$row->id}}">{{$row->name}}</option>
+                        @endif                        
+                    @endforeach
+                </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label>Units</label>
                 <input type="number" class="form-control req" name="units" value="{{$query->units}}">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label>Lab</label>
                 <input type="number" class="form-control req" name="lab" value="{{$query->lab}}">
+            </div>
+            <div class="col-md-3">
+                <label>Pay</label>
+                <input type="number" class="form-control req" name="pay_units" value="{{$query->pay_units}}">
+            </div>
+            <div class="col-md-12"></div>
+            <div class="col-md-3">
+                <label>Type</label>
+                <select class="form-control select2-primary" name="course_type" id="specialization_name_select">
+                    @foreach($course_type as $row)
+                        @if($row->id==$query->course_type_id)
+                            <option value="{{$row->id}}" selected>{{$row->name}} - {{$row->shorten}}</option>
+                        @else
+                            <option value="{{$row->id}}">{{$row->name}} - {{$row->shorten}}</option>
+                        @endif 
+                    @endforeach
+                </select>
+            </div>
+            @if($query->course_type_id==3)
+            <div class="col-md-3" id="specialization_name_div">
+            @else
+            <div class="col-md-3 hide" id="specialization_name_div">
+            @endif
+                <label>Specialization Name:</label>
+                <input type="text" class="form-control" name="specialization_name" value="{{$query->specialization_name}}">
             </div>
             <div class="col-md-12">
                 <br>

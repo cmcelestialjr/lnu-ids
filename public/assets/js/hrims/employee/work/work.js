@@ -67,6 +67,7 @@ function work_submit(thisBtn,div,url){
     var gov_service = $('#'+div+' select[name="gov_service"] option:selected').val();
     var emp_stat = $('#'+div+' select[name="emp_stat"] option:selected').val();
     var fund_source = $('#'+div+' select[name="fund_source"] option:selected').val();
+    var fund_services = $('#'+div+' select[name="fund_services"] option:selected').val();
     var designation = $('#'+div+' select[name="designation"] option:selected').val();
     var credit_type = $('#'+div+' select[name="credit_type"] option:selected').val();
     var role = $('#'+div+' select[name="role"] option:selected').val();
@@ -88,38 +89,46 @@ function work_submit(thisBtn,div,url){
     if(date_from==''){
         $('#'+div+' input[name="date_from"]').addClass('border-require');
         toastr.error('Please input Date from');
+        x++;
     }
     if(date_to_option=='date' && date_to==''){
         $('#'+div+' input[name="date_to"]').addClass('border-require');
         toastr.error('Please input Date To');
+        x++;
     }
+    
     if(position_option=='None'){
         if(position_title==''){
             $('#'+div+' input[name="position_title"]').addClass('border-require');
             toastr.error('Please input Position Title');
+            x++;
         }
         if(position_shorten==''){
             $('#'+div+' input[name="position_shorten"]').addClass('border-require');
             toastr.error('Please input Position Shorten');
+            x++;
         }
         if(salary==''){
             $('#'+div+' input[name="salary"]').addClass('border-require');
             toastr.error('Please input Salary');
+            x++;
         }
         if(sg==''){
             $('#'+div+' input[name="sg"]').addClass('border-require');
             toastr.error('Please input Salary');
+            x++;
         }
         if(step==''){
             $('#'+div+' input[name="step"]').addClass('border-require');
             toastr.error('Please input Salary');
+            x++;
         }
     }else{
         if(!position_id){
             $('#'+div+' #positionList').addClass('border-require');
             toastr.error('Please select Position');
-        }
-        
+            x++;
+        }        
     }
     if(x==0){
         var form_data = {
@@ -137,6 +146,7 @@ function work_submit(thisBtn,div,url){
             gov_service:gov_service,
             emp_stat:emp_stat,
             fund_source:fund_source,
+            fund_services:fund_services,
             designation:designation,
             credit_type:credit_type,
             role:role,
@@ -172,9 +182,6 @@ function work_submit(thisBtn,div,url){
                         var id = data.id;
                     }
                     work_table(id);
-                }else if(data.result=='error'){
-                    toastr.error('Error.');
-                    thisBtn.addClass('input-error');
                 }else{
                     toastr.error(data.result);
                     thisBtn.addClass('input-error');
@@ -227,6 +234,7 @@ function position_shorten_get(thisBtn,div){
                 $('#'+div+' input[name="step"]').val(data.step);
                 $('#'+div+' select[name="emp_stat"]').val(data.emp_stat).change();
                 $('#'+div+' select[name="fund_source"]').val(data.fund_source).change();
+                $('#'+div+' select[name="fund_services"]').val(data.fund_services).change();
                 $('#'+div+' select[name="role"]').val(data.role).change();
                 $('#'+div+' select[name="gov_service"]').val(data.gov_service).change();
                 $('#'+div+' select[name="designation"]').empty();
@@ -276,6 +284,7 @@ function position_option(thisBtn,div){
 
     $('#'+div+' select[name="emp_stat"]').attr('disabled', true);
     $('#'+div+' select[name="fund_source"]').attr('disabled', true);
+    $('#'+div+' select[name="fund_services"]').attr('disabled', true);
     $('#'+div+' select[name="gov_service"]').attr('disabled', true);
     $('#'+div+' select[name="designation"]').attr('disabled', false);
     $('#'+div+' select[name="designation"]').empty();
@@ -307,6 +316,7 @@ function position_option(thisBtn,div){
 
         $('#'+div+' select[name="emp_stat"]').attr('disabled', false);
         $('#'+div+' select[name="fund_source"]').attr('disabled', false);
+        $('#'+div+' select[name="fund_services"]').attr('disabled', false);
         $('#'+div+' select[name="gov_service"]').attr('disabled', false);
         $('#'+div+' select[name="role"]').attr('disabled', false);
         $('#'+div+' select[name="designation"]').attr('disabled', false);

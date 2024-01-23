@@ -20,6 +20,15 @@
                         <option value="{{$row->id}}">{{$row->name}} ({{$row->shorten}})</option>
                     @endforeach
                 </select>
+                <label>Unit</label>
+                <div id="unitByDepartment">
+                    <select class="form-control select2-primary unitByDepartment" name="unit">
+                        <option value="">Please Select</option>
+                        @foreach($unit as $row)
+                            <option value="{{$row->id}}">{{$row->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <label>Name</label>
                 <input type="text" class="form-control" name="name">
                 <label>Shorten</label>

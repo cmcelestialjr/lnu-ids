@@ -5,8 +5,10 @@ use App\Http\Controllers\Controller;
 use App\Models\_Work;
 use App\Models\_WorkType;
 use App\Models\EmploymentStatus;
+use App\Models\FundServices;
 use App\Models\FundSource;
 use App\Models\HRCreditType;
+use App\Models\HRDesignation;
 use App\Models\HRPosition;
 use App\Models\Users;
 use App\Models\UsersRole;
@@ -36,7 +38,8 @@ class WorkController extends Controller
     private function table($request){
         $data = array();
         $id = $request->id;
-        $query = _Work::where('user_id',$id)
+        $query = _Work::with('role','emp_stat')
+            ->where('user_id',$id)
             ->orderBy('date_from','DESC')->get()
             ->map(function($query)  {
                 if($query->date_to=='present'){
@@ -104,6 +107,7 @@ class WorkController extends Controller
             $query = Users::where('id',$id)->first();
             $emp_stat = EmploymentStatus::get();
             $fund_source = FundSource::get();
+            $fund_services = FundServices::get();
             $credit_type = HRCreditType::get();
             $user_role = UsersRole::where('id','>',1)->get();
             $work_type = _WorkType::get();
@@ -111,6 +115,7 @@ class WorkController extends Controller
                 'query' => $query,
                 'emp_stat' => $emp_stat,
                 'fund_source' => $fund_source,
+                'fund_services' => $fund_services,
                 'credit_type' => $credit_type,
                 'user_role' => $user_role,
                 'work_type' => $work_type
@@ -127,6 +132,7 @@ class WorkController extends Controller
             $query = _Work::where('id',$id)->first();
             $emp_stat = EmploymentStatus::get();
             $fund_source = FundSource::get();
+            $fund_services = FundServices::get();
             $credit_type = HRCreditType::get();
             $user_role = UsersRole::where('id','>',1)->get();
             $work_type = _WorkType::get();
@@ -134,6 +140,7 @@ class WorkController extends Controller
                 'query' => $query,
                 'emp_stat' => $emp_stat,
                 'fund_source' => $fund_source,
+                'fund_services' => $fund_services,
                 'credit_type' => $credit_type,
                 'user_role' => $user_role,
                 'work_type' => $work_type
@@ -157,7 +164,8 @@ class WorkController extends Controller
         $designation_name = '';
         $role = '';
         $gov_service = '';
-        $query = HRPosition::where('id',$id)->first();
+        $query = HRPosition::with('designation')
+            ->where('id',$id)->first();
         if($query!=NULL){
             $title = $query->name;
             $shorten = $query->shorten;
@@ -171,6 +179,11 @@ class WorkController extends Controller
                 $fund_source = 'none';
             }else{
                 $fund_source = $query->fund_source_id;
+            }
+            if($query->fund_services_id==NULL){
+                $fund_services = 'none';
+            }else{
+                $fund_services = $query->fund_services_id;
             }
             if($query->designation_id==NULL){
                 $designation = 'none';
@@ -190,6 +203,7 @@ class WorkController extends Controller
                       'step' => $step,
                       'emp_stat' => $emp_stat,
                       'fund_source' => $fund_source,
+                      'fund_services' => $fund_services,
                       'role' => $role,
                       'designation' => $designation,
                       'designation_name' => $designation_name,
@@ -216,6 +230,7 @@ class WorkController extends Controller
             $gov_service = $request->gov_service;
             $emp_stat = $request->emp_stat;
             $fund_source = $request->fund_source;
+            $fund_services = $request->fund_services;
             $designation = $request->designation;
             $credit_type = $request->credit_type;
             $role = $request->role;
@@ -239,9 +254,16 @@ class WorkController extends Controller
             if($credit_type=='none'){
                 $credit_type = NULL;
             }
-            if($designation=='none'){
+            
+            $getDesignation = HRDesignation::find($designation);
+            if($getDesignation){
+                $designation_title = $getDesignation->name;
+                $designation_shorten = $getDesignation->shorten;
+            }else{
                 $designation = NULL;
                 $credit_type = NULL;
+                $designation_title = NULL;
+                $designation_shorten = NULL;
             }
             $check_date = _Work::where('user_id',$id)
                 ->where('date_from',$date_from)
@@ -253,7 +275,7 @@ class WorkController extends Controller
                     ->where('type_id',$type)
                     ->where('date_to','present')
                     ->first();
-            }            
+            }
             if($check_date!=NULL){
                 $result = 'Date from already exists!';
                 $x++;
@@ -264,6 +286,9 @@ class WorkController extends Controller
             }
             if($fund_source=='none'){
                 $fund_source = NULL;
+            }
+            if($fund_services=='none'){
+                $fund_services = NULL;
             }
             if($x==0){
                 $insert = new _Work();
@@ -280,7 +305,10 @@ class WorkController extends Controller
                 $insert->gov_service = $gov_service;
                 $insert->emp_stat_id = $emp_stat;
                 $insert->fund_source_id = $fund_source;
+                $insert->fund_services_id = $fund_services;
                 $insert->designation_id = $designation;
+                $insert->designation_title = $designation_title;
+                $insert->designation_shorten = $designation_shorten;
                 $insert->credit_type_id = $credit_type;
                 $insert->office = $office;
                 $insert->separation = $separation;
@@ -289,8 +317,17 @@ class WorkController extends Controller
                 $insert->type_id = $type;
                 $insert->remarks = $remarks;
                 $insert->lnu = $lnu;
+                $insert->status = 1;
                 $insert->updated_by = $updated_by;
                 $insert->save();
+
+                $employee = Users::find($id);
+
+                $update = _Work::where('user_id',$id)
+                            ->where('date_from','<=',$date_from);
+                $update->status = $employee->emp_status_id;
+                $update->save();
+                
                 $result = 'success';
             }
         }
@@ -318,6 +355,7 @@ class WorkController extends Controller
             $gov_service = $request->gov_service;
             $emp_stat = $request->emp_stat;
             $fund_source = $request->fund_source;
+            $fund_services = $request->fund_services;
             $designation = $request->designation;
             $credit_type = $request->credit_type;
             $role = $request->role;
@@ -327,6 +365,8 @@ class WorkController extends Controller
             $cause = $request->cause;
             $lwop = $request->lwop;
             $remarks = $request->remarks;
+            $work = _Work::find($id);
+            $user_id = $work->user_id;
             if($date_to_option=='present'){
                 $date_to = 'present';
             }else{
@@ -341,17 +381,25 @@ class WorkController extends Controller
             if($credit_type=='none'){
                 $credit_type = NULL;
             }
-            if($designation=='none'){
+            $getDesignation = HRDesignation::find($designation);
+            if($getDesignation){
+                $designation_title = $getDesignation->name;
+                $designation_shorten = $getDesignation->shorten;
+            }else{
                 $designation = NULL;
                 $credit_type = NULL;
+                $designation_title = NULL;
+                $designation_shorten = NULL;
             }
             $check_date = _Work::where('id','!=',$id)
+                ->where('user_id',$user_id)
                 ->where('date_from',$date_from)
                 ->first();
             $check_present = NULL;
             $x = 0;
             if($date_to=='present'){
-                $check_present = _Work::where('id','!=',$id)
+                $check_present = _Work::whereNotIn('id',[$id])
+                    ->where('user_id',$user_id)
                     ->where('type_id',$type)
                     ->where('date_to','present')
                     ->first();
@@ -367,6 +415,10 @@ class WorkController extends Controller
             if($fund_source=='none'){
                 $fund_source = NULL;
             }
+            if($fund_services=='none'){
+                $fund_services = NULL;
+            }
+            
             if($x==0){
                 $data = ['date_from' => $date_from,
                         'date_to' => $date_to,
@@ -380,7 +432,10 @@ class WorkController extends Controller
                         'gov_service' => $gov_service,
                         'emp_stat_id' => $emp_stat,
                         'fund_source_id' => $fund_source,
+                        'fund_services_id' => $fund_services,
                         'designation_id' => $designation,
+                        'designation_title' => $designation_title,
+                        'designation_shorten' => $designation_shorten,
                         'credit_type_id' => $credit_type,
                         'office' => $office,
                         'separation' => $separation,
@@ -393,12 +448,20 @@ class WorkController extends Controller
                         'updated_at' => date('Y-m-d H:i:s')];
                 $update = _Work::where('id', $id)
                             ->update($data);
+                            
                 if($update){
+
+                    $employee = Users::find($user_id);
+
+                    _Work::where('user_id',$user_id)
+                        ->where('date_from','<=',$date_from)
+                        ->update(['status' => $employee->emp_status_id]);
+
                     $result = 'success';
                 }
             }
             $query = _Work::where('id', $id)->first();
-            if($query!=NULL){
+            if($query){
                 $id = $query->user_id;
             }else{
                 $id = NULL;

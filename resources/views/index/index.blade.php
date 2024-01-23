@@ -9,33 +9,29 @@
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link rel="icon" href="{{ asset('assets/images/logo/lnu_logo.png') }}" type="image/gif">
+  <link rel="icon" href="{{ asset('assets/images/logo/lnu_logo.png') }}" type="image/gif" nonce="{{ csp_nonce() }}">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/fontawesome-free/css/all.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/fontawesome-free/css/all.min.css') }}" nonce="{{ csp_nonce() }}">
   <!-- Vendor CSS Files -->
-  <link href="{{ asset('_regna/vendor/aos/aos.css') }}" rel="stylesheet">
-  <link href="{{ asset('_regna/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('_regna/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-  <link href="{{ asset('_regna/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('_regna/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('_regna/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
-
+  <link href="{{ asset('_regna/vendor/aos/aos.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}">
+  <link href="{{ asset('_regna/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}">
+  <link href="{{ asset('_regna/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}">
+  <link href="{{ asset('_regna/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}">
+  <link href="{{ asset('_regna/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}">
+  <link href="{{ asset('_regna/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}">
   <!--  CSS File -->
-  <link href="{{ asset('_regna/css/style.css') }}" rel="stylesheet">
-
-  <!-- adminLTE style -->
-  <!-- <link rel="stylesheet" href="{{ asset('_adminLTE/dist/css/adminlte.min.css') }}"> -->
+  <link href="{{ asset('_regna/css/style.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}">
   <!-- login style -->
-  <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}" nonce="{{ csp_nonce() }}">
   <!-- master style -->
-  <link rel="stylesheet" href="{{ asset('assets/master/master.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/master/master.css') }}" nonce="{{ csp_nonce() }}">
   <!-- Select2 -->
-  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/select2/css/select2.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/select2/css/select2.min.css') }}" nonce="{{ csp_nonce() }}">
+  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}" nonce="{{ csp_nonce() }}">
   <!-- SweetAlert2 -->
-  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}" nonce="{{ csp_nonce() }}">
   <!-- Toastr -->
-  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/toastr/toastr.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/toastr/toastr.min.css') }}" nonce="{{ csp_nonce() }}">
 </head>
 
 <body>
@@ -66,8 +62,8 @@
 
   <section id="hero">
     <div class="hero-container" data-aos="zoom-in" data-aos-delay="100">
-      <h1>INTEGRATED SYSTEM</h1>
-      <h2>LNU - IS</h2>
+      <h1>INTEGRATED DATA SYSTEM</h1>
+      <h2>LNU - IDS</h2>
       <!-- <a href="#about" class="btn-get-started">Get Started</a> -->
     </div>
   </section>
@@ -352,7 +348,7 @@
               <b class="input-header">Password</b>
               <div class="input input-group mb-4">
                 <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" value="">
-                <span class="input-group-text" style="cursor: pointer" tooltip="Show Password">
+                <span class="input-group-text cursor-pointer" tooltip="Show Password">
                   <i class="fa fa-eye" id="togglePassword"></i>
                 </span>
               </div>
@@ -387,7 +383,7 @@
             <input type="text" class="form-control" name="username" placeholder="Enter your username">
             <button class="btn btn-primary">Reset Password</button>
             <br>
-            <p class="mt-4" style="font-size: 14px; font-weight: 500; text-align:center;">A password reset link will be sent to your email address.</p>
+            <p class="mt-4 reset-account-message">A password reset link will be sent to your email address.</p>
             <br>            
           </div>
         </div>
@@ -398,36 +394,36 @@
   </div>
   <!-- /.modal -->
   <!-- jQuery -->
-  <script src="{{ asset('_adminLTE/plugins/jquery/jquery.min.js') }}"></script>
-  <script src="{{ asset('_adminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/jquery/jquery.min.js') }}" nonce="{{ csp_nonce() }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js') }}" nonce="{{ csp_nonce() }}"></script>
   
   <!-- Vendor -->
-  <script src="{{ asset('_regna/vendor/aos/aos.js') }}"></script>
-  <script src="{{ asset('_regna/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ asset('_regna/vendor/glightbox/js/glightbox.min.js') }}"></script>
-  <script src="{{ asset('_regna/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
-  <script src="{{ asset('_regna/vendor/swiper/swiper-bundle.min.js') }}"></script>
-  <script src="{{ asset('_regna/vendor/php-email-form/validate.js') }}"></script>
-  <script src="{{ asset('_regna/js/main.js') }}"></script>
+  <script src="{{ asset('_regna/vendor/aos/aos.js') }}" nonce="{{ csp_nonce() }}"></script>
+  <script src="{{ asset('_regna/vendor/bootstrap/js/bootstrap.bundle.min.js') }}" nonce="{{ csp_nonce() }}"></script>
+  <script src="{{ asset('_regna/vendor/glightbox/js/glightbox.min.js') }}" nonce="{{ csp_nonce() }}"></script>
+  <script src="{{ asset('_regna/vendor/isotope-layout/isotope.pkgd.min.js') }}" nonce="{{ csp_nonce() }}"></script>
+  <script src="{{ asset('_regna/vendor/swiper/swiper-bundle.min.js') }}" nonce="{{ csp_nonce() }}"></script>
+  <script src="{{ asset('_regna/vendor/php-email-form/validate.js') }}" nonce="{{ csp_nonce() }}"></script>
+  <script src="{{ asset('_regna/js/main.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- select2 -->
-  <script src="{{ asset('_adminLTE/plugins/select2/js/select2.full.min.js') }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/select2/js/select2.full.min.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- SweetAlert2 -->
-  <script src="{{ asset('_adminLTE/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/sweetalert2/sweetalert2.min.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- InputMask -->
-  <script src="{{ asset('_adminLTE/plugins/moment/moment.min.js') }}"></script>
-  <script src="{{ asset('_adminLTE/plugins/inputmask/jquery.inputmask.bundle.js') }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/moment/moment.min.js') }}" nonce="{{ csp_nonce() }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/inputmask/jquery.inputmask.bundle.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- date-range-picker -->
-  <script src="{{ asset('_adminLTE/plugins/daterangepicker/daterangepicker.js') }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/daterangepicker/daterangepicker.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- date-picker -->
-  <script src="{{ asset('_adminLTE/plugins/datepicker/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/datepicker/bootstrap-datepicker.min.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- timepicker -->
-  <script src="{{ asset('_adminLTE/plugins/timepicker/jquery.timepicker.min.js') }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/timepicker/jquery.timepicker.min.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- Toastr -->
-  <script src="{{ asset('_adminLTE/plugins/toastr/toastr.min.js') }}"></script>
+  <script src="{{ asset('_adminLTE/plugins/toastr/toastr.min.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- Main -->
-  <script src="{{ asset('assets/master/master.js') }}"></script>
+  <script src="{{ asset('assets/master/master.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- Login -->
-  <script src="{{ asset('assets/js/login.js') }}"></script>  
+  <script src="{{ asset('assets/js/login.js') }}" nonce="{{ csp_nonce() }}"></script>  
 </body>
 
 </html>

@@ -29,7 +29,13 @@ class PersonalInfoController extends Controller
     private function _personalInfo($request){
         $user_access_level = $request->session()->get('user_access_level');
         $id = $request->id;
-        $query = Users::where('id',$id)->first();
+        $query = Users::with('personal_info.per_brgy',
+                             'personal_info.per_city_muns',
+                             'personal_info.per_province',
+                             'personal_info.res_brgy',
+                             'personal_info.res_city_muns',
+                             'personal_info.res_province')
+            ->find($id);
         $sexs = Sexs::get();
         $civil_statuses = CivilStatuses::get();
         $blood_types = BloodType::get();
@@ -49,6 +55,8 @@ class PersonalInfoController extends Controller
         $result = 'error';
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
             $id_no = $request->id_no;
+            $honorific = $request->honorific;
+            $post_nominal = $request->post_nominal;
             $lastname = mb_strtoupper($request->lastname);
             $firstname = mb_strtoupper($request->firstname);
             $middlename = mb_strtoupper($request->middlename);
@@ -98,6 +106,8 @@ class PersonalInfoController extends Controller
                     'firstname' => $firstname,
                     'middlename' => $middlename,
                     'extname' => $extname,
+                    'honorific' => $honorific,
+                    'post_nominal' => $post_nominal,
                     'updated_by' => $updated_by,
                     'updated_at' => date('Y-m-d H:i:s')]);
             _PersonalInfo::where('user_id',$id_no)

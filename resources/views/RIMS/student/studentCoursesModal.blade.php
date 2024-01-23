@@ -4,6 +4,7 @@
         <h4 class="modal-title"> 
             {{$query->year_from}}-{{$query->year_to}} ({{$query->grade_period->name}})
         </h4>
+        <span class="fa fa-times btn-no-design" data-dismiss="modal">x</span>
     </div>
     <div class="modal-body">
         <div class="row">

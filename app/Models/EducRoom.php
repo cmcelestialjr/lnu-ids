@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class EducRoom extends Model
 {
     protected $table = 'educ_rooms';
+    public function status()
+    {
+        return $this->belongsTo(Status::class, 'status_id', 'id')->withDefault();
+    }
+    public function building()
+    {
+        return $this->belongsTo(EducBuilding::class, 'building_id', 'id')->withDefault();
+    }
     public function rooms()
     {
         return $this->hasMany(EducOfferedSchedule::class, 'room_id', 'id');

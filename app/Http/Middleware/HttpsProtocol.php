@@ -20,8 +20,6 @@ class HttpsProtocol
             return $next($request);
         }else{
             return redirect('/error/http');
-            // dd('1');
-            // return view('layouts.404');
         }
     }
 }

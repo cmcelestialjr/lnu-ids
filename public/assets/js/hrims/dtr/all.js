@@ -6,6 +6,10 @@ $(document).on('click', '.employeeView', function (e) {
 $(document).on('click', '#all_div button[name="submit"]', function (e) {
     employee_table(); 
 });
+$(document).off('click', '.receiveDTR').on('click', '.receiveDTR', function (e) {
+    var thisBtn = $(this);
+    receiveDTR(thisBtn);
+});
 function employee_table(){   
     var thisBtn = $('#all_div button');
     var year = $('#all_div select[name="year"] option:selected').val();
@@ -29,7 +33,7 @@ function dtr_view(thisBtn){
     var range = $('#all_div select[name="range"] option:selected').val();
     var url = base_url+'/hrims/dtr/dtrView';
     var modal = 'default';
-    var modal_size = 'modal-xxl';
+    var modal_size = 'modal-xl';
     var form_data = {
         url:url,
         modal:modal,
@@ -94,6 +98,59 @@ function dtr_view(thisBtn){
           thisBtn.removeAttr('disabled');         
           thisBtn.removeClass('input-success');
           thisBtn.removeClass('input-error');
+        }
+    });
+}
+function receiveDTR(thisCh){
+    var thisBtn = $('.receiveDTR');
+    var id = thisCh.data('id');
+    var type = thisCh.data('type');
+    var year = $('#all_div select[name="year"] option:selected').val();
+    var month = $('#all_div select[name="month"] option:selected').val();
+
+    var form_data = {
+        id:id,
+        type:type,
+        year:year,
+        month:month
+    };
+
+    $.ajax({
+        url: base_url+'/hrims/dtr/receiveDTR',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled'); 
+            thisCh.removeClass('input-error');
+            thisCh.addClass('input-loading');
+            thisCh.removeClass('border-require');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisCh.removeClass('input-loading'); 
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisCh.addClass('input-success');
+                thisCh.next('div').html(data.div);
+            }else{
+                toastr.error('Error.');
+                thisCh.addClass('input-error');
+            }
+            setTimeout(function() {
+                thisCh.removeClass('input-success');
+                thisCh.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisCh.removeClass('input-success');
+            thisCh.removeClass('input-error');
         }
     });
 }

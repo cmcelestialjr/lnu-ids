@@ -4,20 +4,25 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PreventBackHistory
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\StreamedResponse)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next): StreamedResponse
     {
         $response = $next($request);
-        return $response->header('Cache-Control','nocache, no-store, max-age=0, must-revalidate')
-                        ->header('Pragma','no-cache')
-                        ->header('Expires','Fri, 01 Jan 1990 00:00:00 GMT');
+
+        $response->headers->set('Cache-Control', 'nocache, no-store, max-age=0, must-revalidate');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
+
+        return $response;
     }
 }
+
+

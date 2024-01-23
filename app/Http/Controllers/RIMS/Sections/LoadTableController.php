@@ -20,10 +20,11 @@ class LoadTableController extends Controller
         $data = array();
         $id = $request->id;
         $program_id = $request->program_id;
-        $offered_curriculum_ids = EducOfferedCurriculum::where('offered_program_id',$program_id)->pluck('id')->toArray();
         $query = EducOfferedCourses::with('curriculum.curriculum')
                     ->select('year_level','offered_curriculum_id')
-                    ->whereIn('offered_curriculum_id',$offered_curriculum_ids)
+                    ->whereHas('curriculum', function ($subQuery) use ($program_id) {
+                        $subQuery->where('offered_program_id', $program_id);
+                    })
                     ->groupBy('year_level')->groupBy('offered_curriculum_id')
                     ->orderBy('offered_curriculum_id')->orderBy('year_level')
                     ->get()
@@ -51,7 +52,7 @@ class LoadTableController extends Controller
                 $data_list['f2'] = $r['curriculum'];
                 $data_list['f3'] = $r['grade_level'];
                 $data_list['f4'] = $r['section'];
-                $data_list['f5'] = '<button class="btn btn-primary btn-primary-scan sectionViewModal"
+                $data_list['f5'] = '<button class="btn btn-primary btn-primary-scan btn-sm sectionViewModal"
                                         data-id="'.$r['offered_curriculum_id'].'"
                                         data-level="'.$r['year_level'].'">
                                         <span class="fa fa-eye"></span> View
@@ -69,11 +70,13 @@ class LoadTableController extends Controller
         $query = EducOfferedCourses::select('year_level','offered_curriculum_id','section')
                     ->where('offered_curriculum_id',$id)
                     ->where('year_level',$level)
-                    ->groupBy('section')->groupBy('year_level')->groupBy('offered_curriculum_id')
+                    ->groupBy('section')
+                    ->groupBy('year_level')
+                    ->groupBy('offered_curriculum_id')
                     ->orderBy('section')
                     ->get()
                     ->map(function($query) {
-                        $courses = EducOfferedCourses::with('course','curriculum.curriculum')
+                        $courses = EducOfferedCourses::with('course.grade_level','curriculum.curriculum')
                                     ->where('year_level',$query->year_level)
                                     ->where('offered_curriculum_id',$query->offered_curriculum_id)
                                     ->where('section',$query->section)->first();
@@ -82,16 +85,28 @@ class LoadTableController extends Controller
                             'section' => $courses->section,
                             'section_code' => $courses->section_code,
                             'curriculum' => $courses->curriculum->curriculum->year_from.' - '.$courses->curriculum->curriculum->year_to,
+                            'min' => $courses->min_student,
+                            'max' => $courses->max_student,
                             'id' => $courses->id
                         ];
                     })->toArray();
         if(count($query)>0){
-            $x = 1;            
+            $x = 1;
             foreach($query as $r){
                 $data_list['f1'] = $x;
                 $data_list['f2'] = $r['section'];
                 $data_list['f3'] = $r['section_code'];
-                $data_list['f4'] = '<button class="btn btn-primary btn-primary-scan courseViewModal"
+                $data_list['f4'] = '<input type="number" class="form-control min_max_section"
+                                        data-id="'.$r['id'].'"
+                                        data-t="min"
+                                        value="'.$r['min'].'"
+                                        style="width:100px;float:right">';
+                $data_list['f5'] = '<input type="number" class="form-control min_max_section"
+                                        data-id="'.$r['id'].'"
+                                        data-t="max"
+                                        value="'.$r['max'].'"
+                                        style="width:100px;float:right">';
+                $data_list['f6'] = '<button class="btn btn-primary btn-primary-scan btn-sm courseViewModal"
                                         data-id="'.$r['id'].'">
                                         <span class="fa fa-eye"></span> View
                                     </button>';

@@ -12,7 +12,7 @@ class FundFinancing extends Model
     {
         return $this->hasMany(FundCluster::class, 'financing_id', 'id');
     }
-    public function updated_by()
+    public function updated_by_info()
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id');
     }

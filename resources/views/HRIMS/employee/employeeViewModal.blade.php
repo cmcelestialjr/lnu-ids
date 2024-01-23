@@ -114,12 +114,16 @@
                     </tr>
                     <tr>
                         <td>Date of Entry:</td>
-                        <td><b>{{date('F d, Y', strtotime($query->date_entry->date_from))}}</b></td>
+                        <td><b>
+                            @if($query->date_entry)
+                            {{date('F d, Y', strtotime($query->date_entry->date_from))}}
+                            @endif
+                        </b></td>
                     </tr>
                     <tr>
                         <td>Status:</td>
                         <td><b>
-                            @if($query->status_id==1)
+                            @if($query->emp_status_id==1)
                             <span id="employee_status" class="btn btn-success btn-success-scan" data-id="{{$query->id}}">Active</span>
                             @else
                             <span id="employee_status" class="btn btn-danger btn-danger-scan" data-id="{{$query->id}}">InActive
@@ -138,15 +142,15 @@
                 <div class="card card-primary card-outline" id="workDiv">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-12"><br>
-                                <button class="btn btn-info btn-info-scan" name="newModal" style="float:right"
+                            <div class="col-md-12">
+                                <button class="btn btn-info btn-info-scan" name="newModal"
                                     data-id="{{$query->id}}">
                                     <span class="fa fa-plus"></span> New
-                                </button><br><br>
+                                </button>
                                 <table id="workTable" class="table table-bordered table-fixed"
                                     data-toggle="table"
                                     data-search="true"
-                                    data-height="600"
+                                    data-height="500"
                                     data-buttons-class="primary"
                                     data-show-export="true"
                                     data-show-columns-toggle-all="true"

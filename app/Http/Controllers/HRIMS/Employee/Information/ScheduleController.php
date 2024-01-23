@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\HRIMS\Employee\Information;
 use App\Http\Controllers\Controller;
+use App\Models\_Work;
 use App\Models\Users;
 use App\Models\UsersSchedDays;
 use App\Models\UsersSchedTime;
+use App\Models\UsersSchedTimeOption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -42,17 +44,40 @@ class ScheduleController extends Controller
     
     private function _schedule($request){
         $user_access_level = $request->session()->get('user_access_level');
+        $year = date('Y');
+        $month = date('m');
         if($request->from_sys=='hr'){
             $id = $request->id;
             $request->session()->put('from_sys','hr');
+        }elseif($request->from_sys=='dtr'){
+            $id = $request->id;
+            $request->session()->put('from_sys','dtr');
         }else{
             $user = Auth::user();
             $id = $user->id;
-            $request->session()->put('from_sys','fis');
+            $request->session()->put('from_sys','fis');            
+        }
+        if($request->year!=''){
+            $year = $request->year;
+        }
+        if($request->month!=''){
+            $month = $request->month;
         }
         $active = $request->active;
+        $date = date('Y-m-01',strtotime($year.'-'.$month.'-01'));
         $query = Users::where('id',$id)->first();
-        $time = UsersSchedTime::where('user_id',$id)->get();
+        $time = UsersSchedTime::with('option')                       
+            ->where(function ($query) use ($date,$id) {
+                $query->where('date_to','>=',$date)
+                ->where('date_from','<=',$date)
+                ->where('user_id',$id) ;
+            })
+            ->orWhere(function ($query) use ($id) {
+                $query->where('date_to',NULL)
+                ->where('date_from',NULL)
+                ->where('user_id',$id) ;
+            })
+            ->orderBy('time_from','ASC')->get();
         $active_view = 'show active';
         $active_table = '';
         if($active=='table_active'){
@@ -64,20 +89,37 @@ class ScheduleController extends Controller
             'time' => $time,
             'active_view' => $active_view,
             'active_table' => $active_table,
+            'year' => $year,
+            'month' => $month,
+            'from_sys' => $request->from_sys,
             'user_access_level' => $user_access_level
         );
         return view('hrims/employee/information/schedule',$data);
-    }    
+    }
     private function _schedNewModal($request){
         $id = $this->_getID($request);
+        $sched_option = $this->sched_option($id);
         $data = array(
-            'id' => $id
+            'id' => $id,
+            'sched_option' => $sched_option
         );
         return view('hrims/employee/information/schedNewModal',$data);
-    }    
+    }
+    
     private function _schedNewDaysList($request){
         $id = $this->_getID($request);
-        $time_other = UsersSchedTime::where('user_id',$id)->get();
+        if($request->duration=='none'){
+            $date_from = date('Y-m-01');
+            $date_to = date('Y-m-t');
+        }else{
+            $exp = explode('-',$request->duration);
+            $date_from = date('Y-m-01',strtotime($exp[0]));
+            $date_to = date('Y-m-t',strtotime($exp[1]));
+        }        
+        $time_other = UsersSchedTime::where('user_id',$id)
+            ->where('date_to','>=',$date_to)
+            ->where('date_from','<=',$date_from)
+            ->get();        
         if($request->time_from=='none' && $request->time_to=='none'){
             $time_from = '';
             $time_to = '';
@@ -98,13 +140,20 @@ class ScheduleController extends Controller
         $updated_by = $user->id;
         $result = 'error';
         $id = $this->_getID($request);
+        $option = $request->option;
         $time_from = date('H:i:s',strtotime($request->time_from));
         $time_to = date('H:i:s',strtotime($request->time_to));
+        $exp = explode('-',$request->duration);
+        $date_from = date('Y-m-01',strtotime($exp[0]));
+        $date_to = date('Y-m-t',strtotime($exp[1]));
         $remarks = $request->remarks;
         $days = $request->days;
         if($days!=''){
             $insert = new UsersSchedTime(); 
             $insert->user_id = $id;
+            $insert->option_id = $option;
+            $insert->date_from = $date_from;
+            $insert->date_to = $date_to;
             $insert->time_from = $time_from;
             $insert->time_to = $time_to;
             $insert->remarks = $remarks;
@@ -133,9 +182,11 @@ class ScheduleController extends Controller
         if($x==0){
             $time_other = UsersSchedTime::where('user_id',$time->user_id)
                 ->where('id','<>',$id)->get();
+            $sched_option = $this->sched_option($id);
             $data = array(
                 'query' => $time,
-                'time_other' => $time_other
+                'time_other' => $time_other,
+                'sched_option' => $sched_option
             );
             return view('hrims/employee/information/schedEditModal',$data);
         }else{
@@ -148,7 +199,17 @@ class ScheduleController extends Controller
         $time = UsersSchedTime::where('id',$id)->first();
         $x = $this->_getX($request);
         if($x==0){
+            if($request->duration=='none'){
+                $date_from = date('Y-m-01');
+                $date_to = date('Y-m-t');
+            }else{
+                $exp = explode('-',$request->duration);
+                $date_from = date('Y-m-01',strtotime($exp[0]));
+                $date_to = date('Y-m-t',strtotime($exp[1]));
+            }  
             $time_other = UsersSchedTime::where('user_id',$time->user_id)
+                ->where('date_to','>=',$date_to)
+                ->where('date_from','<=',$date_from)
                 ->where('id','<>',$id)->get();
             if($request->time_from=='none' && $request->time_to=='none'){
                 $time_from = $time->time_from;
@@ -176,6 +237,10 @@ class ScheduleController extends Controller
         $x = $this->_getX($request);
         $result = 'error';
         if($x==0){            
+            $option = $request->option;
+            $exp = explode('-',$request->duration);
+            $date_from = date('Y-m-01',strtotime($exp[0]));
+            $date_to = date('Y-m-t',strtotime($exp[1]));
             $time_from = date('H:i:s',strtotime($request->time_from));
             $time_to = date('H:i:s',strtotime($request->time_to));
             $remarks = $request->remarks;
@@ -184,7 +249,10 @@ class ScheduleController extends Controller
             UsersSchedTime::where('id',$id)
                     ->update(['time_from' => $time_from,
                             'time_to' => $time_to,
+                            'date_from' => $date_from,
+                            'date_to' => $date_to,
                             'remarks' => $remarks,
+                            'option_id' => $option,
                             'updated_by' => $updated_by,
                             'updated_at' => date('Y-m-d H:i:s')]);
             $delete = UsersSchedDays::whereHas('time', function ($query) use ($id) {
@@ -237,13 +305,26 @@ class ScheduleController extends Controller
     }
     private function _getID($request){
         $from_sys = $request->session()->get('from_sys');
-        if($from_sys=='hr'){
+        if($from_sys=='hr' || $from_sys=='dtr'){
             $id = $request->id;
         }else{
             $user = Auth::user();
             $id = $user->id;
         }
         return $id;
+    }
+    private function sched_option($id){
+        $work = _Work::where('user_id',$id)
+            ->where('date_to','present')
+            ->pluck('emp_stat_id')
+            ->toArray();
+        $sched_option = UsersSchedTimeOption::orderBy('id');
+        if(count($work)==1){
+            if (in_array(5, $work)){
+                $sched_option = $sched_option->where('id',1);
+            }
+        }
+        return $sched_option->get();
     }
     private function _getX($request){
         $user_access_level = $request->session()->get('user_access_level');
@@ -252,7 +333,7 @@ class ScheduleController extends Controller
         $id = $request->id;
         $time = UsersSchedTime::where('id',$id)->first();
         $x = 0;
-        if($from_sys=='hr'){
+        if($from_sys=='hr' || $from_sys=='dtr'){
             if($user_access_level!=1 && $user_access_level!=2 && $user_access_level!=3){
                 $x++;
             }

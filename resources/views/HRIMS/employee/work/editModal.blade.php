@@ -45,7 +45,7 @@
                                             <option value="{{$query->position_id}}">{{$query->position_title}}</option>
                                         </select>
                                     </div>
-                                    <input type="text" class="form-control hide" name="position_title" placeholder="Position Title">
+                                    <input type="hidden" name="position_title" value="{{$query->position_title}}">
                                 @endif
                             </div>
                             <div class="col-lg-6">
@@ -92,23 +92,10 @@
                         </select>
                     </div>
                     <div class="col-lg-12"><br>
-                    </div>                    
-                    <div class="col-lg-3">
-                        <label>Fund Source<span class="text-require">*</span></label>
-                        <select class="form-control select2-primary" name="fund_source" {{$disabled}}>
-                            <option value="none">None</option>
-                            @foreach($fund_source as $row)
-                                @if($query->fund_source_id==$row->id)
-                                    <option value="{{$row->id}}" selected>{{$row->code}} ({{$row->name}})</option>
-                                @else
-                                    <option value="{{$row->id}}">{{$row->name}}</option>
-                                @endif
-                            @endforeach
-                        </select>
                     </div>
                     <div class="col-lg-3">
                         <label>Gov't?<span class="text-require">*</span></label>
-                        <select class="form-control select2-primary" name="gov_service" {{$disabled}}>                            
+                        <select class="form-control select2-primary" name="gov_service" {{$disabled}}>
                             @if($query->gov_service=='Y')
                                 <option value="Y">Yes</option>
                                 <option value="N">No</option>
@@ -119,6 +106,32 @@
                         </select>
                     </div>
                     <div class="col-lg-3">
+                        <label>Fund Source<span class="text-require">*</span></label>
+                        <select class="form-control select2-primary" name="fund_source" {{$disabled}}>
+                            <option value="none">None</option>
+                            @foreach($fund_source as $row)
+                                @if($query->fund_source_id==$row->id)
+                                    <option value="{{$row->id}}" selected>{{$row->code}} ({{$row->name}})</option>
+                                @else
+                                    <option value="{{$row->id}}">{{$row->code}} ({{$row->name}})</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Fund Services<span class="text-require">*</span></label>
+                        <select class="form-control select2-primary" name="fund_services" {{$disabled}}>
+                            <option value="none">None</option>
+                            @foreach($fund_services as $row)
+                                @if($query->fund_services_id==$row->id)
+                                    <option value="{{$row->id}}" selected>{{$row->shorten}} ({{$row->name}})</option>
+                                @else
+                                    <option value="{{$row->id}}">{{$row->shorten}} ({{$row->name}})</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>                    
+                    <div class="col-lg-3">
                         <label>Designation</label>
                         <div id="designationList">
                             <select class="form-control select2-primary designationList" name="designation">
@@ -128,6 +141,8 @@
                                 @endif
                             </select>
                         </div>
+                    </div>
+                    <div class="col-lg-12"><br>
                     </div>
                     <div class="col-lg-3">
                         <label>Designation Type<span class="text-require">*</span></label>
@@ -149,8 +164,6 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-12"><br>
-                    </div>
                     <div class="col-lg-3">
                         <label>Option<span class="text-require">*</span></label>
                         <select class="form-control select2-primary" name="role" {{$disabled}}>
@@ -166,7 +179,10 @@
                     <div class="col-lg-3">
                         <label>Office<span class="text-require">*</span></label>
                         <input type="text" class="form-control" name="office" value="{{$query->office}}">
+                    </div>                    
+                    <div class="col-lg-12"><br>
                     </div>
+                    
                     <div class="col-lg-3">
                         <label>Separation Cause</label>
                         <input type="text" class="form-control" name="cause" value="{{$query->cause}}">
@@ -174,8 +190,6 @@
                     <div class="col-lg-3">
                         <label>Separation Date</label>
                         <input type="text" class="form-control" name="separation" value="{{$query->separation}}">
-                    </div>
-                    <div class="col-lg-12"><br>
                     </div>
                     <div class="col-lg-3">
                         <label>Type<span class="text-require">*</span></label>
@@ -189,6 +203,8 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="col-lg-12"><br>
+                    </div>                    
                     <div class="col-lg-4">
                         <label>LWOP</label>
                         <textarea name="lwop" style="width: 100%">{{$query->lwop}}</textarea>

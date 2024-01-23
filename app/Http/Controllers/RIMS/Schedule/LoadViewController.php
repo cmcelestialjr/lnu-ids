@@ -21,8 +21,6 @@ class LoadViewController extends Controller
         }else{
             return view('layouts/error/error_page');
         }
-        
-        
     }
     private function courseCode($request){
         $school_year = $request->school_year;

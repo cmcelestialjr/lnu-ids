@@ -36,12 +36,17 @@
 <!-- Master -->
 <script src="{{ asset('assets/master/master.js') }}"></script>
 <script src="{{ asset('assets/master/navigation_scroll.js') }}"></script>
+  
+{{-- <script src="{{ asset('sw.js') }}"></script> --}}
+<script nonce="{{ csp_nonce() }}">
+// if (!navigator.serviceWorker.controller) {
+//     navigator.serviceWorker.register("sw.js").then(function (reg) {
+//         console.log("Service worker has been registered for scope: " + reg.scope);
+//     });
+// }
 
-
-
-
-
-
+</script>
 
 
 @livewireScripts
+

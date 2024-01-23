@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers\SEARCH;
 use App\Http\Controllers\Controller;
-use App\Models\EducOfferedCourses;
-use App\Models\EducOfferedCurriculum;
-use App\Models\EducOfferedPrograms;
 use App\Models\Users;
-use App\Models\UsersRole;
 use App\Services\NameServices;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InstructorController extends Controller
 {
     public function instructor(Request $request){
         $name_services = new NameServices;
         $search = $request->input('search');
-        $results = Users::whereHas('user_role', function($query){
+        $results = Users::where('id_no','!=',NULL)
+                    ->where(function ($query) use ($search) {
+                        $query->where(DB::raw("CONCAT(lastname,', ',firstname)"), 'LIKE', "%$search%");
+                        $query->orWhere('id_no', 'LIKE', "%$search%");
+                    }) 
+                    ->whereHas('user_role', function($query){
                         $query->where('role_id', 3);
                     })
-                    ->where('lastname', 'LIKE', "%$search%")
-                    ->orWhere('firstname', 'LIKE', "%$search%")
                     ->orderBy('lastname')
                     ->orderBy('firstname')
                     ->limit(15)

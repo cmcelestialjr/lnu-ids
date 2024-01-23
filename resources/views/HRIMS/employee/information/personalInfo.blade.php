@@ -21,10 +21,16 @@
                     <span class="text-require">*</span> <span style="font-size:12px">Required Field</span>
                     <table class="table">
                         <tr>
-                            <td style="width: 20%"><label>Lastname:<span class="text-require">*</span></label></td>
-                            <td style="width: 30%"><input type="text" class="form-control" name="lastname" value="{{$query->lastname}}"></td>
-                            <td style="width: 20%"><label>Firstname:<span class="text-require">*</span></label></td>
-                            <td style="width: 30%"><input type="text" class="form-control" name="firstname" value="{{$query->firstname}}"></td>
+                            <td style="width: 20%"><label>Horrific Name:</label></td>
+                            <td style="width: 30%"><input type="text" class="form-control" name="honorific" value="{{$query->honorific}}" placeholder="Dr., Atty., Engr."></td>
+                            <td style="width: 20%"><label>Post-Nominal Title:</label></td>
+                            <td style="width: 30%"><input type="text" class="form-control" name="post_nominal" value="{{$query->post_nominal}}" placeholder="PhD., MBA, MA, CPA, MIS, RN"></td>
+                        </tr>
+                        <tr>
+                            <td><label>Lastname:<span class="text-require">*</span></label></td>
+                            <td><input type="text" class="form-control" name="lastname" value="{{$query->lastname}}"></td>
+                            <td><label>Firstname:<span class="text-require">*</span></label></td>
+                            <td><input type="text" class="form-control" name="firstname" value="{{$query->firstname}}"></td>
                         </tr>
                         <tr>
                             <td><label>Middlename:</label></td>
@@ -50,11 +56,14 @@
                         </tr>
                         <tr>
                             <td><label>Birthdate:<span class="text-require">*</span></label></td>
-                            <td><div class="input-group input-group-sm">
-                                    <div class="input-group-append">
-                                        <span class="fa fa-calendar"></span>
+                            <td>
+                                <div class="form-group">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control datePicker" name="dob" value="{{date('m/d/Y',strtotime($query->personal_info->dob))}}">
                                     </div>
-                                    <input type="text" class="form-control datePicker" name="dob" value="{{date('m/d/Y',strtotime($query->personal_info->dob))}}">
                                 </div>
                             </td> 
                             <td><label>Place of Birth:</label></td>
@@ -107,47 +116,57 @@
                                 </select>
                             </td> 
                             <td><label>Telephone No.:</label></td>
-                            <td><div class="input-group input-group-sm">
-                                    <div class="input-group-append">
-                                        <span class="fa fa-phone"></span>
+                            <td><div class="form-group">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="fa fa-phone"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" name="telephone_no" value="{{$query->personal_info->telephone_no}}">
                                     </div>
-                                    <input type="text" class="form-control" name="telephone_no" value="{{$query->personal_info->telephone_no}}">
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td><label>Contact No.:</label></td>
-                            <td><div class="input-group input-group-sm">
-                                    <div class="input-group-append">
-                                        (+63)
+                            <td><div class="form-group">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">(+63)</span>
+                                        </div>
+                                        <input type="text" class="form-control contact" name="contact_no" value="{{$query->personal_info->contact_no}}">
                                     </div>
-                                    <input type="text" class="form-control contact" name="contact_no" value="{{$query->personal_info->contact_no}}">
                                 </div>
                             </td>
                             <td><label>Contact No.(Official):</label></td>
-                            <td><div class="input-group input-group-sm">
-                                    <div class="input-group-append">
-                                        (+63)
+                            <td><div class="form-group">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">(+63)</span>
+                                        </div>
+                                        <input type="text" class="form-control contact" name="contact_no_official" value="{{$query->personal_info->contact_no_official}}">
                                     </div>
-                                    <input type="text" class="form-control contact" name="contact_no_official" value="{{$query->personal_info->contact_no_official}}">
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td><label>Email:</label></td>
-                            <td><div class="input-group input-group-sm">
-                                    <div class="input-group-append">
-                                        <span class="fa fa-envelope"></span>
+                            <td><div class="form-group">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" name="email" value="{{$query->personal_info->email}}">
                                     </div>
-                                    <input type="text" class="form-control" name="email" value="{{$query->personal_info->email}}">
                                 </div>
                             </td>
                             <td><label>Email(Official):</label></td>
-                            <td><div class="input-group input-group-sm">
-                                    <div class="input-group-append">
-                                        <span class="fa fa-envelope"></span>
+                            <td><div class="form-group">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" name="email_official" value="{{$query->personal_info->email_official}}">
                                     </div>
-                                    <input type="text" class="form-control" name="email_official" value="{{$query->personal_info->email_official}}">
                                 </div>
                             </td>
                         </tr>

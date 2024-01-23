@@ -7,9 +7,17 @@
     <div class="modal-body">
         <div class="row">
             <input type="hidden" name="id" value="{{$id}}">
+            <div class="col-lg-4">
+                <label>Branch</label>
+                <select class="form-control select2-default" name="branch">
+                    @foreach($branch as $row)
+                        <option value="{{$row->id}}">({{$row->code}}) {{$row->name}}</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="col-lg-12">
                 @if($user_access_level==1 || $user_access_level==2)
-                    <button class="btn btn-primary btn-primary-scan coursesOpenModal" style="float:right">
+                    <button class="btn btn-primary btn-primary-scan btn-sm coursesOpenModal" style="float:right">
                         <span class="fa fa-plus-square"></span> Open a Course
                     </button>
                     <br><br>
@@ -17,7 +25,7 @@
                 <table id="programsViewTable" class="table table-bordered table-fixed"
                             data-toggle="table"
                             data-search="true"
-                            data-height="600"
+                            data-height="460"
                             data-buttons-class="primary"
                             data-show-export="true"
                             data-show-columns-toggle-all="true"
@@ -33,8 +41,8 @@
                             <th data-field="f2" data-sortable="true" data-align="center">Level</th>
                             <th data-field="f3" data-sortable="true" data-align="center">Department</th>
                             <th data-field="f4" data-sortable="true" data-align="center">Programs</th>
-                            <th data-field="f5" data-sortable="true" data-align="center">Code</th>
-                            <th data-field="f6" data-sortable="true" data-align="center">Courses</th>
+                            <th data-field="f5" data-sortable="true" data-align="center">Courses</th>
+                            <th data-field="f6" data-sortable="true" data-align="center">Status</th>
                         </tr>
                     </thead>
                 </table>

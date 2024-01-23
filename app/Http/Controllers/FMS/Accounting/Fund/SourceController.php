@@ -45,7 +45,7 @@ class SourceController extends Controller
                 $data_list['f4'] = $r['code'];
                 $data_list['f5'] = $r['uacs'];
                 $data_list['f6'] = '<button class="btn btn-primary btn-primary-scan btn-sm update"
-                                        data-id="'.$r['id'].'"
+                                        data-id="'.$r['id'].'">
                                         <span class="fa fa-eye"></span> View
                                     </button>';
                 array_push($data,$data_list);

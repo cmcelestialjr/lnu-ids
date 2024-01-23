@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class LudongGradeLog extends Model
 {
-    protected $table = 'ludong_grade_log';
+    protected $connection = 'student';
+    protected $table = 'grade_log';
     public function info()
     {
         return $this->belongsTo(LudongStudents::class, 'stud_id', 'stud_id');

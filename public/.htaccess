@@ -18,4 +18,8 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    Header set X-XSS-Protection "1; mode=block"
+    Header always set X-Content-Type-Options "nosniff"
 </IfModule>
+

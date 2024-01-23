@@ -20,8 +20,20 @@ class EducOfferedPrograms extends Model
     {
         return $this->belongsTo(EducPrograms::class, 'program_id', 'id')->withDefault();
     }
+    public function program_code()
+    {
+        return $this->belongsTo(EducProgramsCode::class, 'program_code_id', 'id')->withDefault();
+    }
+    public function branch()
+    {
+        return $this->belongsTo(EducBranch::class, 'branch_id', 'id')->withDefault();
+    }
     public function curriculums()
     {
         return $this->hasMany(EducOfferedCurriculum::class, 'offered_program_id', 'id');
+    }
+    public function offered_program()
+    {
+        return $this->hasMany(EducOfferedPrograms::class, 'program_id', 'id');
     }
 }

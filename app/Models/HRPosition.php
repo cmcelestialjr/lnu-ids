@@ -30,7 +30,7 @@ class HRPosition extends Model
     }
     public function status()
     {
-        return $this->belongsTo(HRPositionStatus::class, 'status_id', 'id');
+        return $this->belongsTo(Status::class, 'status_id', 'id');
     }
     public function updated_by()
     {

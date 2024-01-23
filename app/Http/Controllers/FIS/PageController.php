@@ -38,7 +38,7 @@ class PageController extends Controller
             ->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
         return view($this->page.'/students/students',$data);
     }
-    public function subjects($data){
+    public function courses($data){
         $user = Auth::user();
         $instructor_id = $user->id;
         $data['school_year'] = EducOfferedSchoolYear::
@@ -50,7 +50,7 @@ class PageController extends Controller
                 });
             })
             ->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
-        return view($this->page.'/subjects/subjects',$data);
+        return view($this->page.'/courses/courses',$data);
     }
     // public function schedule($data){
     //     $user = Auth::user();

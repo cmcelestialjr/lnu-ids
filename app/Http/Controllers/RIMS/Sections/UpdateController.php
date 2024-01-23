@@ -33,26 +33,25 @@ class UpdateController extends Controller
                 $instructor_schedule = 'success';
                 $instructor_schedule_check = NULL;
                 $result = 'success';
+                
                 if($instructor_id=='TBA'){
                     $instructor_id = NULL;
                 }
                 if($room_id=='TBA'){
                     $room_id = NULL;
                 }
-                $schedule_id = $this->schedDayTime($request,$updated_by);
+                
+                $schedule_id = $this->schedDayTime($request,$updated_by);                
                 if($schedule_id!='new'){
-                    $course = EducOfferedCourses::where('id',$id)->first();
-                    $schedule = EducOfferedSchedule::where('id',$schedule_id)->first();                    
+                    $course = EducOfferedCourses::with('curriculum.offered_program')->where('id',$id)->first();
+                    $schedule = EducOfferedSchedule::with('course.curriculum.offered_program')->where('id',$schedule_id)->first();                    
                     $school_year_id = $course->curriculum->offered_program->school_year_id;
-                    $offered_program_ids = EducOfferedPrograms::where('school_year_id',$school_year_id)->pluck('id')->toArray();
-                    $offered_curriculum_ids = EducOfferedCurriculum::whereIn('offered_program_id',$offered_program_ids)->pluck('id')->toArray();
-                    $offered_course_ids = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)->pluck('id')->toArray();
                     if($schedule==NULL){
                         $schedule_days = NULL;
                     }else{
                         $schedule_days = EducOfferedScheduleDay::where('offered_schedule_id',$schedule->id)->pluck('day')->toArray();                        
                     }
-                    $datas['offered_course_ids'] = $offered_course_ids;
+                    $datas['school_year_id'] = $school_year_id;
                     $datas['schedule_id'] = $schedule_id;
                     $datas['room_id'] = $room_id;
                     $datas['schedule'] = $schedule;
@@ -78,6 +77,7 @@ class UpdateController extends Controller
                         $instructor_schedule_check = $this->instructor_schedule_check($datas);
                     }
                 }
+                
                 if($instructor_schedule_check!=NULL){
                     $instructor_schedule = 'error';
                 }else{
@@ -149,6 +149,34 @@ class UpdateController extends Controller
         $response = array('result' => $result);
         return response()->json($response);
     }
+    public function minMaxStudent(Request $request){
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $updated_by = $user->id;
+        $result = 'error';
+        $id = $request->id;
+        $t = $request->t;
+        $val = $request->val;
+        if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
+            try{
+                if($t=='min'){
+                    $column = 'min_student';
+                }else{
+                    $column = 'max_student';
+                }
+                EducOfferedCourses::where('id', $id)
+                    ->update([$column => $val,
+                        'updated_by' => $updated_by,
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+                $result = 'success';
+            }catch(Exception $e){
+                        
+            }
+        }
+        $response = array('result' => $result);
+        return response()->json($response);
+    }
     public function scheduleTimeUpdate(Request $request){
         $id = $request->id;
         $schedule_id = $request->schedule_id;
@@ -207,19 +235,16 @@ class UpdateController extends Controller
                         $insert->save();
                         $schedule_id = $insert->id; 
                     }
-                    $schedule = EducOfferedSchedule::where('id',$schedule_id)->first();
+                    $schedule = EducOfferedSchedule::with('course.curriculum.offered_program')->where('id',$schedule_id)->first();
                     if($schedule->time_to!=NULL){
-                        $schedule_days = EducOfferedScheduleDay::where('offered_schedule_id',$schedule->id)->pluck('day')->toArray();
                         $school_year_id = $schedule->course->curriculum->offered_program->school_year_id;
+                        $schedule_days = EducOfferedScheduleDay::with('schedule.course.curriculum.offered_program')->where('offered_schedule_id',$schedule->id)->pluck('day')->toArray();
                         $room_id = $schedule->room_id;
                         $instructor_id = $schedule->course->instructor_id;
-                        $offered_program_ids = EducOfferedPrograms::where('school_year_id',$school_year_id)->pluck('id')->toArray();
-                        $offered_curriculum_ids = EducOfferedCurriculum::whereIn('offered_program_id',$offered_program_ids)->pluck('id')->toArray();
-                        $offered_course_ids = EducOfferedCourses::whereIn('offered_curriculum_id',$offered_curriculum_ids)->pluck('id')->toArray();
                         $room_schedule = 'success';
                         $instructor_schedule_check = NULL;
                         $schedule_days[] = $this->daysLetter($day);
-                        $datas['offered_course_ids'] = $offered_course_ids;
+                        $datas['school_year_id'] = $school_year_id;
                         $datas['offered_course_id'] = $schedule->offered_course_id;
                         $datas['schedule_id'] = $schedule_id;
                         $datas['room_id'] = $room_id;
@@ -334,7 +359,7 @@ class UpdateController extends Controller
         return response()->json($response);
     }
     private function schedule_course_self($datas){
-        $offered_course_id = $datas['offered_course_id'];
+        $school_year_id = $datas['school_year_id'];
         $schedule_id = $datas['schedule_id'];
         $room_id = $datas['room_id'];
         $schedule = $datas['schedule'];
@@ -342,7 +367,9 @@ class UpdateController extends Controller
         $time_to = $datas['time_to'];
         $schedule_days = $datas['schedule_days'];
         $room_schedule = $datas['room_schedule'];
-        $room_schedule_check = EducOfferedSchedule::where('offered_course_id',$offered_course_id)
+        $room_schedule_check = EducOfferedSchedule::whereHas('course.curriculum.offered_program', function ($subQuery) use ($school_year_id) {
+                                                $subQuery->where('school_year_id', $school_year_id);
+                                            })
                                             ->where('id','<>',$schedule_id)
                                             ->where(function ($query) use ($time_from,$time_to) {
                                                 $query->where(function ($query) use ($time_from) {
@@ -372,7 +399,7 @@ class UpdateController extends Controller
         return $room_schedule;
     }
     private function room_schedule_check($datas){
-        $offered_course_ids = $datas['offered_course_ids'];
+        $school_year_id = $datas['school_year_id'];
         $schedule_id = $datas['schedule_id'];
         $room_id = $datas['room_id'];
         $schedule = $datas['schedule'];
@@ -380,7 +407,9 @@ class UpdateController extends Controller
         $time_to = $datas['time_to'];
         $schedule_days = $datas['schedule_days'];
         $room_schedule = $datas['room_schedule'];
-        $room_schedule_check = EducOfferedSchedule::whereIn('offered_course_id',$offered_course_ids)
+        $room_schedule_check = EducOfferedSchedule::whereHas('course.curriculum.offered_program', function ($subQuery) use ($school_year_id) {
+                                                $subQuery->where('school_year_id', $school_year_id);
+                                            })
                                             ->where('id','<>',$schedule_id)
                                             ->where('room_id',$room_id)
                                             ->where(function ($query) use ($time_from,$time_to) {
@@ -411,13 +440,15 @@ class UpdateController extends Controller
         return $room_schedule;
     }
     private function instructor_schedule_check($datas){
-        $offered_course_ids = $datas['offered_course_ids'];
+        $school_year_id = $datas['school_year_id'];
         $schedule_id = $datas['schedule_id'];
         $time_from = $datas['time_from'];
         $time_to = $datas['time_to'];
         $schedule_days = $datas['schedule_days'];
         $instructor_id = $datas['instructor_id'];
-        $instructor_schedule_check = EducOfferedSchedule::whereIn('offered_course_id',$offered_course_ids)
+        $instructor_schedule_check = EducOfferedSchedule::whereHas('course.curriculum.offered_program', function ($subQuery) use ($school_year_id) {
+                                                $subQuery->where('school_year_id', $school_year_id);
+                                            })
                                             ->where('id','<>',$schedule_id)
                                             ->where(function ($query) use ($time_from,$time_to) {
                                                 $query->where(function ($query) use ($time_from) {
@@ -483,7 +514,7 @@ class UpdateController extends Controller
                 $check = EducOfferedSchedule::where('id',$schedule_id)->first();
                 $time = explode('-',$request->time);
                 $time_from = date('H:i:s',strtotime($time[0]));
-                $time_to = date('H:i:s',strtotime($time[1]));                           
+                $time_to = date('H:i:s',strtotime($time[1]));
                 if($check!=NULL){
                     EducOfferedSchedule::where('id', $schedule_id)
                         ->update(['offered_course_id' => $id,
@@ -520,10 +551,12 @@ class UpdateController extends Controller
                 }
             }else{
                 if($request->time=='TBA' || $request->days==''){
-                    $delete = EducOfferedScheduleDay::where('offered_schedule_id',$schedule_id)->delete();
-                    $auto_increment = DB::update("ALTER TABLE educ__offered_schedule_day AUTO_INCREMENT = 0;");
-                    $delete = EducOfferedSchedule::where('id',$schedule_id)->delete();
-                    $auto_increment = DB::update("ALTER TABLE educ__offered_schedule AUTO_INCREMENT = 0;");
+                    if($schedule_id!='new'){
+                        $delete = EducOfferedScheduleDay::where('offered_schedule_id',$schedule_id)->delete();
+                        $auto_increment = DB::update("ALTER TABLE educ__offered_schedule_day AUTO_INCREMENT = 0;");
+                        $delete = EducOfferedSchedule::where('id',$schedule_id)->delete();
+                        $auto_increment = DB::update("ALTER TABLE educ__offered_schedule AUTO_INCREMENT = 0;");
+                    }
                     $schedule_id = 'new';
                 }
                 

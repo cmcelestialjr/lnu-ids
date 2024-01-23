@@ -128,11 +128,13 @@ function view_by_program(){
     var thisBtn = $('#scheduleDiv #view select');
     var school_year = $('#scheduleDiv #view select[name="school_year"] option:selected').val();
     var program = $('#scheduleDiv #view select[name="program"] option:selected').val();
+    var branch = $('#scheduleDiv #view select[name="branch"] option:selected').val();
     var form_data = {
         url_table:base_url+'/rims/schedule/viewTable',
         tid:'viewTable',
         school_year:school_year,
-        program:program
+        program:program,
+        branch:branch
     };
     loadTablewLoader(form_data,thisBtn);
 }
@@ -194,15 +196,17 @@ function rm_instructor_update(){
                     $('#courseSchedRmModal #schedule select[name="schedule"]').append($('<option value="'+data.schedule_id+'" selected>'+data.sched_name+'</option>'));
                     course_sched_rm_details();
                     course_sched_rm_schedule();
+                    selectRoom();
+                    selectInstructor();
                     setTimeout(function() {
                         thisBtn.removeAttr('disabled');
                         course_sched_rm_table();
-                        view_schedule();
+                        view_by_program();
                     }, 1000)
                 }else if(data.result=='error'){
                     thisBtn.removeAttr('disabled');
                     toastr.error('Error.');
-                    thisBtn.addClass('input-error');                
+                    thisBtn.addClass('input-error');
                 }else{
                     thisBtn.removeAttr('disabled');
                     toastr.error(data.result);
@@ -354,84 +358,6 @@ function course_sched_rm_rm_instructor(){
         error: function (){
             toastr.error('Error!');
             thisBtn.removeAttr('disabled');
-        }
-    });
-}
-function select_day(){
-    var get_time = [];
-    var get_day = [];
-    var select_days = [];
-    var schedule_id = $('#courseSchedRmModal #schedule select[name="schedule"] option:selected').val();
-    var select_time = $('#courseSchedRmModal #rm_instructor select[name="time"] option:selected').val();
-    $('#courseSchedRmModal #courseSchedRmTable .schedDayTimeInput').each(function () {
-        get_time.push($(this).data('t'));
-        get_day.push($(this).data('d'));
-    }); 
-    $('#courseSchedRmModal #rm_instructor select[name="days[]"] option:selected').each(function () {
-        select_days.push($(this).val());
-    });
-    $('#courseSchedRmModal #rm_instructor select[name="days[]"]').select2({
-        dropdownParent: $("#rm_instructor"),
-        ajax: { 
-        url: base_url+'/rims/schedule/selectDays',
-        type: "post",
-        dataType: 'json',
-        delay: 250,
-        data: function (params) {
-            return {
-                _token: CSRF_TOKEN,
-                schedule_id:schedule_id,
-                get_day:get_day,
-                get_time:get_time,                
-                select_days:select_days,
-                select_time:select_time,
-                search: params.term
-            };
-        },
-        processResults: function (response) {
-            return {
-            results: response
-            };
-        },
-        cache: true
-        }
-    });
-}
-function select_time(){
-    var get_time = [];
-    var get_day = [];
-    var select_days = [];
-    var schedule_id = $('#courseSchedRmModal #schedule select[name="schedule"] option:selected').val();
-    $('#courseSchedRmModal #courseSchedRmTable .schedDayTimeInput').each(function () {
-        get_time.push($(this).data('t'));
-        get_day.push($(this).data('d'));
-    }); 
-    $('#courseSchedRmModal #rm_instructor select[name="days[]"] option:selected').each(function () {
-        select_days.push($(this).val());
-    });
-    $('#courseSchedRmModal #rm_instructor select[name="time"]').select2({
-        dropdownParent: $("#rm_instructor"),
-        ajax: { 
-        url: base_url+'/rims/schedule/selectTime',
-        type: "post",
-        dataType: 'json',
-        delay: 250,
-        data: function (params) {
-            return {
-                _token: CSRF_TOKEN,
-                schedule_id:schedule_id,
-                get_day:get_day,
-                select_days:select_days,
-                get_time:get_time,
-                search: params.term
-            };
-        },
-        processResults: function (response) {
-            return {
-            results: response
-            };
-        },
-        cache: true
         }
     });
 }

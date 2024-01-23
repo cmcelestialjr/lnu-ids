@@ -12,4 +12,8 @@ class EducDepartments extends Model
     {
         return $this->hasMany(EducPrograms::class, 'department_id', 'id');
     }
+    public function offered_department()
+    {
+        return $this->hasMany(EducOfferedDepartment::class, 'department_id', 'id');
+    }    
 }

@@ -29,7 +29,9 @@
                                   <th data-field="f1" data-sortable="true" data-align="center">#</th>
                                   <th data-field="f2" data-sortable="true" data-align="center">Section</th>
                                   <th data-field="f3" data-sortable="true" data-align="center">Code</th>
-                                  <th data-field="f4" data-sortable="true" data-align="center">Courses</th>
+                                  <th data-field="f4" data-sortable="true" data-align="center">Minimun</th>
+                                  <th data-field="f5" data-sortable="true" data-align="center">Maximum</th>
+                                  <th data-field="f6" data-sortable="true" data-align="center">Courses</th>
                               </tr>
                           </thead>
                       </table>

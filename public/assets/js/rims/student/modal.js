@@ -3,6 +3,11 @@ $(document).on('click', '#studentDiv #list .studentView', function (e) {
     var id = thisBtn.data('id');
     student_view(id,thisBtn);
 });
+$(document).on('click', '#studentDiv #new button[name="submit"]', function (e) {
+    var thisBtn = $(this);
+    var id = $('#studentDiv #new .studentSearch option:selected').val();
+    student_view(id,thisBtn);
+});
 $(document).on('click', '#studentViewModal #tor', function (e) {
     var thisBtn = $(this);
     var id = $('#studentViewModal input[name="id"]').val();
@@ -33,6 +38,58 @@ $(document).on('click', '#studentViewModal .studentCoursesModal', function (e) {
         tid:'studentCoursesTable',
         id:id,
         school_year_id:school_year_id
+    };
+    loadModal(form_data,thisBtn);
+});
+$(document).on('click', '#studentTORModal button[name="add"]', function (e) {
+    var thisBtn = $(this);
+    var id = $('#studentTORModal input[name="id"]').val();
+    var level = $('#studentTORModal select[name="level"] option:selected').val();
+    var url = base_url+'/rims/student/studentCourseAddModal';
+    var modal = 'info';
+    var modal_size = 'modal-xl';
+    var form_data = {
+        url:url,
+        modal:modal,
+        modal_size:modal_size,
+        static:'',
+        w_table:'wo',
+        id:id,
+        level:level
+    };
+    loadModal(form_data,thisBtn);
+});
+$(document).on('click', '#studentTORModal button[name="print"]', function (e) {
+    var thisBtn = $(this);
+    var id = $('#studentTORModal input[name="id"]').val();
+    var level = $('#studentTORModal select[name="level"] option:selected').val();
+    var url = base_url+'/rims/student/studentPrintModal';
+    var modal = 'info';
+    var modal_size = 'modal-md';
+    var form_data = {
+        url:url,
+        modal:modal,
+        modal_size:modal_size,
+        static:'',
+        w_table:'wo',
+        id:id,
+        level:level
+    };
+    loadModal(form_data,thisBtn);
+});
+$(document).on('click', '#studentViewModal #shift', function (e) {
+    var thisBtn = $(this);
+    var id = $('#studentViewModal input[name="id"]').val();
+    var url = base_url+'/rims/student/studentShiftModal';
+    var modal = 'info';
+    var modal_size = 'modal-lg';
+    var form_data = {
+        url:url,
+        modal:modal,
+        modal_size:modal_size,
+        static:'',
+        w_table:'wo',
+        id:id
     };
     loadModal(form_data,thisBtn);
 });

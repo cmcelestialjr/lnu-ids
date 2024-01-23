@@ -21,6 +21,7 @@ class UpdateController extends Controller
         $curriculum_id = $request->curriculum_id;
         $section = $request->section;
         $courses = $request->courses;
+        $option = $request->option;
         $cid = $request->cid;
         $result = 'error';
         try {
@@ -49,6 +50,7 @@ class UpdateController extends Controller
                     $insert->program_id = $offered_course->curriculum->offered_program->program_id;
                     $insert->section = $offered_course->section;
                     $insert->credit_course_id = $credit_course_id;
+                    $insert->option = $option;
                     $insert->updated_by = $instructor_id;
                     $insert->save();
                 }

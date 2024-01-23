@@ -50,7 +50,7 @@
                                     <tr>
                                         <td>Sex:</td>
                                         <td><label>
-                                            {{$query->info->personal_info->sex}}
+                                            {{$query->info->personal_info->sexs->name}}
                                             </label></td>
                                         <td>Department:</td>
                                         <td><label>

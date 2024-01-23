@@ -48,7 +48,11 @@ class _PersonalInfo extends Model
     {
         return $this->belongsTo(PSGCProvinces::class, 'per_province_id', 'id');
     }
-    public function updated_by()
+    public function religion()
+    {
+        return $this->belongsTo(Religion::class, 'religion_id', 'id');
+    }
+    public function updated_by_info()
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id');
     }

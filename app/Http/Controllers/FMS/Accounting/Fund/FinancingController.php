@@ -38,7 +38,7 @@ class FinancingController extends Controller
                 $data_list['f1'] = $x;
                 $data_list['f2'] = $r['name'];
                 $data_list['f3'] = '<button class="btn btn-primary btn-primary-scan btn-sm update"
-                                        data-id="'.$r['id'].'"
+                                        data-id="'.$r['id'].'">
                                         <span class="fa fa-eye"></span> View
                                     </button>';
                 array_push($data,$data_list);

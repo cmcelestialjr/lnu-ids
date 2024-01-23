@@ -13,7 +13,7 @@
                 <table id="programAddList" class="table table-bordered table-fixed"
                             data-toggle="table"
                             data-search="true"
-                            data-height="600"
+                            data-height="460"
                             data-buttons-class="primary"
                             data-show-export="true"
                             data-show-columns-toggle-all="true"

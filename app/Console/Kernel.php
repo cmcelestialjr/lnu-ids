@@ -15,13 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
         $schedule->command('app:dtr-machine-check')->everyMinute();
-        
-        //$schedule->command('app:dtr-machine-check')->cron('* * * * 1-5');
-        //$schedule->command('app:dtr-machine-check')->everySecond()->until(now()->addSeconds(60));
-        //$schedule->command('app:dtr-machine-check')->daily('13:04')->timezone('Asia/Manila');
-        //$schedule->command('app:dtr-machine-check')->daily('13:03:59')->timezone('Asia/Manila');
     }
 
     /**

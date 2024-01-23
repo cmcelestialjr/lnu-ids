@@ -5,121 +5,42 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
   <title>LNU IDS V1.0</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link rel="icon" href="{{ asset('assets/images/logo/lnu_logo.png') }}" type="image/gif">
+  <link rel="icon" href="{{ asset('assets/images/logo/lnu_logo.png') }}" type="image/gif" nonce="{{ csp_nonce() }}">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/fontawesome-free/css/all.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/fontawesome-free/css/all.min.css') }}" nonce="{{ csp_nonce() }}">
   <!-- adminLTE style -->
-  <link rel="stylesheet" href="{{ asset('_adminLTE/dist/css/adminlte.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('_adminLTE/dist/css/adminlte.min.css') }}" nonce="{{ csp_nonce() }}">
   <!-- master style -->
-  <link rel="stylesheet" href="{{ asset('assets/master/master.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/master/master.css') }}" nonce="{{ csp_nonce() }}">
+
+  <link rel="stylesheet" href="{{ asset('assets/css/systems.css') }}" nonce="{{ csp_nonce() }}">
 </head>
-<style>
-.carousel-item{
-    height:95vh;
-}
-.carousel-image{
-    height:100%;
-}
-#logo{
-  height: 60px;
-  width: 60px;
-}
-.content-wrapper {
-  width: 100%;
-  height: 100vh;
-  background: url('../../assets/images/background/systems_bg.jpg') center;
-  background-size: cover;
-  position: relative;
-}
-
-#title{
-    font-size: 20px;
-    font-weight: bold;
-    color: #6c757d;
-    text-align: center;
-    letter-spacing: 2px;
-    text-shadow: -1px -1px 3px #f8f9fa, 
-        2px 2px 4px #f8f9fa;
-}
-.button-nav{
-  background: #ffffff;
-  font-weight: 600;
-  margin-bottom: 30px !important;
-}
-.button-info{
-  color: #17a2b8;
-  background: #17a2b8;
-  border-radius: 10px;
-  transition: 0.5s;
-}
-.button-primary {
-  color: #4385F5;
-  background: #4385F5;
-  border-radius: 10px;
-  transition: 0.5s;
-}
-.button-success {
-  color: #109D59;
-  background: #109D59;
-  border-radius: 10px;
-  transition: 0.5s;
-}
-.button-warning {
-  color: #F5B400;
-  background: #F5B400;
-  border-radius: 10px;
-  transition: 0.5s;
-}
-.button-danger {
-  color: #DC4437;
-  background: #DC4437;
-  border-radius: 10px;
-  transition: 0.5s;
-}
-.button-desc{
-  color: #808080;
-  font-size: 16px !important;
-}
-.small-box{
-    margin: 10px;
-    padding: 10px;
-    color:white;
-    border-radius: 10px;
-    border: 1px solid #f5f5f5;
-    box-shadow: none;
-    transition: 0.5s;
-}
-
-#row-size{
-    padding-left:100px;
-    padding-right:100px;
-}
-@media (max-width: 850px){
-    #row-size{
-        padding-left:0px;
-        padding-right:0px;
-    }
-}
-</style>
 <body class="hold-transition layout-top-nav">
     <div class="wrapper">
         <nav class="main-header navbar navbar-expand-md navbar-light navbar-light">
-            <div style="width:100%;">
-                <img src="{{ asset('assets/images/logo/ids_logo_full_light.png') }}"  id="logo" alt="">   
-                <a class="btn btn-primary" href="{{ url('logout') }}" id="logout">Logout</a>
-            </div>
+            <a href="" class="navbar-brand">
+                <img src="{{ asset('assets/images/logo/ids_logo_dark.png') }}" alt="LNU IDS Logo" class="brand-image elevation-3">
+                <span class="brand-text font-weight-light">LNU IDS</span>
+            </a> 
+            <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('logout')}}">
+                        <i class="fa fa-reply"> Logout</i>
+                    </a>
+                </li>
+            </ul>
         </nav>
         <div class="content-wrapper">
-                <br><br>
             <section class="content">
                 <div class="container-fluid">
-                    <h1 class="default-header">My Modules</h1>
-                    <p class="default-desc">Choose the module that you want to use.</p>
+                    <span class="default-header">My Modules</span><br>
+                    <span class="default-desc">Choose the module that you want to use.</span>
                     <!-- Small boxes (Stat box) -->
                     <div class="row" id="row-size">                        
                         @if($count_systems<=2)
@@ -137,14 +58,13 @@
                                 <!-- small box -->
                                 <div class="small-box button-nav">
                                     <div class="inner">
-                                        <h3 class="button-nav {{$row['button']}}" style="background: none !important; font-size: 55px;">{{$row['shorten']}}</h3>
+                                        <h3 class="button-nav button-nav-h3 {{$row['button']}}">{{$row['shorten']}}</h3>
                                         <p class="button-desc">{{$row['name']}}</p>
                                     </div>
                                     <div class="icon">
                                         <i class="{{$row['icon']}}"></i>
                                     </div>
-                                    <a href="{{$url}}" class="{{$row['button']}}" style="display: block; width: 100% !important; 
-                                    color: #f5f5f5; text-align: center; padding: 10px 5px; border-radius: 5px;">Proceed</a>
+                                    <a href="{{$url}}" class="{{$row['button']}} small-box-btn">Proceed</a>
                                 </div>
                             </div> 
                             @php
@@ -161,6 +81,6 @@
 </body>
     
     <!-- jQuery -->
-    <script src="{{ asset('_adminLTE/plugins/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('_adminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('_adminLTE/plugins/jquery/jquery.min.js') }}" nonce="{{ csp_nonce() }}"></script>
+    <script src="{{ asset('_adminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js') }}" nonce="{{ csp_nonce() }}"></script>
 </html>
