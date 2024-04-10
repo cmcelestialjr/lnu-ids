@@ -2,7 +2,7 @@
 <div class="modal-content" id="studentViewModal">
     <div class="modal-header">
         <h4 class="modal-title"></h4>
-        <span class="fa fa-times btn-no-design" data-dismiss="modal">x</span>
+        <span class="fa fa-times" data-dismiss="modal"></span>
     </div>
     <div class="modal-body">
         <div class="row">
@@ -20,54 +20,60 @@
                                 <table class="table">
                                     <tr>
                                         <td style="width: 10%">Lastname:</td>
-                                        <td style="width: 20%"><label>{{$query->info->lastname}}</label></td>
+                                        <td style="width: 20%"><label>{{$query->lastname}}</label></td>
                                         <td style="width: 10%">Firstname:</td>
-                                        <td style="width: 20%"><label>{{$query->info->firstname}}</label></td>
+                                        <td style="width: 20%"><label>{{$query->firstname}}</label></td>
                                     </tr>
                                     <tr>
                                         <td>Middlename:</td>
-                                        <td><label>{{$query->info->middlename}}</label></td>
+                                        <td><label>{{$query->middlename}}</label></td>
                                         <td>Extname:</td>
-                                        <td><label>{{$query->info->extname}}</label></td>
+                                        <td><label>{{$query->extname}}</label></td>
                                     </tr>
                                     <tr>
                                         <td>ID No:</td>
-                                        <td><label>{{$query->id_no}}</label></td>
+                                        <td><label>{{$query->stud_id}}</label></td>
                                         <td>Birthdate:</td>
                                         <td><label>
-                                            {{$query->info->personal_info->dob}}
+                                            {{$query->personal_info->dob}}
                                         </label></td>
                                     </tr>
                                     <tr>
                                         <td>Contact:</td>
                                         <td><label>
-                                            {{$query->info->personal_info->contact}}
+                                            {{$query->personal_info->contact}}
                                             </label></td>
                                         <td>Email:</td>
                                         <td><label>
-                                            {{$query->info->personal_info->email}}
+                                            {{$query->personal_info->email}}
                                             </label></td>
                                     </tr>
                                     <tr>
                                         <td>Sex:</td>
                                         <td><label>
-                                            @if($query->info->personal_info->sex!=NULL)
-                                            {{$query->info->personal_info->sexs->name}}
+                                            @if($query->personal_info->sex!=NULL)
+                                            {{$query->personal_info->sexs->name}}
                                             @endif
                                             </label></td>
                                         <td>Department:</td>
                                         <td><label>
-                                            {{$query->program->departments->name}} ({{$query->program->departments->shorten}})
+                                            @if($query->student_info)
+                                                {{$query->student_info->program->departments->name}} ({{$query->student_info->program->departments->shorten}})
+                                            @endif
                                             </label></td>
                                     </tr>
                                     <tr>
                                         <td>Program:</td>
                                         <td><label>
-                                            {{$query->program->name}} ({{$query->program->shorten}})
+                                            @if($query->student_info)
+                                                {{$query->student_info->program->name}} ({{$query->student_info->program->shorten}})
+                                            @endif
                                             </label></td>
                                         <td>Grade Level:</td>
                                         <td><label>
-                                            {{$query->grade_level->name}}
+                                            @if($query->student_info)
+                                                {{$query->student_info->grade_level->name}}
+                                            @endif
                                             </label></td>
                                     </tr>
                                 </table>
@@ -82,10 +88,18 @@
                         <button class="btn btn-primary btn-primary-scan" id="tor">
                             <span class="fa fa-graduation-cap"></span> TOR</button> &nbsp;
                         <button class="btn btn-info btn-info-scan" id="curriculum">
-                            <span class="fa fa-list"></span> Curriculum</button> 
+                            <span class="fa fa-list"></span> Curriculum</button>  &nbsp;
+                        <button class="btn btn-primary btn-primary-scan" id="grades">
+                                <span class="fa fa-star-half-o"></span> Grades</button>  &nbsp;
+                        <button class="btn btn-info btn-info-scan" id="certification">
+                                <span class="fa fa-check"></span> Certification</button>  &nbsp;                        
                         @if($program_level>=6) &nbsp;
                             <button class="btn btn-primary btn-primary-scan" id="shift">
                                 <span class="fa fa-rotate-right"></span> Shift</button>
+                        @endif
+                        @if(!$query->student_info) &nbsp;
+                            <button class="btn btn-success btn-success-scan" id="selectProgram">
+                                <span class="fa fa-check"></span> Select Program First</button>
                         @endif
                         <table id="studentSchoolYearTable" class="table table-bordered table-fixed"
                                 data-toggle="table"
@@ -118,4 +132,7 @@
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     </div>
 </div>
+<script src="{{ asset('assets/js/rims/student/certification.js') }}"></script>
+<script src="{{ asset('assets/js/rims/student/selectProgram.js') }}"></script>
+<script src="{{ asset('assets/js/rims/student/gradesModal.js') }}"></script>
 <!-- /.modal-content -->

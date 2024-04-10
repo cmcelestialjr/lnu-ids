@@ -143,10 +143,11 @@ $user = $users::with('employee_default.emp_stat')
             //         $time_to =date('H:i',strtotime( $time_to_query->time_to));
             //     }
             // }
+            
             $schedTimeFrom = $usersSchedTime::where('user_id',$user_id)
                 ->where('option_id',1)
-                ->where('date_to','>=',date('Y-m-01',strtotime($year.'-'.$month.'-01')))
-                ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')))
+                ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
+                ->where('date_from','<=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
                 ->whereHas('days', function ($query) use ($weekDay) {
                     $query->where('day',$weekDay);
                 })->orderBy('time_from','ASC')
@@ -154,8 +155,8 @@ $user = $users::with('employee_default.emp_stat')
 
             $schedTimeTo = $usersSchedTime::where('user_id',$user_id)
                 ->where('option_id',1)
-                ->where('date_to','>=',date('Y-m-01',strtotime($year.'-'.$month.'-01')))
-                ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')))
+                ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
+                ->where('date_from','<=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
                 ->whereHas('days', function ($query) use ($weekDay) {
                     $query->where('day',$weekDay);
                 })->orderBy('time_to','DESC')
@@ -174,8 +175,31 @@ $user = $users::with('employee_default.emp_stat')
                 ->where('date',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
                 ->first();
 
+            $next_user_dtr = $usersDtr::where('id_no',$id_no)
+                ->where('date',date('Y-m-d', strtotime("+1 day", strtotime($year.'-'.$month.'-'.$l))))
+                ->first();
+            $next_time_in_am_for = '';
+            $next_time_out_am_for = '';
+            $next_time_in_pm_for = '';
+            $next_time_out_pm_for = '';
+            if($next_user_dtr){
+                if($next_user_dtr->time_in_am){
+                    $next_time_in_am_for = date('H:i',strtotime($next_user_dtr->time_in_am));
+                }
+                if($next_user_dtr->time_out_am){
+                    $next_time_out_am_for = date('H:i',strtotime($next_user_dtr->time_out_am));
+                }
+                if($next_user_dtr->time_in_pm){
+                    $next_time_in_pm_for = date('H:i',strtotime($next_user_dtr->time_in_pm));
+                }
+                if($next_user_dtr->time_out_pm){
+                    $next_time_out_pm_for = date('H:i',strtotime($next_user_dtr->time_out_pm));
+                }
+            }
+            
             if($user_dtr!=NULL){
-                $row = $user_dtr;
+                $row = $user_dtr;                
+
                 $date_day = date('j',strtotime($row->date));
                 $weekDay = date('w', strtotime($row->date));
                 if($weekDay==0){
@@ -292,31 +316,46 @@ $user = $users::with('employee_default.emp_stat')
                 $hd_no = 0;
                 $abs_minutes = 0;
                 $abs_no = 0;
+                $is_rotation_duty = 'No';
 
                 $schedTimeGet = $usersSchedTime::where('user_id',$user_id)
                     ->where('option_id',1)
-                    ->where('date_to','>=',date('Y-m-01',strtotime($year.'-'.$month.'-01')))
-                    ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')))
+                    ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
+                    ->where('date_from','<=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
                     ->whereHas('days', function ($query) use ($weekDay) {
                         $query->where('day',$weekDay);
                     })->get();
 
                 if($schedTimeGet->count()>0){
-                    foreach($schedTimeGet as $rowSchedTime){
+                    foreach($schedTimeGet as $key => $rowSchedTime){
                         $time_from = date('H:i',strtotime($rowSchedTime->time_from));
                         $time_to = date('H:i',strtotime($rowSchedTime->time_to));
-                        if($time_from<'12:00' && $time_to>'12:00'){
-                            if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
-                                && $row->time_type==NULL){
+                        $is_rotation_duty = $rowSchedTime->is_rotation_duty;
+                        
+                        if($is_rotation_duty=='Yes'){
+                            if(($time_from<'12:00' && $time_in_am_for=='') || 
+                                ($time_from>='12:00' && $time_in_pm_for=='')){
                                 $count_days += 1;
                             }
-                        }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
-                            if($time_in_am_for=='' || $time_out_am_for==''){
+                            if($time_to<'12:00' && $time_from>='12:00' && $next_time_out_am_for==''){
+                                $count_days += 1;
+                            }elseif($time_to>='12:00' && $time_from<'12:00' && $time_out_pm_for==''){
                                 $count_days += 1;
                             }
                         }else{
-                            if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
-                                $count_days += 1;
+                            if($time_from<'12:00' && $time_to>'12:00'){
+                                if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
+                                    && $row->time_type==NULL){
+                                    $count_days += 1;
+                                }
+                            }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
+                                if($time_in_am_for=='' || $time_out_am_for==''){
+                                    $count_days += 1;
+                                }
+                            }else{
+                                if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
+                                    $count_days += 1;
+                                }
                             }
                         }
                         // if($emp_type=='Personnel'){
@@ -438,21 +477,41 @@ $user = $users::with('employee_default.emp_stat')
                                     $tardy_no++;
                                 }
                             }
-                            if($time_to<'13:00'){
-                                if($time_out_am_for!='' && $time_out_am_for<$time_to){
-                                    $time_from_ = Carbon::parse($time_out_am_for)->seconds(0);
-                                    $time_to_ = Carbon::parse($time_to)->seconds(0);
-                                    $total_minutes += $time_to_->diffInMinutes($time_from_);
-                                    $ud_minutes += $time_to_->diffInMinutes($time_from_);
-                                    $ud_no++;
+                            if($is_rotation_duty=='Yes'){
+                                if($time_to<'12:00' && $time_from>='12:00'){
+                                    if($next_time_out_am_for!='' && $next_time_out_am_for<$time_to){
+                                        $time_from_ = Carbon::parse($next_time_out_am_for)->seconds(0);
+                                        $time_to_ = Carbon::parse($time_to)->seconds(0);
+                                        $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_no++;
+                                    }
+                                }else{
+                                    if($time_out_pm_for!='' && $time_out_pm_for<$time_to){
+                                        $time_from_ = Carbon::parse($time_out_pm_for)->seconds(0);
+                                        $time_to_ = Carbon::parse($time_to)->seconds(0);
+                                        $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_no++;
+                                    }
                                 }
                             }else{
-                                if($time_out_pm_for!='' && $time_out_pm_for<$time_to){
-                                    $time_from_ = Carbon::parse($time_out_pm_for)->seconds(0);
-                                    $time_to_ = Carbon::parse($time_to)->seconds(0);
-                                    $total_minutes += $time_to_->diffInMinutes($time_from_);
-                                    $ud_minutes += $time_to_->diffInMinutes($time_from_);
-                                    $ud_no++;
+                                if($time_to<'13:00'){
+                                    if($time_out_am_for!='' && $time_out_am_for<$time_to){
+                                        $time_from_ = Carbon::parse($time_out_am_for)->seconds(0);
+                                        $time_to_ = Carbon::parse($time_to)->seconds(0);
+                                        $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_no++;
+                                    }
+                                }else{
+                                    if($time_out_pm_for!='' && $time_out_pm_for<$time_to){
+                                        $time_from_ = Carbon::parse($time_out_pm_for)->seconds(0);
+                                        $time_to_ = Carbon::parse($time_to)->seconds(0);
+                                        $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_no++;
+                                    }
                                 }
                             }
                             
@@ -540,7 +599,8 @@ $user = $users::with('employee_default.emp_stat')
                 $dtr[$date_day]['abs_hr'] = $abs_hr;
                 $dtr[$date_day]['abs_min'] = $abs_min;
                 $dtr[$date_day]['abs_no'] = $abs_no;
-
+                $dtr[$date_day]['is_rotation_duty'] = $is_rotation_duty;
+                
                 $count_days_with += 1;
             }else{
                 if($dtr[$m]['time_from']!=''){
@@ -602,13 +662,13 @@ table td{
 <div class="row">
     <div class="col-lg-12">
         @if($count_days<=0)
-            <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range)}}" method="GET" target="_blank">
+            <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/o')}}" method="GET" target="_blank">
                 <button class="btn btn-info btn-info-scan" style="float:right">
                 <span class="fa fa-file-pdf"></span>
                 Overload Print
                 </button>
             </form>
-            <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range)}}" method="GET" target="_blank">
+            <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/p')}}" method="GET" target="_blank">
                 <button class="btn btn-primary btn-primary-scan" style="float:right">
                 <span class="fa fa-file-pdf"></span>
                 Print

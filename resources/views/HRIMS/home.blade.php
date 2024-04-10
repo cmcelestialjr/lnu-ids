@@ -4,24 +4,14 @@
   <div class="col-lg-12">
       <div class="card card-primary card-outline">
           <div class="card-header">
-            {{$getTime}}
+            {{$deviceName}}
           </div>
           <div class="card-body">
               <table class="table table-bordered">
-              @foreach($getUser as $row)
+              @foreach($getTime as $row)
                 <tr>
-                  <td>{{$row['uid']}}</td>
-                  <td>{{$row['userid']}}</td>
-                  <td>{{$row['name']}}</td>
-                </tr>
-              @endforeach
-              @foreach($attendace as $row)
-                <tr>
-                  <td>{{$row['uid']}}</td>
-                  <td>{{$row['id']}}</td>
-                  <td>{{$row['state']}}</td>
-                  <td>{{$row['timestamp']}}</td>
-                  <td>{{$row['type']}}</td> 
+                  <td>{{$row->DeviceId}}</td>
+                  <td>{{$row->LogDate}}</td>
                 </tr>
               @endforeach
               </table>

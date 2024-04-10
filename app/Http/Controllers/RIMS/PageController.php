@@ -179,6 +179,20 @@ class PageController extends Controller
         $data['school_year_detail'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->first();
         return view($this->page.'/addDrop/addDrop',$data);
     }
+    public function report($data){
+        $school_years = [];
+        $years = StudentsCourses::select('year_from')
+            ->groupBy('year_from')
+            ->orderBy('year_from','DESC')
+            ->get();
+        if($years->count()>0){
+            foreach($years as $year){
+                $school_years[] = $year->year_from.'-'.$year->year_from+1;
+            }
+        }
+        $data['school_years'] = $school_years;
+        return view($this->page.'/report/report',$data);
+    }
     public function student_ludong($data){
         $data['ludong_year'] = LudongGradeLog::select('sy')
             ->where('sy','<=',3000)

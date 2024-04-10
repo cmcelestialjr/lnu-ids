@@ -10,6 +10,7 @@ use App\Models\EducProgramLevel;
 use App\Models\EducPrograms;
 use App\Models\EducProgramsCode;
 use App\Models\StudentsCourses;
+use App\Models\StudentsCoursesCredit;
 use App\Models\StudentsCourseStatus;
 use App\Models\StudentsInfo;
 use App\Models\StudentsProgram;
@@ -133,6 +134,7 @@ class LoadViewController extends Controller
         $query = StudentsCourses::with('grade_period')
             ->where('user_id',$id)
             ->where('year_from','>',1)
+            ->where('program_level_id',$program_level)
             ->select('year_from','year_to','grade_period_id','program_shorten','school_name')
             ->groupBy('year_from')
             ->groupBy('grade_period_id')
@@ -200,7 +202,7 @@ class LoadViewController extends Controller
                                 $query->orWhere('specialization_name',NULL);
                                 $query->orWhere('specialization_name','');
                             })
-                            ->select('id','code','name','units','lab','pre_name','pre_req')
+                            ->select('id','code','name','units','lab','pre_name')
                             ->get()
                             ->map(function($query) use ($id,$curriculum_id,$grade_level_id,$grade_period_id) {
                                 $status = '<button class="btn btn-default btn-xs" style="font-size:10px">Required</button>';
@@ -209,7 +211,9 @@ class LoadViewController extends Controller
                                 $check = StudentsCourses::where('user_id',$id)
                                     ->where(function ($query) use ($course_id){
                                         $query->where('course_id',$course_id)
-                                        ->orWhere('credit_course_id',$course_id);
+                                        ->orWhereHas('courses_credit', function ($query) use ($course_id) {
+                                            $query->where('course_id',$course_id);
+                                        });
                                     })
                                     ->select('student_course_status_id')
                                     ->orderBy('year_from','DESC')
@@ -226,10 +230,9 @@ class LoadViewController extends Controller
                                         }
                                     }
                                 }
-                                $course_other = StudentsCourses::where('user_id',$id)
-                                    ->where('credit_course_id',$course_id)
-                                    ->select('course_code','course_desc','course_units','lab_units')
-                                    ->orderBy('year_from','DESC')
+                                $course_other = StudentsCoursesCredit::with('student_course')
+                                    ->where('user_id',$id)
+                                    ->where('course_id',$course_id)
                                     ->first();
                                 return [
                                     'id' => $query->id,
@@ -239,7 +242,6 @@ class LoadViewController extends Controller
                                     'lab' => $query->lab,
                                     'pre_name' => $query->pre_name,
                                     'status' => $status,
-                                    'pre_req' => $query->pre_req,
                                     'student_course_status' => $student_course_status,
                                     'course_other' => $course_other
                                 ];
@@ -417,7 +419,9 @@ class LoadViewController extends Controller
                                 $check = StudentsCourses::with('status')->where('user_id',$id)
                                     ->where(function ($query) use ($course_id){
                                         $query->where('course_id',$course_id)
-                                        ->orWhere('credit_course_id',$course_id);
+                                        ->orWhereHas('courses_credit', function ($query) use ($course_id) {
+                                            $query->where('course_id',$course_id);
+                                        });
                                     })
                                     ->orderBy('year_from','DESC')
                                     ->first();
@@ -433,9 +437,9 @@ class LoadViewController extends Controller
                                         }
                                     }
                                 }
-                                $course_other = StudentsCourses::where('user_id',$id)
-                                    ->where('credit_course_id',$course_id)
-                                    ->orderBy('year_from','DESC')
+                                $course_other = StudentsCoursesCredit::with('student_course')
+                                    ->where('user_id',$id)
+                                    ->where('course_id',$course_id)
                                     ->first();
                                 return [
                                     'id' => $query->id,

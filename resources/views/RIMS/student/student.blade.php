@@ -6,16 +6,16 @@
       <div class="card-header p-0 pt-1">
         <ul class="nav nav-tabs" role="tablist">
           <li class="nav-item">
-            <a class="nav-link active" data-toggle="pill" href="#list" role="tab" aria-selected="true">List</a>
+            <a class="nav-link" data-toggle="pill" href="#list" role="tab" aria-selected="true">List</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#new" role="tab" aria-selected="false">Search</a>
+            <a class="nav-link active" data-toggle="pill" href="#new" role="tab" aria-selected="false">Search</a>
           </li>
         </ul>
       </div>
       <div class="card-body">
         <div class="tab-content">
-          <div class="tab-pane fade show active" id="list" role="tabpanel">
+          <div class="tab-pane fade" id="list" role="tabpanel">
             <div class="row">
               <div class="col-lg-4">
                 <label>Option</label>
@@ -82,11 +82,11 @@
               </div>
             </div>
           </div>
-          <div class="tab-pane fade" id="new" role="tabpanel" style="height: 150px">
+          <div class="tab-pane fade show active" id="new" role="tabpanel" style="height: 150px">
             <div class="row">
               <div class="col-lg-12"><br></div>
-              <div class="col-lg-1">
-                <label>Student</label>
+              <div class="col-lg-1 center">
+                <h2>STUDENT</h2>
               </div>
               <div class="col-lg-6">
                 <div id="studentSearch">
@@ -96,7 +96,7 @@
                 </div>
               </div>
               <div class="col-lg-4">
-                <button class="btn btn-primary btn-primary-scan" name="submit">
+                <button class="btn btn-primary btn-primary-scan" name="submit" style="height:40px;">
                   <span class="fa fa-check"></span>
                 </button>
               </div>
@@ -117,4 +117,5 @@
 <script src="{{ asset('assets/js/rims/student/update.js') }}"></script>
 <script src="{{ asset('assets/js/rims/student/delete.js') }}"></script>
 <script src="{{ asset('assets/js/search/student.js') }}"></script>
+
 @endsection

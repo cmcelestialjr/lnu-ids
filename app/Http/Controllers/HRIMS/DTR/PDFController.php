@@ -11,6 +11,7 @@ use App\Models\UsersDTR;
 use App\Models\UsersDTRTrack;
 use App\Models\UsersRoleList;
 use App\Models\UsersSchedDays;
+use App\Models\UsersSchedTime;
 use App\Services\NameServices;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,7 +30,8 @@ class PDFController extends Controller
         $id_no_req = $request->id_no;
         $year = $request->year;
         $month = $request->month;
-        $range =$request->range;
+        $range = $request->range;
+        $option = $request->option;
         $result = 'error';
         $src = '';
         $check = UsersDTR::where('id_no',$id_no_req)
@@ -38,7 +40,7 @@ class PDFController extends Controller
         if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req) && $check!=NULL){
             $result = 'success';            
             $name_services = new NameServices;
-            $src = $this->generateQR($id_no_req,$year,$month,$range);
+            $src = $this->generateQR($id_no_req,$year,$month,$range,$option);
             $user = Users::where('id_no',$id_no_req)->first();
             $name = mb_strtoupper($name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname));
             if($range==2){
@@ -84,7 +86,7 @@ class PDFController extends Controller
             return view('layouts/error/404');
         }
     }
-    private function generateQR($id_no,$year,$month,$range){
+    private function generateQR($id_no,$year,$month,$range,$option){
         error_reporting(E_ERROR);
         $image = QrCode::format('png')
                     ->merge(public_path('assets\images\logo\lnu_logo.png'), .28, true)
@@ -94,26 +96,41 @@ class PDFController extends Controller
                     ->eyeColor(2, /*outer*/ 212,175,55, /*inner*/ 0, 0, 128, 0, 0)
                     ->size(300)
                     ->errorCorrection('H')
-                    ->generate('hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range);
-        $imageName = $id_no.'_'.$year.'_'.$month.'_'.$range.'.png';
+                    ->generate('hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/'.$option);
+        $imageName = $id_no.'_'.$year.'_'.$month.'_'.$range.'_'.$option.'.png';
         $path = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/';
         File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
         $file = public_path($path . $imageName);
         file_put_contents($file, $image);
         $qrcode = $path.$imageName;
-        $src = $this->generatePDF($id_no,$year,$month,$range,$qrcode);
+        $src = $this->generatePDF($id_no,$year,$month,$range,$qrcode,$option);
         return $src;
     }
-    private function generatePDF($id_no,$year,$month,$range,$qrcode){
-        $pathUser = NULL;
-        $user = Users::where('id_no',$id_no)->first();
-        $user_id = $user->id;
+    private function generatePDF($id_no,$year,$month,$range,$qrcode,$option){
         $name_services = new NameServices;
+        $pathUser = NULL;
+        $user = Users::with('employee_default.position.office_designate.current_user','instructor_info.position.office_designate.current_user')->where('id_no',$id_no)->first();
+        $user_id = $user->id;
+        $emp_stat_gov = $user->employee_default->emp_stat->gov;        
         $name = mb_strtoupper($name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname));
         
         $logo = public_path('assets\images\logo\lnu_logo.png');
         $logo_blur = public_path('assets\images\logo\lnu_logo_blur1.png');
         $scissor = public_path('assets\images\icons\png\scissor1.png');
+        
+        $signatory = '';
+
+        if($option=='o'){
+            if($user->instructor_info->position->office_designate->current_user){
+                $current_user = $user->instructor_info->position->office_designate->current_user;
+                $signatory = mb_strtoupper($name_services->firstname($current_user->lastname,$current_user->firstname,$current_user->middlename,$current_user->extname));
+            }
+        }else{
+            if($user->employee_default->position->office_designate->current_user){
+                $current_user = $user->instructor_info->position->office_designate->current_user;
+                $signatory = mb_strtoupper($name_services->firstname($current_user->lastname,$current_user->firstname,$current_user->middlename,$current_user->extname));
+            }
+        }
 
         $work = _Work::where('user_id',$user_id)->orderBy('date_from','DESC')->orderBy('emp_stat_id','ASC')->first();
         if($work->role_id==3){
@@ -125,12 +142,14 @@ class PDFController extends Controller
         }else{
             $emp_type = 'Employee';
         }
+
         $user_dtr = UsersDTR::where('id_no',$id_no)
             ->whereYear('date',$year)
             ->whereMonth('date',$month)
             ->orderBy('date','ASC')
             ->orderBy('time_type','DESC')
             ->get();
+
         $holidays = Holidays::
             where(function ($query) use ($month) {
                 $query->whereMonth('date', $month)
@@ -176,68 +195,75 @@ class PDFController extends Controller
                     $weekDay = 7;
                 }
                 $time_minutes_total = 0;
-                if($emp_type=='Employee'){
-                    $day = UsersSchedDays::where('user_id',$user_id)->where('day',$weekDay)->first();
-                    if($day!=NULL){
-                        $time_from = date('H:i',strtotime($day->time->time_from));
-                        $time_to = date('H:i',strtotime($day->time->time_to));
+
+                $schedTimeFrom = UsersSchedTime::where('user_id',$user_id)
+                    ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
+                    ->where('date_from','<=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
+                    ->whereHas('days', function ($query) use ($weekDay) {
+                        $query->where('day',$weekDay);
+                    });                    
+                    if($option=='o'){
+                        $schedTimeFrom = $schedTimeFrom->where('option_id',2);
+                    }else{
+                        $schedTimeFrom = $schedTimeFrom->where('option_id',1);
                     }
-                }else{
-                    $day = EducOfferedScheduleDay::where('no',$weekDay)
-                        ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {                        
-                            $query->whereHas('course', function ($query) use ($user_id,$year,$month) {
-                                $query->where('instructor_id',$user_id);
-                                $query->whereHas('curriculum', function ($query) use ($year,$month) {
-                                    $query->whereHas('offered_program', function ($query) use ($year,$month) {                                    
-                                        $query->whereHas('school_year', function ($query) use ($year,$month) {
-                                            $query->where('year_from','>=',$year);
-                                            $query->whereHas('grade_period', function ($query) use ($month) {
-                                                $query->whereHas('month', function ($query) use ($month) {
-                                                    $query->where('month',$month);
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        })
-                        ->pluck('offered_schedule_id')->toArray();
-                    $time_from_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_from','ASC')
-                        ->whereHas('course', function ($query) {
-                            $query->where('load_type',1);
-                        })
-                        ->first();
-                    $time_to_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_to','DESC')
-                        ->whereHas('course', function ($query) {
-                            $query->where('load_type',1);
-                        })
-                        ->first();
-                    $time_minutes = EducOfferedSchedule::whereIn('id',$day)
-                        ->whereHas('course', function ($query) {
-                            $query->where('load_type',1);
-                        })->get();                
-                    if($time_minutes->count()>0){                    
-                        foreach($time_minutes as $row){
-                            $time_from_ = Carbon::parse($row->time_from);
-                            $time_to_ = Carbon::parse($row->time_to);
-                            $time_minutes_total += $time_to_->diffInMinutes($time_from_);
-                        }
+                $schedTimeFrom = $schedTimeFrom->orderBy('time_from','ASC')
+                    ->first();
+
+                $schedTimeTo = UsersSchedTime::where('user_id',$user_id)
+                    ->where('option_id',1)
+                    ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
+                    ->where('date_from','<=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
+                    ->whereHas('days', function ($query) use ($weekDay) {
+                        $query->where('day',$weekDay);
+                    });
+                    if($option=='o'){
+                        $schedTimeTo = $schedTimeTo->where('option_id',2);
+                    }else{
+                        $schedTimeTo = $schedTimeTo->where('option_id',1);
                     }
-                    if($time_from_query!=NULL){
-                        $time_from = date('H:i',strtotime($time_from_query->time_from));
-                    }
-                    if($time_to_query!=NULL){
-                        $time_to =date('H:i',strtotime( $time_to_query->time_to));
-                    }
+                $schedTimeTo = $schedTimeTo->orderBy('time_to','DESC')
+                    ->first();
+
+                if($schedTimeFrom!=NULL){
+                    $time_from = date('H:i',strtotime($schedTimeFrom->time_from));
                 }
+                if($schedTimeTo!=NULL){
+                    $time_to = date('H:i',strtotime($schedTimeTo->time_to));
+                }
+                
                 $dtr[$l]['time_from'] = $time_from;
                 $dtr[$l]['time_to'] = $time_to;
+
+                $next_user_dtr = UsersDtr::where('id_no',$id_no)
+                    ->where('date',date('Y-m-d', strtotime("+1 day", strtotime($year.'-'.$month.'-'.$l))))
+                    ->first();
+                $next_time_in_am_for = '';
+                $next_time_out_am_for = '';
+                $next_time_in_pm_for = '';
+                $next_time_out_pm_for = '';
+                if($next_user_dtr){
+                    if($next_user_dtr->time_in_am){
+                        $next_time_in_am_for = date('H:i',strtotime($next_user_dtr->time_in_am));
+                    }
+                    if($next_user_dtr->time_out_am){
+                        $next_time_out_am_for = date('H:i',strtotime($next_user_dtr->time_out_am));
+                    }
+                    if($next_user_dtr->time_in_pm){
+                        $next_time_in_pm_for = date('H:i',strtotime($next_user_dtr->time_in_pm));
+                    }
+                    if($next_user_dtr->time_out_pm){
+                        $next_time_out_pm_for = date('H:i',strtotime($next_user_dtr->time_out_pm));
+                    }
+                }
+
                 $user_dtr = UsersDtr::where('id_no',$id_no)
                     ->where('date',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
                     ->whereMonth('date',$month)
                     ->first();
                 if($user_dtr!=NULL){
-                    $row = $user_dtr;
+                    $row = $user_dtr;                
+
                     $date_day = date('j',strtotime($row->date));
                     $weekDay = date('w', strtotime($row->date));
                     if($weekDay==0){
@@ -246,62 +272,9 @@ class PDFController extends Controller
                     $time_from = '';
                     $time_to = '';
                     $time_minutes_total = 0;
-                    if($emp_type=='Employee'){
-                        $day = UsersSchedDays::where('user_id',$user_id)->where('day',$weekDay)->first();
-                        if($day!=NULL){
-                            $time_from = date('H:i',strtotime($day->time->time_from));
-                            $time_to = date('H:i',strtotime($day->time->time_to));
-                        }
-                    }else{
-                        $day = EducOfferedScheduleDay::where('no',$weekDay)
-                            ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {                        
-                                $query->whereHas('course', function ($query) use ($user_id,$year,$month) {
-                                    $query->where('instructor_id',$user_id);
-                                    $query->whereHas('curriculum', function ($query) use ($year,$month) {
-                                        $query->whereHas('offered_program', function ($query) use ($year,$month) {                                    
-                                            $query->whereHas('school_year', function ($query) use ($year,$month) {
-                                                $query->where('year_from','>=',$year);
-                                                $query->whereHas('grade_period', function ($query) use ($month) {
-                                                    $query->whereHas('month', function ($query) use ($month) {
-                                                        $query->where('month',$month);
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            })
-                            ->pluck('offered_schedule_id')->toArray();
-                        $time_from_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_from','ASC')
-                            ->whereHas('course', function ($query) {
-                                $query->where('load_type',1);
-                            })
-                            ->first();
-                        $time_to_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_to','DESC')
-                            ->whereHas('course', function ($query) {
-                                $query->where('load_type',1);
-                            })
-                            ->first();
-                        $time_minutes = EducOfferedSchedule::whereIn('id',$day)
-                            ->whereHas('course', function ($query) {
-                                $query->where('load_type',1);
-                            })->get();                
-                        if($time_minutes->count()>0){                    
-                            foreach($time_minutes as $r){
-                                $time_from_ = Carbon::parse($r->time_from);
-                                $time_to_ = Carbon::parse($r->time_to);
-                                $time_minutes_total += $time_to_->diffInMinutes($time_from_);
-                            }
-                        }
-                        if($time_from_query!=NULL){
-                            $time_from = date('H:i',strtotime($time_from_query->time_from));
-                        }
-                        if($time_to_query!=NULL){
-                            $time_to =date('H:i',strtotime( $time_to_query->time_to));
-                        }
-                    }
+
                     $dtr[$date_day]['check'] = 'dtr';
-                    
+                
                     if($row->time_in_am==NULL){
                         $time_in_am = '';
                         $time_in_am_for = '';
@@ -329,93 +302,191 @@ class PDFController extends Controller
                     }else{
                         $time_out_pm = date('h:ia',strtotime($row->time_out_pm));
                         $time_out_pm_for = date('H:i',strtotime($row->time_out_pm));
-                    }
-                    $total_minutes = 0;
-                    if($time_from!=''){
-                        if($time_from<'12:00' && $time_to>'12:00'){
-                            if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
-                                && $row->time_type==NULL){
-                                $count_days += 1;
-                            }
-                        }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
-                            if($time_in_am_for=='' || $time_out_am_for==''){
-                                $count_days += 1;
-                            }
-                        }else{
-                            if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
-                                $count_days += 1;
-                            }
+                    }                
+                    if($time_from<'12:00' && $time_to>'12:00'){
+                        if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
+                            && $row->time_type==NULL){
+                            $count_days += 1;
                         }
-                        if($time_from<'12:00'){
-                            if($time_in_am_for!='' && $time_in_am_for>$time_from){
-                                $time_from_ = Carbon::parse($time_from);
-                                $time_to_ = Carbon::parse($time_in_am_for);
-                                $total_minutes = $time_to_->diffInMinutes($time_from_);
-                            }
-                            if($time_to>'13:00'){
-                                if($time_out_am_for!='' && $time_out_am_for<'12:00'){
-                                    $time_from_ = Carbon::parse($time_out_am_for);
-                                    $time_to_ = Carbon::parse('12:00');
-                                    $total_minutes = $total_minutes+$time_to_->diffInMinutes($time_from_);
+                    }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
+                        if($time_in_am_for=='' || $time_out_am_for==''){
+                            $count_days += 1;
+                        }
+                    }else{
+                        if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
+                            $count_days += 1;
+                        }
+                    }
+
+                    $total_minutes = 0;
+                    $tardy_minutes = 0;
+                    $tardy_no = 0;
+                    $ud_minutes = 0;
+                    $ud_no = 0;
+                    $hd_minutes = 0;
+                    $hd_no = 0;
+                    $abs_minutes = 0;
+                    $abs_no = 0;
+                    $is_rotation_duty = 'No';
+
+                    $schedTimeGet = UsersSchedTime::where('user_id',$user_id)
+                        ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
+                        ->where('date_from','<=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
+                        ->whereHas('days', function ($query) use ($weekDay) {
+                            $query->where('day',$weekDay);
+                        });
+                    if($option=='o'){
+                        $schedTimeGet = $schedTimeGet->where('option_id',2);
+                    }else{
+                        $schedTimeGet = $schedTimeGet->where('option_id',1);
+                    }
+                    $schedTimeGet = $schedTimeGet->get();
+                    if($schedTimeGet->count()>0){
+                        foreach($schedTimeGet as $key => $rowSchedTime){
+                            $time_from = date('H:i',strtotime($rowSchedTime->time_from));
+                            $time_to = date('H:i',strtotime($rowSchedTime->time_to));
+                            $is_rotation_duty = $rowSchedTime->is_rotation_duty;
+                            
+                            if($is_rotation_duty=='Yes'){
+                                if(($time_from<'12:00' && $time_in_am_for=='') || 
+                                    ($time_from>='12:00' && $time_in_pm_for=='')){
+                                    $count_days += 1;
                                 }
-                                if($time_in_pm_for!='' && $time_in_pm_for>'13:00'){
-                                    $time_from_ = Carbon::parse('13:00');
-                                    $time_to_ = Carbon::parse($time_in_pm_for);
-                                    $total_minutes = $total_minutes+$time_to_->diffInMinutes($time_from_);
+                                if($time_to<'12:00' && $time_from>='12:00' && $next_time_out_am_for==''){
+                                    $count_days += 1;
+                                }elseif($time_to>='12:00' && $time_from<'12:00' && $time_out_pm_for==''){
+                                    $count_days += 1;
                                 }
-                                if($time_out_pm_for!='' && $time_out_pm_for<$time_to){
-                                    $time_from_ = Carbon::parse($time_out_pm_for);
-                                    $time_to_ = Carbon::parse($time_to);
-                                    $total_minutes = $total_minutes+$time_to_->diffInMinutes($time_from_);
-                                }
-                                if($row->time_type==2){
-                                    $time_from_ = Carbon::parse($time_from);
-                                    $time_to_ = Carbon::parse('12:00');
-                                    $total_minutes = $time_to_->diffInMinutes($time_from_);
-                                }elseif($row->time_type==3){
-                                    $time_from_ = Carbon::parse('13:00');
-                                    $time_to_ = Carbon::parse($time_to);
-                                    $total_minutes = $total_minutes+$time_to_->diffInMinutes($time_from_);
-                                }elseif($row->time_type==1){
-                                    $time_from_ = Carbon::parse($time_from);
-                                    $time_to_ = Carbon::parse($time_to);
-                                    $total_minutes = $time_to_->diffInMinutes($time_from_);
-                                    if($total_minutes>=540){
-                                        $total_minutes = 480;
-                                    }
-                                }                        
                             }else{
-                                if($time_out_am_for!='' && $time_out_am_for<$time_to){
-                                    $time_from_ = Carbon::parse($time_out_am_for);
-                                    $time_to_ = Carbon::parse($time_to);
-                                    $total_minutes = $time_to_->diffInMinutes($time_from_);
+                                if($time_from<'12:00' && $time_to>'12:00'){
+                                    if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
+                                        && $row->time_type==NULL){
+                                        $count_days += 1;
+                                    }
+                                }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
+                                    if($time_in_am_for=='' || $time_out_am_for==''){
+                                        $count_days += 1;
+                                    }
+                                }else{
+                                    if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
+                                        $count_days += 1;
+                                    }
+                                }
+                            }
+                            if($time_from<'12:00'){
+                                if($time_in_am_for!='' && $time_in_am_for>$time_from){
+                                    $time_from_ = Carbon::parse($time_from)->seconds(0);
+                                    $time_to_ = Carbon::parse($time_in_am_for)->seconds(0);
+                                    $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                    $tardy_minutes += $time_to_->diffInMinutes($time_from_);
+                                    $tardy_no++;
+                                }
+                            }else{
+                                if($time_in_pm_for!='' && $time_in_pm_for>$time_from){
+                                    $time_from_ = Carbon::parse($time_from)->seconds(0);
+                                    $time_to_ = Carbon::parse($time_in_pm_for)->seconds(0);
+                                    $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                    $tardy_minutes += $time_to_->diffInMinutes($time_from_);
+                                    $tardy_no++;
+                                }
+                            }
+                            if($is_rotation_duty=='Yes'){
+                                if($time_to<'12:00' && $time_from>='12:00'){
+                                    if($next_time_out_am_for!='' && $next_time_out_am_for<$time_to){
+                                        $time_from_ = Carbon::parse($next_time_out_am_for)->seconds(0);
+                                        $time_to_ = Carbon::parse($time_to)->seconds(0);
+                                        $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_no++;
+                                    }
+                                }else{
+                                    if($time_out_pm_for!='' && $time_out_pm_for<$time_to){
+                                        $time_from_ = Carbon::parse($time_out_pm_for)->seconds(0);
+                                        $time_to_ = Carbon::parse($time_to)->seconds(0);
+                                        $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_no++;
+                                    }
+                                }
+                            }else{
+                                if($time_to<'13:00'){
+                                    if($time_out_am_for!='' && $time_out_am_for<$time_to){
+                                        $time_from_ = Carbon::parse($time_out_am_for)->seconds(0);
+                                        $time_to_ = Carbon::parse($time_to)->seconds(0);
+                                        $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_no++;
+                                    }
+                                }else{
+                                    if($time_out_pm_for!='' && $time_out_pm_for<$time_to){
+                                        $time_from_ = Carbon::parse($time_out_pm_for)->seconds(0);
+                                        $time_to_ = Carbon::parse($time_to)->seconds(0);
+                                        $total_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                                        $ud_no++;
+                                    }
+                                }
+                            }
+                            
+                            if($row->time_type==1 || $row->time_type==2 || $row->time_type==3){
+                                $time_from_ = Carbon::parse($time_from)->seconds(0);
+                                $time_to_ = Carbon::parse($time_to)->seconds(0);
+                                $get_time_diff = $time_to_->diffInMinutes($time_from_);
+                                if($emp_stat_gov=='N'){
+                                    $total_minutes += $get_time_diff;
                                 }
                                 if($row->time_type==1){
-                                    $total_minutes = $time_minutes_total;
+                                    $abs_minutes += $get_time_diff;
+                                    $abs_no = 1;
+                                }elseif($row->time_type==2){
+                                    $hd_minutes = $get_time_diff;
+                                    $hd_no = 1;
+                                }elseif($row->time_type==3){
+                                    $hd_minutes = $get_time_diff;
+                                    $hd_no = 1;
                                 }
-                            }                    
-                        }else{
-                            if($time_in_pm_for!='' && $time_in_pm_for>$time_from){
-                                $time_from_ = Carbon::parse($time_from);
-                                $time_to_ = Carbon::parse($time_in_pm_for);
-                                $total_minutes = $time_to_->diffInMinutes($time_from_);
+
                             }
-                            if($time_out_pm_for!='' && $time_out_pm_for<$time_to){
-                                $time_from_ = Carbon::parse($time_out_pm_for);
-                                $time_to_ = Carbon::parse($time_to);
-                                $total_minutes = $total_minutes+$time_to_->diffInMinutes($time_from_);
-                            }
-                            if($row->time_type==1){
-                                $total_minutes = $time_minutes_total;
-                            }
+                        //}
                         }
                     }
+
                     $hours = 0;
                     $minutes = $total_minutes;
                     if($total_minutes>=60){
                         $hours = floor($total_minutes / 60);
                         $minutes = $total_minutes % 60;
                     }
+                    $tardy_hr = 0;
+                    $tardy_min = $tardy_minutes;
+                    if($tardy_minutes>=60){
+                        $tardy_hr = floor($tardy_minutes / 60);
+                        $tardy_min = $tardy_minutes % 60;
+                    }
+                    $ud_hr = 0;
+                    $ud_min = $ud_minutes;
+                    if($ud_minutes>=60){
+                        $ud_hr = floor($ud_minutes / 60);
+                        $ud_min = $ud_minutes % 60;
+                    }
+                    $hd_hr = 0;
+                    $hd_min = $hd_minutes;
+                    if($hd_minutes>=60){
+                        $hd_hr = floor($hd_minutes / 60);
+                        $hd_min = $hd_minutes % 60;
+                    }
+                    $abs_hr = 0;
+                    $abs_min = $abs_minutes;
+                    if($abs_minutes>=60){
+                        $abs_hr = floor($abs_minutes / 60);
+                        $abs_min = $abs_minutes % 60;
+                    }
+                    if($row->time_type_==NULL){
+                        $time_type_name = '';
+                    }else{
+                        $time_type_name = $row->time_type_->name;
+                    }
+
                     $dtr[$date_day]['in_am'] = $time_in_am;            
                     $dtr[$date_day]['out_am'] = $time_out_am;
                     $dtr[$date_day]['in_pm'] = $time_in_pm;
@@ -430,6 +501,7 @@ class PDFController extends Controller
                     $dtr[$date_day]['time_out_pm_type'] = $row->time_out_pm_type;
                     $dtr[$date_day]['hours'] = $hours;
                     $dtr[$date_day]['minutes'] = $minutes;
+                    
                 }else{
                     if($dtr[$m]['time_from']!=''){
                         $count_days += 1;
@@ -920,16 +992,52 @@ class PDFController extends Controller
 
             $pdf::SetXY(5+$x_add, $y+40);
             $pdf::SetFont('typewriteb','',8);
+            $pdf::Cell(95, '', $signatory, '', 1, 'C', 0, '', 1);
+
+            $y = $y-0.4;
+
+            $pdf::SetXY(5+$x_add, $y+40);
+            $pdf::SetFont('typewriteb','',8);
             $pdf::Cell(95, '', '', 'B', 1, 'C', 0, '', 1);
 
-            $y = $y+4.5;
+            $y = $y+4.5;            
 
             $pdf::SetXY(5+$x_add, $y+40);
             $pdf::SetFont('typewriteb','',8);
             $pdf::Cell(95, '', 'Authorized signature', '', 1, 'C', 0, '', 1);
+            
+            $schedTimeGet = UsersSchedTime::with('days')
+                ->where('user_id',$user_id)
+                ->where('date_to','>=',date('Y-m-01',strtotime($year.'-'.$month.'-01')))
+                ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')));
+                if($option=='o'){
+                    $schedTimeGet = $schedTimeGet->where('option_id',2);
+                }else{
+                    $schedTimeGet = $schedTimeGet->where('option_id',1);
+                }
+            $schedTimeGet = $schedTimeGet->get();
+            if($schedTimeGet->count()>0){
+                $y = $y+8;
+                $pdf::SetXY(5+$x_add, $y+40);
+                $pdf::SetFont('typewrite','',8);
+                $pdf::Cell(95, '', 'Official Time:', '', 1, 'L', 0, '', 1);
 
+                $listDays = array('S', 'M', 'T', 'W','TH','F', 'S');
 
-            $pdf::SetXY(5+$x_add, 291);
+                foreach($schedTimeGet as $sched){
+                    $getDays = array();
+                    foreach($sched->days as $days){
+                        $getDays[] = $listDays[$days->day];
+                    }
+                    $implodeDays = implode('',$getDays);
+                    $y = $y+3.5;
+                    $pdf::SetXY(5+$x_add, $y+40);
+                    $pdf::SetFont('typewrite','',8);
+                    $pdf::Cell(95, '', $implodeDays.' - '.date('h:ia',strtotime($sched->time_from)).' - '.date('h:ia',strtotime($sched->time_to)), '', 1, 'L', 0, '', 1);
+                }
+            }
+
+            $pdf::SetXY(5+$x_add, 320);
             $pdf::SetFont('typewritingsmall','',6);
             $pdf::Cell(95, '', 'Date Time printed: '.date('F d, Y h:i a'), '', 1, 'L', 0, '', 1);
         }

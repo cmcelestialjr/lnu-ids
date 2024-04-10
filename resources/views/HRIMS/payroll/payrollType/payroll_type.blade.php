@@ -20,7 +20,7 @@
                                     <button class="btn btn-primary btn-primary-scan" name="new" style="float: right">
                                         <span class="fa fa-plus"></span> New Payroll Type
                                     </button><br>
-                                    <br>                                         
+                                    <br>
                                     <table id="listTable" class="table table-bordered table-fixed"
                                         data-toggle="table"
                                         data-search="true"

@@ -3,13 +3,21 @@
     $year_level = '';
     $course_units = 0;
     $course_add_table = 'hide';
+    $disabled = 'disabled';
+    $limit_units = 26;
+    if($student->program_level_id>=7){
+        $disabled = '';
+    }
     if(count($course_add)>0){
         $course_add_table = '';
+    }
+    if($checkStudentPreenroll!=NULL){
+        $disabled = 'disabled';
     }
 @endphp
 <div class="row">
     <div class="col-lg-12">
-        @if($checkStudentPreenroll!=NULL)
+        @if($checkStudentPreenroll!=NULL)<br>
             <div class="alert alert-success center">You are already Pre-enrolled</div>
         @endif
         <input type="hidden" name="curriculum_id_selected" value="{{$offered_curriculum_id}}" readonly>
@@ -69,11 +77,11 @@ $unit_x = 0;
             <div class="card-body table-responsive">
                 <div class="row">
                     @php
-                    if($row['year_level']==$student->grade_level->name){
+                    if($row['year_level']==$student->grade_level->name && $checkStudentPreenroll==NULL){
                         $checked_input = 'checked';
                     }else{
                         $checked_input = '';
-                    }    
+                    }
                     @endphp
                     @foreach($row['grade_period'] as $grade)
                         @if(count($grade['courses'])>0)
@@ -125,7 +133,7 @@ $unit_x = 0;
                                                             <span class="blue"></span></td>
                                                         <td class="center">{{$list['pre_name']}}
                                                             <span class="blue"></span></td>
-                                                        <td>{!!$list['status']!!}</td>
+                                                        <td class="center">{!!$list['status']!!}</td>
                                                         @if($list['availability']!=3)
                                                             @if($list['availability']==1)
                                                                 @if($list['availability_name']=='Full')
@@ -140,10 +148,12 @@ $unit_x = 0;
                                                                 @else
                                                                     <td></td>
                                                                 @endif
-                                                            @elseif($list['availability']==2)
+                                                            @elseif($list['availability']==2 || $list['availability']==3 || $list['availability']==4)
                                                                 <td></td>
-                                                            @elseif($list['availability']==3)
-                                                                <td></td>
+                                                            @elseif($list['availability']==5)
+                                                                <td>
+                                                                    <input type="checkbox" class="form-control" checked disabled>
+                                                                </td>
                                                             @else
                                                                 @if($list['advised']==1)
                                                                     <td>
@@ -160,7 +170,7 @@ $unit_x = 0;
                                                                                 data-op="{{$course_availability}}"
                                                                                 data-u="{{$list['units']}}"
                                                                                 data-cid="{{$list['credit_course_id']}}"
-                                                                                checked disabled>
+                                                                                checked {{$disabled}}>
                                                                         @endif
                                                                     </td>
                                                                 @else
@@ -176,7 +186,7 @@ $unit_x = 0;
                                                                                     data-op="{{$course_availability}}"
                                                                                     data-u="{{$list['units']}}"
                                                                                     data-cid=""
-                                                                                    {{$checked_input}} disabled>
+                                                                                    {{$checked_input}} {{$disabled}}>
                                                                             @else
                                                                                 <input type="checkbox" class="form-control courseCheck hide course_check{{$row['year_level1']}}"
                                                                                     value="{{$row['year_level1']}}"
@@ -190,7 +200,7 @@ $unit_x = 0;
                                                                                 @php
                                                                                 $total_units_get += $list['units'];
                                                                                 @endphp
-                                                                                @if($total_units_get<=26)
+                                                                                @if($total_units_get<=$limit_units)
                                                                                     @if(($type!='add' && ($year_level=='' || $year_level==$row['year_level1'])) || $list['course_conflict']=='')
                                                                                         <input type="checkbox" class="form-control courseCheck course_check{{$row['year_level1']}}"
                                                                                             value="{{$row['year_level1']}}"
@@ -198,7 +208,7 @@ $unit_x = 0;
                                                                                             data-op="{{$course_availability}}"
                                                                                             data-u="{{$list['units']}}"
                                                                                             data-cid=""
-                                                                                            {{$checked_input}} disabled>
+                                                                                            {{$checked_input}} {{$disabled}}>
                                                                                     @else
                                                                                         <input type="checkbox" class="form-control courseCheck hide course_check{{$row['year_level1']}}"
                                                                                             value="{{$row['year_level1']}}"

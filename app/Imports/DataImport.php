@@ -38,7 +38,8 @@ class DataImport implements ToModel, WithHeadingRow
     public function headingRow(): int
     {
         return 1;
-    }    
+    }
+    
     
     // public function model(array $row)
     // {
@@ -197,11 +198,64 @@ class DataImport implements ToModel, WithHeadingRow
         
     // }
 
-    //employeeinfo
+    //educ_course
     public function model(array $row)
     {
-
+        $user = Auth::User();
+        $user_id = $user->id;
+        $insert = new EducCourses();
+        $insert->curriculum_id = $row["curriculum_id"];
+        $insert->grade_level_id = $row["grade_level_id"];
+        $insert->grade_period_id = $row["grade_period_id"];
+        $insert->name = $row["name"];
+        $insert->shorten = $row["shorten"];
+        $insert->code = $row["code"];
+        $insert->units = $row["units"];
+        $insert->pay_units = $row["units"];
+        $insert->description = $row["name"];
+        $insert->course_type_id = $row["course_type_id"];
+        $insert->updated_by = $user_id;
+        $insert->save();
     }
+
+    //educ_curriculum
+    // public function model(array $row)
+    // {
+    //     $user = Auth::User();
+    //     $user_id = $user->id;
+
+    //     $curriculum_id = $row["curriculum_id"];
+
+    //     if($row['year_from']>0){
+    //         $year_from = $row['year_from'];
+    //     }else{
+    //         $year_from = NULL;
+    //     }
+
+    //     $check = EducCurriculum::find($curriculum_id);
+    //     if($check){
+    //         EducCurriculum::where('id', $curriculum_id)
+    //             ->update(['program_id' => $row["program_id"],
+    //                       'name' => $row["name"],
+    //                       'year_from' => $year_from,
+    //                       'code' => $row["code"],
+    //                       'status_id' => $row["status_id"],
+    //                       'remarks' => $row["remarks"],
+    //                       'updated_by' => $user_id,
+    //                       'updated_at' => date('Y-m-d H:i:s')]);
+    //     }else{
+    //         $insert = new EducCurriculum();
+    //         $insert->id = $curriculum_id;
+    //         $insert->program_id = $row["program_id"];
+    //         $insert->name = $row["name"];
+    //         $insert->year_from = $year_from;
+    //         $insert->code = $row["code"];
+    //         $insert->status_id = $row["status_id"];
+    //         $insert->remarks = $row["remarks"];
+    //         $insert->updated_by = $user_id;
+    //         $insert->save();
+    //     }
+    // }
 
     //employeeinfo
     // public function model(array $row)

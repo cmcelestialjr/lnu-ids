@@ -1,8 +1,6 @@
 <!-- jQuery -->
-<script src="{{ asset('_adminLTE/plugins/jquery/jquery-3.6.3.min.js') }}"></script>
+<script src="{{ asset('_adminLTE/plugins/jquery/jquery-3.7.1.min.js') }}"></script>
 <script src="{{ asset('_adminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<!-- Font Awesome -->
-<script src="{{ asset('_adminLTE/plugins/fontawesome-free/js/all.min.js') }}"></script> 
 <!-- Boostrap Table -->
 <script src="{{ asset('_adminLTE/plugins/bootstrap-table/extensions/export/tableExport.min.js') }}"></script>
 <script src="{{ asset('_adminLTE/plugins/bootstrap-table/bootstrap-table.min.js') }}"></script>
@@ -45,8 +43,10 @@
 //     });
 // }
 
+$('.nav-item.dropdown').hover(function() {
+    $(this).find('.nav-link').dropdown('toggle');
+});
 </script>
-
 
 @livewireScripts
 

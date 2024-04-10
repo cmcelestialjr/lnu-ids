@@ -21,21 +21,29 @@ class ModalController extends Controller
 {
     public function studentViewModal(Request $request){
         $id = $request->id;
-        $query = StudentsInfo::where('user_id',$id)->first();
+        $program_level_id = NULL;
+        $curriculum_id = NULL;
+        $query = Users::with('personal_info','student_info.program.departments','student_info.grade_level')
+            ->where('id',$id)
+            ->first();
         $program_level = StudentsProgram::where('user_id',$id)
                 ->select('program_level_id','curriculum_id')
                 ->orderBy('program_level_id','DESC')->first();
+        if($program_level){
+            $program_level_id = $program_level->program_level_id;
+            $curriculum_id = $program_level->curriculum_id;
+        }
         $data = array(
             'id' => $id,
             'query' => $query,
-            'program_level' => $program_level->program_level_id,
-            'curriculum' => $program_level->curriculum_id
+            'program_level' => $program_level_id,
+            'curriculum' => $curriculum_id
         );
         return view('rims/student/studentViewModal',$data);
     }
     public function studentTORModal(Request $request){
         $id = $request->id;
-        $program_level_ids = StudentsProgram::where('user_id',$id)
+        $program_level_ids = StudentsCourses::where('user_id',$id)
                 ->select('program_level_id')
                 ->groupBy('program_level_id')
                 ->pluck('program_level_id')->toArray();
@@ -81,10 +89,8 @@ class ModalController extends Controller
         DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
         $id = $request->id;
         $level = $request->level;
-        $query = StudentsCourses::where('user_id',$id)
+        $query = StudentsProgram::where('user_id',$id)
             ->where('program_level_id',$level)
-            ->groupBy('school_name')
-            ->groupBy('program_shorten')
             ->orderBy('year_from','DESC')->get();
         $level = EducProgramLevel::find($level);
         $period = $level->period;

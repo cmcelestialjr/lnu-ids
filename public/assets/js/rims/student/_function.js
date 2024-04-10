@@ -133,10 +133,12 @@ function course_credit(curriculumCourseID, courseOtherID){
 function studentCreditRemove(thisBtn){
     var id = $('#studentViewModal input[name="id"]').val();
     var cid = thisBtn.data('id');
+    var crid = thisBtn.data('crid');
     var thisBtn = $('#studentCurriculumModal #studentCurriculumDiv .studentCreditRemove');
     var form_data = {
         id:id,
-        cid:cid
+        cid:cid,
+        crid:crid
     };
     $.ajax({
         url: base_url+'/rims/student/studentCreditRemove',

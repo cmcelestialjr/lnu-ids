@@ -36,18 +36,29 @@ class ImportStudent extends Command
      */
     public function handle()
     {
+        //Steps in importing Student from sys
+        //1. ImportStudent
+        //2. ImportStudentProgram
+        //3. ImportStudentCurriculum
+        //4. ImportStudentInfo
+
         $connectionName = 'sis_student';
         DB::connection($connectionName)->getPdo();
         
-        $users = Users::where('stud_id','!=',NULL)->pluck('stud_id')->toArray();
+        $users = Users::where('stud_id','!=', NULL)->pluck('stud_id');
         $students = DB::connection($connectionName)->table('info')
                         // ->whereNotIn('stud_id',$users)
                         ->where('surname','!=','')
                         ->where('first_name','!=','')
                         ->get();
-        if($students->count()>0){
+        $filteredStudents = $students->filter(function ($student) use ($users) {
+            return !$users->contains($student->stud_id);
+        });
+
+        $filteredStudents->all();
+        if($filteredStudents->count()>0){
             $token = new TokenServices;
-            foreach($students as $row){
+            foreach($filteredStudents as $row){
                 $check = Users::where('stud_id',$row->stud_id)->first();
                 if($check==NULL){
                     $token1 = $token->token(4);

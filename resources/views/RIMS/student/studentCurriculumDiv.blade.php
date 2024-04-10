@@ -69,9 +69,11 @@
                                                                     @if($courses['course_other']!=NULL)
                                                                     <br>
                                                                     <span class="text-primary">                                                                    
-                                                                        {{$courses['course_other']->course_code}}
+                                                                        {{$courses['course_other']->student_course->course_code}}
+                                                                        @if($system_selected=='RIMS')
                                                                         <span class="fa fa-times text-require studentCreditRemove" style="cursor:pointer"
-                                                                            data-id="{{$courses['id']}}"></span>
+                                                                            data-id="{{$courses['id']}}" data-crid="{{$courses['course_other']->student_course->id}}"></span>
+                                                                        @endif
                                                                     </span>
                                                                     @endif
                                                                 </td>
@@ -79,7 +81,7 @@
                                                                     @if($courses['course_other']!=NULL)
                                                                     <br>
                                                                     <span class="text-primary" style="font-size:9px">                                                                        
-                                                                        {{$courses['course_other']->course_desc}}
+                                                                        {{$courses['course_other']->student_course->course_desc}}
                                                                     </span>
                                                                     @endif
                                                                 </td>
@@ -88,7 +90,7 @@
                                                                     <br>
                                                                     <span class="text-primary" style="font-size:9px">
                                                                         
-                                                                        {{$courses['course_other']->course_units}}
+                                                                        {{$courses['course_other']->student_course->course_units}}
                                                                     </span>
                                                                     @endif
                                                                 </td>
@@ -98,7 +100,7 @@
                                                                     <br>
                                                                     <span class="text-primary" style="font-size:9px">
                                                                         
-                                                                        {{$courses['course_other']->lab_units}}
+                                                                        {{$courses['course_other']->student_course->lab_units}}
                                                                     </span>
                                                                     @endif
                                                                 </td>

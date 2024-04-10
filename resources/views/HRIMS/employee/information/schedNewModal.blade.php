@@ -5,7 +5,7 @@
     </div>
     <div class="modal-body">
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 <label>Option</label>
                 <select class="form-control select2-info" name="option">
                     @foreach($sched_option as $row)
@@ -13,9 +13,16 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 <label>Duration</label>
                 <input type="text" class="form-control dateRange duration" name="duration">
+            </div>
+            <div class="col-lg-4">
+                <label>Rotation Duty?</label>
+                <select class="form-control select2-info" name="is_rotation_duty">
+                    <option value="Yes">Yes</option>
+                    <option value="No" selected>No</option>
+                </select>
             </div>
             <div class="col-lg-6">
                 <label>Time From</label>

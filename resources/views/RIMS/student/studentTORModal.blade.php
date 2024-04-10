@@ -29,7 +29,7 @@
             <div class="col-lg-12">
                 <br>
                 <div class="card card-primary card-outline">
-                    <div class="card-body table-responsive" style="height: 600px;">
+                    <div class="card-body">
                         <div id="studentTORDiv">
 
                         </div>

@@ -7,7 +7,7 @@
         <a class="nav-link active" data-toggle="pill" href="#list" role="tab" aria-selected="true">List</a>
       </li>
       <li class="nav-item" id="advisementLink">
-        <a class="nav-link" data-toggle="pill" href="#advisement" role="tab" aria-selected="false">Advised</a>
+        <a class="nav-link" data-toggle="pill" href="#advisementTab" role="tab" aria-selected="false">Advised</a>
       </li>
     </ul>
   </div>                
@@ -125,7 +125,7 @@
               </div>
           </div>
         </div>            
-        <div class="tab-pane" id="advisement" role="tabpanel">
+        <div class="tab-pane" id="advisementTab" role="tabpanel">
           <div class="row">
             <div class="col-lg-4">
               <label>Level</label>
@@ -136,7 +136,7 @@
               </select>
             </div>
             <div class="col-lg-12">
-              <table id="advisedTable" class="table table-bordered table-fixed"
+              <table id="advisedTableTab" class="table table-bordered table-fixed"
                     data-toggle="table"
                     data-search="true"
                     data-height="600"

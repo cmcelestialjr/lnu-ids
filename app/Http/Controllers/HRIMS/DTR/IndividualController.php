@@ -43,12 +43,98 @@ class IndividualController extends Controller
         if($current_url=='dtr' && ($user_access_level==1 || $user_access_level==2)){
             $id_no = $id_no_req;
         }
+        $link = DTRlogs::select('id_no')
+            ->where('link',0)
+            ->groupBy('id_no')->get();
+        if($link->count()>0){
+            foreach($link as $row){
+                $this->updateDtrIndividual($row->id_no,$year,$month);
+            }
+        }
         $this->updateDtrIndividual($id_no_req,$year,$month);
         $check = UsersDTR::where('id_no',$id_no)
             ->whereYear('date',$year)
             ->whereMonth('date',$month)->first();
         if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req) && $check!=NULL){            
             $result = 'success';
+
+            // $insert = new DTRlogs();
+            // $insert->device_id = 0;
+            // $insert->id_no = $id_no;
+            // $insert->state = 1;
+            // $insert->dateTime = '2024-02-01 17:15:27';
+            // $insert->type = 1;
+            // $insert->link = 0;
+            // $insert->skyhrImport = 0;
+            // $insert->ipaddress = '10.5.201.137';
+            // $insert->save();
+
+            // $insert = new DTRlogs();
+            // $insert->device_id = 0;
+            // $insert->id_no = $id_no;
+            // $insert->state = 1;
+            // $insert->dateTime = '2024-01-15 07:59:56';
+            // $insert->type = 0;
+            // $insert->link = 0;
+            // $insert->skyhrImport = 1;
+            // $insert->ipaddress = '10.5.201.137';
+            // $insert->save();
+
+            // $insert = new DTRlogs();
+            // $insert->device_id = 0;
+            // $insert->id_no = $id_no;
+            // $insert->state = 1;
+            // $insert->dateTime = '2024-01-16 08:00:56';
+            // $insert->type = 0;
+            // $insert->link = 0;
+            // $insert->skyhrImport = 1;
+            // $insert->ipaddress = '10.5.201.137';
+            // $insert->save();
+
+            // $insert = new DTRlogs();
+            // $insert->device_id = 0;
+            // $insert->id_no = $id_no;
+            // $insert->state = 1;
+            // $insert->dateTime = '2024-01-18 07:50:39';
+            // $insert->type = 0;
+            // $insert->link = 0;
+            // $insert->skyhrImport = 1;
+            // $insert->ipaddress = '10.5.201.137';
+            // $insert->save();
+
+            // $insert = new DTRlogs();
+            // $insert->device_id = 0;
+            // $insert->id_no = $id_no;
+            // $insert->state = 1;
+            // $insert->dateTime = '2024-01-22 07:56:29';
+            // $insert->type = 0;
+            // $insert->link = 0;
+            // $insert->skyhrImport = 1;
+            // $insert->ipaddress = '10.5.201.137';
+            // $insert->save();
+
+            // $insert = new DTRlogs();
+            // $insert->device_id = 0;
+            // $insert->id_no = $id_no;
+            // $insert->state = 1;
+            // $insert->dateTime = '2024-01-23 08:00:24';
+            // $insert->type = 0;
+            // $insert->link = 0;
+            // $insert->skyhrImport = 1;
+            // $insert->ipaddress = '10.5.201.137';
+            // $insert->save();
+
+            // $insert = new DTRlogs();
+            // $insert->device_id = 0;
+            // $insert->id_no = $id_no;
+            // $insert->state = 1;
+            // $insert->dateTime = '2024-01-24 08:05:47';
+            // $insert->type = 0;
+            // $insert->link = 0;
+            // $insert->skyhrImport = 1;
+            // $insert->ipaddress = '10.5.201.137';
+            // $insert->save();
+
             $name_services = new NameServices;
             $user = Users::where('id_no',$id_no)->first();
             $name = mb_strtoupper($name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname));
@@ -95,17 +181,37 @@ class IndividualController extends Controller
 
                 $time = date('H:i',strtotime($dateTime));
                 $date = date('Y-m-d',strtotime($dateTime));
+                
                 $check = UsersDTR::where('id_no',$user_id)
                     ->where('date',$date)->first();
                 if($time<'12:00'){
-                    if($type==0 || $type==3){
-                        $column = 'time_in_am';
-                        $state_column = 'state_in_am';
-                        $ip_column = 'ipaddress_in_am';
+                    if($check){
+                        if($check->time_out_am!=''){
+                            $column = 'time_in_pm';
+                            $state_column = 'state_in_pm';
+                            $ip_column = 'ipaddress_in_pm';
+                        }else{
+                            if($type==0 || $type==3){
+                                $column = 'time_in_am';
+                                $state_column = 'state_in_am';
+                                $ip_column = 'ipaddress_in_am';
+                            }else{
+                                $column = 'time_out_am';
+                                $state_column = 'state_out_am';
+                                $ip_column = 'ipaddress_out_am';
+                            }
+                        }
                     }else{
-                        $column = 'time_out_am';
-                        $state_column = 'state_out_am';
-                        $ip_column = 'ipaddress_out_am';
+                        if($type==0 || $type==3){
+                            $column = 'time_in_am';
+                            $state_column = 'state_in_am';
+                            $ip_column = 'ipaddress_in_am';
+                        }else{
+                            $column = 'time_out_am';
+                            $state_column = 'state_out_am';
+                            $ip_column = 'ipaddress_out_am';
+                        }
+                        
                     }
                 }elseif($time>='12:00' && $time<='13:00'){
                     if($type==0 || $type==3){

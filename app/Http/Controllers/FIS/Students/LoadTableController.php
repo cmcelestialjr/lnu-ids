@@ -18,16 +18,19 @@ class LoadTableController extends Controller
         $query = StudentsInfo::with('info','program.program_level','grade_level')
             ->whereHas('courses', function ($query) use ($school_year,$level) {
                 $query->where('school_year_id',$school_year);
-                if($level==NULL){
-                    $query->where('program_level_id','>',0);
+                if($level!=''){
+                    foreach($level as $row){
+                        $levels[] = $row;
+                    }
+                    $query->whereIn('program_level_id',$levels);
                 }else{
-                    $query->whereIn('program_level_id',$level);
+                    $query->where('program_level_id','>',0);
                 }
             })->get()
             ->map(function($query) use ($name_services) {
                 $name = $name_services->lastname($query->info->lastname,$query->info->firstname,$query->info->middlename,$query->info->extname);
                 return [
-                    'id' => $query->id,
+                    'id' => $query->user_id,
                     'program_level' => $query->program->program_level->name,                            
                     'program' => $query->program->name.' ('.$query->program->shorten.')',
                     'name' => $name,

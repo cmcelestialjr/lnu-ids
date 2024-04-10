@@ -1,7 +1,7 @@
  <!-- Favicons -->
  <link rel="icon" href="{{ asset('assets/images/logo/lnu_logo.png') }}" type="image/gif" nonce="{{ csp_nonce() }}">
  <!-- Font Awesome -->
- <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/fontawesome-free/css/all.min.css') }}" nonce="{{ csp_nonce() }}">
+ <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/font-awesome-4.7.0/css/font-awesome.min.css') }}" nonce="{{ csp_nonce() }}">
  <!-- Tempusdominus Bootstrap 4 -->
  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}" nonce="{{ csp_nonce() }}">
  <!-- iCheck -->
@@ -31,6 +31,9 @@
  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/bootstrap-table/bootstrap-table.min.css') }}" nonce="{{ csp_nonce() }}">
  <!-- adminLTE style -->
  <link rel="stylesheet" href="{{ asset('_adminLTE/dist/css/adminlte.min.css') }}" nonce="{{ csp_nonce() }}">
+ <!-- loader -->
+ <link rel="stylesheet" href="{{ asset('assets/css/loader.css') }}" nonce="{{ csp_nonce() }}">
+ <link rel="stylesheet" href="{{ asset('assets/css/loader-skeleton.css') }}" nonce="{{ csp_nonce() }}">
  <!-- master style -->
  <link rel="stylesheet" href="{{ asset('assets/master/master.css') }}" nonce="{{ csp_nonce() }}">
  <!-- Progressive Web Apps (PWA) -->

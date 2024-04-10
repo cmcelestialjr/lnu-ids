@@ -3,6 +3,7 @@
 namespace App\Console\Commands\RIMS\SIS;
 
 use App\Models\EducCourses;
+use App\Models\EducCurriculum;
 use App\Models\EducPrograms;
 use App\Models\EducProgramsCode;
 use App\Models\StudentsProgram;
@@ -31,6 +32,12 @@ class ImportStudentProgram extends Command
      */
     public function handle()
     {
+        //Steps in importing Student from sys
+        //1. ImportStudent
+        //2. ImportStudentProgram
+        //3. ImportStudentCurriculum
+        //4. ImportStudentInfo
+        
         $connectionName = 'sis_student';
         DB::connection($connectionName)->getPdo();
 
@@ -83,12 +90,20 @@ class ImportStudentProgram extends Command
                         }
                         $get_latest_course_sy = $get_latest_course->sy;
                         $remarks = $get_latest_course->remarks;
-
+                        $curriculum_id = NULL;
+                        $getCurriculum = EducCurriculum::where('year_from','>=',($get_first_course->sy-1))
+                                ->where('program_id',$row->course)
+                                ->orderBy('year_from','ASC')
+                                ->first();
+                        if($getCurriculum){
+                            $curriculum_id = $getCurriculum->id;
+                        }
                         $insert = new StudentsProgram(); 
                         $insert->user_id = $student->id;
                         $insert->program_id = $row->course;
                         $insert->program_level_id = $program->program_level_id;
                         $insert->program_code_id = $program_code->id;
+                        $insert->curriculum_id = $curriculum_id;
                         $insert->program_name = $program->name;
                         $insert->program_shorten = $program->shorten;
                         $insert->year_from = $get_first_course->sy-1;

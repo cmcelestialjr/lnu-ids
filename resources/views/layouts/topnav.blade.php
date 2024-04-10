@@ -23,7 +23,7 @@
                 <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
                     @foreach($row->navs as $nav)
                         @if(in_array($nav->id,$systems_nav_array))
-                            @php                        
+                            @php
                             if(count($nav->navSubs)>=1){
                                 $system_nav_href = '#';
                             }else{                            
@@ -85,7 +85,7 @@
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item">
             <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-            <i class="fas fa-search"></i>
+            <i class="fa fa-search"></i>
             </a>
             <div class="navbar-search-block">
             <form class="form-inline">
@@ -93,10 +93,10 @@
                 <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
                 <div class="input-group-append">
                     <button class="btn btn-navbar" type="submit">
-                    <i class="fas fa-search"></i>
+                    <i class="fa fa-search"></i>
                     </button>
                     <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                    <i class="fas fa-times"></i>
+                    <i class="fa fa-times"></i>
                     </button>
                 </div>
                 </div>
@@ -106,7 +106,7 @@
 
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
-            <i class="far fa-user"></i>
+            <i class="fa fa-user"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right text-center">
             <a href="#" class="dropdown-item">
@@ -126,11 +126,43 @@
 
         <li class="nav-item">
             <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-            <i class="fas fa-expand-arrows-alt"></i>
+            <i class="fa fa-arrows-alt"></i>
             </a>
         </li>
       </ul>
   </nav>
   <!-- /.navbar -->
 
-  
+{{-- 
+<style>
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f4f6f9;
+    padding: 0px 20px;
+    margin: 0 1em;
+}
+.round-bottom-button {
+    border-top:none;
+    border-bottom: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    background-color: #007bff; /* Button background color */
+    color: #fff; /* Button text color */
+    padding: 5px 10px; /* Button padding */
+    border-radius: 0 0 10px 10px; /* Round only the bottom corners */
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Smooth transition effect */
+}
+
+.round-bottom-button:hover {
+    background-color: #fff; /* Lighter background color on hover */
+    color: #007bff;  /* Button text color on hover */
+    border-color: #007bff; /* Border color on hover */
+}
+</style>
+<div class="top-bar">
+    <button class="round-bottom-button">Click me</button>
+</div> --}}
+        

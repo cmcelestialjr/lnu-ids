@@ -9,6 +9,7 @@ use App\Models\EducPrograms;
 use App\Models\EducProgramsCode;
 use App\Models\EducYearLevel;
 use App\Models\StudentsCourses;
+use App\Models\StudentsCoursesCredit;
 use App\Models\StudentsCourseStatus;
 use App\Models\StudentsInfo;
 use App\Models\StudentsProgram;
@@ -178,16 +179,12 @@ class UpdateController extends Controller
             $statuses = $request->statuses;
             $ratings = $request->ratings;
 
-            if($in_list=='No'){
-                $get = StudentsCourses::find($student_program);
-                $from_school = $get->school_name;
-                $program_name = $get->program_name;
-                $program_shorten = $get->program_shorten;
+            $get_student_program = StudentsProgram::find($student_program);
+            if($in_list=='No'){                
+                $from_school = $get_student_program->from_school;
+                $program_name = $get_student_program->program_name;
+                $program_shorten = $get_student_program->program_shorten;
             }
-
-            $get_student_program = StudentsProgram::where('user_id',$id)
-                ->orderBy('year_from','DESC')
-                ->first();
 
             $x = 0;
             foreach($course_codes as $course_code){
@@ -232,19 +229,31 @@ class UpdateController extends Controller
             $id = $request->id;
             $curriculumCourseID = $request->curriculumCourseID;
             $courseOtherID = $request->courseOtherID;
-
-            StudentsCourses::where('user_id', $id)
-                ->where('credit_course_id', $curriculumCourseID)
-                                    ->update([
-                                    'credit_course_id' => NULL,
-                                    'credited_by_id' => NULL,
-                                    'credited_at' => NULL]);
             
-            StudentsCourses::where('id', $courseOtherID)
-                                    ->update([
-                                    'credit_course_id' => $curriculumCourseID,
-                                    'credited_by_id' => $updated_by,
-                                    'credited_at' => date('Y-m-d H:i:s')]);
+            $check = StudentsCoursesCredit::where('students_course_id',$courseOtherID)
+                ->where('course_id',$curriculumCourseID)
+                ->first();
+            if($check==NULL){
+                $insert = new StudentsCoursesCredit();
+                $insert->user_id = $id;
+                $insert->students_course_id = $courseOtherID;
+                $insert->course_id = $curriculumCourseID;
+                $insert->credited_by_id = $updated_by;
+                $insert->save();
+            }
+
+            // StudentsCourses::where('user_id', $id)
+            //     ->where('credit_course_id', $curriculumCourseID)
+            //                         ->update([
+            //                         'credit_course_id' => NULL,
+            //                         'credited_by_id' => NULL,
+            //                         'credited_at' => NULL]);
+            
+            // StudentsCourses::where('id', $courseOtherID)
+            //                         ->update([
+            //                         'credit_course_id' => $curriculumCourseID,
+            //                         'credited_by_id' => $updated_by,
+            //                         'credited_at' => date('Y-m-d H:i:s')]);
 
             $level = $request->level;
             $program = $request->program;
@@ -283,13 +292,23 @@ class UpdateController extends Controller
 
             $id = $request->id;
             $cid = $request->cid;
+            $crid = $request->crid;
 
-            StudentsCourses::where('user_id', $id)
-                ->where('credit_course_id', $cid)
-                                    ->update([
-                                    'credit_course_id' => NULL,
-                                    'credited_by_id' => NULL,
-                                    'credited_at' => NULL]);
+            $check = StudentsCoursesCredit::where('students_course_id',$crid)
+                ->where('course_id',$cid)
+                ->first();
+            if($check){
+                $delete = StudentsCoursesCredit::where('students_course_id',$crid)
+                    ->where('course_id',$cid)
+                    ->delete();
+                $auto_increment = DB::update("ALTER TABLE `students_courses_credit` AUTO_INCREMENT = 1;");
+            }
+            // StudentsCourses::where('user_id', $id)
+            //     ->where('credit_course_id', $cid)
+            //                         ->update([
+            //                         'credit_course_id' => NULL,
+            //                         'credited_by_id' => NULL,
+            //                         'credited_at' => NULL]);
                                     
             $result = 'success';
         }

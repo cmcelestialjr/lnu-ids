@@ -216,7 +216,36 @@ function loadModal(form_data,thisBtn){
 }
 function loadingTemplate(message) {
     var img = base_url+"/assets/images/loader/loader_gif_no_bg.gif";
-    return '<span class="loading-wrap"><img src="'+img+'" alt="Loader" class="loaderTable"></span>';
+    return '<div class="main-item">'+
+              '<div class="animated-background">'+
+                  '<div class="background-masker btn-divide-left"></div>'+
+              '</div>'+
+              '<div class="static-background">'+
+                '<div class="background-masker btn-divide-left"></div>'+
+              '</div>'+
+              '<div class="animated-background">'+
+                '<div class="background-masker btn-divide-left"></div>'+
+              '</div>'+
+              '<div class="static-background">'+
+                  '<div class="background-masker btn-divide-left"></div>'+
+              '</div>'+
+              '<div class="animated-background">'+
+                  '<div class="background-masker btn-divide-left"></div>'+
+              '</div>'+
+              '<div class="static-background">'+
+                  '<div class="background-masker btn-divide-left"></div>'+
+              '</div>'+
+              '<div class="animated-background">'+
+                  '<div class="background-masker btn-divide-left"></div>'+
+              '</div>'+
+              '<div class="static-background">'+
+                  '<div class="background-masker btn-divide-left"></div>'+
+              '</div>'+
+              '<div class="animated-background">'+
+                  '<div class="background-masker btn-divide-left"></div>'+
+              '</div>'+
+            '</div>';
+    //return '<span class="loading-wrap"><img src="'+img+'" alt="Loader" class="loaderTable"></span>';
 }
 function loadTable(form_data){
   $('#'+form_data.tid).bootstrapTable('destroy')

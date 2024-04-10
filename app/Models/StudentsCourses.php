@@ -60,6 +60,10 @@ class StudentsCourses extends Model
     {
         return $this->belongsTo(Users::class, 'credited_by_id', 'id')->withDefault();
     }
+    public function courses_credit()
+    {
+        return $this->hasMany(StudentsCoursesCredit::class, 'student_course_id', 'id');
+    }
     public function user()
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id')->withDefault();

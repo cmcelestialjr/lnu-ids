@@ -32,6 +32,14 @@ class HRPosition extends Model
     {
         return $this->belongsTo(Status::class, 'status_id', 'id');
     }
+    public function office()
+    {
+        return $this->belongsTo(Office::class, 'office_id', 'id');
+    }
+    public function office_designate()
+    {
+        return $this->belongsTo(HRDesignation::class, 'office_id', 'office_id');
+    }
     public function updated_by()
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id');

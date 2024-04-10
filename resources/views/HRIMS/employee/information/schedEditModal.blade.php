@@ -6,7 +6,7 @@
     <div class="modal-body">
         <input type="hidden" name="time_id" value="{{$query->id}}">
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 <label>Option</label>
                 <select class="form-control select2-info" name="option">
                     @foreach($sched_option as $row)
@@ -18,9 +18,21 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 <label>Duration</label>
                 <input type="text" class="form-control dateRange" name="duration" value="{{date('m/d/Y',strtotime($query->date_from))}} - {{date('m/d/Y',strtotime($query->date_to))}}">
+            </div>
+            <div class="col-lg-4">
+                <label>Rotation Duty?</label> {{$query->is_rotation_duty}}
+                <select class="form-control select2-info" name="is_rotation_duty">
+                    @if($query->is_rotation_duty=='Yes')
+                        <option value="Yes" selected>Yes</option>
+                        <option value="No">No</option>
+                    @else
+                        <option value="Yes">Yes</option>
+                        <option value="No" selected>No</option>
+                    @endif
+                </select>
             </div>
             <div class="col-lg-6">
                 <label>Time From</label>

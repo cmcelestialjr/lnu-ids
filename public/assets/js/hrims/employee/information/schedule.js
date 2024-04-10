@@ -81,6 +81,7 @@ function schedNewModal(thisBtn){
 function schedNewDaysList(thisBtn){
     var id = $('#employeeInformationModal input[name="id_no"]').val();
     var duration = $('#schedNewModal input[name="duration"]').val();
+    var is_rotation_duty = $('#schedNewModal select[name="is_rotation_duty"] option:selected').val();
     var time_from = $('#schedNewModal input[name="time_from"]').val();
     var time_to = $('#schedNewModal input[name="time_to"]').val();
     var x = 0;
@@ -96,11 +97,13 @@ function schedNewDaysList(thisBtn){
         toastr.error('Please input correct time format!');
         x++;
     }
-    if(time_from>time_to){
-        $('#schedNewModal input[name="time_from"]').addClass('border-require');
-        $('#schedNewModal input[name="time_to"]').addClass('border-require');
-        toastr.error('Time from must less than time to');
-        x++;
+    if(is_rotation_duty=='No'){
+        if(time_from>time_to){
+            $('#schedNewModal input[name="time_from"]').addClass('border-require');
+            $('#schedNewModal input[name="time_to"]').addClass('border-require');
+            toastr.error('Time from must less than time to');
+            x++;
+        }
     }
     if(x==0){
         $('#schedNewModal input[name="duration"]').removeClass('dateRange');
@@ -119,7 +122,9 @@ function schedNewSubmit(thisBtn){
     var id = $('#employeeInformationModal input[name="id_no"]').val();
     var option = $('#schedNewModal select[name="option"] option:selected').val();
     var duration = $('#schedNewModal input[name="duration"]').val();
+    var is_rotation_duty = $('#schedNewModal select[name="is_rotation_duty"] option:selected').val();
     var time_from = $('#schedNewModal input[name="time_from"]').val();
+    var time_to = $('#schedNewModal input[name="time_to"]').val();
     var time_to = $('#schedNewModal input[name="time_to"]').val();
     var remarks = $('#schedNewModal textarea[name="remarks"]').val();
     var days = [];
@@ -154,6 +159,7 @@ function schedNewSubmit(thisBtn){
             id:id,
             option:option,
             duration:duration,
+            is_rotation_duty:is_rotation_duty,
             time_from:time_from,
             time_to:time_to,
             days:days,
@@ -222,6 +228,7 @@ function schedEditModal(thisBtn){
 function schedEditDaysList(thisBtn){
     var id = $('#schedEditModal input[name="time_id"]').val();
     var duration = $('#schedEditModal input[name="duration"]').val();
+    var is_rotation_duty = $('#schedEditModal select[name="is_rotation_duty"] option:selected').val();
     var time_from = $('#schedEditModal input[name="time_from"]').val();
     var time_to = $('#schedEditModal input[name="time_to"]').val();
     var x = 0;
@@ -237,11 +244,13 @@ function schedEditDaysList(thisBtn){
         toastr.error('Please input correct time format!');
         x++;
     }
-    if(time_from>time_to){
-        $('#schedEditModal input[name="time_from"]').addClass('border-require');
-        $('#schedEditModal input[name="time_to"]').addClass('border-require');
-        toastr.error('Time from must less than time to');
-        x++;
+    if(is_rotation_duty=='No'){
+        if(time_from>time_to){
+            $('#schedEditModal input[name="time_from"]').addClass('border-require');
+            $('#schedEditModal input[name="time_to"]').addClass('border-require');
+            toastr.error('Time from must less than time to');
+            x++;
+        }
     }
     if(x==0){
         $('#schedEditModal input[name="duration"]').removeClass('dateRange');
@@ -260,6 +269,7 @@ function schedEditSubmit(thisBtn){
     var id = $('#schedEditModal input[name="time_id"]').val();
     var option = $('#schedEditModal select[name="option"] option:selected').val();
     var duration = $('#schedEditModal input[name="duration"]').val();
+    var is_rotation_duty = $('#schedEditModal select[name="is_rotation_duty"] option:selected').val();
     var time_from = $('#schedEditModal input[name="time_from"]').val();
     var time_to = $('#schedEditModal input[name="time_to"]').val();
     var remarks = $('#schedEditModal textarea[name="remarks"]').val();
@@ -295,6 +305,7 @@ function schedEditSubmit(thisBtn){
             id:id,
             option:option,
             duration:duration,
+            is_rotation_duty:is_rotation_duty,
             time_from:time_from,
             time_to:time_to,
             days:days,

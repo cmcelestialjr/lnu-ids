@@ -12,6 +12,7 @@ use App\Models\EducOfferedSchoolYear;
 use App\Models\EducYearLevel;
 use App\Models\StudentsCourses;
 use App\Models\StudentsCoursesAdvise;
+use App\Models\StudentsCoursesPreenroll;
 use App\Models\StudentsCourseStatus;
 use App\Models\StudentsInfo;
 use App\Services\NameServices;
@@ -161,26 +162,6 @@ class LoadViewController extends Controller
                             ->get()
                             ->map(function($query) use ($student_id,$school_year,$offered_curriculum_id,$section,$student_program,$name_services) {
                                 $course_id = $query->id;
-                                $status = '<button class="btn btn-default btn-xs">Required</button>';
-                                $passed_statuses = StudentsCourseStatus::where('option',1)->pluck('id')->toArray();
-                                $check = StudentsCourses::where('user_id',$student_id)
-                                    ->where(function ($query) use ($course_id){
-                                        $query->where('course_id',$course_id)
-                                        ->orWhere('credit_course_id',$course_id);
-                                    })
-                                    ->orderBy('year_from','DESC')
-                                    ->first();
-                                if($check!=NULL){
-                                    if($check->student_course_status_id==NULL){
-                                        $status = '<button class="btn btn-info btn-info-scan btn-xs">NG</button>';
-                                    }else{
-                                        if($check->status->option==1){
-                                            $status = '<button class="btn btn-success btn-success-scan btn-xs">'.$check->status->name.'</button>';
-                                        }else{
-                                            $status = '<button class="btn btn-danger btn-danger-scan btn-xs">'.$check->status->name.'</button>';
-                                        }
-                                    }
-                                }
                                 $availability = 0;
                                 $availability_name = 'Available';
                                 $instructor = 'TBA';
@@ -188,11 +169,54 @@ class LoadViewController extends Controller
                                 $room_implode = 'TBA';
                                 $course_conflict = '';
                                 $offered_course_id = NULL;
+                                $status = '<button class="btn btn-default btn-xs">Required</button>';
+                                $passed_statuses = StudentsCourseStatus::where('option',1)->pluck('id')->toArray();
+                                $check = StudentsCourses::with('status','courses_credit')
+                                    ->where('user_id',$student_id)
+                                    ->where(function ($query) use ($course_id){
+                                        $query->where('course_id',$course_id)
+                                        ->orWhereHas('courses_credit', function ($query) use ($course_id) {
+                                            $query->where('course_id',$course_id);
+                                        });
+                                    })
+                                    ->orderBy('year_from','DESC')
+                                    ->first();
+                                    
+                                if($check!=NULL){
+                                    if($check->student_course_status_id==NULL){
+                                        $status = '<button class="btn btn-info btn-info-scan btn-xs">NG</button>';
+                                    }else{ 
+                                        if($check->status->option==1){
+                                            if($check->course_id){
+                                                if($check->course_id==$course_id){
+                                                    $availability = 2;
+                                                    $availability_name = 'Done';
+                                                }
+                                            }else{
+                                                if(count($check->courses_credit)>0){
+                                                    foreach($check->courses_credit as $credit){
+                                                        if($credit->course_id==$course_id){
+                                                            $availability = 4;
+                                                            $availability_name = 'Credited';
+                                                        }
+                                                    }
+                                                    
+                                                }
+                                            }
+                                            $status = '<button class="btn btn-success btn-success-scan btn-xs">'.$check->status->name.'</button>';
+                                        }else{
+                                            $status = '<button class="btn btn-danger btn-danger-scan btn-xs">'.$check->status->name.'</button>';
+                                        }
+                                    }
+                                }
+                                
                                 $pre_req_ids = EducCoursesPre::where('course_id',$course_id)
                                     ->pluck('pre_id')->toArray();                                                                                               
                                 $pre_req = StudentsCourses::where(function ($query) use ($pre_req_ids){
                                         $query->whereIn('course_id',$pre_req_ids)
-                                        ->orWhereIn('credit_course_id',$pre_req_ids);
+                                        ->orWhereHas('courses_credit', function ($query) use ($pre_req_ids) {
+                                            $query->where('course_id',$pre_req_ids);
+                                        });
                                     })
                                     ->whereIn('student_course_status_id',$passed_statuses)
                                     ->where('user_id',$student_id)
@@ -201,14 +225,16 @@ class LoadViewController extends Controller
                                 //     ->whereIn('student_course_status_id',$passed_statuses)
                                 //     ->where('user_id',$student_id)
                                 //     ->get()->count();
-                                $taken = StudentsCourses::where(function ($query) use ($course_id){
-                                        $query->where('course_id',$course_id)
-                                        ->orWhere('credit_course_id',$course_id);
-                                    })
-                                    ->where('user_id',$student_id)
-                                    ->whereIn('student_course_status_id',$passed_statuses)
-                                    ->orderBy('year_from','DESC')
-                                    ->first();
+                                // $taken = StudentsCourses::where(function ($query) use ($course_id){
+                                //         $query->where('course_id',$course_id);
+                                //         // ->orWhereHas('courses_credit', function ($query) use ($course_id) {
+                                //         //     $query->where('course_id',$course_id);
+                                //         // });
+                                //     })
+                                //     ->where('user_id',$student_id)
+                                //     ->whereIn('student_course_status_id',$passed_statuses)
+                                //     ->orderBy('year_from','DESC')
+                                //     ->first();
                                 $ongoing = StudentsCourses::where('course_id',$course_id)
                                     ->where('user_id',$student_id)
                                     ->where('student_course_status_id',NULL)
@@ -248,10 +274,10 @@ class LoadViewController extends Controller
                                         $availability = 1;
                                         $availability_name = 'Full';
                                     }
-                                    if($taken!=NULL){
-                                        $availability = 2;
-                                        $availability_name = 'Done';
-                                    }
+                                    // if($taken!=NULL){
+                                    //     $availability = 2;
+                                    //     $availability_name = 'Done';
+                                    // }
                                     if($ongoing!=NULL){
                                         $availability = 2;
                                         $availability_name = 'NG';
@@ -280,6 +306,16 @@ class LoadViewController extends Controller
                                     $availability = 3;
                                     $availability_name = 'Unvailable';
                                 }
+
+                                $pre_enroll = StudentsCoursesPreenroll::where('user_id',$student_id)
+                                    ->where('school_year_id',$school_year)
+                                    ->where('course_id',$course_id)
+                                    ->first();                                
+                                if($pre_enroll!=NULL){
+                                    $availability = 5;
+                                    $availability_name = 'Pre-enrolled';
+                                }
+
                                 $advise = StudentsCoursesAdvise::where('user_id',$student_id)
                                     ->where('school_year_id',$school_year)
                                     ->whereHas('course', function ($query) use ($course_id) {
@@ -332,6 +368,9 @@ class LoadViewController extends Controller
             })->toArray();
         $program_code = EducOfferedPrograms::where('school_year_id',$school_year)
             ->where('program_id',$program_id)->get();
+        $checkStudentPreenroll = StudentsCoursesPreenroll::select('id')
+                ->where('user_id',$student_id)
+                ->where('school_year_id',$school_year)->first();
         $course_add = StudentsCoursesAdvise::where('offered_curriculum_id','<>',$offered_curriculum_id)
             ->where('school_year_id',$school_year)
             ->where('user_id',$student_id)
@@ -383,7 +422,8 @@ class LoadViewController extends Controller
             'course_add' => $course_add,
             'type' => 'course',
             'query_school_year' => $query_school_year,
-            'instructor_id' => $instructor_id
+            'instructor_id' => $instructor_id,
+            'checkStudentPreenroll' => $checkStudentPreenroll
         );
         return view('fis/advisement/studentAdvisement',$data);
     }

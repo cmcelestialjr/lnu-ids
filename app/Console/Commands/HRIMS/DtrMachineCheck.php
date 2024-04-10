@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands\HRIMS;
 
+use App\Models\Devices;
 use App\Models\DTRlogs;
 use App\Models\DTRlogsCopy;
 use App\Models\UsersDTR;
 use App\Models\UsersDTRCopy;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Rats\Zkteco\Lib\ZKTeco;
 
 class DtrMachineCheck extends Command
@@ -32,136 +34,88 @@ class DtrMachineCheck extends Command
     {
         $start_time = time();
 
-        while (time() < $start_time + 60) { 
+        //while (time() < $start_time + 60) { 
 
             // $ipaddress = '10.5.200.16';
             // $zk = new ZKTeco($ipaddress,4370);
-            $this->data(new ZKTeco('10.5.200.16',4370),'10.5.200.16');
-            $this->data(new ZKTeco('10.5.200.17',4370),'10.5.200.17');
-            sleep(1);
-        }
+            $query = Devices::where('device_status','Active')
+                ->where('status','On')
+                ->orderBy('id','DESC')
+                ->get();
+            if($query->count()>0){
+                foreach($query as $row){
+                    $ipaddress = $row->ipaddress;
+                    $port = $row->port;
+                    $this->data(new ZKTeco($ipaddress,$port),$ipaddress);
+                }
+            }
+            //sleep(1);
+        //}
     }
     private function data($zk,$ipaddress){
         if ($zk->connect()){
-                
-            //$zk->clearAdmin();
-            //$zk->setUser(5,5,'cesar','',1);
-            //$user_details123 = $zk->specificUser(5);                
-        $attendace = $zk->getAttendance();
-        foreach($attendace as $row){
-            $user_id = $row['id'];
-            $state = $row['state']; //1 finger, 15 face
-            $timestamp = $row['timestamp'];
-            $type = $row['type']; //0 in, 1 out
 
-            $insert = new DTRlogsCopy();
-            $insert->id_no = $user_id;
-            $insert->state = $state;
-            $insert->dateTime = $timestamp;
-            $insert->type = $type;
-            $insert->ipaddress = $ipaddress;
-            $insert->save();
+            $attendace = $zk->getAttendance();
+            $recordsToInsert = [];
+            $recordsCheck = 0;
+            foreach($attendace as $row){
+                $id_no = $row['id'];
+                $state = $row['state']; //1 finger, 15 face
+                $dateTime = date('Y-m-d H:i:s', strtotime($row['timestamp']));
+                $type = $row['type']; //0 in, 1 out
 
-            $time = date('H:i',strtotime($timestamp));
-            $date = date('Y-m-d',strtotime($timestamp));
-
-            $check = UsersDTRCopy::where('id_no',$user_id)
-                ->where('date',$date)->first();
-            if($time<'12:00'){
-                if($type==0 || $type==3){
-                    $column = 'time_in_am';
-                    $state_column = 'state_in_am';
-                    $ip_column = 'ipaddress_in_am';
-                }else{
-                    $column = 'time_out_am';
-                    $state_column = 'state_out_am';
-                    $ip_column = 'ipaddress_out_am';
-                }
-            }elseif($time>='12:00' && $time<='13:00'){
-                if($type==0 || $type==3){
-                    $column = 'time_in_pm';
-                    $state_column = 'state_in_pm';
-                    $ip_column = 'ipaddress_in_pm';
-                }else{
-                    $column = 'time_out_am';
-                    $state_column = 'state_out_am';
-                    $ip_column = 'ipaddress_out_am';
-                }
-            }else{
-                if($type==0 || $type==3){
-                    $column = 'time_in_pm';
-                    $state_column = 'state_in_pm';
-                    $ip_column = 'ipaddress_in_pm';
-                }else{
-                    $column = 'time_out_pm';
-                    $state_column = 'state_out_pm';
-                    $ip_column = 'ipaddress_out_pm';
+                $record = DTRlogs::where('id_no', $id_no)
+                    ->where(DB::raw("DATE_FORMAT(dateTime, '%Y-%m-%d %H:%i')"), date('Y-m-d H:i', strtotime($dateTime)))
+                    ->value('id');
+                if ($record === null) {
+                    // $recordsToInsert[] = [
+                    //     'device_id' => 0,
+                    //     'id_no' => $id_no,
+                    //     'state' => $state,
+                    //     'dateTime' => $dateTime,
+                    //     'type' => $type,
+                    //     'link' => 0,
+                    //     'skyhrImport' => 0,
+                    //     'ipaddress' => $ipaddress,
+                    //     'updated_at' => date('Y-m-d H:i:s'),
+                    //     'created_at' => date('Y-m-d H:i:s')
+                    // ];
+                    
+                    DB::beginTransaction();
+                    try {
+                        $insert = new DTRlogs();
+                        $insert->device_id = 0;
+                        $insert->id_no = $id_no;
+                        $insert->state = $state;
+                        $insert->dateTime = $dateTime;
+                        $insert->type = $type;
+                        $insert->link = 0;
+                        $insert->skyhrImport = 0;
+                        $insert->ipaddress = $ipaddress;
+                        $insert->save();
+                        $recordsCheck++;
+                        DB::commit();
+                    } catch (\Exception $e) {
+                        DB::rollBack();
+                        $this->error("Error: " . $e->getMessage());
+                    }
                 }
             }
-            if($check==NULL){
-                $insert = new UsersDTRCopy();
-                $insert->id_no = $user_id;
-                $insert->date = $date;
-                $insert->$column = $timestamp;
-                $insert->$state_column = $state;
-                $insert->$ip_column = $ipaddress;
-                $insert->ipaddress = $ipaddress;
-                $insert->dateTime = $timestamp;
-                $insert->save();
-            }else{
-                if($time>='12:00' && $check->time_in_pm>$timestamp && $check->time_out_am==NULL && $check->time_in_pm!=NULL && $type==1){
-                    $column = 'time_out_pm';
-                    $state_column = 'state_out_pm';
-                }elseif($time<'12:00' && $check->time_in_am>=$timestamp && $check->time_out_am==NULL && $check->time_in_am!=NULL && $type==1){
-                    $column = 'time_in_am';
-                    $state_column = 'state_in_am';
-                }
-                if($time!=date('H:i',strtotime($check->$column)) && $check->$column==NULL){
-                    UsersDTRCopy::where('id_no',$user_id)
-                            ->where('date',$date)
-                            ->update([$column => $timestamp,
-                                    $state_column => $state,
-                                    $ip_column => $ipaddress,
-                                    'ipaddress' => $ipaddress,
-                                    'dateTime' => $timestamp,
-                                    'updated_at' => date('Y-m-d H:i:s')]);
-                }
-                UsersDTRCopy::where('id_no',$user_id)
-                            ->where('date',$date)
-                            ->update(['ipaddress' => $ipaddress,
-                                    'dateTime' => $timestamp,
-                                    'time_type' => NULL,
-                                    'updated_at' => date('Y-m-d H:i:s')]);
-            }
-            $check = UsersDTRCopy::where('id_no',$user_id)
-                    ->where('date',$date)->first();
-            if($check!=NULL){
-                if($check->time_out_am<=$check->time_in_am && $check->time_in_am!=NULL && $check->time_out_am!=NULL){
-                    UsersDTRCopy::where('id_no',$user_id)
-                            ->where('date',$date)
-                            ->update(['time_out_am' => NULL,
-                                    'state_out_am' => NULL,
-                                    'ipaddress_out_am' => NULL]);
-                }
-                if($check->time_in_pm<=$check->time_out_am && $check->time_in_pm!=NULL && $check->time_out_am!=NULL){
-                    UsersDTRCopy::where('id_no',$user_id)
-                            ->where('date',$date)
-                            ->update(['time_in_pm' => NULL,
-                                    'state_in_pm' => NULL,
-                                    'ipaddress_in_pm' => NULL]);
-                }
-                if($check->time_out_pm<=$check->time_in_pm && $check->time_out_pm!=NULL && $check->time_in_pm!=NULL){
-                    UsersDTRCopy::where('id_no',$user_id)
-                            ->where('date',$date)
-                            ->update(['time_out_pm' => NULL,
-                                    'state_out_pm' => NULL,
-                                    'ipaddress_out_pm' => NULL]);
-                }
-            }
+            // if($recordsCheck>0){
+            //     $zk->clearAttendance();
+            // }
+            //$this->info('Command executed successfully!');
+            // if (!empty($recordsToInsert)) {
+            //     DB::beginTransaction();
+            //     try {
+            //         DTRlogs::insert($recordsToInsert);
+            //         $zk->clearAttendance();
+            //         DB::commit();
+            //     } catch (\Exception $e) {
+            //         DB::rollBack();
+            //         $this->error("Error during bulk insert: " . $e->getMessage());
+            //     }
+            // }
         }
-        $zk->clearAttendance();
-            //$attendace = $zk->getAttendanceSpecific();
-            //$zk->setUser(7,7,'abc','abc',0,0);
-    }
     }
 }

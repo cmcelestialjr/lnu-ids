@@ -27,6 +27,12 @@ class ImportStudentInfo extends Command
      */
     public function handle()
     {
+        //Steps in importing Student from sys
+        //1. ImportStudent
+        //2. ImportStudentProgram
+        //3. ImportStudentCurriculum
+        //4. ImportStudentInfo
+        
         $student_program = Users::where('stud_id','!=',NULL)
             ->get();
         if($student_program->count()>0){
@@ -44,10 +50,7 @@ class ImportStudentInfo extends Command
                         $insert->student_status_id = $row->student_program_latest->student_status_id;
                         $insert->updated_by = 1;
                         $insert->save();
-                    }else{
-                        
-                    }   
-                    
+                    }
                 }
             }   
         }

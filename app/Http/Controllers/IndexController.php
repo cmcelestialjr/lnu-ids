@@ -109,8 +109,9 @@ class IndexController extends Controller
                     }])
                     ->whereHas('user_system', function ($query) use ($user_id) {
                         $query->where('user_id',$user_id);
-                    })->orderBy('order','ASC')->get();
-
+                    })
+                    ->orderBy('order','ASC')->get();
+           // dd($systems);
             $systems_nav_array = SystemsNav::whereHas('user_nav', function ($query) use ($user_id) {
                     $query->where('user_id',$user_id);
                 })

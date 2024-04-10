@@ -54,7 +54,7 @@
         <div class="card-body table-responsive">
             <div class="row">
                 @php
-                if($row['year_level']==$student->grade_level->name){
+                if($row['year_level']==$student->grade_level->name && $checkStudentPreenroll==NULL){
                     $checked_input = 'checked';
                 }else{
                     $checked_input = '';
@@ -90,9 +90,10 @@
                                             <th>Status</th>
                                             @if($option=='w')                                            
                                             <th>Availability</th>
-                                            <th>
+                                            <th><center>
                                                 <input type="checkbox" class="form-control year_check" value="{{$row['year_level1']}}" {{$checked_input}}
                                                     style="width: 30px;height:30px">
+                                                </center>
                                             </th>
                                             <th>Choose<br>another</th>
                                             <th>Instructor</th>
@@ -145,6 +146,12 @@
                                                                     {{$list['availability_name']}}</button></td>
                                                             <td></td>
                                                             <td></td>
+                                                        @elseif($list['availability']==4)
+                                                            <td class="center"><button class="btn btn-primary btn-primary-scan btn-xs">
+                                                                    {{$list['availability_name']}}</button>
+                                                            </td>
+                                                            <td></td>
+                                                            <td></td>                                                        
                                                         @else
                                                             @if($list['advised']==1)
                                                                 <td class="center">
@@ -156,7 +163,6 @@
                                                                     <input type="checkbox" class="form-control"
                                                                             value="{{$row['year_level1']}}" checked disabled>
                                                                         @if($list['advised_status']==1)
-                                                                            (Enrolled)
                                                                         @endif
                                                                     @else
                                                                     <input type="checkbox" class="form-control courseCheck course_check{{$row['year_level1']}}" 
@@ -180,13 +186,21 @@
                                                                 </td>
                                                                 <td>
                                                                     @if(($type!='add' && ($year_level=='' || $year_level==$row['year_level1'])) || $list['course_conflict']=='')
+                                                                        @php
+                                                                            if($list['availability']==5){
+                                                                                $checked_input1 = 'checked';
+                                                                            }else{
+                                                                                $checked_input1 = $checked_input;
+                                                                            }
+                                                                        @endphp    
+                                                                        
                                                                         <input type="checkbox" class="form-control courseCheck course_check{{$row['year_level1']}}" 
                                                                             id="course_checked{{$list['offered_course_id']}}"
                                                                             value="{{$row['year_level1']}}"
                                                                             data-id="{{$list['offered_course_id']}}"
                                                                             data-u="{{$list['units']}}"
                                                                             data-cid=""
-                                                                            {{$checked_input}}>
+                                                                            {{$checked_input1}}>
                                                                     @else
                                                                         <input type="checkbox" class="form-control courseCheck hide course_check{{$row['year_level1']}}" 
                                                                             id="course_checked{{$list['offered_course_id']}}"

@@ -12,7 +12,7 @@
                       <li class="nav-item">
                         <a class="nav-link active" data-toggle="pill" href="#position" role="tab" aria-selected="true">Position</a>
                       </li>
-                      <li class="nav-item">
+                      <li class="nav-item" id="designationLink">
                         <a class="nav-link" data-toggle="pill" href="#designation" role="tab" aria-selected="false">Designation</a>
                       </li>
                     </ul>
@@ -46,7 +46,7 @@
                                       <table id="positionTable" class="table table-bordered table-fixed"
                                               data-toggle="table"
                                               data-search="true"
-                                              data-height="600"
+                                              data-height="470"
                                               data-buttons-class="primary"
                                               data-show-export="true"
                                               data-show-columns-toggle-all="true"
@@ -79,10 +79,9 @@
                               </div>
                           </div>
                           <div class="tab-pane fade" id="designation" role="tabpanel">
-                              <div class="row">
-                                  <div class="col-lg-12">
-                                      
-                                  </div>
+                              <div class="row">                                
+                                <div class="col-lg-12" id="designationDiv">
+                                </div>
                               </div>
                           </div>
                       </div>
@@ -90,7 +89,7 @@
               </div>
             </div>
             <div class="card-footer">
-            
+                
             </div>
         </div>
     </div>
@@ -100,4 +99,5 @@
 @include('layouts.script')
 <script src="{{ asset('assets/js/search/designation.js') }}"></script>
 <script src="{{ asset('assets/js/hrims/position/position.js') }}"></script>
+<script src="{{ asset('assets/js/hrims/designation/view.js') }}"></script>
 @endsection

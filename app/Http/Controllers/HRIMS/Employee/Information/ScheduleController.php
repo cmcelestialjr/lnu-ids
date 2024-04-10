@@ -67,16 +67,18 @@ class ScheduleController extends Controller
         $date = date('Y-m-01',strtotime($year.'-'.$month.'-01'));
         $query = Users::where('id',$id)->first();
         $time = UsersSchedTime::with('option')                       
-            ->where(function ($query) use ($date,$id) {
-                $query->where('date_to','>=',$date)
-                ->where('date_from','<=',$date)
-                ->where('user_id',$id) ;
+            ->where(function ($query) use ($year,$month,$id) {
+                $query->whereMonth('date_to','>=',$month)
+                ->whereYear('date_to','>=',$year)
+                ->whereMonth('date_from','<=',$month)
+                ->whereYear('date_from','<=',$year)
+                ->where('user_id',$id);
             })
-            ->orWhere(function ($query) use ($id) {
-                $query->where('date_to',NULL)
-                ->where('date_from',NULL)
-                ->where('user_id',$id) ;
-            })
+            // ->orWhere(function ($query) use ($id) {
+            //     $query->where('date_to',NULL)
+            //     ->where('date_from',NULL)
+            //     ->where('user_id',$id) ;
+            // })
             ->orderBy('time_from','ASC')->get();
         $active_view = 'show active';
         $active_table = '';
@@ -92,7 +94,8 @@ class ScheduleController extends Controller
             'year' => $year,
             'month' => $month,
             'from_sys' => $request->from_sys,
-            'user_access_level' => $user_access_level
+            'user_access_level' => $user_access_level,
+            'date' => $date
         );
         return view('hrims/employee/information/schedule',$data);
     }
@@ -141,6 +144,7 @@ class ScheduleController extends Controller
         $result = 'error';
         $id = $this->_getID($request);
         $option = $request->option;
+        $is_rotation_duty = $request->is_rotation_duty;
         $time_from = date('H:i:s',strtotime($request->time_from));
         $time_to = date('H:i:s',strtotime($request->time_to));
         $exp = explode('-',$request->duration);
@@ -157,6 +161,7 @@ class ScheduleController extends Controller
             $insert->time_from = $time_from;
             $insert->time_to = $time_to;
             $insert->remarks = $remarks;
+            $insert->is_rotation_duty = $is_rotation_duty;
             $insert->updated_by = $updated_by;
             $insert->save();
             $user_time_id = $insert->id;
@@ -238,6 +243,7 @@ class ScheduleController extends Controller
         $result = 'error';
         if($x==0){            
             $option = $request->option;
+            $is_rotation_duty = $request->is_rotation_duty;
             $exp = explode('-',$request->duration);
             $date_from = date('Y-m-01',strtotime($exp[0]));
             $date_to = date('Y-m-t',strtotime($exp[1]));
@@ -253,6 +259,7 @@ class ScheduleController extends Controller
                             'date_to' => $date_to,
                             'remarks' => $remarks,
                             'option_id' => $option,
+                            'is_rotation_duty' => $is_rotation_duty,
                             'updated_by' => $updated_by,
                             'updated_at' => date('Y-m-d H:i:s')]);
             $delete = UsersSchedDays::whereHas('time', function ($query) use ($id) {

@@ -17,7 +17,7 @@ function src(){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.html('<center>'+loadingTemplate('')+'</center>');
+            thisBtn.html('<center>'+skeletonLoader('')+'</center>');
             $('#documentPreview').addClass('hide');
         },
         success : function(data){
@@ -34,8 +34,4 @@ function src(){
             thisBtn.html('');
         }
     });
-}
-function loadingTemplate() {
-    var img = base_url+"/assets/images/loader/loader_gif_no_bg.gif";
-    return '<span class="loading-wrap"><img src="'+img+'" alt="Loader" class="loaderTable"></span>';
 }

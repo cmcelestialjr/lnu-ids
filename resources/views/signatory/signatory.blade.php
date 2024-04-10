@@ -13,7 +13,7 @@
                         @endforeach
                       </select>
                   </div>
-                  <a href="{{url('/download')}}">download</a>
+                  {{-- <a href="{{url('/download')}}">download</a> --}}
                   <div class="col-lg-12">
                       <table id="signatoryTable" class="table table-bordered table-fixed"
                             data-toggle="table"
@@ -29,14 +29,14 @@
                             data-loading-template="loadingTemplate"
                             data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
                           <thead>
-                              {{-- <tr>
+                              <tr>
                                   <th data-field="f1" data-sortable="true" data-align="center">#</th>
                                   <th data-field="f2" data-sortable="true" data-align="center">Name</th>
                                   <th data-field="f3" data-sortable="true" data-align="center">Signatory</th>
                                   <th data-field="f4" data-sortable="true" data-align="center">Updated By</th>
                                   <th data-field="f5" data-sortable="true" data-align="center">DateTime</th>
-                              </tr> --}}
-                              <tr>
+                              </tr>
+                              {{-- <tr>
                                 <th data-field="f1" data-sortable="true" data-align="center">#</th>
                                 <th data-field="stud_id" data-sortable="true">stud_id</th>
                                 <th data-field="surname" data-sortable="true">surname</th>
@@ -56,7 +56,7 @@
                                 <th data-field="address" data-sortable="true">address</th>
                                 <th data-field="zip" data-sortable="true">zip</th>
                                 <th data-field="phone_no" data-sortable="true">phone_no</th>
-                            </tr>
+                            </tr> --}}
                           </thead>
                       </table>
                   </div>

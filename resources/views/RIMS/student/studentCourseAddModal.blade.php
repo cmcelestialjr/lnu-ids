@@ -27,7 +27,7 @@
                                             $program_shorten = $row->program_info->shorten;
                                         }
                                     @endphp
-                                <option value="{{$row->id}}">{{$program_shorten}}, {{$row->school_name}}</option>
+                                <option value="{{$row->id}}">{{$program_shorten}}, {{$row->from_school}}</option>
                                 @endforeach
                             </select>
                         </div>

@@ -35,6 +35,7 @@ class EmployeeController extends Controller
         $name_services = new NameServices;
         $option = $request->option;
         $status = $request->status;
+        
         $query = Users::with('employee_info.emp_stat','instructor_info.emp_stat','employee_default.emp_stat')
             ->whereHas('user_role', function ($query) use ($option,$status) {
                 if($option=='all'){

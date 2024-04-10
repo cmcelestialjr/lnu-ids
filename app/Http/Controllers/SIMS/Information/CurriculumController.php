@@ -10,6 +10,7 @@ use App\Models\EducOfferedSchoolYear;
 use App\Models\EducProgramLevel;
 use App\Models\EducYearLevel;
 use App\Models\StudentsCourses;
+use App\Models\StudentsCoursesCredit;
 use App\Models\StudentsCourseStatus;
 use App\Models\StudentsProgram;
 use Illuminate\Http\Request;
@@ -159,7 +160,9 @@ class CurriculumController extends Controller
                                 $check = StudentsCourses::with('status')->where('user_id',$id)
                                     ->where(function ($query) use ($course_id){
                                         $query->where('course_id',$course_id)
-                                        ->orWhere('credit_course_id',$course_id);
+                                        ->orWhereHas('courses_credit', function ($query) use ($course_id) {
+                                            $query->where('course_id',$course_id);
+                                        });
                                     })
                                     ->orderBy('year_from','DESC')
                                     ->first();
@@ -175,9 +178,9 @@ class CurriculumController extends Controller
                                         }
                                     }
                                 }
-                                $course_other = StudentsCourses::where('user_id',$id)
-                                    ->where('credit_course_id',$course_id)
-                                    ->orderBy('year_from','DESC')
+                                $course_other = StudentsCoursesCredit::with('student_course')
+                                    ->where('user_id',$id)
+                                    ->where('course_id',$course_id)
                                     ->first();
                                 return [
                                     'id' => $query->id,

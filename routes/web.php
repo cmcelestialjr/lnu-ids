@@ -18,13 +18,15 @@ Route::get('/error/http', function () {
 Route::group(['middleware' => ['HTTPS']], function(){
     Route::group(['middleware' => ['CheckUser']], function(){
         Route::get('/', 'IndexController@view')->name('indexpage');
-        Route::middleware(['throttle:5,1'])->group(function () {
+        //Route::middleware(['throttle:5,1'])->group(function () {
             Route::post('/login', 'LoginController@check');    
-        });
+        //});
     });
     
     Route::get('/monitor1', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@monitor1');
     Route::post('/monitor1/display', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@display');
+
+    Route::get('/student/certification/{stud_id}/{certification}/{program_level}/{school_year}/{period}/{dateTime}', 'RIMS\Student\CertificationController@pdf');
 
     Route::group(['middleware' => ['auth']], function(){
     //Route::group(['middleware' => ['auth','Login','PreventBackHistory']], function(){
@@ -92,6 +94,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/designationList', 'SEARCH\DesignationController@list');
                 Route::post('/ludongStudent', 'SEARCH\LudongController@student');
                 Route::post('/employeePayroll', 'SEARCH\PayrollController@employee');
+                Route::post('/employeeDesignation', 'SEARCH\EmployeeController@designation');
                 Route::post('/studentSearch', 'SEARCH\StudentController@student');
                 Route::post('/courseSelect', 'SEARCH\CourseController@course');
                 Route::post('/courseSelectID', 'SEARCH\CourseController@courseID');
@@ -166,7 +169,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
 
                     Route::post('/gradeLevel', 'FIS\Students\LoadViewController@gradeLevel');
 
-                    Route::post('/studentViewModal', 'FIS\Students\ModalController@studentViewModal');
+                    Route::post('/studentViewModal', 'FIS\Students\ModalController@studentViewModal');                    
                 });
                 Route::group(['prefix'=>'courses'], function(){                    
                     Route::post('/allTable', 'FIS\CoursesController@index');
@@ -184,9 +187,9 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/studentAdvisement', 'FIS\Advisement\LoadViewController@studentAdvisement');
                     Route::post('/sectionSelect', 'FIS\Advisement\LoadViewController@sectionSelect');
 
-                    Route::post('/advisementSubmit', 'FIS\Advisement\UpdateController@advisementSubmit');
-                    
+                    Route::post('/advisementSubmit', 'FIS\Advisement\UpdateController@advisementSubmit');                    
                 });
+                Route::post('/loadSheet', 'FIS\LoadSheetController@index');
             });
             Route::group(['prefix'=>'rims'], function(){
                 Route::group(['prefix'=>'student'], function(){
@@ -211,6 +214,19 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/studentShiftModal', 'RIMS\Student\ModalController@studentShiftModal');
                     Route::post('/studentPrintModal', 'RIMS\Student\ModalController@studentPrintModal');
 
+                    Route::post('/studentSelectProgramModal', 'RIMS\Student\SelectProgramController@index');
+                    Route::post('/selectProgramList', 'RIMS\Student\SelectProgramController@showProgram');
+                    Route::post('/selectCurriculumList', 'RIMS\Student\SelectProgramController@showCurriculum');
+                    
+                    Route::post('/studentGradesModal', 'RIMS\Student\GradesController@index');
+                    Route::post('/studentGradesList', 'RIMS\Student\GradesController@show');                    
+
+                    Route::post('/studentCertificationModal', 'RIMS\Student\CertificationController@index');
+                    Route::post('/certificationSYperiod', 'RIMS\Student\CertificationController@showSYperiod');
+                    Route::post('/certificationSubmit', 'RIMS\Student\CertificationController@show');
+                    Route::post('/certificationDisplay', 'RIMS\Student\CertificationController@display');
+                    
+                    
                     Route::post('/studentShiftModalSubmit', 'RIMS\Student\UpdateController@studentShiftModalSubmit');
                     Route::post('/studentCourseAddModalSubmit', 'RIMS\Student\UpdateController@studentCourseAddModalSubmit');
                     Route::post('/studentCourseCreditSubmit', 'RIMS\Student\UpdateController@studentCourseCreditSubmit');
@@ -458,67 +474,68 @@ Route::group(['middleware' => ['HTTPS']], function(){
                         Route::post('/generate', 'HRIMS\Payroll\Generate\GenerateController@generate');
                     });
                     Route::group(['prefix'=>'view'], function(){
-                        Route::post('/table', 'HRIMS\Payroll\View\ViewController@table');
-                        Route::post('/payroll_table', 'HRIMS\Payroll\View\ViewController@payroll_table');
-                        Route::get('/{payroll_id}/{encoded}', 'HRIMS\Payroll\View\ViewController@view');
-                        Route::post('/deductionModal', 'HRIMS\Payroll\View\ViewController@deductionModal');
-                        Route::post('/deductionModalTable', 'HRIMS\Payroll\View\ViewController@deductionModalTable');
-                        Route::post('/deductionModalInput', 'HRIMS\Payroll\View\ViewController@deductionModalInput');
-                        Route::post('/allowanceModalTable', 'HRIMS\Payroll\View\ViewController@allowanceModalTable');
-                        Route::post('/allowanceModalCheck', 'HRIMS\Payroll\View\ViewController@allowanceModalCheck');
-                        Route::post('/lwopModalInput', 'HRIMS\Payroll\View\ViewController@lwopModalInput');
-                        Route::post('/monthInput', 'HRIMS\Payroll\View\ViewController@monthInput');
-                        Route::post('/salaryChange', 'HRIMS\Payroll\View\ViewController@salaryChange');
-                        Route::post('/addEmployeeSubmit', 'HRIMS\Payroll\View\ViewController@addEmployeeSubmit');
-                        Route::post('/removeEmployeeModal', 'HRIMS\Payroll\View\ViewController@removeEmployeeModal');
-                        Route::post('/removeEmployeeModalSubmit', 'HRIMS\Payroll\View\ViewController@removeEmployeeModalSubmit');
-                        Route::post('/generatePayroll', 'HRIMS\Payroll\View\ViewController@generatePayroll');
-                        Route::post('/payrollPrintModal', 'HRIMS\Payroll\View\PayrollPrintController@modal');
-                        Route::get('/src', 'HRIMS\Payroll\View\PayrollPrintController@src');
+                        Route::post('/table', 'HRIMS\Payroll\PayrollListController@index');
+                        Route::post('/delete', 'HRIMS\Payroll\PayrollListController@delete');
+                        Route::post('/deleteSubmit', 'HRIMS\Payroll\PayrollListController@destroy');
+                        Route::get('/{payroll_id}/{encoded}', 'HRIMS\Payroll\PayrollViewController@index');
+                        Route::post('/payroll_table', 'HRIMS\Payroll\PayrollViewController@show');                        
+                        Route::post('/deductionModal', 'HRIMS\Payroll\PayrollDeductionController@index');
+                        Route::post('/deductionModalTable', 'HRIMS\Payroll\PayrollDeductionController@show');
+                        Route::post('/deductionModalInput', 'HRIMS\Payroll\PayrollDeductionController@update');
+                        Route::post('/allowanceModalTable', 'HRIMS\Payroll\PayrollAllowanceController@index');
+                        Route::post('/allowanceModalCheck', 'HRIMS\Payroll\PayrollAllowanceController@update');
+                        Route::post('/lwopModalInput', 'HRIMS\Payroll\PayrollLWOPController@index');
+                        Route::post('/monthInput', 'HRIMS\Payroll\PayrollMonthController@index');
+                        Route::post('/salaryChange', 'HRIMS\Payroll\PayrollSalaryController@index');
+                        Route::post('/addEmployeeSubmit', 'HRIMS\Payroll\PayrollViewController@store');
+                        Route::post('/removeEmployeeModal', 'HRIMS\Payroll\PayrollViewController@destroyView');
+                        Route::post('/removeEmployeeModalSubmit', 'HRIMS\Payroll\PayrollViewController@destroy');
+                        Route::post('/generatePayroll', 'HRIMS\Payroll\PayrollViewController@update');
+                        Route::get('/src', 'HRIMS\Payroll\PayrollPrintController@src');
                         
                     });
                     Route::group(['prefix'=>'payrollType'], function(){
-                        Route::post('/table', 'HRIMS\Payroll\PayrollType\PayrollTypeController@table');
-                        Route::post('/newModal', 'HRIMS\Payroll\PayrollType\PayrollTypeController@newModal');
-                        Route::post('/newSubmit', 'HRIMS\Payroll\PayrollType\PayrollTypeController@newSubmit');
-                        Route::post('/updateModal', 'HRIMS\Payroll\PayrollType\PayrollTypeController@updateModal');
-                        Route::post('/updateSubmit', 'HRIMS\Payroll\PayrollType\PayrollTypeController@updateSubmit');
+                        Route::post('/table', 'HRIMS\Payroll\TypeController@index');
+                        Route::post('/newModal', 'HRIMS\Payroll\TypeController@create');
+                        Route::post('/newSubmit', 'HRIMS\Payroll\TypeController@store');
+                        Route::post('/updateModal', 'HRIMS\Payroll\TypeController@edit');
+                        Route::post('/updateSubmit', 'HRIMS\Payroll\TypeController@update');
 
-                        Route::post('/newGuideline', 'HRIMS\Payroll\PayrollType\GuidelineController@create');
-                        Route::post('/newGuidelineSubmit', 'HRIMS\Payroll\PayrollType\GuidelineController@store');
-                        Route::post('/tableGuideline/{id}', 'HRIMS\Payroll\PayrollType\GuidelineController@show');
-                        Route::post('/editGuideline/{id}', 'HRIMS\Payroll\PayrollType\GuidelineController@edit');
-                        Route::post('/editGuidelineSubmit/{id}', 'HRIMS\Payroll\PayrollType\GuidelineController@update');
-                        Route::post('/deleteGuideline/{id}', 'HRIMS\Payroll\PayrollType\GuidelineController@delete');
-                        Route::post('/deleteGuidelineSubmit/{id}', 'HRIMS\Payroll\PayrollType\GuidelineController@destroy');
+                        Route::post('/newGuideline', 'HRIMS\Payroll\TypeGuidelineController@create');
+                        Route::post('/newGuidelineSubmit', 'HRIMS\Payroll\TypeGuidelineController@store');
+                        Route::post('/tableGuideline/{id}', 'HRIMS\Payroll\TypeGuidelineController@show');
+                        Route::post('/editGuideline/{id}', 'HRIMS\Payroll\TypeGuidelineController@edit');
+                        Route::post('/editGuidelineSubmit/{id}', 'HRIMS\Payroll\TypeGuidelineController@update');
+                        Route::post('/deleteGuideline/{id}', 'HRIMS\Payroll\TypeGuidelineController@delete');
+                        Route::post('/deleteGuidelineSubmit/{id}', 'HRIMS\Payroll\TypeGuidelineController@destroy');
                     });
                     Route::group(['prefix'=>'deduction'], function(){
                         Route::group(['prefix'=>'list'], function(){
-                            Route::post('/table', 'HRIMS\Payroll\Deduction\ListController@table');
-                            Route::post('/newModal', 'HRIMS\Payroll\Deduction\ListController@newModal');
-                            Route::post('/newSubmit', 'HRIMS\Payroll\Deduction\ListController@newSubmit');
-                            Route::post('/updateModal', 'HRIMS\Payroll\Deduction\ListController@updateModal');
-                            Route::post('/updateSubmit', 'HRIMS\Payroll\Deduction\ListController@updateSubmit');
+                            Route::post('/table', 'HRIMS\Payroll\DeductionListController@index');
+                            Route::post('/newModal', 'HRIMS\Payroll\DeductionListController@create');
+                            Route::post('/newSubmit', 'HRIMS\Payroll\DeductionListController@store');
+                            Route::post('/updateModal', 'HRIMS\Payroll\DeductionListController@edit');
+                            Route::post('/updateSubmit', 'HRIMS\Payroll\DeductionListController@update');
                         });
                         Route::group(['prefix'=>'group'], function(){
-                            Route::post('/table', 'HRIMS\Payroll\Deduction\GroupController@table');
-                            Route::post('/newModal', 'HRIMS\Payroll\Deduction\GroupController@newModal');
-                            Route::post('/newSubmit', 'HRIMS\Payroll\Deduction\GroupController@newSubmit');
-                            Route::post('/viewModal', 'HRIMS\Payroll\Deduction\GroupController@viewModal');
-                            Route::post('/viewModalTable', 'HRIMS\Payroll\Deduction\GroupController@viewModalTable');
-                            Route::post('/updateModal', 'HRIMS\Payroll\Deduction\GroupController@updateModal');
-                            Route::post('/updateSubmit', 'HRIMS\Payroll\Deduction\GroupController@updateSubmit');
+                            Route::post('/table', 'HRIMS\Payroll\DeductionGroupController@index');
+                            Route::post('/newModal', 'HRIMS\Payroll\DeductionGroupController@create');
+                            Route::post('/newSubmit', 'HRIMS\Payroll\DeductionGroupController@store');
+                            Route::post('/viewModal', 'HRIMS\Payroll\DeductionGroupController@show');
+                            Route::post('/viewModalTable', 'HRIMS\Payroll\DeductionGroupController@showTable');
+                            Route::post('/updateModal', 'HRIMS\Payroll\DeductionGroupController@edit');
+                            Route::post('/updateSubmit', 'HRIMS\Payroll\DeductionGroupController@update');
                         });
                     });
                     Route::group(['prefix'=>'allowance'], function(){
-                        Route::post('/table', 'HRIMS\Payroll\Allowance\AllowanceController@table');
-                        Route::post('/newModal', 'HRIMS\Payroll\Allowance\AllowanceController@newModal');
-                        Route::post('/newSubmit', 'HRIMS\Payroll\Allowance\AllowanceController@newSubmit');
-                        Route::post('/updateModal', 'HRIMS\Payroll\Allowance\AllowanceController@updateModal');
-                        Route::post('/updateSubmit', 'HRIMS\Payroll\Allowance\AllowanceController@updateSubmit');
+                        Route::post('/table', 'HRIMS\Payroll\AllowanceController@index');
+                        Route::post('/newModal', 'HRIMS\Payroll\AllowanceController@create');
+                        Route::post('/newSubmit', 'HRIMS\Payroll\AllowanceController@store');
+                        Route::post('/updateModal', 'HRIMS\Payroll\AllowanceController@edit');
+                        Route::post('/updateSubmit', 'HRIMS\Payroll\AllowanceController@update');
                     });
                     Route::group(['prefix'=>'billing'], function(){
-                        Route::post('/table', 'HRIMS\Payroll\Billing\BillingController@table');                
+                        Route::post('/table', 'HRIMS\Payroll\BillingController@index');                
                     });
                 });
                 Route::group(['prefix'=>'position'], function(){
@@ -530,6 +547,11 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/positionView', 'HRIMS\Position\PositionController@view');
                     Route::post('/positionViewTable', 'HRIMS\Position\PositionController@viewTable');
                 });
+                Route::group(['prefix'=>'designation'], function(){
+                    Route::post('/table', 'HRIMS\Designation\DesignationController@index');
+                    Route::post('/new', 'HRIMS\Designation\DesignationController@create');
+                    Route::post('/newSubmit', 'HRIMS\Designation\DesignationController@store');
+                });
                 Route::group(['prefix'=>'dtr'], function(){
                     Route::post('/employeeTable', 'HRIMS\DTR\AllController@index');
                     Route::post('/receiveDTR', 'HRIMS\DTR\AllController@update');
@@ -539,7 +561,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/holidayNewModal', 'HRIMS\DTR\HolidayController@newModal');
                     Route::post('/holidayNewSubmit', 'HRIMS\DTR\HolidayController@newSubmit');
                                         
-                    Route::get('/pdf/{year}/{month}/{id_no}/{range}', 'HRIMS\DTR\PDFController@PDF');
+                    Route::get('/pdf/{year}/{month}/{id_no}/{range}/{option}', 'HRIMS\DTR\PDFController@PDF');
                     Route::post('/individual', 'HRIMS\DTR\IndividualController@individual');
                     Route::post('/dtrInputModal', 'HRIMS\DTR\IndividualController@dtrInputModal');
                     Route::post('/dtrInputTable', 'HRIMS\DTR\IndividualController@dtrInputTable');
@@ -550,6 +572,14 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/department', 'HRIMS\DTR\IndividualController@department');
                     Route::post('/departmentSubmit', 'HRIMS\DTR\IndividualController@departmentSubmit');
                 }); 
+                Route::group(['prefix'=>'office'], function(){
+                    Route::post('/office', 'HRIMS\Office\OfficeController@index');
+                    Route::post('/officeTable', 'HRIMS\Office\OfficeController@table');
+                    Route::post('/officeNew', 'HRIMS\Office\OfficeController@create');
+                    Route::post('/officeNewSubmit', 'HRIMS\Office\OfficeController@store');
+                    Route::post('/officeUpdate/{id}', 'HRIMS\Office\OfficeController@edit');
+                    Route::post('/officeUpdateSubmit/{id}', 'HRIMS\Office\OfficeController@update');
+                });
                 Route::group(['prefix'=>'my'], function(){
                     Route::post('/payslip', 'HRIMS\MY\PayslipController@index');
                 });

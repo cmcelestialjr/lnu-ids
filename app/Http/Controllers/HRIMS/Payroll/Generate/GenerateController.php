@@ -348,7 +348,7 @@ class GenerateController extends Controller
             'year' => 'required|integer',
             'month' => 'required|string',
             'months' => 'required|array',
-            'unclaimeds' => 'array',
+            'unclaimeds' => 'nullable|array',
             'payroll_type' => 'required|integer',
             'emp_stats' => 'required|array',
             'fund_sources' => 'required|array',
@@ -373,7 +373,8 @@ class GenerateController extends Controller
         $work_services = new WorkServices;
         $tracking_services = new TrackingServices;
 
-        try {
+        DB::beginTransaction();
+        try {            
             $year = $request->year;
             $month = $request->month;
             $months = $request->months;
@@ -566,8 +567,8 @@ class GenerateController extends Controller
                     if($include=='Y'){
                         $allowance = $this->getAllowance($emp_stat,$payroll_type,$include_pera);
                         $deduction = $this->getDeduction($emp_stat,$payroll_type,$employee);
-                        $earned = $earned;
-                        $netpay = $earned-$deduction;
+                        $gross = $earned+$allowance;
+                        $netpay = $gross-$deduction;
 
                         $insert = new HRPayrollList();
                         $insert->payroll_id = $payroll_id;
@@ -590,7 +591,7 @@ class GenerateController extends Controller
                         $insert->column_amount2 = $column_amount2;
                         $insert->earned = $earned;
                         $insert->allowances = $allowance;
-                        $insert->gross = $earned+$allowance;
+                        $insert->gross = $gross;
                         $insert->deduction = $deduction;
                         $insert->netpay = $netpay;
                         $insert->day_from = $day_from;
@@ -628,27 +629,29 @@ class GenerateController extends Controller
                                 $insert->updated_by = $updated_by;
                                 $insert->save();
                             }
-                            if(count($unclaimeds)>0){
-                                foreach($unclaimeds as $month1){
-                                    $check = HRPayrollMonths::where('user_id',$employee)
-                                        ->where('year',($year-1))
-                                        ->where('month',$month)
-                                        ->first();
-                                    $status = 'unclaimed';
-                                    if($check!=NULL){
-                                        $status = 'claimed';
+                            if($unclaimeds!=NULL){
+                                if(count($unclaimeds)>0){
+                                    foreach($unclaimeds as $month1){
+                                        $check = HRPayrollMonths::where('user_id',$employee)
+                                            ->where('year',($year-1))
+                                            ->where('month',$month)
+                                            ->first();
+                                        $status = 'unclaimed';
+                                        if($check!=NULL){
+                                            $status = 'claimed';
+                                        }
+                                        $insert = new HRPayrollMonths();
+                                        $insert->payroll_list_id = $payroll_list_id;
+                                        $insert->payroll_id = $payroll_id;
+                                        $insert->user_id = $employee;
+                                        $insert->year = ($year-1);
+                                        $insert->month = $month1;
+                                        $insert->amount = 0;
+                                        $insert->option = 'unclaimed';
+                                        $insert->status = $status;
+                                        $insert->updated_by = $updated_by;
+                                        $insert->save();
                                     }
-                                    $insert = new HRPayrollMonths();
-                                    $insert->payroll_list_id = $payroll_list_id;
-                                    $insert->payroll_id = $payroll_id;
-                                    $insert->user_id = $employee;
-                                    $insert->year = ($year-1);
-                                    $insert->month = $month1;
-                                    $insert->amount = 0;
-                                    $insert->option = 'unclaimed';
-                                    $insert->status = $status;
-                                    $insert->updated_by = $updated_by;
-                                    $insert->save();
                                 }
                             }
                         }
@@ -710,7 +713,7 @@ class GenerateController extends Controller
                 $update->dv = $netpay;
                 $update->tracking_id = $tracking_id;
                 $update->save();
-
+                
                 if($fund_services==''){
                     $emp_fund_service = array_unique($emp_fund_services);
                     foreach ($emp_fund_service as $fund_service) {
@@ -721,10 +724,11 @@ class GenerateController extends Controller
                         $insert->save();
                     }
                 }
-
+                DB::commit();
                 $result = 'success';
             }
         } catch (\Exception $e) {
+            DB::rollBack();
             $result = 'error';
         }
         $response = array('result' => $result

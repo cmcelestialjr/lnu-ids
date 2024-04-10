@@ -117,8 +117,11 @@ class LoadViewController extends Controller
                                                             ->pluck('pre_id')->toArray();                                                                                               
                                                 $pre_req = StudentsCourses::where(function ($query) use ($pre_req_ids){
                                                                 $query->whereIn('course_id',$pre_req_ids)
-                                                                ->orWhereIn('credit_course_id',$pre_req_ids);
+                                                                ->orWhereHas('courses_credit', function ($query) use ($pre_req_ids) {
+                                                                    $query->where('course_id',$pre_req_ids);
+                                                                });
                                                             })
+                                                            ->whereIn('course_id',$pre_req_ids)
                                                             ->where('user_id',$student_id)
                                                             ->whereIn('student_course_status_id',$passed_statuses)
                                                             ->get()->count();
@@ -128,7 +131,10 @@ class LoadViewController extends Controller
                                                 //             ->get()->count();
                                                 $taken = StudentsCourses::where(function ($query) use ($course_id){
                                                                 $query->where('course_id',$course_id)
-                                                                ->orWhere('credit_course_id',$course_id);
+                                                                ->orWhereHas('courses_credit', function ($query) use ($course_id) {
+                                                                    $query->where('course_id',$course_id);
+                                                                });
+                                                                
                                                             })
                                                             ->where('user_id',$student_id)
                                                             ->whereIn('student_course_status_id',$passed_statuses)
@@ -394,7 +400,9 @@ class LoadViewController extends Controller
                                                             ->pluck('pre_id')->toArray();                                                                                               
                                                 $pre_req = StudentsCourses::where(function ($query) use ($pre_req_ids){
                                                                 $query->whereIn('course_id',$pre_req_ids)
-                                                                ->orWhereIn('credit_course_id',$pre_req_ids);
+                                                                ->orWhereHas('courses_credit', function ($query) use ($pre_req_ids) {
+                                                                    $query->where('course_id',$pre_req_ids);
+                                                                });
                                                             })
                                                             ->where('user_id',$student_id)
                                                             ->whereIn('student_course_status_id',$passed_statuses)
@@ -405,7 +413,9 @@ class LoadViewController extends Controller
                                                 //             ->get()->count();
                                                 $taken = StudentsCourses::where(function ($query) use ($course_id){
                                                                 $query->where('course_id',$course_id)
-                                                                ->orWhere('credit_course_id',$course_id);
+                                                                ->orWhereHas('courses_credit', function ($query) use ($course_id) {
+                                                                    $query->where('course_id',$course_id);
+                                                                });
                                                             })
                                                             ->where('user_id',$student_id)
                                                             ->whereIn('student_course_status_id',$passed_statuses)

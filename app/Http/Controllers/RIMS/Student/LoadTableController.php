@@ -37,6 +37,7 @@ class LoadTableController extends Controller
                 // $school_year = $school_year->year_from;
                 $query = $query->whereDoesntHave('courses', function ($query) use ($school_year_id) {
                     $query->where('school_year_id',$school_year_id);
+                    $query->where('school_year_id',NULL);
                 })->whereIn('student_status_id',[1,2,3,4]);
                 // $query = $query->whereHas('student_program', function ($query) use ($school_year) {
                 //     $query->whereYear('date_admitted',$school_year);
@@ -50,6 +51,7 @@ class LoadTableController extends Controller
             }else{
                 $query = $query->whereHas('courses', function ($query) use ($school_year_id) {
                             $query->where('school_year_id', $school_year_id);
+                            $query->where('school_year_id','!=',NULL);
                         });
             }
         }

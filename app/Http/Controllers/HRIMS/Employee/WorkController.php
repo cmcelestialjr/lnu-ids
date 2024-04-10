@@ -323,11 +323,21 @@ class WorkController extends Controller
 
                 $employee = Users::find($id);
 
-                $update = _Work::where('user_id',$id)
-                            ->where('date_from','<=',$date_from);
-                $update->status = $employee->emp_status_id;
-                $update->save();
+                _Work::where('user_id',$id)
+                        ->where('date_from','<=',$date_from)
+                        ->update(['status' => $employee->emp_status_id]);
                 
+                if($position_option!='None' && $date_to=='present'){
+                    $update = HRPosition::find($position_id);
+                    $update->current_user_id = $id;
+                    $update->save();
+                }
+
+                if($getDesignation){
+                    $update = HRDesignation::find($designation);
+                    $update->current_user_id = $id;
+                    $update->save();
+                }
                 $result = 'success';
             }
         }
@@ -456,6 +466,18 @@ class WorkController extends Controller
                     _Work::where('user_id',$user_id)
                         ->where('date_from','<=',$date_from)
                         ->update(['status' => $employee->emp_status_id]);
+
+                    if($position_option!='None' && $date_to=='present'){
+                        $update = HRPosition::find($position_id);
+                        $update->current_user_id = $user_id;
+                        $update->save();
+                    }
+        
+                    if($getDesignation){
+                        $update = HRDesignation::find($designation);
+                        $update->current_user_id = $user_id;
+                        $update->save();
+                    }
 
                     $result = 'success';
                 }

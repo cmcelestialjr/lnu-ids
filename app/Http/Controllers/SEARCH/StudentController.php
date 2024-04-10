@@ -15,17 +15,18 @@ class StudentController extends Controller
         $results = Users::where(function($query) use ($search) {
                         $query->where(DB::raw('CONCAT(lastname,", ",firstname)'), 'LIKE', "%".$search."%");
                         $query->orWhere('stud_id', 'LIKE', "%$search%");
-                    })  
-                    ->whereHas('student_info', function ($query) {
+                    })
+                    ->where('stud_id','!=',NULL)
+                    // ->whereHas('student_info', function ($query) {
                         
-                    })              
+                    // })              
                     ->limit(10)
                     ->get();
 
         $data = [];
         if($results->count()>0){
             foreach ($results as $result) {
-                $name = $name_services->lastname($result->lastname,$result->firstname,$result->middlename,$result->extname).'-'.$result->student_info->id_no;
+                $name = $name_services->lastname($result->lastname,$result->firstname,$result->middlename,$result->extname).'-'.$result->stud_id;
                 $data[] = ['id' => $result->id, 'text' => $name];
             }
         }

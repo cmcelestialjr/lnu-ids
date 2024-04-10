@@ -17,11 +17,14 @@ class PDFController extends Controller
         $user_access_level = $request->session()->get('user_access_level');
         $user = Auth::user();
         $id_no = $user->id_no;
+        
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
             $data = array(
                 'pdf_option' => $request->pdf_option
             );
+            
                 return view('pdf/pdf',$data);
+                
         }else{
             return view('layouts/error/404');
         }
@@ -30,13 +33,14 @@ class PDFController extends Controller
         $result = 'error';
         $src = '';
         $pdf_option = $request->pdf_option;
+    
         $exp = explode(': ',$pdf_option);
         $result = 'error';
         $src = '';
         
         $response = array('result' => $result,
                           'src' => $src);
-
+                          
         if(isset($exp[1]) && isset($exp[2])){
             $id = str_replace(' Code','',$exp[1]);
             $code = $exp[2];
@@ -46,16 +50,14 @@ class PDFController extends Controller
                 $controller = 'controller_'.$exp[2][16];
                 $response = $this->$controller($exp[0],$pdf_option);
             }
-        }
-        
-                          
+        }                          
         return response()->json($response);
     }
     private function controller_1($controller,$pdf_option){
         if($controller=='Payroll'){
-            return app('App\Http\Controllers\HRIMS\Payroll\View\PayrollPrintController')->src($pdf_option);
+            return app('App\Http\Controllers\HRIMS\Payroll\PayrollPrintController')->src($pdf_option);
         }
-        $response = array('result' => 'error',
+        return array('result' => 'error',
                           'src' => '');     
     }
 }

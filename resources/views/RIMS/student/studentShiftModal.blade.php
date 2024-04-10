@@ -14,7 +14,7 @@
                     <div class="col-lg-12 alert alert-info">
                         <label>Shift Program To:</label>
                         <select class="form-control select2-info" name="shift_to" style="width: 100%">
-                            <option value="">Please Program</option>
+                            <option value="">Please Select Program</option>
                             @foreach($programs as $row)
                                 <option value="{{$row->id}}">{{$row->name}} ({{$row->shorten}})</option>
                             @endforeach

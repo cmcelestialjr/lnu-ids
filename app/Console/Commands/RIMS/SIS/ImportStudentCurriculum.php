@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands\RIMS\SIS;
 
+use App\Models\EducCourses;
+use App\Models\EducCurriculum;
 use App\Models\StudentsProgram;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -27,8 +29,14 @@ class ImportStudentCurriculum extends Command
      */
     public function handle()
     {
-        $connectionCourse = 'sis_courses';
-        DB::connection($connectionCourse)->getPdo();
+        //Steps in importing Student from sys
+        //1. ImportStudent
+        //2. ImportStudentProgram
+        //3. ImportStudentCurriculum
+        //4. ImportStudentInfo
+
+        // $connectionCourse = 'sis_courses';
+        // DB::connection($connectionCourse)->getPdo();
         $connectionStudent = 'sis_student';
         DB::connection($connectionStudent)->getPdo();
         // StudentsProgram::where('program_id',15)
@@ -55,7 +63,7 @@ class ImportStudentCurriculum extends Command
                         ->update(['year_from' => $get_first_course->sy-1,
                                 'updated_at' => date('Y-m-d H:i:s')]);
                 }
-                DB::connection($connectionCourse)->statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+                //DB::connection($connectionCourse)->statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
                 $subjects = DB::connection($connectionStudent)->table('grade_log')
                     ->where('stud_id',$stud_id)
                     ->where('sy','>=',$sy_from)
@@ -69,16 +77,24 @@ class ImportStudentCurriculum extends Command
                         $term[] = $subj->terms;
                     }
                     //var_dump($catalog_no);
-                    $subject_curriculum = DB::connection($connectionCourse)->table('prospectus')
-                            ->where('course_id',$course_id)
-                            ->whereIn('catalog_no',$catalog_no)
-                            // ->whereIn('term',$term)
-                            ->select('prospectus_id', DB::raw('COUNT(prospectus_id) as count'))
-                            ->groupBy('prospectus_id')
-                            ->orderBy(DB::raw('COUNT(prospectus_id)'), 'desc')
-                            ->first();
+                    // $subject_curriculum = DB::connection($connectionCourse)->table('prospectus')
+                    //         ->where('course_id',$course_id)
+                    //         ->whereIn('catalog_no',$catalog_no)
+                    //         // ->whereIn('term',$term)
+                    //         ->select('prospectus_id', DB::raw('COUNT(prospectus_id) as count'))
+                    //         ->groupBy('prospectus_id')
+                    //         ->orderBy(DB::raw('COUNT(prospectus_id)'), 'desc')
+                    //         ->first();
+                    $subject_curriculum = EducCourses::whereIn('code',$catalog_no)
+                        ->whereHas('curriculum', function ($query) use ($course_id) {
+                            $query->where('program_id',$course_id);
+                        })
+                        ->select('curriculum_id', DB::raw('COUNT(curriculum_id) as count'))
+                        ->groupBy('curriculum_id')
+                        ->orderBy(DB::raw('COUNT(curriculum_id)'), 'desc')
+                        ->first();
                     if ($subject_curriculum!=NULL) {
-                        $curriculum_id = $subject_curriculum->prospectus_id;
+                        $curriculum_id = $subject_curriculum->curriculum_id;
                         StudentsProgram::where('id',$row->id)
                             ->update(['curriculum_id' => $curriculum_id,
                                     'updated_at' => date('Y-m-d H:i:s')]);

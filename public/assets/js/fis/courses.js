@@ -1,8 +1,8 @@
 grade_level();
-$(document).on('change', '#subjectsDiv #list select[name="school_year"]', function (e) {
+$(document).off('change', '#subjectsDiv #list select[name="school_year"]').on('change', '#subjectsDiv #list select[name="school_year"]', function (e) {
     subjects_table();
 });
-$(document).on('change', '#subjectsDiv #list select[name="level[]"]', function (e) {
+$(document).off('change', '#subjectsDiv #list select[name="level[]"]').on('change', '#subjectsDiv #list select[name="level[]"]', function (e) {
     subjects_table();
 });
 $(document).off('change', '#studentsListModal .selectStatus').on('change', '#studentsListModal .selectStatus', function (e) {
@@ -25,19 +25,19 @@ $(document).off('blur', '#studentsListModal .inputGrade').on('blur', '#studentsL
         studentGrade1(thisBtn);
     }
 });
-$(document).on('click', '#studentsDiv #list .studentView', function (e) {
+$(document).off('click', '#studentsDiv #list .studentView').on('click', '#studentsDiv #list .studentView', function (e) {
     var thisBtn = $(this);
     var id = thisBtn.data('id');
     student_view(id,thisBtn);
 });
-$(document).on('click', '#studentViewModal #curriculum', function (e) {
+$(document).off('click', '#studentViewModal #curriculum').on('click', '#studentViewModal #curriculum', function (e) {
     var thisBtn = $(this);
     var id = $('#studentViewModal input[name="id"]').val();
     var program_level = $('#studentViewModal input[name="program_level"]').val();
     var curriculum = $('#studentViewModal input[name="curriculum"]').val();
     curriculumModal(id,program_level,curriculum,thisBtn);
 });
-$(document).on('click', '#studentViewModal .studentCoursesModal', function (e) {
+$(document).off('click', '#studentViewModal .studentCoursesModal').on('click', '#studentViewModal .studentCoursesModal', function (e) {
     var thisBtn = $(this);
     var school_year_id = thisBtn.data('id');
     var id = $('#studentViewModal input[name="id"]').val();
@@ -57,7 +57,7 @@ $(document).on('click', '#studentViewModal .studentCoursesModal', function (e) {
     };
     loadModal(form_data,thisBtn);
 });
-$(document).on('click', '#subjectsDiv .studentsListModal', function (e) {
+$(document).off('click', '#subjectsDiv .studentsListModal').on('click', '#subjectsDiv .studentsListModal', function (e) {
     var thisBtn = $(this);
     var id = thisBtn.data('id');
     var url = base_url+'/fis/courses/studentsListModal';

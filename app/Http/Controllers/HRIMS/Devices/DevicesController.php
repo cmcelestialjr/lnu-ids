@@ -20,7 +20,7 @@ class DevicesController extends Controller
             ->map(function($query) {
                 $dateTime = '';
                 if($query->status=='On'){
-                    $dateTime = date('F d, Y h:ia',strtotime($query->dateTime));
+                    $dateTime = date('F d, Y h:i:sa',strtotime($query->dateTime));
                 }
                 return [
                     'id' => $query->id,
@@ -240,7 +240,7 @@ class DevicesController extends Controller
                         ->map(function($query) {
                             $dateTime = '';
                             if($query->status=='On'){
-                                $dateTime = date('F d, Y h:ia',strtotime($query->dateTime));
+                                $dateTime = date('F d, Y h:i:sa',strtotime($query->dateTime));
                             }
                             return [
                                 'id' => $query->id,
@@ -273,7 +273,8 @@ class DevicesController extends Controller
                     $dateTime = date('Y-m-d H:i:s', strtotime($date.' '.$time));
                     $zk = new ZKTeco($device->ipaddress,$device->port);
                     if ($zk->connect()){
-                        //$zk->setTime('2023-08-24 10:26:15');
+                        //$zk->setTime('2024-03-18 08:26:45');
+                        $dateTime = date('Y-m-d H:i:s');
                         $zk->setTime($dateTime);
                         Devices::where('id', $id)
                                     ->update(['dateTime' => $dateTime]);
@@ -282,20 +283,25 @@ class DevicesController extends Controller
                     }
                 }
 
-                // $devices = Devices::where('device_status','Active')->get();
-                // if($devices->count()>0){
-                //     foreach($devices as $device){
-                //         $dateTime = date('Y-m-d H:i:s');
+                // $devices = Devices::where('device_status','Active')
+                //     ->where('id','>=',7)
+                //     ->where('id','<=',8)->get();
+                // if($devices->count()>0){   
+                //     $deviceIds = [];                 
+                //     foreach($devices as $device){                        
                 //         $zk = new ZKTeco($device->ipaddress,$device->port);
                 //         if ($zk->connect()){
+                //             $dateTime = date('Y-m-d H:i:s');
                 //             //$zk->setTime('2023-08-24 10:26:15');
                 //             $zk->setTime($dateTime);
-                //             Devices::where('id', $device->id)
-                //                         ->update(['dateTime' => $dateTime]);
-                //             $dateTime = date('F d, Y h:ia', strtotime($date.' '.$time));
+                //             $deviceIds[] = $device->id;
+                            
                 //             $result = 'success';
                 //         }
                 //     }
+                //     Devices::where('id', $deviceIds)
+                //             ->update(['dateTime' => $dateTime]);
+                //     $dateTime = date('F d, Y h:i:sa', strtotime($date.' '.$time));
                 // }
 
             }catch(Exception $e) {

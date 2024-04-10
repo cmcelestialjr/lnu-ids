@@ -70,7 +70,7 @@ class PageController extends Controller
         return view($this->page.'/schedule/schedule_muna',$data);
     }
     public function advisement($data){
-        $data['school_year'] = EducOfferedSchoolYear::orderBy('year_from','DESC')->get();
+        $data['school_year'] = EducOfferedSchoolYear::orderBy('year_from','DESC')->orderBy('grade_period_id','DESC')->get();
         return view($this->page.'/advisement/advisement',$data);
     }
     // public function grades($data){
@@ -82,5 +82,20 @@ class PageController extends Controller
     //         return view('layouts/error/404');
     //     }
     // }
+
+    public function loadsheet($data){
+        $user = Auth::user();
+        $instructor_id = $user->id;
+        $data['school_year'] = EducOfferedSchoolYear::
+            whereHas('offered_program', function ($query) use ($instructor_id) {
+                $query->whereHas('curriculums', function ($query) use ($instructor_id) {
+                    $query->whereHas('offered_courses', function ($query) use ($instructor_id) {
+                        $query->where('instructor_id',$instructor_id);
+                    });
+                });
+            })
+            ->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
+        return view($this->page.'/loadsheet/view',$data);
+    }
 }
 ?>
