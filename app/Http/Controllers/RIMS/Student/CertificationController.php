@@ -7,10 +7,18 @@ use App\Models\EducGradePeriod;
 use App\Models\EducProgramLevel;
 use App\Models\EducYearLevel;
 use App\Models\StudentsCourses;
+use App\Models\StudentsDocuments;
+use App\Models\StudentsDocumentsList;
 use App\Models\Users;
 use App\Services\NameServices;
+use App\Services\PasswordServices;
+use App\Services\TokenServices;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use PDF;
@@ -46,26 +54,25 @@ class CertificationController extends Controller
     /**
      * Show the form for viewing a resource.
      */
-    public function pdf(Request $request){
-
-        $user_access_level = $request->session()->get('user_access_level');
-        if($user_access_level!=1 && $user_access_level!=2 && $user_access_level!=3){
-            return view('layouts/error/404');
-        }
-            
+    public function pdf(Request $request){            
         $stud_id = $request->stud_id;
         $certification = $request->certification;
         $program_level = $request->program_level;
         $school_year = $request->school_year;
         $period = $request->period;
-        $dateTime = $request->dateTime;
-
+        $date = $request->date;
+        $pdf_code = $request->pdf_code;
+        
+        $first_remove = substr($pdf_code, 4);
+        $second_remove = substr($first_remove, 0, -4);
+        $new_pdf_code = $second_remove;
+        
         $student = Users::where('stud_id',$stud_id)->first();
-        if($student==NULL){
+        if($student==NULL || $new_pdf_code!=mb_substr($date, -1)){
             return view('layouts/error/404');
         }
         
-        $src = 'storage\rims\students/'.$stud_id.'\certification/'.$certification.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$dateTime.'.pdf';
+        $src = 'storage\rims\students/'.$stud_id.'\certification/'.$certification.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$date.'_'.$pdf_code.'.pdf';
 
         $data = array(
                 'src' => $src
@@ -73,15 +80,17 @@ class CertificationController extends Controller
         return view('pdf/main_view',$data);
     }
 
-
-
     /**
      * Display a listing of the resource.
      */
     public function display(Request $request)
     {
         $src = $request->src;
-        $src = 'storage\rims\students/'.$src.'.pdf';
+        if($src=='error'){
+            $src = 'assets\pdf\pdf_error.pdf';
+        }else{
+            $src = 'storage\rims\students/'.$src.'.pdf';
+        }        
         $data = array(
             'src' => $src
         );
@@ -168,7 +177,7 @@ class CertificationController extends Controller
                 return response()->json(['result' => $validator->errors()], 400);
             }
 
-            $url = $this->generateQRscholasticReport($request);
+            $url = $this->generateStudentDocuments($request);
 
             return response()->json(['result' => 'success',
                                 'url' => $url
@@ -176,21 +185,69 @@ class CertificationController extends Controller
         }
     }
 
-    private function generateQRscholasticReport($request){
+    private function generateStudentDocuments($request){
+        $user = Auth::user();
+        $name_services = new NameServices;
+        $name_user = mb_strtoupper($name_services->lastname($user->lastname,$user->firstname,$user->middlename,$user->extname));
+
+        $url = 'error';
+        $id = $request->id;
+        $certification = $request->certification;
+
+        $document_id = StudentsDocuments::where('name2',$certification)->first('id');
+
+        if($document_id == NULL){
+            return $url;
+        }      
+
+        if($certification=='scholasticReport'){
+            $program_level = $request->program_level;
+            $school_year = $request->school_year;
+            $period = $request->period;
+            $exp_school_year = explode('-',$school_year);
+            $year_from = $exp_school_year[0];
+            $year_to = $exp_school_year[1];
+
+            $insert = new StudentsDocumentsList();
+            $insert->document_id = $document_id->id;
+            $insert->user_id = $id;
+            $insert->program_level_id = $program_level;
+            $insert->grade_period_id = $period;
+            $insert->year_from = $year_from;
+            $insert->year_to = $year_to;
+            $insert->updated_by = $user->id;
+            $insert->save();
+
+            $url = $this->generateQRscholasticReport($request,$name_user);
+        }        
+
+        return $url;
+    }
+
+    private function generateQRscholasticReport($request,$name_user){
         error_reporting(E_ERROR);
 
         $id = $request->id;
         $certification = $request->certification;
         $program_level = $request->program_level;
         $school_year = $request->school_year;
-        $period = $request->period;        
+        $period = $request->period;
+        $date = date('Y-m-d');
+
+        $token = new TokenServices;
+        $token1 = $token->token_w_upper(4);
+        $token2 = $token->token_w_upper(4);
+        $pdf_code = $token1.mb_substr($date, -1).$token2;
+        $password = $token1.mb_substr($date, -1).$token2;
 
         $student = Users::where('id',$id)
             ->where('stud_id','!=',NULL)
             ->first();
         $stud_id = $student->stud_id;
 
-        $dateTime = date('Y-m-d');
+        $path = 'storage\rims\students/'.$stud_id.'\certification/';
+        
+        // File::deleteDirectory($path);
 
         $image = QrCode::format('png')
                     ->merge(public_path('assets\images\logo\lnu_logo.png'), .28, true)
@@ -200,18 +257,50 @@ class CertificationController extends Controller
                     ->eyeColor(2, /*outer*/ 212,175,55, /*inner*/ 0, 0, 128, 0, 0)
                     ->size(300)
                     ->errorCorrection('H')
-                    ->generate('students/certification/'.$stud_id.'/'.$certification.'/'.$program_level.'/'.$school_year.'/'.$period.'/'.$dateTime);
-        $imageName = $certification.'_'.$program_level.'_'.$school_year.'_'.$dateTime.'.png';
-        $path = 'storage\rims\students/'.$stud_id.'\certification/';
+                    ->generate('student/certification/'.$stud_id.'/'.$certification.'_protected/'.$program_level.'/'.$school_year.'/'.$period.'/'.$date.'/'.$pdf_code);
+        $imageName = $certification.'_'.$program_level.'_'.$school_year.'_'.$date.'_'.$pdf_code.'.png';        
+
         File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
+
         $file = public_path($path . $imageName);
         file_put_contents($file, $image);
         $qrcode = $path.$imageName;
-        $src = $this->generatePDFscholasticReport($student,$request,$dateTime,$qrcode);
+        $src = $this->generatePDFscholasticReport($student,$request,$date,$qrcode,$pdf_code,$name_user,$password);
         return $src;
     }
 
-    private function  generatePDFscholasticReport($student,$request,$dateTime,$qrcode){
+    private function generatePDFscholasticReport($student,$request,$date,$qrcode,$pdf_code,$name_user,$password){
+        $password_services = new PasswordServices;
+        $certification = $request->certification;
+        $program_level = $request->program_level;
+        $school_year = $request->school_year;
+        $period = $request->period;      
+        $stud_id = $student->stud_id;
+
+        $master_password = $password_services->master();
+
+        //$pdf = new PDF('A4', 'mm', '', true, 'UTF-8', false);
+        $page_size = array(215.9, 330.2);
+        $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
+        $height = 185;
+        $width = 260;
+        $pdf::reset();  
+        $pdf = $this->generatePDFscholasticReportDetails($pdf,$student,$request,$date,$qrcode,$pdf_code,$name_user,$password);
+        $pdf::setProtection();
+        $pathUserUnprotected  = 'storage/rims/students/'.$stud_id.'\certification/'.$certification.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$date.'_'.$pdf_code.'.pdf';
+        $pdf::Output(public_path($pathUserUnprotected),'F');       
+   
+        // $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
+        // $pdf::reset();
+        // $pdf = $this->generatePDFscholasticReportDetails($pdf,$student,$request,$date,$qrcode,$pdf_code,$name_user,$password);
+        // $pdf::setProtection(array('print'), $password, $master_password, 0, null);
+        // $pathUserProtected = 'storage/rims/students/'.$stud_id.'\certification/'.$certification.'_protected'.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$date.'_'.$pdf_code.'.pdf';
+        // $pdf::Output(public_path($pathUserProtected),'F');
+        
+        return $stud_id.'\certification/'.$certification.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$date.'_'.$pdf_code;
+    }
+
+    private function generatePDFscholasticReportDetails($pdf,$student,$request,$date,$qrcode,$pdf_code,$name_user,$password){
         $name_services = new NameServices;
         $certification = $request->certification;
         $program_level = $request->program_level;
@@ -272,14 +361,14 @@ class CertificationController extends Controller
         $web_icon = public_path('assets\images\icons\png\web.png');
         $phone_icon = public_path('assets\images\icons\png\phone.png');
 
-        //$pdf = new PDF('A4', 'mm', '', true, 'UTF-8', false);
-        $page_size = array(215.9, 330.2);
-        $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
-        $height = 185;
-        $width = 260;
-        $pdf::reset();
+              
 
-        // $pdf::setHeaderCallback(function($pdf) use ($logo,$qrcode,$at_icon,$web_icon,$phone_icon,$grade_period_name_no,$school_year){
+        $pdf::SetCreator(PDF_CREATOR);
+        $pdf::SetAuthor($name_user);
+        $pdf::SetTitle($stud_id.' - '.$name_student);
+        $pdf::SetSubject('Scholastic Report '.$grade_period_name_no.' '.$school_year);
+
+        // $pdf::setHeaderCallback(function($pdf) use ($logo,$qrcode,$at_icon,$web_icon,$phone_icon,$grade_period_name_no,$school_year,$password){
         //        $y = 8;
         //        $x = 10;
         //        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
@@ -299,8 +388,11 @@ class CertificationController extends Controller
         //        $pdf->SetXY($x+118, $y+20);
         //        $pdf->Image($web_icon, '', '', 3, 3, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
         //        $pdf->SetXY($x+160, $y+2);
-        //        $pdf->Image($qrcode, '', '', 35, 25, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
-
+        //        $pdf->Image($qrcode, '', '', 35, 24, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
+        //        $pdf->SetXY($x+160, $y+25.5);
+        //        $pdf->SetFont('arial','',8);
+        //        $pdf->Cell(35, '', $password, 0, 1, 'C', 0, '', 1);
+               
         //        $pdf->SetXY($x+30, $y+4);
         //        $pdf->SetFont('arial','',10);
         //        $pdf->Cell(95, '', 'Republic of the Philippines', 0, 1, 'L', 0, '', 1);
@@ -541,11 +633,8 @@ class CertificationController extends Controller
         $y_add = $y_add+4;
         $pdf::SetXY($x+$x_add, $y+$y_add);
         $pdf::Cell(190, '', '5.0(69 and below) Failure: student must repeat; WDR - Withdrawn Subject; DR - Dropped; INC - Incomplete.', 0, 1, 'L', 0, '', 1);
-
-        $pathUser = 'storage\rims\students/'.$stud_id.'\certification/'.$certification.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$dateTime.'.pdf';
-        $pdf::Output(public_path($pathUser),'F');
-
-        return $stud_id.'\certification/'.$certification.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$dateTime;
+        
+        return $pdf;
     }
 
     /**

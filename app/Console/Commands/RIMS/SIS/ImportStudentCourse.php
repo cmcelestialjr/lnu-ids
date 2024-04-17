@@ -79,7 +79,7 @@ class ImportStudentCourse extends Command
             ->orderBy('sy','ASC')
             ->orderBy('term','ASC')
             ->orderBy('terms','ASC')
-            ->where('sy','2020')
+            ->where('sy','2013')
             ->get();
         if($courses->count()>0){
             foreach($courses as $course){

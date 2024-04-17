@@ -155,7 +155,7 @@ body {
 <body>
     <section id="not-found">
       <div id="title">404<br>
-        <label style="font-size:20px">Oops. There's been problem accessing this page. Please try again later. Thank you!</label>
+        <label style="font-size:20px">Oops. Not Found!</label>
       </div>
       <div class="circles">
         <p>404<br>

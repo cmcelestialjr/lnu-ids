@@ -32,7 +32,7 @@ class UpdatePassword extends Command
     {
         $token = new TokenServices;
 
-        $users = Users::where('username','150906')->first();
+        $users = Users::where('username','141103')->first();
 
         $token1 = $token->token(4);
         $token2 = $token->token(4);

@@ -101,9 +101,9 @@ class DtrMachineCheck extends Command
                     }
                 }
             }
-            // if($recordsCheck>0){
-            //     $zk->clearAttendance();
-            // }
+            if($recordsCheck>0){
+                $zk->clearAttendance();
+            }
             //$this->info('Command executed successfully!');
             // if (!empty($recordsToInsert)) {
             //     DB::beginTransaction();

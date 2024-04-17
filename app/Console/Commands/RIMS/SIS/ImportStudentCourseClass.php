@@ -48,9 +48,11 @@ class ImportStudentCourseClass extends Command
         $connectionOfferings = 'sis_offerings';
         DB::connection($connectionOfferings)->getPdo();
 
+        $school_year = '2015';
+
         $subjects_offerings = DB::connection($connectionOfferings)
             ->table('subjects')
-            ->where('sy', '2022')
+            ->where('sy', $school_year)
             ->where('term', '>', 0)
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -68,7 +70,7 @@ class ImportStudentCourseClass extends Command
 
         $class_course = DB::connection($connectionName)
             ->table('classes')
-            ->where('sy', '2022')
+            ->where('sy', $school_year)
             ->where('term', '>', 0)
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))

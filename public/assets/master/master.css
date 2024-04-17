@@ -487,6 +487,20 @@ datalist{
   z-index: 3050 !important;
 }
 
+.table-container {
+  position: relative;
+  overflow: auto;
+  max-height: 750px;
+}
+
+.sticky-div{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  overflow-y: auto;
+  max-height: inherit;
+}
+
 /* TABLE ELEMENTS */
 
 .table{

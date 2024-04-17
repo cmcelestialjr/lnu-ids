@@ -59,22 +59,6 @@ $(document).on('click', '#studentTORModal button[name="add"]', function (e) {
     };
     loadModal(form_data,thisBtn);
 });
-$(document).on('click', '#studentViewModal #selectProgram', function (e) {
-    var thisBtn = $(this);
-    var id = $('#studentViewModal input[name="id"]').val();
-    var url = base_url+'/rims/student/studentSelectProgramModal';
-    var modal = 'info';
-    var modal_size = 'modal-md';
-    var form_data = {
-        url:url,
-        modal:modal,
-        modal_size:modal_size,
-        static:'',
-        w_table:'wo',
-        id:id
-    };
-    loadModal(form_data,thisBtn);
-});
 $(document).on('click', '#studentTORModal button[name="print"]', function (e) {
     var thisBtn = $(this);
     var id = $('#studentTORModal input[name="id"]').val();

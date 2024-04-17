@@ -46,7 +46,10 @@ $(document).off('change', '#studentCurriculumModal #studentCurriculumDiv .course
     var checkboxesOther = $('#studentCurriculumModal #studentCurriculumDiv .courses_other');
     checkboxesCurriculum.not(this).prop('disabled', $(this).prop('checked'));
     $('#studentCurriculumModal #studentCurriculumDiv #courses_other_td').addClass('hide');
+    $('#studentCurriculumModal #studentCurriculumDiv #courses_main_table').css('width', '100%');
     if ($(this).is(':checked')) {
+        $('#studentCurriculumModal #studentCurriculumDiv #courses_main_table').css("width","65%").css("float", "left");
+        $('#studentCurriculumModal #studentCurriculumDiv #courses_other_td').css("width","35%").css("float", "right");
         $('#studentCurriculumModal #studentCurriculumDiv #courses_other_td').removeClass('hide');
     }
     if (checkboxesCurriculum.is(':checked') && checkboxesOther.is(':checked')) {
@@ -54,6 +57,10 @@ $(document).off('change', '#studentCurriculumModal #studentCurriculumDiv .course
         var courseOtherID = checkboxesOther.filter(':checked').data('id');
         course_credit(curriculumCourseID, courseOtherID);
     }
+});
+$(document).off('click', '#studentCurriculumModal #studentCurriculumDiv #close_courses_other').on('click', '#studentCurriculumModal #studentCurriculumDiv #close_courses_other', function (e) {
+    $('#studentCurriculumModal #studentCurriculumDiv #courses_other_td').addClass('hide');
+    $('#studentCurriculumModal #studentCurriculumDiv .courses_curriculum').prop('checked', false).prop('disabled', false);
 });
 
 $(document).off('change', '#studentCurriculumModal #studentCurriculumDiv .courses_other').on('change', '#studentCurriculumModal #studentCurriculumDiv .courses_other', function (e) {

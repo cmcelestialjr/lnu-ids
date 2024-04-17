@@ -62,7 +62,7 @@ function torDiv(id,program_level,thisBtn){
 function curriculumModal(id,program_level,curriculum,thisBtn){
     var url = base_url+'/rims/student/studentCurriculumModal';
     var modal = 'primary';
-    var modal_size = 'modal-xl';
+    var modal_size = 'modal-xxl';
     var form_data = {
         url:url,
         modal:modal,

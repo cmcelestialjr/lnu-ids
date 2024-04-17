@@ -16,7 +16,7 @@ class _EducationBg extends Model
     {
         return $this->belongsTo(EducProgramLevel::class, 'level_id', 'id');
     }
-    public function school_id()
+    public function school()
     {
         return $this->belongsTo(School::class, 'school_id', 'id');
     }

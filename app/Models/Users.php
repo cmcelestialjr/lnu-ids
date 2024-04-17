@@ -15,7 +15,7 @@ class Users extends Model
     public function personal_info()
     {
         return $this->belongsTo(_PersonalInfo::class, 'id', 'user_id');
-    }
+    }    
     public function employee_info()
     {
         return $this->belongsTo(_Work::class, 'id', 'user_id')->where('role_id',2)->orderBy('date_from','ASC');
@@ -51,6 +51,10 @@ class Users extends Model
     public function date_entry()
     {
         return $this->belongsTo(_Work::class, 'id', 'user_id')->where('position_id','>',0)->orderBy('date_from','DESC');
+    }
+    public function education()
+    {
+        return $this->hasMany(_EducationBg::class, 'user_id', 'id')->orderBy('level_id','ASC')->orderBy('period_from','ASC');
     }
     public function work()
     {

@@ -23,7 +23,20 @@ class ModalController extends Controller
         $id = $request->id;
         $program_level_id = NULL;
         $curriculum_id = NULL;
-        $query = Users::with('personal_info','student_info.program.departments','student_info.grade_level')
+        $query = Users::with('personal_info.country',
+                             'personal_info.religion',
+                             'personal_info.civil_statuses',
+                             'personal_info.res_brgy',
+                             'personal_info.res_city_muns',
+                             'personal_info.res_province',
+                             'personal_info.per_brgy',
+                             'personal_info.per_city_muns',
+                             'personal_info.per_province',
+                             'student_info.program.departments',
+                             'student_info.grade_level',
+                             'education.level',
+                             'education.school',
+                             'education.program')
             ->where('id',$id)
             ->first();
         $program_level = StudentsProgram::where('user_id',$id)

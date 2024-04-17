@@ -52,6 +52,10 @@ class _PersonalInfo extends Model
     {
         return $this->belongsTo(Religion::class, 'religion_id', 'id');
     }
+    public function country()
+    {
+        return $this->belongsTo(Countries::class, 'country_id', 'id');
+    }
     public function updated_by_info()
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id');

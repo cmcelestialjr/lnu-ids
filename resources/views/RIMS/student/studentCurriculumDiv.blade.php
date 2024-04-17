@@ -24,9 +24,10 @@
     </div>
 </div>
 @endif
-<table class="table">
+<div class="table-responsive table-container">
+<table class="table" id="courses_main_table" style="overflow: auto;">
     <tr>
-        <td style="width: 65%">
+        <td>
         @foreach($query as $row)
             <div class="card card-primary card-outline">
                 <div class="card-body table-responsive">
@@ -145,11 +146,17 @@
             </div>
         @endforeach
         </td>
-        <td id="courses_other_td" class="hide" style="width: 35%">
-            <div class="card card-primary card-outline">
+    </tr>
+</table>
+<div class="table-responsive sticky-div hide" id="courses_other_td">
+<table class="table">
+    <tr>
+        <td>
+            <div class="card card-primary card-outline sticky-div">
                 <div class="card-body table-responsive">
                     <div class="row">
                         <div class="col-lg-12">
+                            <span class="fa fa-times" id="close_courses_other" style="float:right;cursor:pointer;"></span>
                             <table class="table table-bordered" style="font-size:10px;">
                                 <thead>
                                     <td class="center" style="padding:4px"><label>School Term & <br>Course No.</label></td>
@@ -233,3 +240,5 @@
         </td>
     </tr>
 </table>
+</div>
+</div>

@@ -85,7 +85,7 @@
           <div class="tab-pane fade show active" id="new" role="tabpanel" style="height: 150px">
             <div class="row">
               <div class="col-lg-12"><br></div>
-              <div class="col-lg-1 center">
+              <div class="col-lg-2 center">
                 <h2>STUDENT</h2>
               </div>
               <div class="col-lg-6">

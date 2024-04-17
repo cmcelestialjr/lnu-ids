@@ -18,7 +18,10 @@ use App\Models\StudentsCourses;
 use App\Models\StudentsEnrollmentForm;
 use App\Models\StudentsInfo;
 use App\Models\StudentsTOR;
+use App\Models\Users;
 use App\Services\NameServices;
+use App\Services\PasswordServices;
+use App\Services\TokenServices;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +32,33 @@ use PDF;
 
 class EnrollmentFormController extends Controller
 {
+    /**
+     * Show the form for viewing a resource.
+     */
+    public function pdf(Request $request){            
+        $stud_id = $request->stud_id;
+        $school_year = $request->school_year;
+        $school_year_period = $request->school_year_period;
+        $enrollment_form_no = $request->enrollment_form_no;
+        $pdf_code = $request->pdf_code;
+        
+        $first_remove = substr($pdf_code, 4);
+        $second_remove = substr($first_remove, 0, -4);
+        $new_pdf_code = $second_remove;
+        
+        $student = Users::where('stud_id',$stud_id)->first();
+        if($student==NULL || $new_pdf_code!=mb_substr($stud_id, -1)){
+            return view('layouts/error/404');
+        }
+        
+        $src = 'storage\rims\students/'.$stud_id.'\enrollment_form/'.$school_year.'_'.$school_year_period.'_'.$enrollment_form_no.'.pdf';
+
+        $data = array(
+                'src' => $src
+            );
+        return view('pdf/main_view',$data);
+    }
+
     public function form(Request $request){
         $user_access_level = $request->session()->get('user_access_level');
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
@@ -64,6 +94,16 @@ class EnrollmentFormController extends Controller
         error_reporting(E_ERROR);
         $enrollment_form_no = $this->enrollment_form_no($student->user_id,$school_year_id,$year_from);
         $id_no = $student->student_info->id_no;
+
+        $token = new TokenServices;
+        $password_services = new PasswordServices;
+
+        $token1 = $token->token_w_upper(4);
+        $token2 = $token->token_w_upper(4);
+        $pdf_code = $token1.mb_substr($id_no, -1).$token2;
+        $password = $token1.mb_substr($id_no, -1).$token2;
+        $master_password = $password_services->master();
+
         $image = QrCode::format('png')
                     ->merge(public_path('assets\images\logo\lnu_logo.png'), .28, true)
                     ->style('round', 0.2)
@@ -72,16 +112,17 @@ class EnrollmentFormController extends Controller
                     ->eyeColor(2, /*outer*/ 212,175,55, /*inner*/ 0, 0, 128, 0, 0)
                     ->size(300)
                     ->errorCorrection('H')
-                    ->generate('ENROLLMENTFORM_'.$id_no.'_'.$school_year.'_'.$school_year_period.'_'.$enrollment_form_no);
+                    ->generate('student/enrollmentform/'.$id_no.'/'.$school_year.'/'.$school_year_period.'/'.$enrollment_form_no.'_protected/'.$pdf_code);
+
         $imageName = $id_no.'_'.$school_year.'_'.$school_year_period.'.png';
         $path = 'storage\rims\students/'.$id_no.'\enrollment_form/';
         File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
         $file = public_path($path . $imageName);
         file_put_contents($file, $image);
         $qrcode = $path.$imageName;
-        $src = $this->generatePDF($student,$school_year_id,$school_year,$school_year_period,$qrcode,$enrollment_form_no);
+        $src = $this->generatePDF($student,$school_year_id,$school_year,$school_year_period,$qrcode,$enrollment_form_no,$password,$master_password);
         return $src;
-    }
+    }    
     private function enrollment_form_no($id,$school_year_id,$year_from){
         $user = Auth::user();
         $updated_by = $user->id;
@@ -108,7 +149,25 @@ class EnrollmentFormController extends Controller
         }
         return $enrollment_form_no;
     }
-    private function generatePDF($student,$school_year_id,$school_year,$school_year_period,$qrcode,$enrollment_form_no){
+    private function generatePDF($student,$school_year_id,$school_year,$school_year_period,$qrcode,$enrollment_form_no,$password,$master_password){
+        //$pdf = new PDF('A4', 'mm', '', true, 'UTF-8', false);
+        $page_size = array(210, 270);
+        $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
+        $pdf::reset();
+        $pdf = $this->generatePDFDetails($pdf,$student,$school_year_id,$school_year,$school_year_period,$qrcode,$enrollment_form_no,$password);
+        $pathUser = 'storage\rims\students/'.$student->student_info->id_no.'\enrollment_form/'.$school_year.'_'.$school_year_period.'_'.$enrollment_form_no.'.pdf';
+        $pdf::Output(public_path($pathUser),'F');
+
+        $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
+        $pdf::reset();
+        $pdf = $this->generatePDFDetails($pdf,$student,$school_year_id,$school_year,$school_year_period,$qrcode,$enrollment_form_no,$password);
+        $pdf::setProtection(array('print'), $password, $master_password, 0, null);
+        $pathUser = 'storage\rims\students/'.$student->student_info->id_no.'\enrollment_form/'.$school_year.'_'.$school_year_period.'_'.$enrollment_form_no.'_protected.pdf';
+        $pdf::Output(public_path($pathUser),'F');
+
+        return $pathUser;
+    }
+    private function generatePDFDetails($pdf,$student,$school_year_id,$school_year,$school_year_period,$qrcode,$enrollment_form_no,$password){
         $user = Auth::user();
         $pathUser = NULL;
         $user_id = $student->student_info->user_id;
@@ -132,10 +191,8 @@ class EnrollmentFormController extends Controller
             ->orderByDesc('count')
             ->first();
         $section = $get_no->section_code;
-        //$pdf = new PDF('A4', 'mm', '', true, 'UTF-8', false);
+
         $page_size = array(210, 270);
-        $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
-        $pdf::reset();
         $pdf::AddPage('P',$page_size);
         $pdf::SetAutoPageBreak(TRUE, 3);
        //landscape scale A4
@@ -684,9 +741,6 @@ class EnrollmentFormController extends Controller
         $pdf::Cell(70, '', date('m/d/Y h:i A'), 0, 1, 'C', 0, '', 1);
         
 
-        $pathUser = 'storage\rims\students/'.$student->student_info->id_no.'\enrollment_form/'.$school_year.'_'.$school_year_period.'_'.$enrollment_form_no.'.pdf';
-        $pdf::Output(public_path($pathUser),'F');
-
-        return $pathUser;
+        return $pdf;
     }
 }

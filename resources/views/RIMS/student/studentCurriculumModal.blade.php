@@ -2,7 +2,7 @@
 <div class="modal-content" id="studentCurriculumModal">
     <div class="modal-header">
         <h4 class="modal-title"> Curriculum</h4>
-        <span class="fa fa-times btn-no-design" data-dismiss="modal">x</span>
+        <span class="fa fa-times" data-dismiss="modal"></span>
     </div>
     <div class="modal-body">
         <div class="row">

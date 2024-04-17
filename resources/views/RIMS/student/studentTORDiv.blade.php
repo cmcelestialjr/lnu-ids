@@ -21,11 +21,15 @@
                 $grade_period_old = '';
                 $total_units = 0;
                 $total_grade = 0;
+                $total_units_w_nstp = 0;
+                $total_grade_w_nstp = 0;
             @endphp
                 @foreach($query as $row)
                     @php
                     $sem_units = 0;
-                    $sem_grade = 0;                
+                    $sem_grade = 0; 
+                    $sem_units_w_nstp = 0;
+                    $sem_grade_w_nstp = 0;                
                     @endphp
                     @foreach($row['courses'] as $courses)
                     @php
@@ -60,6 +64,10 @@
                             $total_units += $course_units;
                             $total_grade += $course_units*$final_grade;
                         }
+                        $sem_units_w_nstp += $course_units;
+                        $sem_grade_w_nstp += $course_units*$final_grade;
+                        $total_units_w_nstp += $course_units;
+                        $total_grade_w_nstp += $course_units*$final_grade;
                     @endphp
                     @if($grade_period!=$grade_period_old)
                     <tr>
@@ -90,8 +98,8 @@
                     @endforeach
                     <tr>
                         <td class="center" colspan="2">Sem Ave:</td>
-                        <td class="center">{{$sem_grade}}</td>
-                        <td class="center">{{$sem_units}}</td>
+                        <td class="center">{{$sem_grade_w_nstp}}</td>
+                        <td class="center">{{$sem_units_w_nstp}}</td>
                     </tr>
                 @endforeach
         </tbody>
@@ -100,11 +108,25 @@
 <table style="border:1px solid; width: 100%;border-collapse: collapse;">
     <tr>
         <td class="center" style="width: 75%;border:1px solid" colspan="2">TOTAL UNITS:</td>
+        <td class="center" style="width: 12%;border:1px solid">{{$total_grade_w_nstp}}</td>
+        <td class="center" style="width: 13%;border:1px solid">{{$total_units_w_nstp}}</td>
+    </tr>
+    <tr>
+        <td class="center" colspan="2">GWA:</td>
+        <td></td>
+        <td>
+            @if($total_units_w_nstp>0)
+            {{round($total_grade_w_nstp/$total_units_w_nstp,2)}}
+            @endif
+        </td>
+    </tr>
+    <tr>
+        <td class="center" style="width: 75%;border:1px solid" colspan="2">TOTAL UNITS W/O NSTP:</td>
         <td class="center" style="width: 12%;border:1px solid">{{$total_grade}}</td>
         <td class="center" style="width: 13%;border:1px solid">{{$total_units}}</td>
     </tr>
     <tr>
-        <td class="center" colspan="2">GWA:</td>
+        <td class="center" colspan="2">GWA W/O NSTP:</td>
         <td></td>
         <td>
             @if($total_units>0)

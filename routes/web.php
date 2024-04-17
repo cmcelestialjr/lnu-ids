@@ -26,7 +26,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
     Route::get('/monitor1', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@monitor1');
     Route::post('/monitor1/display', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@display');
 
-    Route::get('/student/certification/{stud_id}/{certification}/{program_level}/{school_year}/{period}/{dateTime}', 'RIMS\Student\CertificationController@pdf');
+    Route::get('/student/certification/{stud_id}/{certification}/{program_level}/{school_year}/{period}/{date}/{pdf_code}', 'RIMS\Student\CertificationController@pdf');
+    Route::get('/student/enrollmentform/{stud_id}/{school_year}/{school_year_period}/{enrollment_form_no}/{pdf_code}', 'RIMS\Student\EnrollmentFormController@pdf');
 
     Route::group(['middleware' => ['auth']], function(){
     //Route::group(['middleware' => ['auth','Login','PreventBackHistory']], function(){
