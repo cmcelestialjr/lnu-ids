@@ -128,7 +128,7 @@ class PageController extends Controller
         }
         $data['query'] = $query;
         $data['students_data'] = $students_data;
-        return view('rims/home',$data);
+        return view($this->page.'/home',$data);
     }
     public function students($data){
         $data['program_level'] = EducProgramLevel::get();
