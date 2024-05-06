@@ -7,6 +7,7 @@ use App\Models\EducBranch;
 use App\Models\EducCourses;
 use App\Models\EducCourseStatus;
 use App\Models\EducCurriculum;
+use App\Models\EducCurriculumBranch;
 use App\Models\EducDepartments;
 use App\Models\EducDepartmentUnit;
 use App\Models\EducProgramLevel;
@@ -33,7 +34,7 @@ class ProgramController extends Controller
     {
         // Get the user access level from the session
         $user_access_level = $request->session()->get('user_access_level');
-        
+
         // Initialize data array
         $data = array();
 
@@ -44,35 +45,53 @@ class ProgramController extends Controller
         if ($validator->fails()) {
             return response()->json($data);
         }
-        
+
         // Get the authenticated user
         $user = Auth::user();
-        
-        // Get the status ID from the request
+
+        // Get the request
         $status_id = $request->status_id;
-        
+        $branch_id = $request->branch_id;
+        $level_id = $request->level_id;
+
+        $status_check = EducCourseStatus::where('id', $status_id)->first();
+        $branch_check = EducBranch::where('id', $branch_id)->first();
+        $level_check = EducProgramLevel::where('id', $level_id)->first();
+
+
+        // Check if status if exists
+        if ($level_check==NULL && $status_check==NULL && $branch_check==NULL) {
+            return response()->json($data);
+        }
+
         // Query the programs with related data
-        $query = EducPrograms::with('departments', 'program_level', 'status')->where('status_id', $status_id)->get();
-        
+        $query = EducProgramsCode::with('program.departments', 'program.program_level', 'status')
+            ->whereHas('program.departments', function ($q) use ($level_id) {
+                $q->where('program_level_id', $level_id);
+            })
+            ->where('status_id', $status_id)
+            ->where('branch_id', $branch_id)
+            ->get();
+
         // Count the results
         $count = $query->count();
-        
+
         // Process the query results
         if ($count > 0) {
             $x = 1;
             foreach ($query as $r) {
                 $data_list['f1'] = $x;
-                $data_list['f2'] = $r->program_level->name;
-                $data_list['f3'] = $r->departments->shorten;
-                $data_list['f4'] = $r->name;
-                $data_list['f5'] = $r->shorten;
-                
+                $data_list['f2'] = $r->program->program_level->name;
+                $data_list['f3'] = $r->program->departments->shorten;
+                $data_list['f4'] = $r->program->name;
+                $data_list['f5'] = $r->program->shorten;
+
                 if ($user_access_level == 1 || $user_access_level == 2) {
                     $data_list['f6'] = '<button class="btn btn-primary btn-primary-scan programEdit"
-                                            data-id="'.$r->id.'"
+                                            data-id="'.$r->program_id.'"
                                             ><span class="fa fa-edit"></span> Edit</button>';
                     $data_list['f9'] = '<button class="btn btn-primary btn-primary-scan branch"
-                                            data-id="'.$r->id.'"
+                                            data-id="'.$r->program_id.'"
                                             ><span class="fa fa-eye"></span> Branches</button>';
                     if ($r->status->id == 1) {
                         $status = '<button class="btn btn-success btn-success-scan programStatus"
@@ -92,18 +111,18 @@ class ProgramController extends Controller
                         $status = '<button class="btn btn-danger">'.$r->status->name.'</button>';
                     }
                 }
-                
+
                 $data_list['f7'] = $status;
                 $data_list['f8'] = '<button class="btn btn-info btn-info-scan viewModal"
-                                        data-id="'.$r->id.'">
+                                        data-id="'.$r->program_id.'">
                                         <span class="fa fa-eye"></span> Courses
                                     </button>';
-                
+
                 array_push($data, $data_list);
                 $x++;
             }
         }
-        
+
         // Return the data as a JSON response
         return response()->json($data);
     }
@@ -118,7 +137,7 @@ class ProgramController extends Controller
     {
         // Get program levels
         $levels = EducProgramLevel::get();
-        
+
         // Get departments and order them by name
         $departments_query = EducDepartments::orderBy('name');
         $departments = $departments_query->get();
@@ -131,7 +150,7 @@ class ProgramController extends Controller
             'departments' => $departments,
             'unit' => $unit
         );
-        
+
         // Return the view for creating a new program
         return view('rims/programs/programNewModal', $data);
     }
@@ -206,17 +225,18 @@ class ProgramController extends Controller
                     $insert->save();
 
                     // Iterate through branches and create corresponding program code records
-                    $branches = EducBranch::where('id', '!=', 1)->get();
+                    $branches = EducBranch::where('id', '>', 1)->get();
                     if ($branches->count() > 0) {
                         foreach ($branches as $branch) {
                             $insert = new EducProgramsCode();
                             $insert->program_id = $program_id;
                             $insert->name = $branch->code;
                             $insert->branch_id = $branch->id;
-                            $insert->status_id = 1;
+                            $insert->status_id = 0;
                             $insert->updated_by = $updated_by;
                         }
                     }
+
                     // Commit the database transaction
                     DB::commit();
                     // Set the result to 'success'
@@ -372,7 +392,7 @@ class ProgramController extends Controller
         }
 
         // Start a database transaction
-        DB::beginTransaction();  
+        DB::beginTransaction();
         try {
             // Get the authenticated user
             $user = Auth::user();
@@ -412,7 +432,7 @@ class ProgramController extends Controller
                         'updated_by' => $updated_by,
                         'updated_at' => date('Y-m-d H:i:s'),
                     ]);
-                
+
                 // Commit the database transaction
                 DB::commit();
                 return response()->json(['result' => 'success']);
@@ -453,7 +473,7 @@ class ProgramController extends Controller
         $id = $request->id;
 
         // Query the database to retrieve the program details
-        $query = EducPrograms::where('id', $id)->first();
+        $query = EducProgramsCode::where('id', $id)->first();
 
         // Determine the program's current status and set the appropriate class, button, and status text
         if ($query->status_id == 1) {
@@ -497,29 +517,29 @@ class ProgramController extends Controller
         }
         // Get user access level from the session
         $user_access_level = $request->session()->get('user_access_level');
-        
+
         // Get the currently authenticated user
         $user = Auth::user();
-        
+
         // Get the user's ID for tracking the update
         $updated_by = $user->id;
-        
+
         // Get the program ID from the request
         $id = $request->id;
-        
+
         // Initialize variables to store the result, button class, and button HTML
         $result = 'error';
         $btn_class = '';
         $btn_html = '';
-        
+
         // Check if the user has sufficient access level to perform the status update
         if ($user_access_level == 1 || $user_access_level == 2) {
             // Start a database transaction
-            DB::beginTransaction();  
+            DB::beginTransaction();
             try {
                 // Retrieve the program record from the database
-                $check = EducPrograms::where('id', $id)->first();
-                
+                $check = EducProgramsCode::where('id', $id)->first();
+
                 // Check if the program record exists
                 if ($check != null) {
                     // Determine the new status and associated button styles
@@ -532,37 +552,51 @@ class ProgramController extends Controller
                         $btn_class = 'btn-success btn-success-scan';
                         $btn_html = ' Open';
                     }
-                    
-                    // Retrieve the curriculum IDs associated with the program
-                    $curriculum_id = EducCurriculum::where('program_id', $id)->pluck('id')->toArray();
+
+                    // // Retrieve the curriculum IDs associated with the program
+
                     $now = date('Y-m-d H:i:s');
-                    // Update the program status
-                    EducPrograms::where('id', $id)
-                        ->update(['status_id' => $status_id,
-                                'updated_by' => $updated_by,
-                                'updated_at' => $now]);
-                    
+                    // // Update the program status
+                    // EducPrograms::where('id', $id)
+                    //     ->update(['status_id' => $status_id,
+                    //             'updated_by' => $updated_by,
+                    //             'updated_at' => $now]);
+
                     // Update the program code status
-                    EducProgramsCode::where('program_id', $id)
-                        ->update(['status_id' => $status_id,
-                                'updated_by' => $updated_by,
-                                'updated_at' => $now]); 
-                    
-                    // Update the curriculum status
-                    EducCurriculum::where('program_id', $id)
+                    EducProgramsCode::where('id', $id)
                         ->update(['status_id' => $status_id,
                                 'updated_by' => $updated_by,
                                 'updated_at' => $now]);
-                    
-                    // Update the course status associated with the curriculum
-                    EducCourses::whereIn('curriculum_id', $curriculum_id)
+
+                    if($status_id == 1) {
+                    $curriculum_latest = EducCurriculum::where('program_id', $check->program_id)
+                        ->orderBy('year_from','DESC')
+                        ->first();
+                    // // Update the curriculum status
+                    EducCurriculumBranch::where('branch_id',$check->branch_id)
+                        ->where('curriculum_id',$curriculum_latest->id)
                         ->update(['status_id' => $status_id,
                                 'updated_by' => $updated_by,
                                 'updated_at' => $now]);
+                    } else {
+                        $curriculum_id = EducCurriculum::where('program_id', $check->program_id)->pluck('id')->toArray();
+                        EducCurriculumBranch::where('branch_id',$check->branch_id)
+                            ->whereIn('curriculum_id',$curriculum_id)
+                            ->update(['status_id' => $status_id,
+                                    'updated_by' => $updated_by,
+                                    'updated_at' => $now]);
+                    }
+
+                    // // Update the course status associated with the curriculum
+                    // EducCourses::whereIn('curriculum_id', $curriculum_id)
+                    //     ->update(['status_id' => $status_id,
+                    //             'updated_by' => $updated_by,
+                    //             'updated_at' => $now]);
+
                     // Commit the database transaction
                     DB::commit();
                     // Set the result to success
-                    $result = 'success';  
+                    $result = 'success';
                 }else{
                     DB::rollback();
                 }
@@ -577,14 +611,14 @@ class ProgramController extends Controller
                 return $this->handleOtherError($e);
             }
         }
-        
+
         // Prepare the response data as an array
         $response = [
             'result' => $result,
             'btn_class' => $btn_class,
             'btn_html' => $btn_html
         ];
-        
+
         // Return the response as JSON
         return response()->json($response);
     }
@@ -598,6 +632,60 @@ class ProgramController extends Controller
         //
     }
 
+    public function departments(Request $request){
+        // Validate the incoming request data
+        $validator = $this->indexValidateRequest($request);
+
+        // Check if validation fails
+        // if ($validator->fails()) {
+        //     return response()->json(['result' => 'error']);
+        // }
+
+        // Get the request from the request
+        $status_id = $request->status_id;
+        $branch = $request->branch;
+        $level = $request->level;
+
+        $status_check = EducCourseStatus::where('id', $status_id)->first();
+        $level_check = EducProgramLevel::where('id', $level)->first();
+        $branch_check = EducBranch::where('id', $branch)->first();
+
+        // Check if status if exists
+        if ($level_check==NULL && $status_check==NULL && $branch_check==NULL) {
+            return view('layouts/error/404');
+        }
+
+        $departments = EducDepartments::with(['programs' => function ($query) use ($status_id,$branch,$level) {
+                $query->where('program_level_id', $level);
+                $query->whereHas('codes', function($query) use ($status_id,$branch) {
+                    $query->where('status_id', $status_id);
+                    $query->where('branch_id', $branch);
+                });
+                $query->with(['codes' => function ($query) use ($status_id,$branch) {
+                    $query->where('status_id', $status_id);
+                    $query->where('branch_id', $branch);
+                }]);
+            }])
+            ->whereHas('programs', function($query) use ($status_id,$branch,$level) {
+                $query->where('program_level_id', $level);
+                $query->whereHas('codes', function($query) use ($status_id,$branch) {
+                    $query->where('status_id', $status_id);
+                    $query->where('branch_id', $branch);
+                });
+            })->whereHas('levels', function($query) use ($level) {
+                $query->where('program_level_id', $level);
+            })->get();
+
+        $departments1 = EducDepartments::whereHas('levels', function($query) use ($level) {
+                $query->where('program_level_id', $level);
+            })->get();
+        $data = array(
+            'departments' => $departments,
+            'departments1' => $departments1
+        );
+        return view('rims/programs/departments',$data);
+    }
+
     /**
      * Validate the request data.
      *
@@ -607,12 +695,18 @@ class ProgramController extends Controller
     private function indexValidateRequest(Request $request)
     {
         $rules = [
-            'status_id' => 'required|numeric'
+            'status_id' => 'required|numeric',
+            'branch_id' => 'required|numeric',
+            'level_id' => 'required|numeric'
         ];
 
         $customMessages = [
-            'status_id.required' => 'StatusID is required.',
-            'status_id.numeric' => 'StatusID must be a number.'
+            'status_id.required' => 'Status is required.',
+            'status_id.numeric' => 'Status must be a number.',
+            'branch_id.required' => 'Branch is required.',
+            'branch_id.numeric' => 'Branch must be a number.',
+            'level_id.required' => 'Level is required.',
+            'level_id.numeric' => 'Level must be a number.'
         ];
 
         return Validator::make($request->all(), $rules, $customMessages);

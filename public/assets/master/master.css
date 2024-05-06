@@ -1,4 +1,4 @@
-/** 
+/**
     Main CSS File for Default UI Styling
 
 */
@@ -29,7 +29,6 @@
 } */
 
 .form-control {
-  font-weight: 200;
   width: 100%;
   height: calc(1.75rem + 2px);
   padding: 0.375rem 0.75rem;
@@ -37,6 +36,14 @@
   font-weight: 200;
   line-height: 1.5;
 }
+
+.input-group-prepend {
+    height: calc(1.75rem + 2px);
+    font-size: .75rem;
+    font-weight: 200;
+    line-height: 1.5;
+}
+
 .select2-container--default .select2-selection--single {
   border: 1px solid #ced4da;
   padding: 0.30rem 0.75rem !important;
@@ -250,7 +257,7 @@ body{
   margin-top: -10px;
 }
 
-.navbar-nav .nav-item.dropdown .nav-link:focus, 
+.navbar-nav .nav-item.dropdown .nav-link:focus,
 .navbar-nav .nav-item.dropdown .nav-link:hover {
         outline: none !important;
 }
@@ -301,7 +308,7 @@ p.default-desc{
   transition: 0.5s;
 }
 
-.button-info:hover, .button-primary:hover, .button-success:hover, 
+.button-info:hover, .button-primary:hover, .button-success:hover,
 .button-warning:hover, .button-danger:hover{
   filter: saturate(250%) !important;
   transition: 0.5s;
@@ -784,7 +791,7 @@ datalist{
   background-color: rgba(228, 241, 254, 1);
   border-radius: 3px;
   transition: 0.2s;
- 
+
 }
 .choose-file-button {
   flex-shrink: 0;
@@ -812,7 +819,7 @@ datalist{
   width: 100%;
   cursor: pointer;
   opacity: 0;
-  
+
 }
 .opacity6{
   opacity: .6;
@@ -850,7 +857,7 @@ datalist{
   -webkit-box-shadow: 0px 6px 18px -3px rgba(138,136,138,1);
   -moz-box-shadow: 0px 6px 18px -3px rgba(138,136,138,1);
   box-shadow: 0px 6px 18px -3px rgba(138,136,138,1);
-}  
+}
 .alert-green-g{
   color: #fff;
   background-color: #007f00;

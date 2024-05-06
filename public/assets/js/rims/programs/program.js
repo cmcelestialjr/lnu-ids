@@ -1,7 +1,11 @@
 //programEdit
 view_programs();
-$(document).on('change', '#programsDiv select[name="status"]', function (e) {
+list_departments();
+$(document).on('change', '#programsDiv .select2', function (e) {
     view_programs();
+});
+$(document).on('change', '#summary .select2', function (e) {
+    list_departments();
 });
 $(document).on('input', '#programsNewModal', function (e) {
     var name = $('#programsNewModal input[name="name"]').val();
@@ -60,7 +64,7 @@ $(document).on('click', '#programsDiv .programEdit', function (e) {
     };
     loadModal(form_data,thisBtn);
 });
-$(document).on('click', '#programsDiv .programStatus', function (e) {
+$(document).on('click', '#programsDiv .programStatus,#summary .programStatus', function (e) {
     var thisBtn = $(this);
     var id = thisBtn.data('id');
     var url = base_url+'/rims/programs/programStatusModal';
@@ -106,7 +110,7 @@ $(document).on('click', '#programStatusModal button[name="submit"]', function (e
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
@@ -120,7 +124,7 @@ $(document).on('click', '#programStatusModal button[name="submit"]', function (e
                 $('#programsDiv #programStatus'+id).removeClass('btn-danger btn-danger-scan');
                 $('#programsDiv #programStatus'+id).addClass(data.btn_class);
                 $('#programsDiv #programStatus'+id).html(data.btn_html);
-                
+                list_departments();
             }else{
                 toastr.error('Error.');
                 thisBtn.addClass('input-error');
@@ -178,7 +182,7 @@ $(document).on('click', '#programsNewModal button[name="submit"]', function (e) 
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
@@ -187,8 +191,8 @@ $(document).on('click', '#programsNewModal button[name="submit"]', function (e) 
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
-                    $('#modal-primary').modal('hide');  
-                    view_programs();               
+                    $('#modal-primary').modal('hide');
+                    view_programs();
                 }else if(data.result=='exists'){
                     toastr.error('Name/Shorten/Code already exists!');
                     thisBtn.addClass('input-error');
@@ -234,7 +238,7 @@ $(document).on('click', '#programEdit button[name="submit"]', function (e) {
     }
     if(x==0){
         var form_data = {
-            id:id,            
+            id:id,
             department:department,
             unit:unit,
             name:name,
@@ -252,7 +256,7 @@ $(document).on('click', '#programEdit button[name="submit"]', function (e) {
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
@@ -261,8 +265,8 @@ $(document).on('click', '#programEdit button[name="submit"]', function (e) {
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
-                    $('#modal-primary').modal('hide');  
-                    view_programs();               
+                    $('#modal-primary').modal('hide');
+                    view_programs();
                 }else if(data.result=='exists'){
                     toastr.error('Name/Shorten/Code already exists!');
                     thisBtn.addClass('input-error');
@@ -285,12 +289,16 @@ $(document).on('click', '#programEdit button[name="submit"]', function (e) {
     }
 });
 function view_programs(){
-    var thisBtn = $('#programsDiv select[name="status"]');
-    var status_id = thisBtn.val();
+    var thisBtn = $('#programsDiv .select2');
+    var status_id = $('#programsDiv select[name="status"] option:selected').val();
+    var branch_id = $('#programsDiv select[name="branch"] option:selected').val();
+    var level_id = $('#programsDiv select[name="level"] option:selected').val();
     var form_data = {
         url_table:base_url+'/rims/programs/viewTable',
         tid:'viewTable',
-        status_id:status_id
+        status_id:status_id,
+        branch_id:branch_id,
+        level_id:level_id
     };
     loadTablewLoader(form_data,thisBtn);
 }
@@ -305,4 +313,18 @@ function view_program_code(id){
 function programFetchUnit(){
     var department_id = $('#programEdit select[name="department"] option:selected').val();
     unitByDepartment(department_id);
+}
+function list_departments(){
+    var thisBtn = $('#summary #departmentsDiv');
+    var status_id = $('#summary select[name="status"] option:selected').val();
+    var branch = $('#summary select[name="branch"] option:selected').val();
+    var level = $('#summary select[name="level"] option:selected').val();
+    var form_data = {
+        url_table:base_url+'/rims/programs/departments',
+        tid:'departmentsShow',
+        status_id:status_id,
+        branch:branch,
+        level:level
+    };
+    loadDivwDisabled(form_data,thisBtn);
 }

@@ -35,7 +35,7 @@ class SkyHRImport extends Command
             foreach($query as $row){
                 $idNo = $row->id_no;
                 $dateTime = $row->dateTime;
-                $type = $row->type; 
+                $type = $row->type;
                 $ipaddress = $row->ipaddress;
 
                 $deviceId = DB::connection('skyhr')->table('skyhr.db_owner.tblDevices')->where('IP',$ipaddress)->value('DeviceId');
@@ -50,7 +50,7 @@ class SkyHRImport extends Command
                         'IdNo' => $idNo,
                         'LogDate' => $dateTime.'.000',
                         'Mode' => $type
-                    ];                
+                    ];
                     DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')->insert($dataToInsert);
 
                     $lastInsertedId = DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')
@@ -64,13 +64,13 @@ class SkyHRImport extends Command
 
                 $employeeId = DB::connection('skyhr')->table('tblEmployees')
                     ->where('IdNo',$idNo)
-                    ->value('EmployeeId');  
+                    ->value('EmployeeId');
 
                 $checkEmployeeLog = DB::connection('skyhr')->table('tblEmployee_TimeLog')
                     ->where('EmployeeId',$employeeId)
                     ->where('TimeLog',$dateTime.'.000')
                     ->first();
-                    
+
                 if($checkEmployeeLog==NULL && $employeeId){
                     $dataToInsert = [
                         'EmployeeId' => $employeeId,
@@ -79,7 +79,7 @@ class SkyHRImport extends Command
                         'DeviceLogId' => $lastInsertedId,
                         'Mode' => $type,
                         'DeviceReference' => 'DEVICE_ID-'.$deviceId
-                    ];        
+                    ];
                     DB::connection('skyhr')->table('tblEmployee_TimeLog')->insert($dataToInsert);
                 }
 

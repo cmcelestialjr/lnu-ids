@@ -100,7 +100,7 @@ $('.yearpicker').datepicker({
   viewMode: 'years',
   minViewMode: 'years'
 });
-function loadModal(form_data,thisBtn){  
+function loadModal(form_data,thisBtn){
   $.ajax({
       url: form_data.url,
       type: 'POST',
@@ -111,7 +111,7 @@ function loadModal(form_data,thisBtn){
       cache: false,
       beforeSend: function() {
         var loaderImage = base_url+"/assets/images/loader/loader-dots.gif";
-        var loaderModal = 
+        var loaderModal =
                       '<div class="modal-content bg-default">'+
                         '<div id="loader-icon"><div class="overlay">'+
                             '<img src="'+loaderImage+'" alt="IDSLoader" class="loaderModal">'+
@@ -132,7 +132,7 @@ function loadModal(form_data,thisBtn){
             $('#modal-'+form_data.modal).modal({backdrop:false,keyboard:false,show:true});
           }else{
             $('#modal-'+form_data.modal).modal('show');
-          }          
+          }
           $("#modal-"+form_data.modal+" .modal-dialog #modal-"+form_data.modal+"-content").html('');
           $("#modal-"+form_data.modal+" .modal-dialog").removeClass('modal-xxl');
           $("#modal-"+form_data.modal+" .modal-dialog").removeClass('modal-xl');
@@ -141,16 +141,16 @@ function loadModal(form_data,thisBtn){
           $("#modal-"+form_data.modal+" .modal-dialog").removeClass('modal-sm');
           $("#modal-"+form_data.modal+" .modal-dialog").removeClass('modal-xs');
           $("#modal-"+form_data.modal+" .modal-dialog").addClass(form_data.modal_size);
-          
+
           $("#loader-icon").removeClass("hide");
           $("#modal-"+form_data.modal+" .modal-dialog #modal-"+form_data.modal+"-content").html(loaderModal);
       },
       success : function(data){
           $("#loader-icon").addClass('hide');
-          thisBtn.removeAttr('disabled'); 
+          thisBtn.removeAttr('disabled');
           thisBtn.removeClass('input-loading');
-          thisBtn.addClass('input-success');          
-          $("#modal-"+form_data.modal+" .modal-dialog #modal-"+form_data.modal+"-content").html(data); 
+          thisBtn.addClass('input-success');
+          $("#modal-"+form_data.modal+" .modal-dialog #modal-"+form_data.modal+"-content").html(data);
           $(".select2-"+form_data.modal).select2({
               dropdownParent: $("#modal-"+form_data.modal)
           });
@@ -161,7 +161,7 @@ function loadModal(form_data,thisBtn){
           $(".philhealth_no").inputmask('99-999999999-9');
           $(".sss_no").inputmask('99-9999999-9');
           $(".pagibig_no").inputmask('9999-9999-9999');
-          $(".year").inputmask('9999');          
+          $(".year").inputmask('9999');
           $('.yearpicker').inputmask({'mask': '9999'});
           $('.dateRange').daterangepicker();
           $(".datePicker1").inputmask('mm/dd/yyyy');
@@ -187,7 +187,7 @@ function loadModal(form_data,thisBtn){
           });
           $('.summernote-modal').summernote({
             height: 200
-          });        
+          });
           setTimeout(function() {
             thisBtn.removeClass('input-success');
             thisBtn.removeClass('input-error');
@@ -208,7 +208,7 @@ function loadModal(form_data,thisBtn){
       },
       error: function (){
         toastr.error('Error!');
-        thisBtn.removeAttr('disabled');         
+        thisBtn.removeAttr('disabled');
         thisBtn.removeClass('input-success');
         thisBtn.removeClass('input-error');
       }
@@ -263,8 +263,8 @@ function loadTable(form_data){
     beforeSend: function() {
 
     },
-    success : function(data){  
-      var $table = $('#'+form_data.tid);    
+    success : function(data){
+      var $table = $('#'+form_data.tid);
       $table.bootstrapTable('destroy');
        $table.bootstrapTable({
         data:data,
@@ -277,8 +277,8 @@ function loadTable(form_data){
           templateSelection: function(option) {
               if (!option.id) {
                   return option.text;
-              }                    
-              var color = $(option.element).data("color");                    
+              }
+              var color = $(option.element).data("color");
               return $("<span>").text(option.text).css("color", color);
           },
           templateResult: function(option) {
@@ -325,7 +325,7 @@ function loadTablewLoader(form_data,thisBtn){
         thisBtn.attr('disabled','disabled');
         thisBtn.addClass('input-loading');
       },
-      success : function(data){      
+      success : function(data){
         $('#'+form_data.tid).bootstrapTable('destroy')
           .bootstrapTable({
           data:data,
@@ -339,8 +339,8 @@ function loadTablewLoader(form_data,thisBtn){
             templateSelection: function(option) {
                 if (!option.id) {
                     return option.text;
-                }                    
-                var color = $(option.element).data("color");                    
+                }
+                var color = $(option.element).data("color");
                 return $("<span>").text(option.text).css("color", color);
             },
             templateResult: function(option) {
@@ -422,7 +422,7 @@ function loadDivwLoader(form_data,thisBtn){
     }
   });
 }
-function loadDivwDisabled(form_data,thisBtn){  
+function loadDivwDisabled(form_data,thisBtn){
   $.ajax({
     url: form_data.url_table,
     type: 'POST',
@@ -473,7 +473,7 @@ function loadDivwDisabled(form_data,thisBtn){
     }
   });
 }
-function loadModalGet(form_data,thisBtn){  
+function loadModalGet(form_data,thisBtn){
   $.ajax({
       url: form_data.url,
       type: 'GET',
@@ -483,7 +483,7 @@ function loadModalGet(form_data,thisBtn){
       cache: false,
       beforeSend: function() {
         var loaderImage = base_url+"/assets/images/loader/loader-dots.gif";
-        var loaderModal = 
+        var loaderModal =
                       '<div class="modal-content bg-default">'+
                         '<div id="loader-icon"><div class="overlay">'+
                             '<img src="'+loaderImage+'" alt="IDSLoader" class="loaderModal">'+
@@ -504,7 +504,7 @@ function loadModalGet(form_data,thisBtn){
             $('#modal-'+form_data.modal).modal({backdrop:false,keyboard:false,show:true});
           }else{
             $('#modal-'+form_data.modal).modal('show');
-          }          
+          }
           $("#modal-"+form_data.modal+" .modal-dialog #modal-"+form_data.modal+"-content").html('');
           $("#modal-"+form_data.modal+" .modal-dialog").removeClass('modal-xxl');
           $("#modal-"+form_data.modal+" .modal-dialog").removeClass('modal-xl');
@@ -513,16 +513,16 @@ function loadModalGet(form_data,thisBtn){
           $("#modal-"+form_data.modal+" .modal-dialog").removeClass('modal-sm');
           $("#modal-"+form_data.modal+" .modal-dialog").removeClass('modal-xs');
           $("#modal-"+form_data.modal+" .modal-dialog").addClass(form_data.modal_size);
-          
+
           $("#loader-icon").removeClass("hide");
           $("#modal-"+form_data.modal+" .modal-dialog #modal-"+form_data.modal+"-content").html(loaderModal);
       },
       success : function(data){
           $("#loader-icon").addClass('hide');
-          thisBtn.removeAttr('disabled'); 
+          thisBtn.removeAttr('disabled');
           thisBtn.removeClass('input-loading');
-          thisBtn.addClass('input-success');          
-          $("#modal-"+form_data.modal+" .modal-dialog #modal-"+form_data.modal+"-content").html(data); 
+          thisBtn.addClass('input-success');
+          $("#modal-"+form_data.modal+" .modal-dialog #modal-"+form_data.modal+"-content").html(data);
           $(".select2-"+form_data.modal).select2({
               dropdownParent: $("#modal-"+form_data.modal)
           });
@@ -533,7 +533,7 @@ function loadModalGet(form_data,thisBtn){
           $(".philhealth_no").inputmask('99-999999999-9');
           $(".sss_no").inputmask('99-9999999-9');
           $(".pagibig_no").inputmask('9999-9999-9999');
-          $(".year").inputmask('9999');          
+          $(".year").inputmask('9999');
           $('.yearpicker').inputmask({'mask': '9999'});
           $('.dateRange').daterangepicker();
           $(".datePicker1").inputmask('mm/dd/yyyy');
@@ -559,7 +559,7 @@ function loadModalGet(form_data,thisBtn){
           });
           $('.summernote-modal').summernote({
             height: 200
-          });        
+          });
           setTimeout(function() {
             thisBtn.removeClass('input-success');
             thisBtn.removeClass('input-error');
@@ -578,7 +578,7 @@ function loadModalGet(form_data,thisBtn){
       },
       error: function (){
         toastr.error('Error!');
-        thisBtn.removeAttr('disabled');         
+        thisBtn.removeAttr('disabled');
         thisBtn.removeClass('input-success');
         thisBtn.removeClass('input-error');
       }
@@ -600,8 +600,8 @@ function loadTableGet(form_data){
     beforeSend: function() {
 
     },
-    success : function(data){  
-      var $table = $('#'+form_data.tid);    
+    success : function(data){
+      var $table = $('#'+form_data.tid);
       $table.bootstrapTable('destroy');
        $table.bootstrapTable({
         data:data,
@@ -614,8 +614,8 @@ function loadTableGet(form_data){
           templateSelection: function(option) {
               if (!option.id) {
                   return option.text;
-              }                    
-              var color = $(option.element).data("color");                    
+              }
+              var color = $(option.element).data("color");
               return $("<span>").text(option.text).css("color", color);
           },
           templateResult: function(option) {
@@ -704,4 +704,8 @@ function ipaddressValidate(ipaddress){
   }else{
       return false;
   }
+}
+function isYear(value) {
+    var regex = /^\d{4}$/;
+    return regex.test(value);
 }

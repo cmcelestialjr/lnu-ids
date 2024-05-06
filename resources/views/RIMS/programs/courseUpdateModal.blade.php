@@ -2,7 +2,7 @@
 <div class="modal-content" id="courseUpdateModal">
     <div class="modal-header">
         <h4 class="modal-title">
-            
+
         </h4>
     </div>
     <div class="modal-body">
@@ -15,7 +15,7 @@
             <div class="col-md-8">
                 <label>Descriptive Title</label>
                 <input type="text" class="form-control req" name="name" value="{{$query->name}}">
-            </div>            
+            </div>
             <div class="col-md-3">
                 <label>Lab Group</label>
                 <select class="form-control select2-div" name="lab_group">
@@ -25,7 +25,7 @@
                             <option value="{{$row->id}}" selected>{{$row->name}}</option>
                         @else
                             <option value="{{$row->id}}">{{$row->name}}</option>
-                        @endif                        
+                        @endif
                     @endforeach
                 </select>
             </div>
@@ -35,7 +35,13 @@
             </div>
             <div class="col-md-3">
                 <label>Lab</label>
-                <input type="number" class="form-control req" name="lab" value="{{$query->lab}}">
+                @php
+                    $query_lab = 0;
+                    if($query->lab>0){
+                        $query_lab = $query->lab;
+                    }
+                @endphp
+                <input type="number" class="form-control req" name="lab" value="{{$query_lab}}">
             </div>
             <div class="col-md-3">
                 <label>Pay</label>
@@ -50,7 +56,7 @@
                             <option value="{{$row->id}}" selected>{{$row->name}} - {{$row->shorten}}</option>
                         @else
                             <option value="{{$row->id}}">{{$row->name}} - {{$row->shorten}}</option>
-                        @endif 
+                        @endif
                     @endforeach
                 </select>
             </div>
@@ -68,7 +74,7 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <label>Name appear in Pre-requisite</label>
-                        <input type="text" class="form-control" name="pre_name" value="{{$query->pre_name}}">
+                        <input type="text" class="form-control" name="pre_name" value="@if($query->pre_name=='')None @else{{$query->pre_name}}@endif">
                     </div>
                     <div class="col-lg-4">
                     </div>
@@ -85,7 +91,7 @@
                     </div>
                 </div>
                 <div id="courseTablePre">
-                    
+
                 </div>
             </div>
         </div>

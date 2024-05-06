@@ -3,7 +3,7 @@ function schoolSearch(){
     $(document).ready(function() {
         $(".schoolSearch").select2({
             dropdownParent: $("#schoolSearch"),
-            ajax: { 
+            ajax: {
             url: base_url+'/search/school1',
             type: "post",
             dataType: 'json',
@@ -24,3 +24,4 @@ function schoolSearch(){
         });
     });
 }
+

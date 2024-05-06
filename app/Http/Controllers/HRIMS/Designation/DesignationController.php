@@ -34,7 +34,7 @@ class DesignationController extends Controller
                 $data_list['f2'] = $r['name'];
                 $data_list['f3'] = '<button class="btn btn-primary btn-primary-scan btn-sm update"
                                         data-id="'.$r['id'].'">
-                                        <span class="fa fa-edit"></span> 
+                                        <span class="fa fa-edit"></span>
                                     </button>';
                 array_push($data,$data_list);
                 $x++;
@@ -100,7 +100,7 @@ class DesignationController extends Controller
 
         try{
 
-            $insert = new HRDesignation(); 
+            $insert = new HRDesignation();
             $insert->name = $name;
             $insert->shorten = $shorten;
             $insert->role_id = 1;
@@ -108,7 +108,7 @@ class DesignationController extends Controller
             $insert->office_id = $office;
             $insert->updated_by = $updated_by;
             $insert->save();
-         
+
             return response()->json(['result' => 'success']);
         } catch (QueryException $e) {
             // Handle database query exceptions
@@ -168,7 +168,7 @@ class DesignationController extends Controller
             'level' => 'required|numeric',
             'office' => 'required|numeric'
         ];
-        
+
         $customMessages = [
             'name.required' => 'Name is required',
             'name.string' => 'Name must be a string',

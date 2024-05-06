@@ -8,7 +8,7 @@ $(document).off('change', '#generateDiv select[name="payroll_type"]').on('change
     var val = $(this).val();
     show_hide_div();
 });
-$(document).off('click', '#generateDiv button[name="submit"]').on('click', '#generateDiv button[name="submit"]', function (e) {    
+$(document).off('click', '#generateDiv button[name="submit"]').on('click', '#generateDiv button[name="submit"]', function (e) {
     generate_list();
 });
 $(document).off('click', '#generateDiv .generate').on('click', '#generateDiv .generate', function (e) {
@@ -26,7 +26,7 @@ function show_hide_div(){
     var emp_stats = [];
     var emp_stats_g = [];
     var payroll_type = $('#generateDiv select[name="payroll_type"] option:selected').val();
-    var option = $('#generateDiv select[name="option"] option:selected').val();    
+    var option = $('#generateDiv select[name="option"] option:selected').val();
     $('#generateDiv select[name="emp_stat[]"] option:selected').each(function() {
         emp_stats.push($(this).val());
         emp_stats_g.push($(this).data('g'));
@@ -35,7 +35,7 @@ function show_hide_div(){
         $('#generateDiv #monthSingleDiv').removeClass('hide');
         $('#generateDiv #monthMultipleDiv').addClass('hide');
         $('#generateDiv #unclaimedDiv').addClass('hide');
-        $('#generateDiv #include_peraDiv').removeClass('hide');        
+        $('#generateDiv #include_peraDiv').removeClass('hide');
         if(jQuery.inArray('5', emp_stats) != -1){
             $('#generateDiv #monthMultipleDiv').removeClass('hide');
             $('#generateDiv #unclaimedDiv').removeClass('hide');
@@ -63,14 +63,14 @@ function show_hide_div(){
             $('#generateDiv #include_peraDiv').addClass('hide');
             $('#generateDiv #durationDiv').addClass('hide');
         }
-    }else{        
+    }else{
         $('#generateDiv #unclaimedDiv').addClass('hide');
         $('#generateDiv #monthSingleDiv').removeClass('hide');
         $('#generateDiv #monthMultipleDiv').addClass('hide');
         $('#generateDiv #durationDiv').addClass('hide');
         $('#generateDiv #optionDiv').addClass('hide');
         $('#generateDiv #optionSelectDiv').addClass('hide');
-        $('#generateDiv #include_peraDiv').addClass('hide');        
+        $('#generateDiv #include_peraDiv').addClass('hide');
     }
 }
 function generate_list(){
@@ -108,11 +108,11 @@ function generate_list(){
     $('#generateDiv select[name="fund_service[]"] option:selected').each(function() {
         fund_services.push($(this).val());
     });
-    
+
     $('#generateDiv select[name="months[]"] option:selected').each(function() {
-        months.push($(this).val());      
+        months.push($(this).val());
     });
-    
+
     if(fund_sources==''){
         $('#generateDiv #fund_sourceDiv').addClass('border-require');
         toastr.error('Please select Fund Source');
@@ -162,13 +162,14 @@ function generate_list(){
             data:form_data,
             cache: false,
             beforeSend: function() {
-                $('#generateDiv #listTableDiv').attr('disabled','disabled'); 
+                $('#generateDiv #listTableDiv').attr('disabled','disabled');
             },
             success : function(data){
                 $('#generateDiv #listTableDiv').removeAttr('disabled');
                 if(data=='error'){
                     toastr.error('Error!');
                 }else{
+                    $('#generateDiv #listTableDiv').html('');
                     $('#generateDiv #listTableDiv').html(data);
                     var form_data = {
                         url_table:base_url+'/hrims/payroll/generate/list',
@@ -187,7 +188,6 @@ function generate_list(){
                         status:status,
                         include_pera:include_pera
                     };
-            
                     loadTablewLoader(form_data,thisBtn);
                 }
             },
@@ -197,7 +197,7 @@ function generate_list(){
             }
         });
 
-        
+
     }
 }
 function generate(thisBtn){
@@ -221,13 +221,13 @@ function generate(thisBtn){
     var account_title = $('#generateDiv select[name="account_title"] option:selected').val();
 
     $('#generateDiv select[name="months[]"] option:selected').each(function() {
-        months.push($(this).val());      
+        months.push($(this).val());
     });
     $('#generateDiv select[name="unclaimeds[]"] option:selected').each(function() {
-        unclaimeds.push($(this).val());      
+        unclaimeds.push($(this).val());
     });
     $('#generateDiv select[name="fund_source[]"] option:selected').each(function() {
-        fund_sources.push($(this).val());      
+        fund_sources.push($(this).val());
     });
     $('#generateDiv select[name="fund_service[]"] option:selected').each(function() {
         fund_services.push($(this).val());
@@ -236,7 +236,7 @@ function generate(thisBtn){
         emp_stats.push($(this).val());
     });
     $('#generateDiv .employee:checked').each(function() {
-        employees.push($(this).val());      
+        employees.push($(this).val());
     });
     if(employees==''){
         toastr.error('Please select an employee!');
@@ -273,12 +273,12 @@ function generate(thisBtn){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
+                thisBtn.removeClass('input-loading');
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');

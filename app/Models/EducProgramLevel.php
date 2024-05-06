@@ -12,6 +12,10 @@ class EducProgramLevel extends Model
     {
         return $this->hasMany(EducYearLevel::class, 'program_level_id', 'id');
     }
+    public function programs()
+    {
+        return $this->hasMany(EducPrograms::class, 'program_level_id', 'id');
+    }
     public function students_courses()
     {
         return $this->hasMany(StudentsCourses::class, 'program_level_id', 'id');

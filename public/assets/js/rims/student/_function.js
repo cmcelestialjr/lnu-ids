@@ -1,12 +1,12 @@
 function student_table(){
     var thisBtn = $('#studentDiv #list select');
-    var option = $('#studentDiv #list select[name="option"] option:selected').val();  
+    var option = $('#studentDiv #list select[name="option"] option:selected').val();
     var school_year = $('#studentDiv #list select[name="school_year"] option:selected').val();
-    var year_graduate = $('#studentDiv #list select[name="date_graduate"] option:selected').val();  
+    var year_graduate = $('#studentDiv #list select[name="date_graduate"] option:selected').val();
     var level = [];
     $('#studentDiv #list select[name="level[]"] option:selected').each(function () {
         level.push($(this).val());
-    }); 
+    });
     var form_data = {
         url_table:base_url+'/rims/student/studentTable',
         tid:'studentTable',
@@ -17,10 +17,10 @@ function student_table(){
     };
     loadTablewLoader(form_data,thisBtn);
 }
-function student_view(id,thisBtn){    
+function student_view(id,thisBtn){
     var url = base_url+'/rims/student/studentViewModal';
     var modal = 'default';
-    var modal_size = 'modal-xl';
+    var modal_size = 'modal-xxl';
     var form_data = {
         url:url,
         modal:modal,
@@ -75,7 +75,7 @@ function curriculumModal(id,program_level,curriculum,thisBtn){
         program_level:program_level,
         curriculum:curriculum
     };
-    loadModal(form_data,thisBtn);    
+    loadModal(form_data,thisBtn);
 }
 function course_credit(curriculumCourseID, courseOtherID){
     var id = $('#studentViewModal input[name="id"]').val();
@@ -102,12 +102,12 @@ function course_credit(curriculumCourseID, courseOtherID){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -120,7 +120,7 @@ function course_credit(curriculumCourseID, courseOtherID){
                 thisBtn.removeClass('input-success');
                 thisBtn.removeClass('input-error');
             }, 3000);
-            
+
         },
         error: function (){
             toastr.error('Error!');
@@ -149,12 +149,12 @@ function studentCreditRemove(thisBtn){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -167,7 +167,7 @@ function studentCreditRemove(thisBtn){
                 thisBtn.removeClass('input-success');
                 thisBtn.removeClass('input-error');
             }, 3000);
-            
+
         },
         error: function (){
             toastr.error('Error!');
@@ -191,7 +191,7 @@ function fetchCurriculum(thisBtn){
     loadDivwDisabled(form_data,thisBtn);
 }
 function studendCourseAddModal(thisBtn){
-    var length = $('#studentCourseAddModal .course_code').length+1;    
+    var length = $('#studentCourseAddModal .course_code').length+1;
     var form_data = {
         length:length
     };
@@ -204,12 +204,12 @@ function studendCourseAddModal(thisBtn){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             $("#studentCourseAddModal #courseInfoTable tbody").append(data);
             $(".select2-tr"+length).select2({
                 dropdownParent: $("#studentCourseAddModal")
@@ -223,3 +223,6 @@ function studendCourseAddModal(thisBtn){
         }
     });
 }
+
+
+

@@ -2,7 +2,7 @@ view_sections();
 $(document).on('change', '#sectionDiv select[name="school_year"]', function (e) {
     view_sections();
 });
-$(document).on('change', '#sectionDiv #programsSelectDiv select[name="program"]', function (e) {
+$(document).on('change', '#sectionDiv #programsSelectDiv .select2-programsSelect', function (e) {
     view_sections_by_program();
 });
 $(document).on('change', '#sectionNewModal select[name="curriculum"]', function (e) {
@@ -20,17 +20,17 @@ $(document).on('change', '#sectionNewModal select[name="curriculum"]', function 
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
-            $('#sectionNewModal select[name="grade_level"]').attr('disabled','disabled'); 
+            $('#sectionNewModal select[name="grade_level"]').attr('disabled','disabled');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             $('#sectionNewModal select[name="grade_level"]').removeAttr('disabled');
             if(data=='error'){
                 toastr.error('Error.');
-                thisBtn.addClass('input-error');                
+                thisBtn.addClass('input-error');
             }else{
                 toastr.success('Success');
                 $('#sectionNewModal #gradeLevelDiv').html(data);

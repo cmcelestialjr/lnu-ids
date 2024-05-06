@@ -30,7 +30,7 @@ class GradesController extends Controller
         $program_level = EducProgramLevel::whereHas('students_courses', function ($subQuery) use ($id) {
                 $subQuery->where('user_id', $id);
             })->get();
-        
+
         $data = array(
             'student' => $student,
             'program_level' => $program_level

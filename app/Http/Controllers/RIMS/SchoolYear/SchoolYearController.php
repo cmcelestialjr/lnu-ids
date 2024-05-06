@@ -87,7 +87,7 @@ class SchoolYearController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request){ 
+    public function store(Request $request){
         $user = Auth::user();
         $updated_by = $user->id;
         $year_from = $request->year_from;
@@ -108,7 +108,7 @@ class SchoolYearController extends Controller
         $exp_add_dropping_duration = explode(' - ',$add_dropping_duration);
         $add_dropping_from = date('Y-m-d',strtotime($exp_add_dropping_duration[0]));
         $add_dropping_to = date('Y-m-d',strtotime($exp_add_dropping_duration[0]));
-        
+
         if($date_extension<=$date_to){
             $date_extension = $date_to;
         }
@@ -128,7 +128,7 @@ class SchoolYearController extends Controller
         if($check==NULL){
             $time_max = EducTimeMax::first();
             try{
-                $insert = new EducOfferedSchoolYear; 
+                $insert = new EducOfferedSchoolYear;
                 $insert->year_from = $year_from;
                 $insert->year_to = $year_to;
                 $insert->grade_period_id = $grade_period;
@@ -167,8 +167,8 @@ class SchoolYearController extends Controller
         $response = array('result' => $result,
                           'id' => $id);
         return response()->json($response);
-    }  
-    
+    }
+
     /**
      * Display the specified resource.
      */
@@ -201,7 +201,7 @@ class SchoolYearController extends Controller
             'query' => $query
         );
         return view('rims/schoolYear/modalEdit',$data);
-    } 
+    }
 
     /**
      * Update the specified resource in storage.
@@ -232,7 +232,7 @@ class SchoolYearController extends Controller
             }
             if($enrollment_extension<=$enrollment_to){
                 $enrollment_extension = $enrollment_to;
-            }    
+            }
             if($add_dropping_extension<=$add_dropping_to){
                 $add_dropping_extension = $add_dropping_to;
             }
@@ -285,8 +285,9 @@ class SchoolYearController extends Controller
             $school_year = EducOfferedSchoolYear::with('grade_period')->where('id',$id)->first();
             $grade_period = $school_year->grade_period_id;
             $grade_period_period = $school_year->grade_period->period;
-            $program_level_ids = EducProgramLevel::where('period',$grade_period_period)->pluck('id')->toArray();              
-                $query = EducProgramsCode::with('program')->where('status_id', 1)
+            $program_level_ids = EducProgramLevel::where('period',$grade_period_period)->pluck('id')->toArray();
+
+            $query = EducProgramsCode::with('program')->where('status_id', 1)
                                                 ->whereHas('program', function($query) use ($program_level_ids){
                                                     $query->whereIn('program_level_id', $program_level_ids);
                                                 })
@@ -307,10 +308,10 @@ class SchoolYearController extends Controller
                                                 ];
                                             })->toArray();
                 EducOfferedPrograms::insert($query);
-                
+
                 $programs_id = EducOfferedPrograms::where('school_year_id',$id)->pluck('id')->toArray();
                 $department_ids = EducOfferedPrograms::where('school_year_id',$id)->pluck('department_id')->toArray();
-                
+
                 $query = EducDepartments::whereIn('id',$department_ids)->get()
                                             ->map(function($query) use ($id,$updated_by) {
                                             return [
@@ -326,12 +327,17 @@ class SchoolYearController extends Controller
                                         })->toArray();
                 EducOfferedDepartment::insert($query);
 
-                $query = EducOfferedPrograms::join('educ_curriculum', 'educ__offered_programs.program_id', '=', 'educ_curriculum.program_id')
+                $query = EducOfferedPrograms::join('educ_curriculum',
+                                                    'educ__offered_programs.program_id', '=', 'educ_curriculum.program_id')
+                                            ->join('educ_curriculum_branch', function ($join) {
+                                                $join->on('educ__offered_programs.branch_id', '=', 'educ_curriculum_branch.branch_id')
+                                                    ->on('educ_curriculum.id', '=', 'educ_curriculum_branch.curriculum_id');
+                                            })
                                             ->select('educ_curriculum.id',
-                                                    'educ_curriculum.code', 
+                                                    'educ_curriculum.code',
                                                     DB::raw('educ__offered_programs.id as offered_program_id'))
                                             ->where('educ__offered_programs.school_year_id', $id)
-                                            ->where('educ_curriculum.status_id',1)
+                                            ->where('educ_curriculum_branch.status_id',1)
                                             ->get()
                                             ->map(function($query) use ($updated_by) {
                                             return [
@@ -346,11 +352,13 @@ class SchoolYearController extends Controller
                                         })->toArray();
                 EducOfferedCurriculum::insert($query);
 
-                $query = EducOfferedCurriculum::with('offered_program.program')->whereIn('offered_program_id', $programs_id)
+                $query = EducOfferedCurriculum::with('offered_program.program','curriculum')
+                            ->whereIn('offered_program_id', $programs_id)
                             ->get();
                 foreach($query as $row){
                     $courses = EducCourses::with('grade_level')->where('curriculum_id', $row->curriculum_id)
                                     ->where('grade_period_id',$grade_period)
+                                    ->where('shorten','NOT LIKE','%nstp%')
                                     ->get();
                     foreach($courses as $course){
                         $datas[] = [
@@ -364,7 +372,9 @@ class SchoolYearController extends Controller
                                     'section' => 1,
                                     'hours' => $course->units,
                                     'minutes' => 0,
-                                    'section_code' => $row->offered_program->name.$row->offered_program->program->code.'1'.$course->grade_level->level.$row->code,
+                                    'section_code' => date('y',strtotime($row->curriculum->year_from.'-01-01')).
+                                                        $row->offered_program->program->code.'1'.
+                                                        $course->grade_level->level,
                                     'updated_by' => $updated_by,
                                     'created_at' => date('Y-m-d H:i:s'),
                                     'updated_at' => date('Y-m-d H:i:s')
@@ -378,7 +388,7 @@ class SchoolYearController extends Controller
                 if($query->count()>0){
                     foreach($query as $row){
                         $discount_id = $row->id;
-                        $insert = new EducOfferedDiscount(); 
+                        $insert = new EducOfferedDiscount();
                         $insert->school_year_id = $id;
                         $insert->discount_id = $discount_id;
                         $insert->name = $row->name;
@@ -392,7 +402,7 @@ class SchoolYearController extends Controller
                             ->get();
                         if($fees_type->count()>0){
                             foreach($fees_type as $row_fees)
-                                {$insert = new EducOfferedDiscountFeesType(); 
+                                {$insert = new EducOfferedDiscountFeesType();
                                 $insert->school_year_id = $id;
                                 $insert->offered_discount_id = $offered_discount_id;
                                 $insert->fees_type_id = $row_fees->fees_type_id;
@@ -404,7 +414,7 @@ class SchoolYearController extends Controller
                             ->get();
                         if($list->count()>0){
                             foreach($list as $row_list){
-                                $insert = new EducOfferedDiscountList(); 
+                                $insert = new EducOfferedDiscountList();
                                 $insert->school_year_id = $id;
                                 $insert->offered_discount_id = $offered_discount_id;
                                 $insert->program_id = $row_list->program_id;
@@ -420,7 +430,7 @@ class SchoolYearController extends Controller
                             ->get();
                 if($query->count()>0){
                     foreach($query as $row){
-                        $insert = new EducOfferedFees(); 
+                        $insert = new EducOfferedFees();
                         $insert->school_year_id = $id;
                         $insert->fees_id = $row->fees_id;
                         $insert->fees_type_id = $row->fees->type_id;
@@ -436,7 +446,7 @@ class SchoolYearController extends Controller
                 $query = EducLabCourses::get();
                 if($query->count()>0){
                     foreach($query as $row){
-                        $insert = new EducOfferedLabCourses(); 
+                        $insert = new EducOfferedLabCourses();
                         $insert->school_year_id = $id;
                         $insert->lab_group_id = $row->lab_group_id;
                         $insert->program_level_id = $row->program_level_id;

@@ -22,7 +22,7 @@ function fetchCurriculumList(){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
             $('#studentCurriculumModal select[name="program"]').empty();
             $('#studentCurriculumModal select[name="curriculum"]').empty();
@@ -30,7 +30,7 @@ function fetchCurriculumList(){
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             $('#studentCurriculumModal select[name="program"]').append(new Option(data.program_text, data.program_value));
             $.each(data.curriculums, function(index, item) {
                 var option = new Option(item.text, item.value);

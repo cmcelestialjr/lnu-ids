@@ -19,14 +19,17 @@ class LoadTableController extends Controller
     public function viewTable(Request $request){
         $data = array();
         $id = $request->id;
+        $branch_id = $request->branch_id;
         $program_id = $request->program_id;
         $query = EducOfferedCourses::with('curriculum.curriculum')
                     ->select('year_level','offered_curriculum_id')
-                    ->whereHas('curriculum', function ($subQuery) use ($program_id) {
-                        $subQuery->where('offered_program_id', $program_id);
+                    ->whereHas('curriculum.offered_program', function ($subQuery) use ($program_id,$branch_id) {
+                        $subQuery->where('program_id', $program_id);
+                        $subQuery->where('branch_id', $branch_id);
                     })
                     ->groupBy('year_level')->groupBy('offered_curriculum_id')
-                    ->orderBy('offered_curriculum_id')->orderBy('year_level')
+                    ->orderBy('offered_curriculum_id','DESC')
+                    ->orderBy('year_level')
                     ->get()
                     ->map(function($query) {
                         $courses = EducOfferedCourses::with('course.grade_level')
@@ -42,7 +45,7 @@ class LoadTableController extends Controller
                             'year_level' => $query->year_level,
                             'grade_level' => $courses->course->grade_level->name,
                             'section' => $count,
-                            'curriculum' => $query->curriculum->curriculum->year_from.' - '.$query->curriculum->curriculum->year_to.' ('.$query->curriculum->code.')'
+                            'curriculum' => $query->curriculum->curriculum->year_from.' '.$query->curriculum->curriculum->year_to
                         ];
                     })->toArray();
         if(count($query)>0){
@@ -136,8 +139,8 @@ class LoadTableController extends Controller
                             $instructor = $name_services->lastname($query->instructor->lastname,$query->instructor->firstname,$query->instructor->middlename,$query->instructor->extname);
                         }
                         if(count($query->schedule)>0){
-                            foreach($query->schedule as $row){   
-                                $days = array();                             
+                            foreach($query->schedule as $row){
+                                $days = array();
                                 foreach($row->days as $day){
                                     $days[] = $day->day;
                                 }
@@ -148,7 +151,7 @@ class LoadTableController extends Controller
                                         $rooms[] = '<u>TBA</u>';
                                     }else{
                                         $rooms[] = '<u>'.$row->room->name.'</u>';
-                                    }                                
+                                    }
                             }
                             $schedule = implode('<br>',$schedules);
                             $room = implode('<br>',$rooms);
@@ -200,7 +203,7 @@ class LoadTableController extends Controller
             }
         }
         return  response()->json($data);
-    }    
+    }
 }
 
 ?>

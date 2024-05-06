@@ -19,7 +19,7 @@ class ProgramController extends Controller
             ->groupBy('code')
             ->orderBy('code')
             ->limit(15)
-            ->get();                    
+            ->get();
         $data = [];
         if($results->count()>0){
             foreach ($results as $result) {
@@ -38,7 +38,7 @@ class ProgramController extends Controller
                 ->where(function($query) use ($search){
                     $query->where('name', 'LIKE', "%$search%")
                     ->orWhere('shorten', 'LIKE', "%$search%");
-                })                
+                })
                 ->orderBy('name')
                 ->limit(15)
                 ->get();

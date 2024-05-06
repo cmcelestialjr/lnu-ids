@@ -14,12 +14,12 @@ $(document).on('click', '#curriculumModal .curriculumStatus', function (e) {
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -65,12 +65,12 @@ $(document).on('blur', '#curriculumModal .curriculum_input', function (e) {
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -152,12 +152,12 @@ $(document).on('click', '#courseUpdateModal button[name="submit"]', function (e)
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
+                thisBtn.removeClass('input-loading');
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
@@ -165,7 +165,7 @@ $(document).on('click', '#courseUpdateModal button[name="submit"]', function (e)
                 }else if(data.result=='exists'){
                     toastr.error('Course Code or Descriptive Title already exists!');
                     thisBtn.addClass('input-error');
-                }else{                    
+                }else{
                     toastr.error('Error.');
                     thisBtn.addClass('input-error');
                 }
@@ -199,12 +199,12 @@ $(document).on('click', '#curriculumDiv #curriculumTable .courseStatus', functio
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='error'){
                 toastr.error('Error.');
                 thisBtn.addClass('input-error');
@@ -233,47 +233,53 @@ $(document).on('click', '#curriculumDiv #curriculumTable .courseStatus', functio
 $(document).on('click', '#newCourseModal #courseSelectSubmit', function (e) {
     var thisBtn = $(this);
     var id = $('#newCourseModal .courseSelect option:selected').val();
-    var form_data = {
-        id:id
-    };
-    $.ajax({
-        url: base_url+'/rims/programs/courseInfo',
-        type: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': CSRF_TOKEN
-        },
-        data:form_data,
-        cache: false,
-        beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
-            thisBtn.addClass('input-loading');
-            $('#newCourseModal #courseInfo').addClass('disabled');
-        },
-        success : function(data){
-            thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading');
-            if(data=='error'){
-                toastr.error('Error.');
-                thisBtn.addClass('input-error');
-            }else{
-                $('#newCourseModal #courseInfo').removeClass('disabled');
-                $('#newCourseModal #courseInfo').html(data);
-                $(".select2-div").select2({
-                    dropdownParent: $("#courseInfo")
-                });
-                toastr.success('Success');
-                thisBtn.addClass('input-success');
-            }
-            setTimeout(function() {
+    if(!id){
+        toastr.success('Please Select a course.');
+        $('#newCourseModal #courseSelect').addClass('border-require');
+    }else{
+        var form_data = {
+            id:id
+        };
+        $.ajax({
+            url: base_url+'/rims/programs/courseInfo',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN
+            },
+            data:form_data,
+            cache: false,
+            beforeSend: function() {
+                thisBtn.attr('disabled','disabled');
+                thisBtn.addClass('input-loading');
+                $('#newCourseModal #courseInfo').addClass('disabled');
+                $('#newCourseModal #courseSelect').removeClass('border-require');
+            },
+            success : function(data){
+                thisBtn.removeAttr('disabled');
+                thisBtn.removeClass('input-loading');
+                if(data=='error'){
+                    toastr.error('Error.');
+                    thisBtn.addClass('input-error');
+                }else{
+                    $('#newCourseModal #courseInfo').removeClass('disabled');
+                    $('#newCourseModal #courseInfo').html(data);
+                    $(".select2-div").select2({
+                        dropdownParent: $("#courseInfo")
+                    });
+                    toastr.success('Success');
+                    thisBtn.addClass('input-success');
+                }
+                setTimeout(function() {
+                    thisBtn.removeClass('input-success');
+                    thisBtn.removeClass('input-error');
+                }, 3000);
+            },
+            error: function (){
+                toastr.error('Error!');
+                thisBtn.removeAttr('disabled');
                 thisBtn.removeClass('input-success');
                 thisBtn.removeClass('input-error');
-            }, 3000);
-        },
-        error: function (){
-            toastr.error('Error!');
-            thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-success');
-            thisBtn.removeClass('input-error');
-        }
-    });
+            }
+        });
+    }
 });

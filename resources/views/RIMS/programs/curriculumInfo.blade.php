@@ -30,7 +30,7 @@
                 <option value="{{$row->id}}" selected>{{$row->year_from}} - {{$row->year_to}} ({{$row->code}}) ({{$row->status->name}})</option>
             @else
                 <option value="{{$row->id}}">{{$row->year_from}} - {{$row->year_to}} ({{$row->code}}) ({{$row->status->name}})</option>
-            @endif            
+            @endif
         @endforeach
     </select>
     </div>

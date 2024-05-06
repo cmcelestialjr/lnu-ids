@@ -1,6 +1,6 @@
 $(document).off('click', '#employeeInformationModal .buttonDisp').on('click', '#employeeInformationModal .buttonDisp', function (e) {
     var thisBtn = $(this);
-    var t = thisBtn.data('t');    
+    var t = thisBtn.data('t');
     var url = '';
     var active = '';
     if(t=='info'){
@@ -15,7 +15,7 @@ $(document).off('click', '#employeeInformationModal .buttonDisp').on('click', '#
     }
 });
 function _information(url,thisBtn,active){
-    
+
     var id = $('#employeeInformationModal input[name="id_no"]').val();
     var form_data = {
         url_table:base_url+'/hrims/employee/'+url,

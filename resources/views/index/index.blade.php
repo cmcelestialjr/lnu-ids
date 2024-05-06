@@ -40,7 +40,7 @@
   <header id="header" class="fixed-top d-flex align-items-center header-transparent">
     <div class="container d-flex justify-content-between align-items-center">
 
-      <div id="logo"> 
+      <div id="logo">
         <a href="#hero"><img src="{{ asset('assets/images/logo/lnu_logo_header_blue.png') }}" alt=""></a>
         <!-- Uncomment below if you prefer to use a text logo -->
         <!--<h1><a href="index.html"></a></h1>-->
@@ -74,7 +74,7 @@
       <div class="container" data-aos="fade-up">
         <div class="row about-container">
 
-          <div class="col-lg-6 content order-lg-1 order-2">            
+          <div class="col-lg-6 content order-lg-1 order-2">
             <h2 class="title">Few Words About Us</h2>
             <p>
             abc
@@ -230,7 +230,7 @@
 
       </div>
     </section><!-- End Team Section -->
-    
+
     <!-- ======= Contact Section ======= -->
     <section id="contact">
       <div class="container">
@@ -324,9 +324,9 @@
       </div>
     </div>
   </footer><!-- End Footer -->
-        
+
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  
+
   <div class="modal fade" id="modal-default">
     <div class="modal-dialog modal-md" id="login-form">
       <div class="modal-content">
@@ -362,7 +362,7 @@
           </div>
         </div>
         <div class="modal-footer justify-content-between">
-          
+
         </div>
       </div>
       <!-- /.modal-content -->
@@ -384,7 +384,7 @@
             <button class="btn btn-primary">Reset Password</button>
             <br>
             <p class="mt-4 reset-account-message">A password reset link will be sent to your email address.</p>
-            <br>            
+            <br>
           </div>
         </div>
       </div>
@@ -396,7 +396,7 @@
   <!-- jQuery -->
   <script src="{{ asset('_adminLTE/plugins/jquery/jquery.min.js') }}" nonce="{{ csp_nonce() }}"></script>
   <script src="{{ asset('_adminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js') }}" nonce="{{ csp_nonce() }}"></script>
-  
+
   <!-- Vendor -->
   <script src="{{ asset('_regna/vendor/aos/aos.js') }}" nonce="{{ csp_nonce() }}"></script>
   <script src="{{ asset('_regna/vendor/bootstrap/js/bootstrap.bundle.min.js') }}" nonce="{{ csp_nonce() }}"></script>
@@ -423,7 +423,7 @@
   <!-- Main -->
   <script src="{{ asset('assets/master/master.js') }}" nonce="{{ csp_nonce() }}"></script>
   <!-- Login -->
-  <script src="{{ asset('assets/js/login.js') }}" nonce="{{ csp_nonce() }}"></script>  
+  <script src="{{ asset('assets/js/login.js') }}" nonce="{{ csp_nonce() }}"></script>
 </body>
 
 </html>

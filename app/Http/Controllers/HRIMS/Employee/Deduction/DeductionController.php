@@ -19,10 +19,10 @@ class DeductionController extends Controller
     }
     public function deductionTable(Request $request){
         return $this->_deductionTable($request); // Call private _deductionTable function
-    }    
+    }
     public function deductionSubmit(Request $request){
         return $this->_deductionSubmit($request); // Call private _deductionSubmit function
-    }    
+    }
     public function update(Request $request){
         return $this->_update($request); // Call private _update function
     }
@@ -46,7 +46,7 @@ class DeductionController extends Controller
     private function _deductionTable($request){
         $data = array(); // Initialize empty array
         $id = $request->id; // Get ID from request
-        $payroll_type = $request->payroll_type; // Get payroll type from request        
+        $payroll_type = $request->payroll_type; // Get payroll type from request
         $get_employee_stat = Users::where('id',$id)->first(); // Get employee statistics based on ID
         if($request->emp_stat=='None'){
             if($get_employee_stat->employee_default){ // Check if employee_default exists
@@ -55,7 +55,7 @@ class DeductionController extends Controller
         }else{
             $emp_stat = $request->emp_stat;
         }
-        
+
         $query = HRDeduction::orderBy('group_id')
                 // ->whereHas('payroll_type', function ($query) use ($payroll_type) {
                 //     $query->where('payroll_type_id',$payroll_type);
@@ -75,7 +75,7 @@ class DeductionController extends Controller
                     $date_from = NULL;
                     $date_to = NULL;
                     $docs = NULL;
-                    $remarks = NULL;                    
+                    $remarks = NULL;
                     if($employee_deduction){
                         $amount = $employee_deduction->amount;
                         $date_from = $employee_deduction->date_from;
@@ -89,7 +89,7 @@ class DeductionController extends Controller
                     if($date_to){
                         $date_to = date('m/d/Y',strtotime($date_to));
                     }
-                    
+
                     return [
                         'id' => $query->id,
                         'name' => $query->name,
@@ -117,23 +117,23 @@ class DeductionController extends Controller
                 $data_list['f3'] = $r['group'];
                 $data_list['f4'] = '<input type="number" class="form-control input"
                     id="amount'.$r['id'].'"
-                    data-id="'.$r['id'].'" 
-                    data-val="amount" 
+                    data-id="'.$r['id'].'"
+                    data-val="amount"
                     value="'.$r['amount'].'">';
-                $data_list['f5'] = '<input type="text" class="form-control datePicker input" 
+                $data_list['f5'] = '<input type="text" class="form-control datePicker input"
                     id="date_from'.$r['id'].'"
-                    data-id="'.$r['id'].'" 
-                    data-val="date_from" 
+                    data-id="'.$r['id'].'"
+                    data-val="date_from"
                     value="'.$r['date_from'].'">';
                 $data_list['f6'] = '<input type="text" class="form-control datePicker input"
                     id="date_to'.$r['id'].'"
-                    data-id="'.$r['id'].'" 
-                    data-val="date_to" 
+                    data-id="'.$r['id'].'"
+                    data-val="date_to"
                     value="'.$r['date_to'].'">';
                 $data_list['f7'] = $docs;
-                $data_list['f8'] = '<input type="text" class="form-control input" 
+                $data_list['f8'] = '<input type="text" class="form-control input"
                     id="remarks'.$r['id'].'"
-                    data-id="'.$r['id'].'" 
+                    data-id="'.$r['id'].'"
                     data-val="remarks"
                     value="'.$r['remarks'].'">';
                 array_push($data,$data_list);
@@ -145,7 +145,7 @@ class DeductionController extends Controller
     private function _deductionSubmit($request){
         $user_access_level = $request->session()->get('user_access_level');
         $result = 'error';
-        
+
         // Check user access level
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
             $id = $request->id;
@@ -154,24 +154,24 @@ class DeductionController extends Controller
             $percent = $request->percent;
             $percent_employer = $request->percent_employer;
             $ceiling = $request->ceiling;
-            
+
             // Handle group value
             if($group=='None'){
                 $group = NULL;
             }
-            
+
             // Check if the deduction already exists
             $check = HRDeduction::where('id','!=',$id)
                 ->where(function ($query) use ($name,$group) {
                     $query->where('name',$name)
                         ->where('group_id',$group);
                 })->first();
-            
+
             // If deduction doesn't exist, update it
             if($check==NULL){
                 $user = Auth::user();
                 $updated_by = $user->id;
-                
+
                 HRDeduction::where('id', $id)
                     ->update([
                         'name' => $name,
@@ -182,20 +182,20 @@ class DeductionController extends Controller
                         'updated_by' => $updated_by,
                         'updated_at' => date('Y-m-d H:i:s'),
                     ]);
-                    
+
                 $result = 'success';
             }
         }
-        
+
         $response = array('result' => $result);
         return response()->json($response);
     }
-    
+
     private function _update($request){
         $user_access_level = $request->session()->get('user_access_level');
         $result = 'error';
         $check_amount = NULL;
-        
+
         // Check user access level
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
             $id = $request->id;
@@ -208,10 +208,10 @@ class DeductionController extends Controller
             if($val=='date_from' || $val=='date_to'){
                 $value = empty($value) ? NULL : date('Y-m-d', strtotime($value));
             }
-            
+
             $user = Auth::user();
             $updated_by = $user->id;
-            
+
             // Update or create the deduction employee record
             HRDeductionEmployee::updateOrCreate(
                 [
@@ -226,32 +226,32 @@ class DeductionController extends Controller
                     'updated_at' => date('Y-m-d H:i:s'),
                 ]
             );
-            
+
             // Check the deduction amount
             $check_deduction = HRDeductionEmployee::where('user_id', $id)
                 ->where('payroll_type_id', $payroll_type)
                 ->where('emp_stat_id', $emp_stat)
-                ->where('deduction_id', $did)->first();                
-            
+                ->where('deduction_id', $did)->first();
+
             if($check_deduction){
                 if($check_deduction->amount > 0){
                     $check_amount = $check_deduction->amount;
                 }
             }
-            
+
             // If the deduction amount is null, delete the record
             if($check_amount == NULL){
                 $delete = HRDeductionEmployee::where('user_id', $id)
                     ->where('payroll_type_id', $payroll_type)
                     ->where('emp_stat_id', $emp_stat)
                     ->where('deduction_id', $did)->delete();
-                    
-                $auto_increment = DB::update("ALTER TABLE `hr_deduction_employee` AUTO_INCREMENT = 0;");
+
+                $auto_increment = DB::update("ALTER TABLE `hr_deduction_employee` AUTO_INCREMENT = 1;");
             }
-            
+
             $result = 'success';
         }
-        
+
         $response = array('result' => $result, 'check_amount' => $check_amount);
         return response()->json($response);
     }

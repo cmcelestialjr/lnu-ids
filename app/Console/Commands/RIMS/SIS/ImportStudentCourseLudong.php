@@ -46,8 +46,8 @@ class ImportStudentCourseLudong extends Command
         //4. ImportStudentCourse
 
         $connectionName = 'sis_student';
-        DB::connection($connectionName)->getPdo();        
-        
+        DB::connection($connectionName)->getPdo();
+
         $courses = DB::connection($connectionName)->table('mark')
             // ->where('sy','2024')
             // ->where('stud_id','2305785')
@@ -121,7 +121,7 @@ class ImportStudentCourseLudong extends Command
                         $program_level_id = $studentProgram->program_level_id;
                         $program_name = $studentProgram->program_info->name;
                         $program_shorten = $studentProgram->program_info->shorten;
-                            
+
                         $getCourse = EducCourses::where('curriculum_id',$curriculum_id)
                             ->where('code',$course_code)
                             ->first();
@@ -131,7 +131,7 @@ class ImportStudentCourseLudong extends Command
                             if($units==NULL || $units=='' || $units<=0){
                                 $units = $getCourse->units;
                             }
-                        } 
+                        }
                     }else{
                         $getCourse = EducCourses::with('curriculum.programs')
                             ->where('code',$course_code)
@@ -175,7 +175,7 @@ class ImportStudentCourseLudong extends Command
                         $exp = explode('_',$getGrade);
                         $grade = $exp[0];
                         $student_course_status_id = $exp[1];
-                    }    
+                    }
                     if (!is_numeric($units)) {
                         $units = NULL;
                     }
@@ -187,7 +187,7 @@ class ImportStudentCourseLudong extends Command
                         ->where('year_to',$sy+1)
                         ->first();
                     if($courseCheck==NULL){
-                        $insert = new StudentsCourses(); 
+                        $insert = new StudentsCourses();
                         $insert->student_program_id = $student_program_id;
                         $insert->user_id = $user_id;
                         $insert->stud_id = $course->stud_id;
@@ -240,7 +240,7 @@ class ImportStudentCourseLudong extends Command
                             $insert->course_id = $course_id;
                             $insert->course_code = $course_code;
                             $insert->save();
-                            
+
                             StudentsCourses::where('id', $student_course_id)
                             ->update([
                                 'type_id' => 2
@@ -268,12 +268,12 @@ class ImportStudentCourseLudong extends Command
                                 'remarks' => $remarks
                             ]);
                     }
-                }   
+                }
             }
-        }        
-         
+        }
+
     }
-    
+
     private function grades($grade){
         $grade = str_replace("\\", "", $grade);
         $grades = array('2.2'=>'2.2_1',
@@ -866,13 +866,13 @@ class ImportStudentCourseLudong extends Command
         '4,5'=>'4.5_11',
         '1,9'=>'1.9_1',
         'On-Going'=>'_8',
-        'COND'=>'_8',        
+        'COND'=>'_8',
         );
         if (isset($grades[$grade])) {
             return $grades[$grade];
         } else {
             return 'NotExists';
-        }        
+        }
     }
     private function retake($grade){
         $retake = array('3.0'=>'3_1',

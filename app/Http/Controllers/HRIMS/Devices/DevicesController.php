@@ -278,7 +278,7 @@ class DevicesController extends Controller
                         $zk->setTime($dateTime);
                         Devices::where('id', $id)
                                     ->update(['dateTime' => $dateTime]);
-                        $dateTime = date('F d, Y h:ia', strtotime($date.' '.$time));
+                        $dateTime_display = date('F d, Y h:i:sa', strtotime($dateTime));
                         $result = 'success';
                     }
                 }
@@ -310,7 +310,7 @@ class DevicesController extends Controller
         }
         $response = array('result' => $result,
                           'id' => $id,
-                          'dateTime' => $dateTime);
+                          'dateTime' => $dateTime_display);
         return response()->json($response);
     }
 }

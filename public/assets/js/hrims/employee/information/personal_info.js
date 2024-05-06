@@ -63,7 +63,7 @@ function same_res(thisBtn){
     var res_brgy_id_text = $('#address select[name="res_brgy_id"] option:selected').text();
     var res_city_muns_id_text = $('#address select[name="res_municipality_id"] option:selected').text();
     var res_province_id_text = $('#address select[name="res_province_id"] option:selected').text();
-    
+
     if(thisBtn.data('num')==0){
         var per_lot = $('#address input[name="per_lot"]').val();
         var per_street = $('#address input[name="per_street"]').val();
@@ -99,8 +99,8 @@ function same_res(thisBtn){
     var per_province_id = $('#address select[name="per_province_id_"] option:selected').val();
     var per_brgy_id_text = $('#address select[name="per_brgy_id_"] option:selected').text();
     var per_city_muns_id_text = $('#address select[name="per_municipality_id_"] option:selected').text();
-    var per_province_id_text = $('#address select[name="per_province_id_"] option:selected').text();    
-    
+    var per_province_id_text = $('#address select[name="per_province_id_"] option:selected').text();
+
     if(thisBtn.is(':checked')){
         $('#address input[name="per_lot"]').val(res_lot);
         $('#address input[name="per_street"]').val(res_street);
@@ -109,7 +109,7 @@ function same_res(thisBtn){
         $('#address select[name="per_brgy_id"]').append($('<option></option>').val(res_brgy_id).text(res_brgy_id_text));
         $('#address select[name="per_municipality_id"]').append($('<option></option>').val(res_city_muns_id).text(res_city_muns_id_text));
         $('#address select[name="per_province_id"]').append($('<option></option>').val(res_province_id).text(res_province_id_text));
-        
+
         $('#address input[name="per_lot"]').attr("disabled", true);
         $('#address input[name="per_street"]').attr("disabled", true);
         $('#address input[name="per_subd"]').attr("disabled", true);
@@ -125,7 +125,7 @@ function same_res(thisBtn){
         $('#address select[name="per_brgy_id"]').append($('<option></option>').val(per_brgy_id).text(per_brgy_id_text));
         $('#address select[name="per_municipality_id"]').append($('<option></option>').val(per_city_muns_id).text(per_city_muns_id_text));
         $('#address select[name="per_province_id"]').append($('<option></option>').val(per_province_id).text(per_province_id_text));
-        
+
         $('#address input[name="per_lot"]').attr("disabled", false);
         $('#address input[name="per_street"]').attr("disabled", false);
         $('#address input[name="per_subd"]').attr("disabled", false);
@@ -136,7 +136,7 @@ function same_res(thisBtn){
     }
 }
 function infoSubmit(thisBtn){
-    var id_no = $('#employeeInformationModal input[name="id_no"]').val();    
+    var id_no = $('#employeeInformationModal input[name="id_no"]').val();
     var honorific = $('#info input[name="honorific"]').val();
     var post_nominal = $('#info input[name="post_nominal"]').val();
     var lastname = $('#info input[name="lastname"]').val();
@@ -215,12 +215,12 @@ function infoSubmit(thisBtn){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
+                thisBtn.removeClass('input-loading');
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
@@ -252,7 +252,7 @@ function addressSubmit(thisBtn){
     var res_municipality_id = $('#address select[name="res_municipality_id"] option:selected').val();
     var res_province_id = $('#address select[name="res_province_id"] option:selected').val();
     var same_res = $('#address input[name="same_res"]');
-    
+
     if(same_res.is(':checked')){
         var same_res = 'Yes';
         var per_lot = res_lot;
@@ -300,12 +300,12 @@ function addressSubmit(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -364,12 +364,12 @@ function idNoSubmit(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');

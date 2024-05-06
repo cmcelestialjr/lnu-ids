@@ -27,9 +27,9 @@
                 @foreach($query as $row)
                     @php
                     $sem_units = 0;
-                    $sem_grade = 0; 
+                    $sem_grade = 0;
                     $sem_units_w_nstp = 0;
-                    $sem_grade_w_nstp = 0;                
+                    $sem_grade_w_nstp = 0;
                     @endphp
                     @foreach($row['courses'] as $courses)
                     @php
@@ -38,8 +38,8 @@
                             if($school_name==$school_name_old){
                                 $school_name = '';
                             }
-                        }              
-                        
+                        }
+
                         $grade_period = $row['grade_period'];
                         if($courses->option!=NULL){
                             $grade_period = str_replace('Semester','',$row['grade_period']).' '.$courses->option;

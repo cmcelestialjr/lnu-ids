@@ -2,7 +2,7 @@ function programSearch2(level,school){
     $(document).ready(function() {
         $(".programSearch2").select2({
             dropdownParent: $("#programSearch2"),
-            ajax: { 
+            ajax: {
             url: base_url+'/search/programSearch2',
             type: "post",
             dataType: 'json',

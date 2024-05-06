@@ -57,7 +57,7 @@
                                   <div class="col-lg-3">
                                       <label>Year</label>
                                       <select class="form-control select2" name="year">
-                                          @for($i=date('Y'); $i >= 2022; $i--) 
+                                          @for($i=date('Y'); $i >= 2022; $i--)
                                               <option value="{{$i}}">{{$i}}</option>
                                           @endfor
                                       </select>
@@ -65,9 +65,9 @@
                                   <div class="col-lg-3" id="monthSingleDiv">
                                       <label>Month</label>
                                       <select class="form-control select2" name="month">
-                                          @for($i=1; $i <= 12; $i++) 
+                                          @for($i=1; $i <= 12; $i++)
                                               @php
-                                              $month = date('m', strtotime(date('Y').'-'.$i.'-01')); 
+                                              $month = date('m', strtotime(date('Y').'-'.$i.'-01'));
                                               $month_name =  date('F', strtotime(date('Y').'-'.$i.'-01'));
                                               @endphp
                                               @if(date('m')==$month)
@@ -84,7 +84,7 @@
                                           <select class="form-control select2" name="months[]" multiple>
                                               @for($i=1; $i <= 12; $i++)
                                                   @php
-                                                  $month = date('m', strtotime(date('Y').'-'.$i.'-01')); 
+                                                  $month = date('m', strtotime(date('Y').'-'.$i.'-01'));
                                                   $month_name =  date('F', strtotime(date('Y').'-'.$i.'-01'));
                                                   @endphp
                                                   @if(date('m')==$month)
@@ -101,7 +101,7 @@
                                       <select class="form-control select2" name="unclaimeds[]" multiple>
                                           @for($i=1; $i <= 12; $i++)
                                               @php
-                                              $month = date('m', strtotime(date('Y').'-'.$i.'-01')); 
+                                              $month = date('m', strtotime(date('Y').'-'.$i.'-01'));
                                               $month_name =  date('F', strtotime(date('Y').'-'.$i.'-01'));
                                               @endphp
                                               <option value="{{$month}}">{{$month_name}}</option>
@@ -121,9 +121,9 @@
                                       <select class="form-control select2" name="duration">
                                           @foreach($payroll_duration as $row)
                                               <option value="{{$row->id}}">{{$row->name}}</option>
-                                          @endforeach                                                
+                                          @endforeach
                                       </select>
-                                  </div>                                        
+                                  </div>
                                   <div class="col-lg-3 hide" id="optionSelectDiv">
                                       <div class="row">
                                           <div class="col-lg-6">
@@ -179,12 +179,12 @@
                                         data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
                                         <thead>
                                             <tr>
-                                                <th data-field="f1" data-sortable="true" data-align="center">#</th>
+                                                <th data-field="f1" data-sortable="true" data-align="center">#aaa</th>
                                                 <th data-field="f2" data-align="center">
-                                                    <input type="checkbox" class="form-control" id="all" checked>
+                                                    <input type="checkbox" class="form-control" id="" checked>
                                                 </th>
                                                 <th data-field="f3" data-sortable="true" data-align="center">Name</th>
-                                                <th data-field="f4" data-sortable="true" data-align="center">Position</th>            
+                                                <th data-field="f4" data-sortable="true" data-align="center">Position</th>
                                                 <th data-field="f5" data-sortable="true" data-align="center">Salary</th>
                                                 <th data-field="f6" data-sortable="true" data-align="center">Gross</th>
                                                 <th data-field="f7" data-sortable="true" data-align="center">Deduction</th>
@@ -194,7 +194,7 @@
                                     </table>
                                   </div>
                                   <div class="col-lg-12">
-                                      
+
                                       <br>
                                       {{-- <button class="btn btn-primary btn-primary-scan generate" value="generate">
                                           <span class="fa fa-check"></span> Generate Payroll
@@ -210,7 +210,7 @@
               </div>
             </div>
             <div class="card-footer">
-              
+
             </div>
         </div>
     </div>

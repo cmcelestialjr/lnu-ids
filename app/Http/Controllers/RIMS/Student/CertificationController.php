@@ -39,7 +39,7 @@ class CertificationController extends Controller
         if($student==NULL){
             return response()->json(['result' => 'error']);
         }
-        
+
         $program_level = EducProgramLevel::whereHas('students_courses', function ($subQuery) use ($id) {
                 $subQuery->where('user_id', $id);
             })->get();
@@ -54,7 +54,7 @@ class CertificationController extends Controller
     /**
      * Show the form for viewing a resource.
      */
-    public function pdf(Request $request){            
+    public function pdf(Request $request){
         $stud_id = $request->stud_id;
         $certification = $request->certification;
         $program_level = $request->program_level;
@@ -62,16 +62,16 @@ class CertificationController extends Controller
         $period = $request->period;
         $date = $request->date;
         $pdf_code = $request->pdf_code;
-        
+
         $first_remove = substr($pdf_code, 4);
         $second_remove = substr($first_remove, 0, -4);
         $new_pdf_code = $second_remove;
-        
+
         $student = Users::where('stud_id',$stud_id)->first();
         if($student==NULL || $new_pdf_code!=mb_substr($date, -1)){
             return view('layouts/error/404');
         }
-        
+
         $src = 'storage\rims\students/'.$stud_id.'\certification/'.$certification.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$date.'_'.$pdf_code.'.pdf';
 
         $data = array(
@@ -90,7 +90,7 @@ class CertificationController extends Controller
             $src = 'assets\pdf\pdf_error.pdf';
         }else{
             $src = 'storage\rims\students/'.$src.'.pdf';
-        }        
+        }
         $data = array(
             'src' => $src
         );
@@ -198,7 +198,7 @@ class CertificationController extends Controller
 
         if($document_id == NULL){
             return $url;
-        }      
+        }
 
         if($certification=='scholasticReport'){
             $program_level = $request->program_level;
@@ -219,7 +219,7 @@ class CertificationController extends Controller
             $insert->save();
 
             $url = $this->generateQRscholasticReport($request,$name_user);
-        }        
+        }
 
         return $url;
     }
@@ -246,7 +246,7 @@ class CertificationController extends Controller
         $stud_id = $student->stud_id;
 
         $path = 'storage\rims\students/'.$stud_id.'\certification/';
-        
+
         // File::deleteDirectory($path);
 
         $image = QrCode::format('png')
@@ -258,7 +258,7 @@ class CertificationController extends Controller
                     ->size(300)
                     ->errorCorrection('H')
                     ->generate('student/certification/'.$stud_id.'/'.$certification.'_protected/'.$program_level.'/'.$school_year.'/'.$period.'/'.$date.'/'.$pdf_code);
-        $imageName = $certification.'_'.$program_level.'_'.$school_year.'_'.$date.'_'.$pdf_code.'.png';        
+        $imageName = $certification.'_'.$program_level.'_'.$school_year.'_'.$date.'_'.$pdf_code.'.png';
 
         File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
 
@@ -274,7 +274,7 @@ class CertificationController extends Controller
         $certification = $request->certification;
         $program_level = $request->program_level;
         $school_year = $request->school_year;
-        $period = $request->period;      
+        $period = $request->period;
         $stud_id = $student->stud_id;
 
         $master_password = $password_services->master();
@@ -284,19 +284,19 @@ class CertificationController extends Controller
         $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
         $height = 185;
         $width = 260;
-        $pdf::reset();  
+        $pdf::reset();
         $pdf = $this->generatePDFscholasticReportDetails($pdf,$student,$request,$date,$qrcode,$pdf_code,$name_user,$password);
         $pdf::setProtection();
         $pathUserUnprotected  = 'storage/rims/students/'.$stud_id.'\certification/'.$certification.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$date.'_'.$pdf_code.'.pdf';
-        $pdf::Output(public_path($pathUserUnprotected),'F');       
-   
+        $pdf::Output(public_path($pathUserUnprotected),'F');
+
         // $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
         // $pdf::reset();
         // $pdf = $this->generatePDFscholasticReportDetails($pdf,$student,$request,$date,$qrcode,$pdf_code,$name_user,$password);
         // $pdf::setProtection(array('print'), $password, $master_password, 0, null);
         // $pathUserProtected = 'storage/rims/students/'.$stud_id.'\certification/'.$certification.'_protected'.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$date.'_'.$pdf_code.'.pdf';
         // $pdf::Output(public_path($pathUserProtected),'F');
-        
+
         return $stud_id.'\certification/'.$certification.'_'.$program_level.'_'.$school_year.'_'.$period.'_'.$date.'_'.$pdf_code;
     }
 
@@ -315,7 +315,7 @@ class CertificationController extends Controller
         $user_id = $student->id;
         $stud_id = $student->stud_id;
         $name_student = mb_strtoupper($name_services->lastname_full($student->lastname,$student->firstname,$student->middlename,$student->extname));
-        
+
         $grade_period = EducGradePeriod::find($period);
         $grade_period_name_no = $grade_period->name_no;
 
@@ -361,7 +361,7 @@ class CertificationController extends Controller
         $web_icon = public_path('assets\images\icons\png\web.png');
         $phone_icon = public_path('assets\images\icons\png\phone.png');
 
-              
+
 
         $pdf::SetCreator(PDF_CREATOR);
         $pdf::SetAuthor($name_user);
@@ -373,7 +373,7 @@ class CertificationController extends Controller
         //        $x = 10;
         //        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
         //        $pdf->Image($logo,12,10, 25, 25, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
-               
+
         //        $pdf->SetXY($x, $y);
         //        $pdf->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         //        $pdf->Cell(197, 29, '', 1, 1, 'L', 0, '', 1);
@@ -392,7 +392,7 @@ class CertificationController extends Controller
         //        $pdf->SetXY($x+160, $y+25.5);
         //        $pdf->SetFont('arial','',8);
         //        $pdf->Cell(35, '', $password, 0, 1, 'C', 0, '', 1);
-               
+
         //        $pdf->SetXY($x+30, $y+4);
         //        $pdf->SetFont('arial','',10);
         //        $pdf->Cell(95, '', 'Republic of the Philippines', 0, 1, 'L', 0, '', 1);
@@ -423,7 +423,7 @@ class CertificationController extends Controller
         $pdf::setHeaderCallback(function($pdf) use ($grade_period_name_no,$school_year){
                $y = 5;
                $x = 10;
-               $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);               
+               $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
 
                $pdf->SetXY($x, $y+4);
                $pdf->SetFont('typewrite','',10);
@@ -439,7 +439,7 @@ class CertificationController extends Controller
                $pdf->Cell(197, '', 'OFFICE OF THE REGISTRAR', 0, 1, 'C', 0, '', 1);
                $pdf->SetXY($x, $y+23);
                $pdf->SetFont('typewriteb','',9);
-               $pdf->Cell(197, '', "STUDENT'S SCHOLASTIC REPORT", 0, 1, 'C', 0, '', 1);               
+               $pdf->Cell(197, '', "STUDENT'S SCHOLASTIC REPORT", 0, 1, 'C', 0, '', 1);
                $pdf->SetXY($x, $y+27);
                $pdf->SetFont('typewrite','',9);
                $pdf->Cell(197, '', $grade_period_name_no.' '.$school_year.'/FINAL GRADE', 0, 1, 'C', 0, '', 1);
@@ -452,7 +452,7 @@ class CertificationController extends Controller
 
         $pdf::AddPage('P',$page_size);
         $pdf::SetAutoPageBreak(TRUE, 3);
-        
+
         $pdf::SetFont('typewrite','',10);
         $pdf::SetXY($x, $y);
         $pdf::Cell(30, '', 'STUDENT NO.:', 0, 1, 'L', 0, '', 1);
@@ -475,7 +475,7 @@ class CertificationController extends Controller
         $pdf::SetXY($x+130, $y+$y_add);
         $pdf::Cell(25, '', 'COURSE/YR:', 0, 1, 'L', 0, '', 1);
 
-        
+
         $pdf::SetXY($x+155, $y+$y_add);
         $pdf::Cell(42, '', $student_program.'/'.$student_grade_level, 'B', 1, 'L', 0, '', 1);
 
@@ -516,7 +516,7 @@ class CertificationController extends Controller
             $y_add = $y_add+5;
             foreach($student_courses as $course){
                 $x_add = 0;
-                
+
                 $pdf::SetXY($x, $y+$y_add);
                 // $pdf::Cell(40, 8, $course->course_code, 'LR', 1, 'C', 0, '', 1);
                 $pdf::MultiCell(35, 6, $course->course_code, 'LR', 'L', 0, 0, '', '', true);
@@ -558,7 +558,7 @@ class CertificationController extends Controller
                 }
 
                 $y_add = $y_add+6;
-                
+
                 if($course->status->option==1){
                     $passed_units += $course->course_units;
                     $grade_unit_product += $course->grade*$course->course_units;
@@ -569,7 +569,7 @@ class CertificationController extends Controller
             $y_add = $y_add-1;
             $pdf::SetXY($x, $y+$y_add);
             $pdf::Cell(35, '', '', 'LR', 1, 'C', 0, '', 1);
-                
+
             $x_add = $x_add+35;
             $pdf::SetXY($x+$x_add, $y+$y_add);
             $pdf::Cell(91, '', '- - - - - Nothing Follows - - - - -', 'LR', 1, 'C', 0, '', 1);
@@ -584,7 +584,7 @@ class CertificationController extends Controller
 
             $x_add = $x_add+19;
             $pdf::SetXY($x+$x_add, $y+$y_add);
-            $pdf::Cell(33, '', '', 'LR', 1, 'C', 0, '', 1);            
+            $pdf::Cell(33, '', '', 'LR', 1, 'C', 0, '', 1);
         }
         $x_add = 0;
         $y_add = $y_add+4;
@@ -633,7 +633,7 @@ class CertificationController extends Controller
         $y_add = $y_add+4;
         $pdf::SetXY($x+$x_add, $y+$y_add);
         $pdf::Cell(190, '', '5.0(69 and below) Failure: student must repeat; WDR - Withdrawn Subject; DR - Dropped; INC - Incomplete.', 0, 1, 'L', 0, '', 1);
-        
+
         return $pdf;
     }
 

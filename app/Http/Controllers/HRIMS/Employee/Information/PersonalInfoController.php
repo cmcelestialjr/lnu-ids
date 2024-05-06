@@ -25,7 +25,7 @@ class PersonalInfoController extends Controller
         return $this->_idNoSubmit($request);
     }
 
-    
+
     private function _personalInfo($request){
         $user_access_level = $request->session()->get('user_access_level');
         $id = $request->id;

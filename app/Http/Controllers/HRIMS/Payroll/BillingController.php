@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\HRIMS\Payroll\Billing;
+namespace App\Http\Controllers\HRIMS\Payroll;
 use App\Http\Controllers\Controller;
 use App\Models\HRBilling;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class BillingController extends Controller
                 $data_list['f6'] = $r['date'];
                 $data_list['f7'] = '<button class="btn btn-primary btn-primary-scan btn-sm update"
                                         data-id="'.$r['id'].'">
-                                        <span class="fa fa-eye"></span> 
+                                        <span class="fa fa-eye"></span>
                                     </button>';
                 array_push($data,$data_list);
                 $x++;

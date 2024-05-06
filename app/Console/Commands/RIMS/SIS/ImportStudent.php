@@ -44,7 +44,7 @@ class ImportStudent extends Command
 
         $connectionName = 'sis_student';
         DB::connection($connectionName)->getPdo();
-        
+
         $users = Users::where('stud_id','!=', NULL)->pluck('stud_id');
         $students = DB::connection($connectionName)->table('info')
                         // ->whereNotIn('stud_id',$users)
@@ -71,7 +71,7 @@ class ImportStudent extends Command
 
                     $get_civil_status = CivilStatuses::where('name',$row->civil_status)->first();
                     $civil_status = ($get_civil_status!=NULL) ? $get_civil_status->id : 1;
-                    
+
                     $get_contact = DB::connection($connectionName)->table('phones')
                             ->where('stud_id',$row->stud_id)
                             ->where('contact_type','Student')
@@ -125,7 +125,7 @@ class ImportStudent extends Command
                             $check_system = 1;
                         }
                     }else{
-                        $insert = new Users(); 
+                        $insert = new Users();
                         $insert->username = $row->stud_id;
                         $insert->password = $password;
                         $insert->level_id = 6;
@@ -140,7 +140,7 @@ class ImportStudent extends Command
                         $insert->save();
                         $user_id = $insert->id;
 
-                        $insert = new _PersonalInfo(); 
+                        $insert = new _PersonalInfo();
                         $insert->user_id = $user_id;
                         $insert->dob = $dob;
                         $insert->sex = $sex;
@@ -149,18 +149,18 @@ class ImportStudent extends Command
                         $insert->contact_no = $contact_no;
                         $insert->email = $email;
                         $insert->updated_by = 1;
-                        $insert->save();                    
+                        $insert->save();
                     }
 
                     if($check_role==0){
-                        $insert = new UsersRoleList(); 
+                        $insert = new UsersRoleList();
                         $insert->user_id = $user_id;
                         $insert->role_id = 1;
                         $insert->updated_by = 1;
                         $insert->save();
                     }
                     if($check_system==0){
-                        $insert = new UsersSystems(); 
+                        $insert = new UsersSystems();
                         $insert->user_id = $user_id;
                         $insert->system_id = 1;
                         $insert->role_id = 1;
@@ -168,7 +168,7 @@ class ImportStudent extends Command
                         $insert->updated_by = 1;
                         $insert->save();
 
-                        $insert = new UsersSystemsNav(); 
+                        $insert = new UsersSystemsNav();
                         $insert->user_id = $user_id;
                         $insert->system_nav_id = 1;
                         $insert->role_id = 1;
@@ -176,7 +176,7 @@ class ImportStudent extends Command
                         $insert->updated_by = 1;
                         $insert->save();
 
-                        $insert = new UsersSystemsNav(); 
+                        $insert = new UsersSystemsNav();
                         $insert->user_id = $user_id;
                         $insert->system_nav_id = 2;
                         $insert->role_id = 1;
@@ -184,7 +184,7 @@ class ImportStudent extends Command
                         $insert->updated_by = 1;
                         $insert->save();
 
-                        $insert = new UsersSystemsNav(); 
+                        $insert = new UsersSystemsNav();
                         $insert->user_id = $user_id;
                         $insert->system_nav_id = 3;
                         $insert->role_id = 1;
@@ -192,7 +192,7 @@ class ImportStudent extends Command
                         $insert->updated_by = 1;
                         $insert->save();
 
-                        $insert = new UsersSystemsNav(); 
+                        $insert = new UsersSystemsNav();
                         $insert->user_id = $user_id;
                         $insert->system_nav_id = 26;
                         $insert->role_id = 1;
@@ -200,7 +200,7 @@ class ImportStudent extends Command
                         $insert->updated_by = 1;
                         $insert->save();
 
-                        $insert = new UsersSystemsNav(); 
+                        $insert = new UsersSystemsNav();
                         $insert->user_id = $user_id;
                         $insert->system_nav_id = 6;
                         $insert->role_id = 1;

@@ -35,22 +35,22 @@ class EnrollmentFormController extends Controller
     /**
      * Show the form for viewing a resource.
      */
-    public function pdf(Request $request){            
+    public function pdf(Request $request){
         $stud_id = $request->stud_id;
         $school_year = $request->school_year;
         $school_year_period = $request->school_year_period;
         $enrollment_form_no = $request->enrollment_form_no;
         $pdf_code = $request->pdf_code;
-        
+
         $first_remove = substr($pdf_code, 4);
         $second_remove = substr($first_remove, 0, -4);
         $new_pdf_code = $second_remove;
-        
+
         $student = Users::where('stud_id',$stud_id)->first();
         if($student==NULL || $new_pdf_code!=mb_substr($stud_id, -1)){
             return view('layouts/error/404');
         }
-        
+
         $src = 'storage\rims\students/'.$stud_id.'\enrollment_form/'.$school_year.'_'.$school_year_period.'_'.$enrollment_form_no.'.pdf';
 
         $data = array(
@@ -65,7 +65,7 @@ class EnrollmentFormController extends Controller
             $id_no = $request->id_no;
             $school_year = explode('-',$request->school_year);
             $year_from = $school_year[0];
-            $year_to = $school_year[1];            
+            $year_to = $school_year[1];
             $school_period = str_replace('-',' ',$request->school_period);
             $student = StudentsInfo::where('id_no',$id_no)->first();
             $school_year_info = EducOfferedSchoolYear::where('year_from',$year_from)
@@ -88,7 +88,7 @@ class EnrollmentFormController extends Controller
                 }
             }
         }
-        return view('layouts/error/404');        
+        return view('layouts/error/404');
     }
     private function generateQR($student,$year_from,$school_year_id,$school_year,$school_year_period){
         error_reporting(E_ERROR);
@@ -122,7 +122,7 @@ class EnrollmentFormController extends Controller
         $qrcode = $path.$imageName;
         $src = $this->generatePDF($student,$school_year_id,$school_year,$school_year_period,$qrcode,$enrollment_form_no,$password,$master_password);
         return $src;
-    }    
+    }
     private function enrollment_form_no($id,$school_year_id,$year_from){
         $user = Auth::user();
         $updated_by = $user->id;
@@ -137,7 +137,7 @@ class EnrollmentFormController extends Controller
             if($get_no!=NULL){
                 $no = $get_no->no+1;
             }
-            $insert = new StudentsEnrollmentForm(); 
+            $insert = new StudentsEnrollmentForm();
             $insert->school_year_id = $school_year_id;
             $insert->user_id = $id;
             $insert->no = $no;
@@ -180,7 +180,7 @@ class EnrollmentFormController extends Controller
         $at_icon = public_path('assets\images\icons\png\at.png');
         $web_icon = public_path('assets\images\icons\png\web.png');
         $phone_icon = public_path('assets\images\icons\png\phone.png');
-        
+
         DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
         $get_no = EducOfferedCourses::whereHas('students', function ($query) use ($user_id,$school_year_id) {
                 $query->where('user_id',$user_id);
@@ -203,13 +203,13 @@ class EnrollmentFormController extends Controller
         //height = 270;
 
         //$pdf::Image($logo_blur,34,85, 140, 135, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
-        
+
         $y = 7;
         $x = 7;
         $pdf::SetXY($x, $y);
         $pdf::Image($logo,'','', 25, 25, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
-        
-        
+
+
         $y_add = 7;
         $pdf::SetXY($x+26, $y+$y_add);
         $pdf::SetFont('times','b',12);
@@ -256,7 +256,7 @@ class EnrollmentFormController extends Controller
         $y_add = $y_add+5;
         $pdf::SetXY($x, $y+$y_add);
         $pdf::Cell(15, '', 'College:', 0, 1, 'L', 0, '', 1);
-        
+
         $pdf::SetXY($x+17, $y+$y_add);
         $pdf::Cell(70, '', $student->program->program_info->departments->name, 0, 1, 'L', 0, '', 1);
 
@@ -272,7 +272,7 @@ class EnrollmentFormController extends Controller
 
         $pdf::SetXY($x+17, $y+$y_add);
         $pdf::Cell(100, '', $student->program->program_info->name, 0, 1, 'L', 0, '', 1);
-        
+
         $pdf::SetFont('times','',9);
         $y_add = $y_add+7;
         $pdf::SetXY($x, $y+$y_add);
@@ -283,7 +283,7 @@ class EnrollmentFormController extends Controller
 
         $pdf::SetXY($x+84, $y+$y_add);
         $pdf::Cell(8, '', 'UNITS', 0, 1, 'C', 0, '', 1);
-        
+
         $pdf::SetXY($x+94, $y+$y_add);
         $pdf::Cell(6, '', 'LAB', 0, 1, 'C', 0, '', 1);
 
@@ -295,7 +295,7 @@ class EnrollmentFormController extends Controller
 
         $pdf::SetXY($x+162, $y+$y_add);
         $pdf::Cell(23, '', 'INSTRUCTOR', 0, 1, 'L', 0, '', 1);
-        
+
         $courses = StudentsCourses::where('user_id',$user_id)
             ->where('school_year_id',$school_year_id)
             ->get();
@@ -305,7 +305,7 @@ class EnrollmentFormController extends Controller
             $count_row = 0;
             foreach($courses as $row){
                 $courses_code_list[] = $row->course_code;
-                $y_add = $y_add + ($count_row == 0 ? 4 : 4);                
+                $y_add = $y_add + ($count_row == 0 ? 4 : 4);
                 $pdf::SetFont('times','',9);
                 $pdf::SetXY($x, $y+$y_add);
                 $pdf::Cell(20, '', $row->course_code, 0, 1, 'L', 0, '', 1);
@@ -317,10 +317,10 @@ class EnrollmentFormController extends Controller
                 $pdf::SetFont('times','',9);
                 $pdf::SetXY($x+84, $y+$y_add);
                 $pdf::Cell(8, '', $row->course_units, 0, 1, 'C', 0, '', 1);
-                
+
                 $lab_units = $row->lab_units > 0 ? $row->lab_units : '';
                 $pdf::SetXY($x+94, $y+$y_add);
-                $pdf::Cell(6, '', $lab_units, 0, 1, 'C', 0, '', 1);                
+                $pdf::Cell(6, '', $lab_units, 0, 1, 'C', 0, '', 1);
 
                 $pdf::SetXY($x+147, $y+$y_add);
                 $pdf::Cell(10, '', $row->course->section_code, 0, 1, 'L', 0, '', 1);
@@ -348,7 +348,7 @@ class EnrollmentFormController extends Controller
                         $day_get = implode('',$day_get);
                         $pdf::SetXY($x+120, $y+$y_add);
                         $pdf::Cell(15, '', $day_get, 0, 1, 'L', 0, '', 1);
-                        
+
                         $pdf::SetXY($x+132, $y+$y_add);
                         $pdf::Cell(12, '', $sched->room->name, 0, 1, 'L', 0, '', 1);
                         $count_sched++;
@@ -356,7 +356,7 @@ class EnrollmentFormController extends Controller
                 }else{
                     $pdf::SetXY($x+102, $y+$y_add);
                     $pdf::Cell(15, '', 'TBA', 0, 1, 'L', 0, '', 1);
-                    
+
                     $pdf::SetXY($x+117, $y+$y_add);
                     $pdf::Cell(15, '', 'TBA', 0, 1, 'L', 0, '', 1);
 
@@ -380,7 +380,7 @@ class EnrollmentFormController extends Controller
         $program_level_name = $student->program->program_level->name;
         $program_id = $student->program->program_id;
         $school_year_id = $student->school_year_id;
-        
+
         $fees_course_code = EducOfferedLabCourses::where('school_year_id',$school_year_id)
             ->whereIn('course_code',$courses_code_list)
             ->get();
@@ -407,7 +407,7 @@ class EnrollmentFormController extends Controller
             $pdf::SetFont('times','',8);
             foreach($fees as $row_fees){
                 $fees_type_id = $row_fees->id;
-                
+
                 if(($fees_type_id==2 && $fees_course_code_count) || $fees_type_id!=2){
                     $y_add = $y_add+6;
                     $pdf::SetXY($x, $y+$y_add);
@@ -429,7 +429,7 @@ class EnrollmentFormController extends Controller
 
                             //     $offered_discount_add_x = $offered_discount_cell;
                             // }
-                            
+
                             foreach($offered_discount as $row_offered_discount){
                                 $offered_discount_name[] = $row_offered_discount->name;
                             }
@@ -448,14 +448,14 @@ class EnrollmentFormController extends Controller
                         if($fees_lab_group->count()>0){
                             $fees_x = 0;
                             $fees_amount = 0;
-                            foreach($fees_lab_group as $row_lab_group){  
+                            foreach($fees_lab_group as $row_lab_group){
                                 $fees_x++;
                                 $count_course_code = EducOfferedLabCourses::where('school_year_id',$school_year_id)
                                     ->where('lab_group_id',$row_lab_group->id)
                                     ->get()->count();
                                 $amount_course_code = EducOfferedLabCourses::where('school_year_id',$school_year_id)
                                     ->where('lab_group_id',$row_lab_group->id)
-                                    ->first();      
+                                    ->first();
                                 $y_add = $y_add+4;
                                 $pdf::SetXY($x+5, $y+$y_add);
                                 $pdf::Cell(50, '', 'Lab Fee - '.$row_lab_group->name.' : '.$count_course_code.' x '.$amount_course_code->amount.'/subject', 0, 1, 'L', 0, '', 1);
@@ -475,9 +475,9 @@ class EnrollmentFormController extends Controller
                                     // $discount_amount_less = 0;
                                     // foreach($offered_discount as $row_offered_discount){
                                     //     $offered_discount = EducOfferedDiscountFeesType::where('offered_discount_id',$offered_discount_id)
-                                    //         ->where('fees_type_id',$fees_type_id)->first();                                        
+                                    //         ->where('fees_type_id',$fees_type_id)->first();
                                     //     if($offered_discount!=NULL){
-                                    //         $discount_amount = round((($count_course_code*$amount_course_code->amount-$discount_amount_less)*round((50/100),2)),2);                                            
+                                    //         $discount_amount = round((($count_course_code*$amount_course_code->amount-$discount_amount_less)*round((50/100),2)),2);
                                     //         $discount_balance = ($count_course_code*$amount_course_code->amount-$discount_amount_less)-$discount_amount;
 
                                     //         $pdf::SetXY($x+90+$offered_discount_add_x, $y+$y_add);
@@ -517,7 +517,7 @@ class EnrollmentFormController extends Controller
                         $fees_x = 0;
                         $fees_amount = 0;
                         foreach($fees_offered as $row_fees_offered){
-                            $fees_x++;                            
+                            $fees_x++;
                             $program_level = $row_fees_offered->fees->program_level==NULL ? ' - '.ucwords(mb_strtolower($program_level_name)) : '';
                             if($fees_type_id==1){
                                 $y_add = $y_add+4;
@@ -532,7 +532,7 @@ class EnrollmentFormController extends Controller
                                     $discount_percent = 0;
                                     foreach($offered_discount as $row_offered_discount){
                                         $offered_discount_percent = EducOfferedDiscountFeesType::where('offered_discount_id',$offered_discount_id)
-                                            ->where('fees_type_id',$fees_type_id)->first(); 
+                                            ->where('fees_type_id',$fees_type_id)->first();
                                         if($offered_discount_percent!=NULL){
                                             $discount_percent += $row_offered_discount->percent;
                                         }
@@ -563,7 +563,7 @@ class EnrollmentFormController extends Controller
                                     $discount_percent = 0;
                                     foreach($offered_discount as $row_offered_discount){
                                         $offered_discount_percent = EducOfferedDiscountFeesType::where('offered_discount_id',$offered_discount_id)
-                                            ->where('fees_type_id',$fees_type_id)->first(); 
+                                            ->where('fees_type_id',$fees_type_id)->first();
                                         if($offered_discount_percent!=NULL){
                                             $discount_percent += $row_offered_discount->percent;
                                         }
@@ -581,7 +581,7 @@ class EnrollmentFormController extends Controller
                                     $total_discount_balance += $discount_balance;
                                 }
                             }
-                            
+
                             if($fees_x==$fees_offered->count() && $fees_type_id!=2){
                                 $pdf::SetXY($x+71, $y+$y_add);
                                 $pdf::Cell(16, '', number_format(($fees_amount),2), 0, 1, 'R', 0, '', 1);
@@ -590,7 +590,7 @@ class EnrollmentFormController extends Controller
                     }
                 }
             }
-            
+
             $y_add = $y_add+7;
             $pdf::SetXY($x, $y+$y_add);
             $pdf::Cell(65, '', 'Total Assessment:', 0, 1, 'L', 0, '', 1);
@@ -606,7 +606,7 @@ class EnrollmentFormController extends Controller
         // $tuition_fees = EducFees::where('program_level_id',$program_level_id)
         //     ->where('type_id',1)
         //     ->get();
-        
+
         // $total_tuition = 0;
         // if($tuition_fees->count()>0){
         //     foreach($tuition_fees as $row){
@@ -739,7 +739,7 @@ class EnrollmentFormController extends Controller
         $y_add = $y_add+4;
         $pdf::SetXY($x+120, $y+$y_add);
         $pdf::Cell(70, '', date('m/d/Y h:i A'), 0, 1, 'C', 0, '', 1);
-        
+
 
         return $pdf;
     }

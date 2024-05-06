@@ -34,7 +34,7 @@ class DtrMachineCheck extends Command
     {
         $start_time = time();
 
-        //while (time() < $start_time + 60) { 
+        //while (time() < $start_time + 60) {
 
             // $ipaddress = '10.5.200.16';
             // $zk = new ZKTeco($ipaddress,4370);
@@ -80,7 +80,7 @@ class DtrMachineCheck extends Command
                     //     'updated_at' => date('Y-m-d H:i:s'),
                     //     'created_at' => date('Y-m-d H:i:s')
                     // ];
-                    
+
                     DB::beginTransaction();
                     try {
                         $insert = new DTRlogs();

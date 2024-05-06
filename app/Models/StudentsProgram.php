@@ -16,6 +16,10 @@ class StudentsProgram extends Model
     {
         return $this->belongsTo(EducPrograms::class, 'program_id', 'id')->withDefault();
     }
+    public function program_code()
+    {
+        return $this->belongsTo(EducProgramsCode::class, 'program_code_id', 'id')->withDefault();
+    }
     public function program_level()
     {
         return $this->belongsTo(EducProgramLevel::class, 'program_level_id', 'id')->withDefault();

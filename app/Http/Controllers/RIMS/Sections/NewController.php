@@ -17,7 +17,7 @@ class NewController extends Controller
         $grade_level = $request->grade_level;
         $no = $request->no;
         $result = 'error';
-        if($user_access_level==1 || $user_access_level==2){            
+        if($user_access_level==1 || $user_access_level==2){
             try{
                 $check = EducOfferedCourses::where('offered_curriculum_id', $curriculum)
                             ->where('year_level',$grade_level)
@@ -47,12 +47,12 @@ class NewController extends Controller
                                 })->toArray();
                     EducOfferedCourses::insert($query);
                 }
-                $result = 'success';  
+                $result = 'success';
             }catch(Exception $e){
-                    
+
             }
         }
         $response = array('result' => $result);
         return response()->json($response);
-    }    
+    }
 }

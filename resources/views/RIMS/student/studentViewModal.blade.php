@@ -10,13 +10,12 @@
             <input type="hidden" name="program_level" value="{{$program_level}}">
             <input type="hidden" name="curriculum" value="{{$curriculum}}">
             <div class="col-lg-12">
-                <div class="card card-primary card-outline">
-                   
-                        <div class="row">                            
-                            <div class="col-lg-3 center"><br><br>
+                <div class="card card-primary card-outline"\>
+                        <div class="row">
+                            <div class="col-lg-3 col-sm-12 center"><br><br><br>
                                 <img src="{{ asset('assets/images/icons/png/user.png') }}" class="profile-picture" alt="Student Image">
                             </div>
-                            <div class="col-9 col-sm-9">
+                            <div class="col-lg-9 col-sm-12">
                                 <div class="card-header p-0 pt-1 border-bottom-0">
                                     <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist" style="font-size: 12px;">
                                       <li class="nav-item">
@@ -36,7 +35,13 @@
                                 <div class="card-body">
                                     <div class="tab-content" id="custom-tabs-three-tabContent">
                                       <div class="tab-pane fade show active" id="personal-info" role="tabpanel" aria-labelledby="custom-tabs-three-home-tab" style="min-height: 250px;">
-                                        <div class="row">  
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <button class="btn btn-info btn-info-scan btn-xs studentInfoEdit"
+                                                    data-val="Info" style="float:right">
+                                                    <span class="fa fa-edit"> Edit</span>
+                                                </button>
+                                            </div>
                                             <div class="col-lg-12 table-responsive">
                                                 <table class="table">
                                                     <tr>
@@ -49,7 +54,7 @@
                                                         <td style="width: 10%">Nickname:</td>
                                                         <td style="width: 20%"><label>{{$query->firstname}}</label></td>
                                                     </tr>
-                                                    <tr>                                                        
+                                                    <tr>
                                                         <td>Sex:</td>
                                                         <td><label>
                                                             @if($query->personal_info->sex!=NULL)
@@ -109,7 +114,7 @@
                                                             </label>
                                                         </td>
                                                     </tr>
-                                                    <tr>                                                        
+                                                    <tr>
                                                         <td>Department:</td>
                                                         <td><label>
                                                             @if($query->student_info)
@@ -126,6 +131,15 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
+                                                        <td>Curriculum:</td>
+                                                        <td><label>
+                                                            @if($query->student_info)
+                                                                @if($query->student_info->curriculum_id!=NULL)
+                                                                    {{$query->student_info->curriculum->year_from}}
+                                                                @endif
+                                                            @endif
+                                                            </label>
+                                                        </td>
                                                         <td>Grade Level:</td>
                                                         <td><label>
                                                             @if($query->student_info)
@@ -139,13 +153,19 @@
                                         </div>
                                       </div>
                                       <div class="tab-pane fade" id="custom-tabs-three-profile" role="tabpanel" aria-labelledby="custom-tabs-three-profile-tab" style="min-height: 250px;">
-                                        <div class="row">  <br>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <button class="btn btn-info btn-info-scan btn-xs studentInfoEdit"
+                                                    data-val="Contact" style="float:right">
+                                                    <span class="fa fa-edit"> Edit</span>
+                                                </button>
+                                            </div>
                                             <div class="col-lg-12 table-responsive">
                                                 <table class="table">
                                                     <tr>
                                                         <td style="width: 25%">Contact No. 1:</td>
                                                         <td style="width: 25%"><label>
-                                                            {{$query->personal_info->contact_no_official}}
+                                                            +63-{{$query->personal_info->contact_no_official}}
                                                             </label>
                                                         </td>
                                                         <td style="width: 20%">Email 1:</td>
@@ -157,7 +177,7 @@
                                                     <tr>
                                                         <td>Contact No. 2:</td>
                                                         <td><label>
-                                                            {{$query->personal_info->contact_no}}
+                                                            +63-{{$query->personal_info->contact_no}}
                                                             </label>
                                                         </td>
                                                         <td>Email 2:</td>
@@ -180,7 +200,7 @@
                                                             Residential Address:
                                                         </td>
                                                         <td colspan="3"><label>
-                                                            {{$query->personal_info->res_lot}} {{$query->personal_info->res_street}} {{$query->personal_info->res_subd}} 
+                                                            {{$query->personal_info->res_lot}} {{$query->personal_info->res_street}} {{$query->personal_info->res_subd}}
                                                             @if($query->personal_info->res_brgy_id!=NULL)
                                                                 {{$query->personal_info->res_brgy->name}}
                                                             @endif
@@ -198,7 +218,7 @@
                                                             Permanent Address:
                                                         </td>
                                                         <td colspan="3"><label>
-                                                            {{$query->personal_info->per_lot}} {{$query->personal_info->per_street}} {{$query->personal_info->per_subd}} 
+                                                            {{$query->personal_info->per_lot}} {{$query->personal_info->per_street}} {{$query->personal_info->per_subd}}
                                                             @if($query->personal_info->per_brgy_id!=NULL)
                                                                 {{$query->personal_info->per_brgy->name}}
                                                             @endif
@@ -216,7 +236,13 @@
                                         </div>
                                       </div>
                                       <div class="tab-pane fade" id="custom-tabs-three-messages" role="tabpanel" aria-labelledby="custom-tabs-three-messages-tab" style="min-height: 250px;">
-                                        <div class="row">  
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <button class="btn btn-info btn-info-scan btn-xs studentInfoEdit"
+                                                    data-val="Educ" style="float:right">
+                                                    <span class="fa fa-edit"> Edit</span>
+                                                </button>
+                                            </div>
                                             <div class="col-lg-12 table-responsive">
                                                 <table class="table">
                                                     <thead>
@@ -226,13 +252,13 @@
                                                             <th>Program</th>
                                                             <th>Period From</th>
                                                             <th>Period To</th>
-                                                            <th>Units Earned</th>
-                                                            <th>Year Grad</th>
-                                                            <th>Honors</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         @if(count($query->education)>0)
+                                                            @php
+                                                                $x = 1;
+                                                            @endphp
                                                             @foreach($query->education as $row)
                                                                 <tr>
                                                                     <td>{{$row->level->name}}</td>
@@ -244,22 +270,38 @@
                                                                     </td>
                                                                     <td>
                                                                         @if(strtotime($row->period_from) !== false)
-                                                                            {{date('m/d/y',strtotime($row->period_from))}}
+                                                                            {{date('m/d/Y',strtotime($row->period_from))}}
                                                                         @else
                                                                             {{$row->period_from}}
                                                                         @endif
                                                                     </td>
                                                                     <td>
                                                                         @if(strtotime($row->period_to) !== false)
-                                                                            {{date('m/d/y',strtotime($row->period_to))}}
+                                                                            {{date('m/d/Y',strtotime($row->period_to))}}
                                                                         @else
                                                                             {{$row->period_to}}
                                                                         @endif
                                                                     </td>
-                                                                    <td>{{$row->units_earned}}</td>
-                                                                    <td>{{$row->year_grad}}</td>
-                                                                    <td>{{$row->honors}}</td>                                                                    
                                                                 </tr>
+                                                                <tr id="educBgViewMore{{$x}}">
+                                                                    <td></td>
+                                                                    <td colspan="4">
+                                                                        <div class="row">
+                                                                            <div class="col-md-4">
+                                                                                Units Earned: {{$row->units_earned}}
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                Year Graduated: {{$row->year_grad}}
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                Honors: {{$row->honors}}
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                @php
+                                                                    $x++;
+                                                                @endphp
                                                             @endforeach
                                                         @endif
                                                     </tbody>
@@ -268,13 +310,96 @@
                                         </div>
                                       </div>
                                       <div class="tab-pane fade" id="custom-tabs-three-settings" role="tabpanel" aria-labelledby="custom-tabs-three-settings-tab" style="min-height: 250px;">
-                                         
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <button class="btn btn-info btn-info-scan btn-xs studentInfoEdit"
+                                                    data-val="Fam" style="float:right">
+                                                    <span class="fa fa-edit"> Edit</span>
+                                                </button>
+                                            </div>
+                                            <div class="col-8 col-sm-10">
+                                                <div class="tab-content" id="vert-tabs-right-tabContent">
+                                                @if(count($query->family)>0)
+                                                    @php
+                                                        $x = 0;
+                                                    @endphp
+                                                    @foreach($query->family as $row)
+                                                        <div class="tab-pane fade @if($x==0) show active @endif"
+                                                            id="{{$row->fam_relation->name}}" role="tabpanel"
+                                                            aria-labelledby="{{$row->fam_relation->name}}-tab">
+                                                            <div class="table-responsive"><br>
+                                                                <table class="table">
+                                                                    <tr>
+                                                                        <td>Name:</td>
+                                                                        <td colspan="3">
+                                                                            <label>{{$row->lastname}},
+                                                                                {{$row->firstname}}
+                                                                                {{$row->extname}}
+                                                                                {{$row->middlename}}</label>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Birthdate:</td>
+                                                                        <td><label>@if(strtotime($row->dob) !== false) {{date('F d, Y',strtotime($row->dob))}} @endif</label></td>
+                                                                        <td>Contact:</td>
+                                                                        <td><label>{{$row->contact_no}}</label></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Email:</td>
+                                                                        <td><label>{{$row->email}}</label></td>
+                                                                        <td>Occupation:</td>
+                                                                        <td><label>{{$row->occupation}}</label></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Employer:</td>
+                                                                        <td><label>{{$row->employer}}</label></td>
+                                                                        <td>Employer Contact:</td>
+                                                                        <td><label>{{$row->employer_contact}}</label></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Employer Address:</td>
+                                                                        <td colspan="3"><label>{{$row->employer_address}}</label></td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    @php
+                                                            $x++;
+                                                        @endphp
+                                                    @endforeach
+                                                @endif
+                                                </div>
+                                            </div>
+                                            <div class="col-4 col-sm-2">
+                                              <div class="nav flex-column nav-tabs nav-tabs-right h-100" id="vert-tabs-right-tab" role="tablist" aria-orientation="vertical">
+                                                @if(count($query->family)>0)
+                                                    @php
+                                                        $x = 0;
+                                                    @endphp
+                                                    @foreach($query->family as $row)
+                                                        <a class="nav-link @if($x==0) active @endif"
+                                                                id="{{$row->fam_relation->name}}-tab"
+                                                                data-toggle="pill"
+                                                                href="#{{$row->fam_relation->name}}"
+                                                                role="tab"
+                                                                aria-controls="{{$row->fam_relation->name}}"
+                                                                aria-selected="true">
+                                                            {{$row->fam_relation->name}}
+                                                        </a>
+                                                        @php
+                                                            $x++;
+                                                        @endphp
+                                                    @endforeach
+                                                @endif
+                                              </div>
+                                            </div>
+                                        </div>
                                       </div>
                                     </div>
                                 </div>
-                            </div>                            
+                            </div>
                         </div>
-         
+
                 </div>
             </div>
             <div class="col-lg-12">
@@ -287,7 +412,7 @@
                         <button class="btn btn-primary btn-primary-scan" id="grades">
                                 <span class="fa fa-star-half-o"></span> Grades</button>  &nbsp;
                         <button class="btn btn-info btn-info-scan" id="certification">
-                                <span class="fa fa-check"></span> Certification</button>  &nbsp;                        
+                                <span class="fa fa-check"></span> Certification</button>  &nbsp;
                         @if($program_level>=6) &nbsp;
                             <button class="btn btn-primary btn-primary-scan" id="shift">
                                 <span class="fa fa-rotate-right"></span> Shift</button>
@@ -330,4 +455,5 @@
 <script src="{{ asset('assets/js/rims/student/certification.js') }}"></script>
 <script src="{{ asset('assets/js/rims/student/selectProgram.js') }}"></script>
 <script src="{{ asset('assets/js/rims/student/gradesModal.js') }}"></script>
+
 <!-- /.modal-content -->

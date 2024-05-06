@@ -19,10 +19,10 @@ Route::group(['middleware' => ['HTTPS']], function(){
     Route::group(['middleware' => ['CheckUser']], function(){
         Route::get('/', 'IndexController@view')->name('indexpage');
         //Route::middleware(['throttle:5,1'])->group(function () {
-            Route::post('/login', 'LoginController@check');    
+            Route::post('/login', 'LoginController@check');
         //});
     });
-    
+
     Route::get('/monitor1', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@monitor1');
     Route::post('/monitor1/display', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@display');
 
@@ -46,26 +46,26 @@ Route::group(['middleware' => ['HTTPS']], function(){
             Route::get('/systems', 'IndexController@systems');
 
             Route::get('/ids/{system_selected}/{nav_selected}/{type}', 'IndexController@ids');
-            
+
             Route::get('/students/tor/{id_no}/{level}/{dateTime}', 'RIMS\Student\TORController@tor');
-            
-            Route::get('/enrollment_form/{id_no}/{school_year}/{school_period}', 'RIMS\Student\EnrollmentFormController@form');            
-            
+
+            Route::get('/enrollment_form/{id_no}/{school_year}/{school_period}', 'RIMS\Student\EnrollmentFormController@form');
+
             Route::group(['prefix'=>'users'], function(){
                 Route::post('/table', 'USERS\TableController@table');
 
-                Route::post('/accessView', 'USERS\AccessController@access');            
+                Route::post('/accessView', 'USERS\AccessController@access');
                 Route::post('/accessListNav', 'USERS\AccessController@listNav');
                 Route::post('/accessListNavSub', 'USERS\AccessController@listNavSub');
                 Route::post('/accessUpdate', 'USERS\AccessController@update');
 
                 Route::post('/statusView', 'USERS\StatusController@status');
                 Route::post('/statusUpdate', 'USERS\StatusController@update');
-                
+
                 Route::post('/systems', 'USERS\SystemsController@table');
                 Route::post('/systemsTable', 'USERS\SystemsController@table');
                 Route::post('/systemsNew', 'USERS\SystemsController@new');
-                Route::post('/systemsEdit', 'USERS\SystemsController@edit');            
+                Route::post('/systemsEdit', 'USERS\SystemsController@edit');
                 Route::post('/systemNewSubmit', 'USERS\SystemsController@newSubmit');
                 Route::post('/systemEditSubmit', 'USERS\SystemsController@editSubmit');
                 Route::post('/systemsNav', 'USERS\SystemsController@nav');
@@ -79,9 +79,9 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/systemsNavSubNewSubmit', 'USERS\SystemsController@navSubNewSubmit');
                 Route::post('/systemsNavSubEditSubmit', 'USERS\SystemsController@navSubEditSubmit');
                 Route::post('/systemsNavView', 'USERS\SystemsController@navView');
-                Route::post('/systemsNavSubView', 'USERS\SystemsController@navSubView');            
+                Route::post('/systemsNavSubView', 'USERS\SystemsController@navSubView');
             });
-            
+
             Route::group(['prefix'=>'search'], function(){
                 Route::post('/courseCode', 'SEARCH\CourseCodeController@courseCode');
                 Route::post('/courseDesc', 'SEARCH\CourseDescController@courseDesc');
@@ -105,7 +105,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/school1', 'SEARCH\SchoolController@school1');
                 Route::post('/programSearch2', 'SEARCH\ProgramController@programSearch2');
             });
-            
+
             Route::group(['prefix'=>'signatory'], function(){
                 Route::post('/table', 'SignatoryController@table');
                 Route::post('/modal', 'SignatoryController@modal');
@@ -125,7 +125,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/informationEditDiv', 'SIMS\Information\InformationController@showDiv');
                     Route::post('/personalInfoSubmit', 'SIMS\Information\InformationController@update');
                     Route::post('/informationPersonalInfo', 'SIMS\Information\InformationController@edit');
-                    
+
                     Route::post('/coursesSelect', 'SIMS\Information\CoursesController@index');
                     Route::post('/coursesList', 'SIMS\Information\CoursesController@list');
 
@@ -139,7 +139,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/educBgDelete', 'SIMS\Information\EducBgController@delete');
                     Route::post('/educBgDeleteSubmit', 'SIMS\Information\EducBgController@destroy');
                     Route::post('/informationEducBg', 'SIMS\Information\EducBgController@show');
-                    
+
                     Route::post('/famNew', 'SIMS\Information\FamBgController@create');
                     Route::post('/famNewSubmit', 'SIMS\Information\FamBgController@store');
                     Route::post('/famEdit', 'SIMS\Information\FamBgController@edit');
@@ -164,23 +164,23 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 });
             });
             Route::group(['prefix'=>'fis'], function(){
-                Route::group(['prefix'=>'students'], function(){                
+                Route::group(['prefix'=>'students'], function(){
                     Route::post('/studentsTable', 'FIS\Students\LoadTableController@studentsTable');
                     Route::post('/studentSchoolYearTable', 'FIS\Students\LoadTableController@studentSchoolYearTable');
 
                     Route::post('/gradeLevel', 'FIS\Students\LoadViewController@gradeLevel');
 
-                    Route::post('/studentViewModal', 'FIS\Students\ModalController@studentViewModal');                    
+                    Route::post('/studentViewModal', 'FIS\Students\ModalController@studentViewModal');
                 });
-                Route::group(['prefix'=>'courses'], function(){                    
+                Route::group(['prefix'=>'courses'], function(){
                     Route::post('/allTable', 'FIS\CoursesController@index');
                     Route::post('/subjectsTable', 'FIS\CoursesController@semTable');
-                    Route::post('/studentsListTable', 'FIS\CoursesController@showTable');                    
+                    Route::post('/studentsListTable', 'FIS\CoursesController@showTable');
                     Route::post('/studentsListModal', 'FIS\CoursesController@show');
                     Route::post('/studentGradeUpdate', 'FIS\CoursesController@update');
                 });
                 Route::group(['prefix'=>'schedule'], function(){
-                    Route::post('/scheduleTable', 'FIS\ScheduleController@index');                    
+                    Route::post('/scheduleTable', 'FIS\ScheduleController@index');
                 });
                 Route::group(['prefix'=>'advisement'], function(){
                     Route::post('/studentInfo', 'FIS\Advisement\LoadViewController@studentInfo');
@@ -188,7 +188,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/studentAdvisement', 'FIS\Advisement\LoadViewController@studentAdvisement');
                     Route::post('/sectionSelect', 'FIS\Advisement\LoadViewController@sectionSelect');
 
-                    Route::post('/advisementSubmit', 'FIS\Advisement\UpdateController@advisementSubmit');                    
+                    Route::post('/advisementSubmit', 'FIS\Advisement\UpdateController@advisementSubmit');
                 });
                 Route::post('/loadSheet', 'FIS\LoadSheetController@index');
             });
@@ -196,7 +196,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::group(['prefix'=>'student'], function(){
                     Route::post('/studentTable', 'RIMS\Student\LoadTableController@studentTable');
                     Route::post('/studentSchoolYearTable', 'RIMS\Student\LoadTableController@studentSchoolYearTable');
-                    Route::post('/studentCoursesTable', 'RIMS\Student\LoadTableController@studentCoursesTable');  
+                    Route::post('/studentCoursesTable', 'RIMS\Student\LoadTableController@studentCoursesTable');
 
                     Route::post('/searchStudent', 'RIMS\Student\LoadViewController@searchStudent');
                     Route::post('/searchStudents', 'RIMS\Student\LoadViewController@searchStudents');
@@ -204,8 +204,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/studentCurriculumDiv', 'RIMS\Student\LoadViewController@studentCurriculumDiv');
                     Route::post('/studentShiftModalCurriculum', 'RIMS\Student\LoadViewController@studentShiftModalCurriculum');
                     Route::post('/studentCurriculumList', 'RIMS\Student\LoadViewController@studentCurriculumList');
-                    Route::post('/studentCurriculumLoad', 'RIMS\Student\LoadViewController@studentCurriculumLoad');                    
-                    
+                    Route::post('/studentCurriculumLoad', 'RIMS\Student\LoadViewController@studentCurriculumLoad');
+
                     Route::post('/studentViewModal', 'RIMS\Student\ModalController@studentViewModal');
                     Route::post('/studentTORModal', 'RIMS\Student\ModalController@studentTORModal');
                     Route::post('/studentCurriculumModal', 'RIMS\Student\ModalController@studentCurriculumModal');
@@ -215,19 +215,27 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/studentShiftModal', 'RIMS\Student\ModalController@studentShiftModal');
                     Route::post('/studentPrintModal', 'RIMS\Student\ModalController@studentPrintModal');
 
+                    Route::post('/studentEditInfo', 'RIMS\Student\InfoController@index');
+                    Route::post('/studentProgramList', 'RIMS\Student\InfoController@programList');
+                    Route::post('/studentCurriculumList', 'RIMS\Student\InfoController@curriculumList');
+                    Route::post('/studentUpdateInfoSubmit', 'RIMS\Student\InfoController@infoUpdate');
+                    Route::post('/studentUpdateContactSubmit', 'RIMS\Student\InfoController@contactUpdate');
+                    Route::post('/studentUpdateEducSubmit', 'RIMS\Student\InfoController@educUpdate');
+                    Route::post('/studentUpdateFamSubmit', 'RIMS\Student\InfoController@famUpdate');
+
                     Route::post('/studentSelectProgramModal', 'RIMS\Student\SelectProgramController@index');
                     Route::post('/selectProgramList', 'RIMS\Student\SelectProgramController@showProgram');
                     Route::post('/selectCurriculumList', 'RIMS\Student\SelectProgramController@showCurriculum');
-                    
+
                     Route::post('/studentGradesModal', 'RIMS\Student\GradesController@index');
-                    Route::post('/studentGradesList', 'RIMS\Student\GradesController@show');                    
+                    Route::post('/studentGradesList', 'RIMS\Student\GradesController@show');
 
                     Route::post('/studentCertificationModal', 'RIMS\Student\CertificationController@index');
                     Route::post('/certificationSYperiod', 'RIMS\Student\CertificationController@showSYperiod');
                     Route::post('/certificationSubmit', 'RIMS\Student\CertificationController@show');
                     Route::post('/certificationDisplay', 'RIMS\Student\CertificationController@display');
-                    
-                    
+
+
                     Route::post('/studentShiftModalSubmit', 'RIMS\Student\UpdateController@studentShiftModalSubmit');
                     Route::post('/studentCourseAddModalSubmit', 'RIMS\Student\UpdateController@studentCourseAddModalSubmit');
                     Route::post('/studentCourseCreditSubmit', 'RIMS\Student\UpdateController@studentCourseCreditSubmit');
@@ -235,7 +243,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/studentPrintSubmit', 'RIMS\Student\UpdateController@studentPrintSubmit');
                     Route::post('/specializationNameSubmit', 'RIMS\Student\UpdateController@specializationNameSubmit');
                     Route::post('/useThisCurriculum', 'RIMS\Student\UpdateController@useThisCurriculum');
-                });                
+                });
                 Route::group(['prefix'=>'departments'], function(){
                     Route::post('/viewTable', 'RIMS\Departments\DepartmentController@index');
                     Route::post('/editModal', 'RIMS\Departments\DepartmentController@edit');
@@ -245,9 +253,10 @@ Route::group(['middleware' => ['HTTPS']], function(){
 
                     Route::post('/programsModal', 'RIMS\Departments\ProgramController@index');
                     Route::post('/programsList', 'RIMS\Departments\ProgramController@show');
-                    Route::post('/programAddList', 'RIMS\Departments\ProgramController@create');                    
-                    Route::post('/programAddModal', 'RIMS\Departments\ProgramController@edit');                    
+                    Route::post('/programAddList', 'RIMS\Departments\ProgramController@create');
+                    Route::post('/programAddModal', 'RIMS\Departments\ProgramController@edit');
                     Route::post('/programsAddSubmit', 'RIMS\Departments\ProgramController@update');
+
                 });
                 Route::group(['prefix'=>'programs'], function(){
                     Route::post('/viewTable', 'RIMS\Programs\ProgramController@index');
@@ -258,28 +267,43 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/programStatusSubmit', 'RIMS\Programs\ProgramController@statusUpdate');
                     Route::post('/programEdit', 'RIMS\Programs\ProgramController@edit');
                     Route::post('/programUpdate', 'RIMS\Programs\ProgramController@update');
+                    Route::post('/departments', 'RIMS\Programs\ProgramController@departments');
 
                     Route::post('/branch', 'RIMS\Programs\BranchController@index');
                     Route::post('/branchTable', 'RIMS\Programs\BranchController@show');
-                    Route::post('/branchUpdate', 'RIMS\Programs\BranchController@update');                    
+                    Route::post('/branchUpdate', 'RIMS\Programs\BranchController@update');
 
                     Route::post('/curriculumTable', 'RIMS\Programs\LoadViewController@curriculumTable');
                     Route::post('/curriculumTablePre', 'RIMS\Programs\LoadViewController@curriculumTablePre');
                     Route::post('/courseTablePre', 'RIMS\Programs\LoadViewController@courseTablePre');
                     Route::post('/curriculumInfo', 'RIMS\Programs\LoadViewController@curriculumInfo');
                     Route::post('/courseInfo', 'RIMS\Programs\LoadViewController@courseInfo');
-                    
+
                     Route::post('/newCourse', 'RIMS\Programs\ModalController@newCourse');
                     Route::post('/courseUpdate', 'RIMS\Programs\ModalController@courseUpdate');
                     Route::post('/curriculumNewModal', 'RIMS\Programs\ModalController@curriculumNewModal');
-                    
+
                     Route::post('/newCourseSubmit', 'RIMS\Programs\NewController@newCourseSubmit');
                     Route::post('/curriculumNewSubmit', 'RIMS\Programs\NewController@curriculumNewSubmit');
 
-                    Route::post('/courseStatus', 'RIMS\Programs\UpdateController@courseStatus');                
+                    Route::post('/courseStatus', 'RIMS\Programs\UpdateController@courseStatus');
                     Route::post('/courseUpdateSubmit', 'RIMS\Programs\UpdateController@courseUpdateSubmit');
                     Route::post('/curriculumStatus', 'RIMS\Programs\UpdateController@curriculumStatus');
                     Route::post('/curriculumInputUpdate', 'RIMS\Programs\UpdateController@curriculumInputUpdate');
+                });
+                Route::group(['prefix'=>'curriculums'], function(){
+                    Route::post('/viewTable', 'RIMS\Curriculums\CurriculumsController@index');
+                    Route::post('/viewModal/{id}', 'RIMS\Curriculums\CurriculumsController@viewModal');
+                    Route::post('/editModal/{id}', 'RIMS\Curriculums\CurriculumsController@editModal');
+                    Route::post('/updateSubmit/{id}', 'RIMS\Curriculums\CurriculumsController@update');
+                    Route::post('/programList/{id}', 'RIMS\Curriculums\CurriculumsController@programList');
+                    Route::post('/newModal', 'RIMS\Curriculums\CurriculumsController@create');
+                    Route::post('/storeSubmit', 'RIMS\Curriculums\CurriculumsController@store');
+                    Route::post('/departments', 'RIMS\Curriculums\CurriculumsController@departments');
+                });
+                Route::group(['prefix'=>'courses'], function(){
+                    Route::post('/coursesTable/{id}', 'RIMS\Courses\CoursesController@index');
+
                 });
                 Route::group(['prefix'=>'buildings'], function(){
                     Route::post('/buildingsTable', 'RIMS\Buildings\BuildingsController@index');
@@ -304,10 +328,10 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/new', 'RIMS\SchoolYear\SchoolYearController@store');
 
                     Route::post('/programsViewModal', 'RIMS\SchoolYear\ProgramController@index');
-                    Route::post('/programsViewTable', 'RIMS\SchoolYear\ProgramController@show');  
+                    Route::post('/programsViewTable', 'RIMS\SchoolYear\ProgramController@show');
                     Route::post('/offerPrograms', 'RIMS\SchoolYear\ProgramController@store');
-                    Route::post('/programs', 'RIMS\SchoolYear\ProgramController@edit'); 
-                    Route::post('/moveProgram', 'RIMS\SchoolYear\ProgramController@update');                                        
+                    Route::post('/programs', 'RIMS\SchoolYear\ProgramController@edit');
+                    Route::post('/moveProgram', 'RIMS\SchoolYear\ProgramController@update');
 
                     Route::post('/coursesViewModal', 'RIMS\SchoolYear\CourseController@index');
                     Route::post('/curriculumViewList', 'RIMS\SchoolYear\CourseController@show');
@@ -318,39 +342,39 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/coursesListTable', 'RIMS\SchoolYear\CourseOpenController@show');
                     Route::post('/courseOpenSubmit', 'RIMS\SchoolYear\CourseOpenController@store');
 
-                    Route::post('/selectStatusUpdate', 'RIMS\SchoolYear\StatusUpdateController@update');                    
-                    
+                    Route::post('/selectStatusUpdate', 'RIMS\SchoolYear\StatusUpdateController@update');
+
                 });
-                Route::group(['prefix'=>'sections'], function(){ 
+                Route::group(['prefix'=>'sections'], function(){
                     Route::post('/viewTable', 'RIMS\Sections\LoadTableController@viewTable');
                     Route::post('/sectionViewTable', 'RIMS\Sections\LoadTableController@sectionViewTable');
-                    Route::post('/courseViewTable', 'RIMS\Sections\LoadTableController@courseViewTable');                
-                    
+                    Route::post('/courseViewTable', 'RIMS\Sections\LoadTableController@courseViewTable');
+
                     Route::post('/programsSelect', 'RIMS\Sections\LoadViewController@programsSelect');
                     Route::post('/gradeLevelSelect', 'RIMS\Sections\LoadViewController@gradeLevelSelect');
-                    Route::post('/courseSchedRmSchedule', 'RIMS\Sections\LoadViewController@courseSchedRmSchedule');                       
+                    Route::post('/courseSchedRmSchedule', 'RIMS\Sections\LoadViewController@courseSchedRmSchedule');
                     Route::post('/courseSchedRmTable', 'RIMS\Sections\LoadViewController@courseSchedRmTable');
-                    
+
                     Route::post('/sectionNewModal', 'RIMS\Sections\ModalController@sectionNewModal');
                     Route::post('/sectionViewModal', 'RIMS\Sections\ModalController@sectionViewModal');
-                    Route::post('/courseViewModal', 'RIMS\Sections\ModalController@courseViewModal');                    
+                    Route::post('/courseViewModal', 'RIMS\Sections\ModalController@courseViewModal');
                     Route::post('/minMaxModal', 'RIMS\Sections\ModalController@minMaxModal');
-                    
+
                     Route::post('/sectionNewSubmit', 'RIMS\Sections\NewController@sectionNewSubmit');
 
                     Route::post('/courseSchedRmInstructorUpdate', 'RIMS\Sections\UpdateController@courseSchedRmInstructorUpdate');
                     Route::post('/scheduleTimeUpdate', 'RIMS\Sections\UpdateController@scheduleTimeUpdate');
                     Route::post('/typeUpdate', 'RIMS\Sections\UpdateController@typeUpdate');
                     Route::post('/minMaxSubmit', 'RIMS\Sections\UpdateController@minMaxSubmit');
-                    Route::post('/minMaxStudent', 'RIMS\Sections\UpdateController@minMaxStudent');  
-                                  
+                    Route::post('/minMaxStudent', 'RIMS\Sections\UpdateController@minMaxStudent');
+
                 });
                 Route::group(['prefix'=>'enrollment'], function(){
                     Route::post('/enrollmentTable', 'RIMS\Enrollment\LoadTableController@enrollmentTable');
                     Route::post('/courseAnotherTable', 'RIMS\Enrollment\LoadTableController@courseAnotherTable');
                     Route::post('/enrollmentViewTable', 'RIMS\Enrollment\LoadTableController@enrollmentViewTable');
                     Route::post('/coursesViewTable', 'RIMS\Enrollment\LoadTableController@coursesViewTable');
-                    
+
                     Route::post('/studentInformationDiv', 'RIMS\Enrollment\LoadViewController@studentInformationDiv');
                     Route::post('/programCodeDiv', 'RIMS\Enrollment\LoadViewController@programCodeDiv');
                     Route::post('/programCurriculumDiv', 'RIMS\Enrollment\LoadViewController@programCurriculumDiv');
@@ -359,49 +383,49 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/programAddSelect', 'RIMS\Enrollment\LoadViewController@programAddSelect');
                     Route::post('/programAddCourseDiv', 'RIMS\Enrollment\LoadViewController@programAddCourseDiv');
                     Route::post('/dateList', 'RIMS\Enrollment\LoadViewController@dateList');
-                    
+
                     Route::post('/enrollModal', 'RIMS\Enrollment\ModalController@enrollModal');
                     Route::post('/courseAnotherModal', 'RIMS\Enrollment\ModalController@courseAnotherModal');
                     Route::post('/courseAddModal', 'RIMS\Enrollment\ModalController@courseAddModal');
                     Route::post('/enrollmentViewModal', 'RIMS\Enrollment\ModalController@enrollmentViewModal');
                     Route::post('/coursesViewModal', 'RIMS\Enrollment\ModalController@coursesViewModal');
-                    
+
                     Route::post('/courseAnotherSubmit', 'RIMS\Enrollment\UpdateController@courseAnotherSubmit');
                     Route::post('/courseAddSubmit', 'RIMS\Enrollment\UpdateController@courseAddSubmit');
                     Route::post('/enrollSubmit', 'RIMS\Enrollment\UpdateController@enrollSubmit');
                     Route::post('/enrollAdvisedSubmit', 'RIMS\Enrollment\UpdateController@enrollAdvisedSubmit');
-                    
+
                 });
-                
+
                 Route::group(['prefix'=>'schedule'], function(){
                     Route::post('/viewTable', 'RIMS\Schedule\LoadTableController@viewTable');
                     Route::post('/searchTable', 'RIMS\Schedule\LoadTableController@searchTable');
                     Route::post('/schedWoTable', 'RIMS\Schedule\LoadTableController@schedWoTable');
-                    
+
                     Route::post('/searchDiv', 'RIMS\Schedule\LoadViewController@searchDiv');
 
-                    Route::post('/searchCourseSched', 'RIMS\Schedule\ModalController@searchCourseSched');                
-                    
-                    Route::post('/scheduleCourseModal', 'RIMS\Schedule\ScheduleController@index');                    
+                    Route::post('/searchCourseSched', 'RIMS\Schedule\ModalController@searchCourseSched');
+
+                    Route::post('/scheduleCourseModal', 'RIMS\Schedule\ScheduleController@index');
                     Route::post('/scheduleCourseTime', 'RIMS\Schedule\ScheduleController@time');
                     Route::post('/scheduleCourseDetails', 'RIMS\Schedule\ScheduleController@details');
                     Route::post('/scheduleCourseTable', 'RIMS\Schedule\ScheduleController@show');
                     Route::post('/scheduleCourseTableRe', 'RIMS\Schedule\ScheduleController@reShow');
                     Route::post('/scheduleCourseUpdate', 'RIMS\Schedule\ScheduleController@update');
                     Route::post('/scheduleRemove', 'RIMS\Schedule\ScheduleController@destroy');
-                    Route::post('/scheduleRemoveDay', 'RIMS\Schedule\ScheduleController@destroyDay');                    
+                    Route::post('/scheduleRemoveDay', 'RIMS\Schedule\ScheduleController@destroyDay');
 
                     Route::post('/selectDay', 'RIMS\Schedule\_SelectDetailsList@selectDay');
                     Route::post('/selectTime', 'RIMS\Schedule\_SelectDetailsList@selectTime');
                     Route::post('/selectRoom', 'RIMS\Schedule\_SelectRoomController@selectRoom');
-                    Route::post('/selectInstructor', 'RIMS\Schedule\_SelectInstructorController@selectInstructor');                    
-                    
+                    Route::post('/selectInstructor', 'RIMS\Schedule\_SelectInstructorController@selectInstructor');
+
                     Route::post('/roomView', 'RIMS\Schedule\RoomController@index');
                     Route::post('/roomTable', 'RIMS\Schedule\RoomController@show');
 
                     Route::post('/instructorView', 'RIMS\Schedule\InstructorController@index');
                     Route::post('/instructorTable', 'RIMS\Schedule\InstructorController@show');
-                    
+
                 });
 
                 Route::group(['prefix'=>'addDrop'], function(){
@@ -409,12 +433,12 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/dropSubmit', 'RIMS\AddDrop\AddDropController@dropSubmit');
                     Route::post('/addSubmit', 'RIMS\AddDrop\AddDropController@addSubmit');
                 });
-                
+
                 Route::group(['prefix'=>'ludong'], function(){
                     Route::post('/studentTable', 'RIMS\Ludong\StudentController@table');
                 });
             });
-            
+
             Route::group(['prefix'=>'hrims'], function(){
                 Route::group(['prefix'=>'employee'], function(){
                     Route::post('/employeeTable', 'HRIMS\Employee\EmployeeController@employeeTable');
@@ -424,23 +448,23 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/employeeInformation', 'HRIMS\Employee\EmployeeController@employeeInformation');
                     Route::post('/uploadImage', 'HRIMS\Employee\EmployeeController@uploadImage');
                     Route::post('/workTable', 'HRIMS\Employee\WorkController@workTable');
-                    
+
                     Route::post('/personalInfo', 'HRIMS\Employee\Information\PersonalInfoController@personalInfo');
                     Route::post('/schedule', 'HRIMS\Employee\Information\ScheduleController@schedule');
                     Route::post('/employeeStatus', 'HRIMS\Employee\StatusController@status');
                     Route::post('/employeeStatusSubmit', 'HRIMS\Employee\StatusController@submit');
-                    
-                    
+
+
                     Route::group(['prefix'=>'information'], function(){
                         Route::post('/infoSubmit', 'HRIMS\Employee\Information\PersonalInfoController@infoSubmit');
                         Route::post('/addressSubmit', 'HRIMS\Employee\Information\PersonalInfoController@addressSubmit');
-                        Route::post('/idNoSubmit', 'HRIMS\Employee\Information\PersonalInfoController@idNoSubmit');   
-                        
+                        Route::post('/idNoSubmit', 'HRIMS\Employee\Information\PersonalInfoController@idNoSubmit');
+
                         Route::group(['prefix'=>'schedule'], function(){
                             Route::post('/schedNewModal', 'HRIMS\Employee\Information\ScheduleController@schedNewModal');
                             Route::post('/schedNewDaysList', 'HRIMS\Employee\Information\ScheduleController@schedNewDaysList');
                             Route::post('/schedNewSubmit', 'HRIMS\Employee\Information\ScheduleController@schedNewSubmit');
-                            
+
                             Route::post('/schedEditModal', 'HRIMS\Employee\Information\ScheduleController@schedEditModal');
                             Route::post('/schedEditDaysList', 'HRIMS\Employee\Information\ScheduleController@schedEditDaysList');
                             Route::post('/schedEditSubmit', 'HRIMS\Employee\Information\ScheduleController@schedEditSubmit');
@@ -459,7 +483,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     });
                     Route::group(['prefix'=>'allowance'], function(){
                         Route::post('/table', 'HRIMS\Employee\Allowance\AllowanceController@table');
-                    });              
+                    });
                     Route::group(['prefix'=>'work'], function(){
                         Route::post('/newModal', 'HRIMS\Employee\WorkController@newModal');
                         Route::post('/editModal', 'HRIMS\Employee\WorkController@editModal');
@@ -479,7 +503,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                         Route::post('/delete', 'HRIMS\Payroll\PayrollListController@delete');
                         Route::post('/deleteSubmit', 'HRIMS\Payroll\PayrollListController@destroy');
                         Route::get('/{payroll_id}/{encoded}', 'HRIMS\Payroll\PayrollViewController@index');
-                        Route::post('/payroll_table', 'HRIMS\Payroll\PayrollViewController@show');                        
+                        Route::post('/payroll_table', 'HRIMS\Payroll\PayrollViewController@show');
                         Route::post('/deductionModal', 'HRIMS\Payroll\PayrollDeductionController@index');
                         Route::post('/deductionModalTable', 'HRIMS\Payroll\PayrollDeductionController@show');
                         Route::post('/deductionModalInput', 'HRIMS\Payroll\PayrollDeductionController@update');
@@ -493,7 +517,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                         Route::post('/removeEmployeeModalSubmit', 'HRIMS\Payroll\PayrollViewController@destroy');
                         Route::post('/generatePayroll', 'HRIMS\Payroll\PayrollViewController@update');
                         Route::get('/src', 'HRIMS\Payroll\PayrollPrintController@src');
-                        
+
                     });
                     Route::group(['prefix'=>'payrollType'], function(){
                         Route::post('/table', 'HRIMS\Payroll\TypeController@index');
@@ -536,7 +560,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                         Route::post('/updateSubmit', 'HRIMS\Payroll\AllowanceController@update');
                     });
                     Route::group(['prefix'=>'billing'], function(){
-                        Route::post('/table', 'HRIMS\Payroll\BillingController@index');                
+                        Route::post('/table', 'HRIMS\Payroll\BillingController@index');
                     });
                 });
                 Route::group(['prefix'=>'position'], function(){
@@ -561,7 +585,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/holidayTable', 'HRIMS\DTR\HolidayController@table');
                     Route::post('/holidayNewModal', 'HRIMS\DTR\HolidayController@newModal');
                     Route::post('/holidayNewSubmit', 'HRIMS\DTR\HolidayController@newSubmit');
-                                        
+
                     Route::get('/pdf/{year}/{month}/{id_no}/{range}/{option}', 'HRIMS\DTR\PDFController@PDF');
                     Route::post('/individual', 'HRIMS\DTR\IndividualController@individual');
                     Route::post('/dtrInputModal', 'HRIMS\DTR\IndividualController@dtrInputModal');
@@ -572,7 +596,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/schedule', 'HRIMS\DTR\IndividualController@schedule');
                     Route::post('/department', 'HRIMS\DTR\IndividualController@department');
                     Route::post('/departmentSubmit', 'HRIMS\DTR\IndividualController@departmentSubmit');
-                }); 
+                });
                 Route::group(['prefix'=>'office'], function(){
                     Route::post('/office', 'HRIMS\Office\OfficeController@index');
                     Route::post('/officeTable', 'HRIMS\Office\OfficeController@table');
@@ -593,7 +617,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/devicesUpdateStatus', 'HRIMS\Devices\DevicesController@updateStatus');
                     Route::post('/devicesDateTimeModal', 'HRIMS\Devices\DevicesController@dateTimeModal');
                     Route::post('/dateTimeModalSubmit', 'HRIMS\Devices\DevicesController@dateTimeModalSubmit');
-                    
+
                     Route::post('/logsAcquire', 'HRIMS\Devices\LogsController@acquire');
                     Route::post('/logsClear', 'HRIMS\Devices\LogsController@clear');
                 });

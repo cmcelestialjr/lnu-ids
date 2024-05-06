@@ -99,7 +99,7 @@ class ImportStudentCurriculum extends Command
                             ->update(['curriculum_id' => $curriculum_id,
                                     'updated_at' => date('Y-m-d H:i:s')]);
                     }
-                    
+
                 }
             }
         }

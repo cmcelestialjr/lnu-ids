@@ -15,18 +15,18 @@ function curriculum_div(thisBtn){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
             $('#curriculumModal #curriculumInfoDiv').addClass('disabled');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             $('#curriculumModal #curriculumInfoDiv').removeClass('disabled');
             if(data=='error'){
                 toastr.error('Error.');
                 thisBtn.addClass('input-error');
-            }else{                
+            }else{
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
                 $('#curriculumModal #curriculumInfoDiv').html(data);
@@ -52,5 +52,5 @@ function curriculum_div(thisBtn){
             thisBtn.removeAttr('disabled');
         }
     });
-    
+
 }

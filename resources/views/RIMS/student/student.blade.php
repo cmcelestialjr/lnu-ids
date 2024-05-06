@@ -1,6 +1,6 @@
 @extends('layouts.header')
 @section('content')
-<div class="row" id="studentDiv">  
+<div class="row" id="studentDiv">
   <div class="col-lg-12">
     <div class="card card-primary card-tabs">
       <div class="card-header p-0 pt-1">
@@ -69,7 +69,7 @@
                     data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
                   <thead>
                     <tr>
-                      <th data-field="f1" data-sortable="true" data-align="center">#</th>                          
+                      <th data-field="f1" data-sortable="true" data-align="center">#</th>
                       <th data-field="f2" data-sortable="true" data-align="center">Name</th>
                       <th data-field="f3" data-sortable="true" data-align="center">ID No.</th>
                       <th data-field="f4" data-sortable="true" data-align="center">Program Level</th>

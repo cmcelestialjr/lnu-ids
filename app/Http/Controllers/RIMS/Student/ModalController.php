@@ -33,10 +33,12 @@ class ModalController extends Controller
                              'personal_info.per_city_muns',
                              'personal_info.per_province',
                              'student_info.program.departments',
+                             'student_info.curriculum',
                              'student_info.grade_level',
                              'education.level',
                              'education.school',
-                             'education.program')
+                             'education.program',
+                             'family.fam_relation')
             ->where('id',$id)
             ->first();
         $program_level = StudentsProgram::where('user_id',$id)

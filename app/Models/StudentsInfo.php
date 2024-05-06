@@ -8,6 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 class StudentsInfo extends Model
 {
     protected $table = 'students_info';
+
+    protected $fillable = [
+        'user_id',
+        'id_no',
+        'program_id',
+        'program_code_id',
+        'program_level_id',
+        'student_status_id',
+        'curriculum_id',
+        'grade_level_id',
+        'student_status_id',
+        'date_admitted',
+        'specialization_name',
+        'nstp_serial_no',
+        'updated_by',
+        'created_at',
+        'updated_at'
+    ];
+
     public function info()
     {
         return $this->belongsTo(Users::class, 'user_id', 'id')->withDefault();
@@ -31,7 +50,7 @@ class StudentsInfo extends Model
     public function grade_level()
     {
         return $this->belongsTo(EducYearLevel::class, 'grade_level_id', 'id')->withDefault();
-    }    
+    }
     public function status()
     {
         return $this->belongsTo(StudentsStatus::class, 'student_status_id', 'id')->withDefault();

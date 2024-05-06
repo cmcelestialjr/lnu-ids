@@ -8,14 +8,35 @@ use Illuminate\Database\Eloquent\Model;
 class Users extends Model
 {
     protected $table = 'users';
+
+    protected $fillable = [
+        'id_no',
+        'stud_id',
+        'lastname',
+        'firstname',
+        'middlename',
+        'extname',
+        'remember_token',
+        'image',
+        'honorific',
+        'post_nominal',
+        'status_id',
+        'emp_status_id',
+        'user_id',
+        'designated',
+        'updated_by',
+        'created_at',
+        'updated_at'
+    ];
+
     public function statuses()
     {
         return $this->belongsTo(Status::class, 'status_id', 'id')->withDefault();
-    }      
+    }
     public function personal_info()
     {
         return $this->belongsTo(_PersonalInfo::class, 'id', 'user_id');
-    }    
+    }
     public function employee_info()
     {
         return $this->belongsTo(_Work::class, 'id', 'user_id')->where('role_id',2)->orderBy('date_from','ASC');
@@ -39,7 +60,7 @@ class Users extends Model
     public function student_info()
     {
         return $this->belongsTo(StudentsInfo::class, 'id', 'user_id');
-    }  
+    }
     public function student_program()
     {
         return $this->hasMany(StudentsProgram::class, 'id', 'user_id');
@@ -54,7 +75,11 @@ class Users extends Model
     }
     public function education()
     {
-        return $this->hasMany(_EducationBg::class, 'user_id', 'id')->orderBy('level_id','ASC')->orderBy('period_from','ASC');
+        return $this->hasMany(_EducationBg::class, 'user_id', 'id')->orderBy('level_id','DESC')->orderBy('period_from','DESC');
+    }
+    public function family()
+    {
+        return $this->hasMany(_FamilyBg::class, 'user_id', 'id')->orderBy('relation_id','ASC')->orderBy('dob','DESC');
     }
     public function work()
     {

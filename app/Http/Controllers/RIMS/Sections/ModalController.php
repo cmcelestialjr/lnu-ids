@@ -35,7 +35,7 @@ class ModalController extends Controller
         $id = $request->id;
         $branch_id = $request->branch_id;
         $program_id = $request->program_id;
-        
+
         $grade_level = EducYearLevel::
                 whereHas('courses', function ($subQuery) use ($id,$program_id,$branch_id) {
                     $subQuery->whereHas('courses.curriculum.offered_program', function ($subQuery) use ($id,$program_id,$branch_id) {
@@ -45,12 +45,17 @@ class ModalController extends Controller
                     });
                 })
                 ->get();
-        
+
         $query = EducOfferedPrograms::with('program')
             ->where('school_year_id',$id)
             ->where('program_id',$program_id)
             ->where('branch_id',$branch_id)
             ->first();
+
+        if($query==NULL){
+            return view('layouts/error/404');
+        }
+
         $curriculum = EducOfferedCurriculum::with('curriculum')
                     ->whereHas('offered_program', function ($subQuery) use ($id,$program_id,$branch_id) {
                         $subQuery->where('school_year_id', $id);
@@ -74,7 +79,7 @@ class ModalController extends Controller
             'query' => $query
         );
         return view('rims/sections/courseViewModal',$data);
-    }    
+    }
     public function minMaxModal(Request $request){
         $id = $request->id;
         $query = EducOfferedCourses::where('id',$id)->first();

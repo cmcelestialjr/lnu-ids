@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
         //}
         //$schedule->command('app:dtr-machine-check')->everyTwoSeconds();
         //$schedule->command('app:sky-hr-import')->everyMinute();
-        
+
     }
 
     /**

@@ -149,9 +149,9 @@ class DTRImport implements ToModel, WithHeadingRow
             //                         'state_out_pm' => NULL,
             //                         'ipaddress_out_pm' => NULL]);
             //     }
-            // }               
+            // }
         }
-        
+
     }
 }
 ?>

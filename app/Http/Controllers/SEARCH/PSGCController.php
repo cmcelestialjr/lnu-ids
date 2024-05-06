@@ -41,7 +41,7 @@ class PSGCController extends Controller
             ->get();
         $data = [];
         if($results->count()>0){
-            foreach ($results as $result) {                
+            foreach ($results as $result) {
                 if($province!='place'){
                     $data[] = ['id' => $result->id, 'text' => $result->name];
                 }else{
@@ -58,7 +58,13 @@ class PSGCController extends Controller
     }
     public function provinces(Request $request){
         $search = $request->input('search');
+        $region = $request->region;
         $results = PSGCProvinces::where('name', 'LIKE', "%$search%");
+        if($region!='none' && $region!=NULL){
+            $results = $results->whereHas('provinces', function ($query) use ($region) {
+                 $query->where('id',$region);
+            });
+        }
         $results = $results->orderBy('name')
             ->limit(10)
             ->get();

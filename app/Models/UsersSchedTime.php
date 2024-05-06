@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UsersSchedTime extends Model
 {
     protected $table = 'users_sched_time';
+
     public function user()
     {
         return $this->belongsTo(Users::class, 'user_id', 'id')->withDefault();

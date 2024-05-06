@@ -32,6 +32,10 @@ class EducOfferedPrograms extends Model
     {
         return $this->hasMany(EducOfferedCurriculum::class, 'offered_program_id', 'id');
     }
+    public function curriculum()
+    {
+        return $this->hasMany(EducCurriculum::class, 'program_id', 'program_id')->withDefault();
+    }
     public function offered_program()
     {
         return $this->hasMany(EducOfferedPrograms::class, 'program_id', 'id');

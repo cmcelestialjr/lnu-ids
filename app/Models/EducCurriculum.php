@@ -23,10 +23,15 @@ class EducCurriculum extends Model
                 ->orderBy('grade_period_id','ASC')
                 ->orderBy('id','ASC');
     }
+    public function branch()
+    {
+        return $this->hasMany(EducCurriculumBranch::class, 'curriculum_id', 'id');
+    }
     public function offered_curriculums()
     {
         return $this->hasMany(EducOfferedCurriculum::class, 'curriculum_id', 'id');
     }
+
     public function students()
     {
         return $this->hasMany(StudentsProgram::class, 'curriculum_id', 'id');

@@ -114,7 +114,7 @@ class DocsController extends Controller
                 $date_to = $request->date_to;
                 $amount = $request->amount;
                 $remarks = $request->remarks;
-                
+
                 $user = Auth::user();
                 $updated_by = $user->id;
 
@@ -148,15 +148,15 @@ class DocsController extends Controller
                 $doc = $merge_import_services->do($request,$path,$path_retrieve,$extension,$name,$imageNameNew);
                 // foreach ($files as $file) {
                 //     $filename = $file->getClientOriginalName();
-                //     $extension = $file->getClientOriginalExtension();           
+                //     $extension = $file->getClientOriginalExtension();
                 //     $filename = 'abc.'.$extension;
                 //     $path = 'public/hrims/employee/deduction/docs/';
                 //     Storage::putFileAs($path, $file, $filename);
-                    
+
                 //     $uploadedFiles[] = $filename;
                 // }
 
-                $insert = new HRDeductionDocs(); 
+                $insert = new HRDeductionDocs();
                 $insert->deduction_employee_id = $deduction_employee_id;
                 $insert->date_from = $date_from;
                 $insert->date_to = $date_to;
@@ -166,7 +166,7 @@ class DocsController extends Controller
                 $insert->updated_by = $updated_by;
                 $insert->save();
 
-                
+
                 $result = 'success';
             // } catch (\Exception $e) {
             //     $result = 'error';

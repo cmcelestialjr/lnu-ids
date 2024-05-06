@@ -1,13 +1,15 @@
 
 function view_sections_by_program(){
-    var thisBtn = $('#sectionDiv #programsSelectDiv select[name="program"]');
-    var program_id = thisBtn.val();
+    var thisBtn = $('#sectionDiv #programsSelectDiv .select2-programsSelect');
     var id = $('#sectionDiv select[name="school_year"]').val();
+    var program_id = $('#sectionDiv #programsSelectDiv select[name="program"]').val();
+    var branch_id = $('#sectionDiv #programsSelectDiv select[name="branch"]').val();
     var form_data = {
         url_table:base_url+'/rims/sections/viewTable',
         tid:'viewTable',
         id:id,
-        program_id:program_id
+        program_id:program_id,
+        branch_id:branch_id
     };
     loadTablewLoader(form_data,thisBtn);
 }
@@ -26,21 +28,22 @@ function view_sections(){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
             $('#sectionDiv #programsSelectDiv select[name="program"]').attr('disabled','disabled');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             $('#sectionDiv #programsSelectDiv select[name="program"]').removeAttr('disabled');
             if(data=='error'){
                 toastr.success('Error');
                 thisBtn.addClass('input-error');
             }else{
-                thisBtn.addClass('input-success');                
+                thisBtn.addClass('input-success');
                 $('#sectionDiv #programsSelectDiv').html(data);
                 var program_id = $('#sectionDiv #programsSelectDiv select[name="program"]').val();
+                var branch_id = $('#sectionDiv #programsSelectDiv select[name="branch"]').val();
                 $(".select2-programsSelect").select2({
                     dropdownParent: $("#programsSelectDiv")
                 });
@@ -48,7 +51,8 @@ function view_sections(){
                     url_table:base_url+'/rims/sections/viewTable',
                     tid:'viewTable',
                     id:id,
-                    program_id:program_id
+                    program_id:program_id,
+                    branch_id:branch_id
                 };
                 loadTablewLoader(form_data,thisBtn);
             }
@@ -85,7 +89,7 @@ function rm_instructor_update(){
     if(x==0){
         $('#courseSchedRmModal #rm_instructor select[name="days[]"] option:selected').each(function () {
             days.push($(this).val());
-        }); 
+        });
         var form_data = {
             id:id,
             instructor_id:instructor_id,
@@ -107,11 +111,11 @@ function rm_instructor_update(){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
-            success : function(data){                
-                thisBtn.removeClass('input-loading'); 
+            success : function(data){
+                thisBtn.removeClass('input-loading');
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
@@ -132,7 +136,7 @@ function rm_instructor_update(){
                 }else if(data.result=='error'){
                     thisBtn.removeAttr('disabled');
                     toastr.error('Error.');
-                    thisBtn.addClass('input-error');                
+                    thisBtn.addClass('input-error');
                 }else{
                     thisBtn.removeAttr('disabled');
                     toastr.error(data.result);
@@ -171,13 +175,13 @@ function select_day(){
     $('#courseSchedRmModal #courseSchedRmTable .schedDayTimeInput').each(function () {
         get_time.push($(this).data('t'));
         get_day.push($(this).data('d'));
-    }); 
+    });
     $('#courseSchedRmModal #rm_instructor select[name="days[]"] option:selected').each(function () {
         select_days.push($(this).val());
     });
     $('#courseSchedRmModal #rm_instructor select[name="days[]"]').select2({
         dropdownParent: $("#rm_instructor"),
-        ajax: { 
+        ajax: {
         url: base_url+'/rims/schedule/selectDays',
         type: "post",
         dataType: 'json',
@@ -187,7 +191,7 @@ function select_day(){
                 _token: CSRF_TOKEN,
                 schedule_id:schedule_id,
                 get_day:get_day,
-                get_time:get_time,                
+                get_time:get_time,
                 select_days:select_days,
                 select_time:select_time,
                 search: params.term
@@ -210,13 +214,13 @@ function select_time(){
     $('#courseSchedRmModal #courseSchedRmTable .schedDayTimeInput').each(function () {
         get_time.push($(this).data('t'));
         get_day.push($(this).data('d'));
-    }); 
+    });
     $('#courseSchedRmModal #rm_instructor select[name="days[]"] option:selected').each(function () {
         select_days.push($(this).val());
     });
     $('#courseSchedRmModal #rm_instructor select[name="time"]').select2({
         dropdownParent: $("#rm_instructor"),
-        ajax: { 
+        ajax: {
         url: base_url+'/rims/schedule/selectTime',
         type: "post",
         dataType: 'json',

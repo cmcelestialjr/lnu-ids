@@ -55,10 +55,10 @@ class PageController extends Controller
         $query = [];
         $idNo = '230209';
         $dateTime = '2024-02-06 08:05:56';
-        $type = '0'; 
+        $type = '0';
         $ipaddress = '10.5.201.137';
 
-        $deviceId = DB::connection('skyhr')->table('skyhr.db_owner.tblDevices')->where('IP',$ipaddress)->value('DeviceId');
+        //$deviceId = DB::connection('skyhr')->table('skyhr.db_owner.tblDevices')->where('IP',$ipaddress)->value('DeviceId');
 
         // $dataToInsert = [
         //     'DeviceId' => $deviceId,
@@ -67,17 +67,17 @@ class PageController extends Controller
         //     'Mode' => $type
         //     // add other columns and values as needed
         // ];
-        
+
         // DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')->insert($dataToInsert);
 
         // $lastInsertedId = DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')
         //     ->where('IdNo',$idNo)
         //     ->where('LogDate',$dateTime)
         //     ->orderBy('Id', 'desc')
-        //     ->value('Id');        
+        //     ->value('Id');
         // $employeeId = DB::connection('skyhr')->table('tblEmployees')
         //     ->where('IdNo',$idNo)
-        //     ->value('EmployeeId');        
+        //     ->value('EmployeeId');
         // if($employeeId){
         //     $dataToInsert = [
         //         'EmployeeId' => $employeeId,
@@ -86,7 +86,7 @@ class PageController extends Controller
         //         'DeviceLogId' => $lastInsertedId,
         //         'Mode' => $type,
         //         'DeviceReference' => 'DEVICE_ID-'.$deviceId
-        //     ];        
+        //     ];
         //     DB::connection('skyhr')->table('tblEmployee_TimeLog')->insert($dataToInsert);
         // }
 
@@ -109,9 +109,9 @@ class PageController extends Controller
         //     //     $attendace = $zk->specificAttendance(230209);
         //     //     $attendace = $zk_guard->getAttendance();
         //     //     $deviceName = $zk_guard->getTime();
-        //     //     140720                
+        //     //     140720
         //     //     $zk->setTime('2023-08-24 10:26:15');
-        //     //     $getTime = $zk->getTime(); 
+        //     //     $getTime = $zk->getTime();
         //     //     $getUser = $zk_guard->userSpecific(900911);
         //     //     $startDate = '2023-06-01';
         //     //     $endDate = '2023-06-31';
@@ -121,18 +121,18 @@ class PageController extends Controller
         //     //         $recordDate = date('Y-m-d', strtotime($recordDate));
         //     //         return $recordDate >= $startDate && $recordDate <= $endDate;
         //     //     });
-                
+
         //     $getUser = $zk->getUser();
         //     //     foreach($attendace as $row){
         //     //         $insert = new DTRlogsCopy();
-                
+
         //     //         $insert->id_no = $row['id'];
         //     //         $insert->state = $row['state'];
         //     //         $insert->dateTime = $row['timestamp'];
         //     //         $insert->type = $row['type'];
         //     //         $insert->save();
         //     //     }
-                
+
         //         //  foreach($getUser as $row){
         //         //     //$getFingerprint = $zk1->getFingerprint($row['uid']);
         //         //     //$query = Users::where('id_no',$row['userid'])->first();
@@ -150,7 +150,7 @@ class PageController extends Controller
         //         //     //     $resultFinger = 'error';
         //         //     // }
         //         // }
-                
+
         //    }
         // }catch(Exception $e){
 
@@ -162,7 +162,7 @@ class PageController extends Controller
         $data['getTime'] = $query;
         return view($this->page.'/home',$data);
     }
-    public function employees($data){       
+    public function employees($data){
         return view($this->page.'/employee/employee1',$data);
     }
     public function new_employee($data){
@@ -191,7 +191,7 @@ class PageController extends Controller
     //     $data['emp_stat'] = $emp_stat;
     //     $data['payroll_type'] = $payroll_type;
     //     $data['fund_source'] = $fund_source;
-    //     return view($this->page.'/employee/deduction/deduction',$data); 
+    //     return view($this->page.'/employee/deduction/deduction',$data);
     // }
 
     //payroll
@@ -210,28 +210,28 @@ class PageController extends Controller
         $data['payroll_duration'] = $payroll_duration;
         $data['payroll_option'] = $payroll_option;
         $data['account_titles'] = $account_titles;
-        return view($this->page.'/payroll/generate/generate',$data); 
+        return view($this->page.'/payroll/generate/generate',$data);
     }
     public function payroll_view($data){
         $payroll_type = HRPayrollType::get();
         $data['payroll_type'] = $payroll_type;
-        return view($this->page.'/payroll/view/view',$data); 
+        return view($this->page.'/payroll/view/view',$data);
     }
     public function payroll_type($data){
-        return view($this->page.'/payroll/payrollType/payroll_type',$data); 
+        return view($this->page.'/payroll/payrollType/payroll_type',$data);
     }
     public function deduction($data){
-        return view($this->page.'/payroll/deduction/deduction',$data); 
+        return view($this->page.'/payroll/deduction/deduction',$data);
     }
     public function allowance($data){
-        return view($this->page.'/payroll/allowance/allowance',$data); 
+        return view($this->page.'/payroll/allowance/allowance',$data);
     }
     public function billing($data){
         $deduction_group = HRDeductionGroup::get();
         $payroll_type = HRPayrollType::get();
         $data['deduction_group'] = $deduction_group;
         $data['payroll_type'] = $payroll_type;
-        return view($this->page.'/payroll/billing/billing',$data); 
+        return view($this->page.'/payroll/billing/billing',$data);
     }
 
     public function signatory($data){
@@ -242,16 +242,16 @@ class PageController extends Controller
         $data['signatory_type'] = $signatory_type;
         return view('signatory/signatory',$data);
     }
-    
+
     public function dtr($data){
         $route = Route::current();
         $routeName = $route->getName();
         $dtrType = DTRType::get();
         $data['dtrType'] = $dtrType;
         $data['routeName'] = $routeName;
-        return view($this->page.'/dtr/all1',$data); 
+        return view($this->page.'/dtr/all1',$data);
     }
-    
+
     public function position($data){
         $position_type = HRPositionType::get();
         $position_status = Status::whereHas('status_list', function ($query) {
@@ -259,21 +259,21 @@ class PageController extends Controller
             })->get();
         $data['position_type'] = $position_type;
         $data['position_status'] = $position_status;
-        return view($this->page.'/position/position',$data); 
+        return view($this->page.'/position/position',$data);
     }
 
     public function devices($data){
         return view($this->page.'/devices/devices',$data);
     }
 
-    public function office($data){        
+    public function office($data){
         return view($this->page.'/office/office',$data);
     }
 
     //my
     public function mydtr($data){
         $user = Auth::user();
-        $data['id_no'] = $user->id_no;        
+        $data['id_no'] = $user->id_no;
         return view($this->page.'/dtr/individual',$data);
     }
     public function mypayslip($data){

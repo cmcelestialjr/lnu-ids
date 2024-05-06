@@ -36,7 +36,7 @@
                             <td><label>Middlename:</label></td>
                             <td><input type="text" class="form-control" name="middlename" value="{{$query->middlename}}"></td>
                             <td><label>Extname:</label></td>
-                            <td><input type="text" class="form-control" name="extname" value="{{$query->extname}}"></td>                
+                            <td><input type="text" class="form-control" name="extname" value="{{$query->extname}}"></td>
                         </tr>
                         <tr>
                             <td colspan="2" class="center">Include Middlename in lastname?:<span class="text-require">*</span><br>
@@ -52,7 +52,7 @@
                                         <option value="Y">Yes</option>
                                     @endif
                                 </select>
-                            </td>                               
+                            </td>
                         </tr>
                         <tr>
                             <td><label>Birthdate:<span class="text-require">*</span></label></td>
@@ -65,7 +65,7 @@
                                         <input type="text" class="form-control datePicker" name="dob" value="{{date('m/d/Y',strtotime($query->personal_info->dob))}}">
                                     </div>
                                 </div>
-                            </td> 
+                            </td>
                             <td><label>Place of Birth:</label></td>
                             <td>
                                 <div id="psgcCityMunsPlace">
@@ -85,7 +85,7 @@
                                             <option value="{{$row->id}}">{{$row->name}}</option>
                                         @endif
                                     @endforeach
-                                </select></td> 
+                                </select></td>
                             <td><label>Civil Status:<span class="text-require">*</span></label></td>
                             <td><select class="form-control select2-div" name="civil_status">
                                 @foreach($civil_statuses as $row)
@@ -99,7 +99,7 @@
                         </tr>
                         <tr>
                             <td><label>Height (m):</label></td>
-                            <td><input type="number" class="form-control" name="height" value="{{$query->personal_info->height}}"></td> 
+                            <td><input type="number" class="form-control" name="height" value="{{$query->personal_info->height}}"></td>
                             <td><label>Weight (kg):</label></td>
                             <td><input type="number" class="form-control" name="weight" value="{{$query->personal_info->weight}}"></td>
                         </tr>
@@ -114,7 +114,7 @@
                                         @endif
                                     @endforeach
                                 </select>
-                            </td> 
+                            </td>
                             <td><label>Telephone No.:</label></td>
                             <td><div class="form-group">
                                     <div class="input-group input-group-sm">
@@ -190,7 +190,7 @@
                             <td><label>Middlename:</label></td>
                             <td>{{$query->middlename}}</td>
                             <td><label>Extname:</label></td>
-                            <td>{{$query->extname}}</td>                
+                            <td>{{$query->extname}}</td>
                         </tr>
                         <tr>
                             <td><label>Birthdate:</label></td>
@@ -200,7 +200,7 @@
                                     </div>
                                     {{$query->personal_info->dob}}
                                 </div>
-                            </td> 
+                            </td>
                             <td><label>Place of Birth:</label></td>
                             <td>
                                 {{$query->place_birth}}
@@ -211,7 +211,7 @@
                             <td>@if($query->personal_info->sex!=NULL)
                                 {{$query->personal_info->sexs->name}}
                                 @endif
-                            </td> 
+                            </td>
                             <td><label>Civil Status:</label></td>
                             <td>@if($query->personal_info->civil_status_id!=NULL)
                                 {{$query->personal_info->civil_statuses->name}}
@@ -219,7 +219,7 @@
                         </tr>
                         <tr>
                             <td><label>Height (m):</label></td>
-                            <td>{{$query->personal_info->height}}</td> 
+                            <td>{{$query->personal_info->height}}</td>
                             <td><label>Weight (kg):</label></td>
                             <td>{{$query->personal_info->weight}}</td>
                         </tr>
@@ -228,7 +228,7 @@
                             <td>@if($query->personal_info->blood_type_id!=NULL)
                                 {{$query->personal_info->blood->name}}
                                 @endif
-                            </td> 
+                            </td>
                             <td><label>Telephone No.:</label></td>
                             <td><div class="input-group input-group-sm">
                                     <div class="input-group-append">
@@ -288,12 +288,12 @@
                         <tr>
                             <td><label>Subdivision/Village</label></td>
                             <td><input type="text" class="form-control" name="res_subd" value="{{$query->personal_info->res_subd}}"></td>
-                            <td><label>Barangay</label></td>
+                            <td><label>Province</label></td>
                             <td>
-                                <div id="psgcBrgysRes">
-                                    <select class="form-control select2-div psgcBrgysRes" name="res_brgy_id">
-                                        @if($query->personal_info->res_brgy_id!=NULL)
-                                        <option value="{{$query->personal_info->res_brgy_id}}">{{$query->personal_info->res_brgy->name}}</option>
+                                <div id="psgcProvinceRes">
+                                    <select class="form-control select2-div psgcProvinceRes" name="res_province_id">
+                                        @if($query->personal_info->res_province_id!=NULL)
+                                        <option value="{{$query->personal_info->res_province_id}}">{{$query->personal_info->res_province->name}}</option>
                                         @endif
                                     </select>
                                 </div>
@@ -310,12 +310,12 @@
                                     </select>
                                 </div>
                             </td>
-                            <td><label>Province</label></td>
+                            <td><label>Barangay</label></td>
                             <td>
-                                <div id="psgcProvinceRes">
-                                    <select class="form-control select2-div psgcProvinceRes" name="res_province_id">
-                                        @if($query->personal_info->res_province_id!=NULL)
-                                        <option value="{{$query->personal_info->res_province_id}}">{{$query->personal_info->res_province->name}}</option>
+                                <div id="psgcBrgysRes">
+                                    <select class="form-control select2-div psgcBrgysRes" name="res_brgy_id">
+                                        @if($query->personal_info->res_brgy_id!=NULL)
+                                        <option value="{{$query->personal_info->res_brgy_id}}">{{$query->personal_info->res_brgy->name}}</option>
                                         @endif
                                     </select>
                                 </div>
@@ -339,7 +339,7 @@
                         @endphp
                         <tr>
                             <td colspan="4" class="center">
-                                <label>Check if same as Residential Address? 
+                                <label>Check if same as Residential Address?
                                 @if($query->personal_info->same_res=='Yes')
                                 <input type="checkbox" name="same_res" value="Yes" data-num="0" checked>
                                 @else
@@ -357,15 +357,15 @@
                         <tr>
                             <td><label>Subdivision/Village</label></td>
                             <td><input type="text" class="form-control" name="per_subd" value="{{$query->personal_info->per_subd}}" {{$disabled}}></td>
-                            <td><label>Barangay</label></td>
+                            <td><label>Province</label></td>
                             <td>
-                                <div id="psgcBrgysPer">
-                                    <select class="form-control select2-div psgcBrgysPer" name="per_brgy_id" {{$disabled}}>
-                                        @if($query->personal_info->per_brgy_id!=NULL)
-                                        <option value="{{$query->personal_info->per_brgy_id}}">{{$query->personal_info->per_brgy->name}}</option>
+                                <div id="psgcProvincePer">
+                                    <select class="form-control select2-div psgcProvincePer" name="per_province_id" {{$disabled}}>
+                                        @if($query->personal_info->per_province_id!=NULL)
+                                        <option value="{{$query->personal_info->per_province_id}}">{{$query->personal_info->per_province->name}}</option>
                                         @endif
                                     </select>
-                                    <select class="hide" name="per_brgy_id_">
+                                    <select class="hide" name="per_province_id_">
                                     </select>
                                 </div>
                             </td>
@@ -383,15 +383,15 @@
                                     </select>
                                 </div>
                             </td>
-                            <td><label>Province</label></td>
+                            <td><label>Barangay</label></td>
                             <td>
-                                <div id="psgcProvincePer">
-                                    <select class="form-control select2-div psgcProvincePer" name="per_province_id" {{$disabled}}>
-                                        @if($query->personal_info->per_province_id!=NULL)
-                                        <option value="{{$query->personal_info->per_province_id}}">{{$query->personal_info->per_province->name}}</option>
+                                <div id="psgcBrgysPer">
+                                    <select class="form-control select2-div psgcBrgysPer" name="per_brgy_id" {{$disabled}}>
+                                        @if($query->personal_info->per_brgy_id!=NULL)
+                                        <option value="{{$query->personal_info->per_brgy_id}}">{{$query->personal_info->per_brgy->name}}</option>
                                         @endif
                                     </select>
-                                    <select class="hide" name="per_province_id_">
+                                    <select class="hide" name="per_brgy_id_">
                                     </select>
                                 </div>
                             </td>
@@ -499,32 +499,32 @@
                                 {{$query->id_no}}</td>
                             <td style="width: 25%"><label>Bank Account No.</label></td>
                             <td style="width: 25%">
-                                <input type="text" class="form-control bank_account_no" name="bank_account_no" 
+                                <input type="text" class="form-control bank_account_no" name="bank_account_no"
                                     value="{{$query->personal_info->bank_account_no}}"></td>
                         </tr>
                         <tr>
                             <td><label>TIN No.</label></td>
                             <td>
-                                <input type="text" class="form-control tin_no" name="tin_no" 
+                                <input type="text" class="form-control tin_no" name="tin_no"
                                     value="{{$query->personal_info->tin_no}}"></td>
                             <td><label>GSIS ID No.</label></td>
-                            <td><input type="text" class="form-control gsis_bp_no" name="gsis_bp_no" 
-                                value="{{$query->personal_info->gsis_bp_no}}"></td>   
+                            <td><input type="text" class="form-control gsis_bp_no" name="gsis_bp_no"
+                                value="{{$query->personal_info->gsis_bp_no}}"></td>
                         </tr>
                         <tr>
                             <td><label>Philhealth No.</label></td>
-                            <td><input type="text" class="form-control philhealth_no" name="philhealth_no" 
+                            <td><input type="text" class="form-control philhealth_no" name="philhealth_no"
                                 value="{{$query->personal_info->philhealth_no}}"></td>
                             <td><label>SSS No.</label></td>
-                            <td><input type="text" class="form-control sss_no" name="sss_no" 
-                                value="{{$query->personal_info->sss_no}}"></td>                            
+                            <td><input type="text" class="form-control sss_no" name="sss_no"
+                                value="{{$query->personal_info->sss_no}}"></td>
                         </tr>
                         <tr>
                             <td><label>PAGIBIG ID No.</label></td>
-                            <td><input type="text" class="form-control pagibig_no" name="pagibig_no" 
+                            <td><input type="text" class="form-control pagibig_no" name="pagibig_no"
                                 value="{{$query->personal_info->pagibig_no}}"></td>
                             <td><label>PAGIBIG II ID No.</label></td>
-                            <td><input type="text" class="form-control" name="pagibig2_no" 
+                            <td><input type="text" class="form-control" name="pagibig2_no"
                                 value="{{$query->personal_info->pagibig2_no}}"></td>
                         </tr>
                         <tr>
@@ -532,18 +532,18 @@
                         </tr>
                         <tr>
                             <td><label>MPL</label></td>
-                            <td><input type="text" class="form-control" name="pagibig_mpl_app_no" 
+                            <td><input type="text" class="form-control" name="pagibig_mpl_app_no"
                                 value="{{$query->personal_info->pagibig_mpl_app_no}}"></td>
                             <td><label>CALAMITY</label></td>
-                            <td><input type="text" class="form-control" name="pagibig_cal_app_no" 
+                            <td><input type="text" class="form-control" name="pagibig_cal_app_no"
                                 value="{{$query->personal_info->pagibig_cal_app_no}}"></td>
                         </tr>
                         <tr>
                             <td><label>HOUSING</label></td>
-                            <td><input type="text" class="form-control" name="pagibig_housing_app_no" 
+                            <td><input type="text" class="form-control" name="pagibig_housing_app_no"
                                 value="{{$query->personal_info->pagibig_housing_app_no}}"></td>
                             <td><label>PAGIBIG II</label></td>
-                            <td><input type="text" class="form-control" name="pagibig_pag2_app_no" 
+                            <td><input type="text" class="form-control" name="pagibig_pag2_app_no"
                                 value="{{$query->personal_info->pagibig_pag2_app_no}}"></td>
                         </tr>
                         <tr>
@@ -561,13 +561,13 @@
                             <td style="width: 25%">
                                 {{$query->id_no}}</td>
                             <td style="width: 25%"><label>Bank Account No.</label></td>
-                            <td style="width: 25%">{{$query->personal_info->bank_account_no}}</td>                            
+                            <td style="width: 25%">{{$query->personal_info->bank_account_no}}</td>
                         </tr>
                         <tr>
                             <td><label>TIN No.</label></td>
                             <td>{{$query->personal_info->tin_no}}</td>
                             <td><label>GSIS ID No.</label></td>
-                            <td>{{$query->personal_info->gsis_bp_no}}</td>   
+                            <td>{{$query->personal_info->gsis_bp_no}}</td>
                         </tr>
                         <tr>
                             <td><label>Philhealth No.</label></td>

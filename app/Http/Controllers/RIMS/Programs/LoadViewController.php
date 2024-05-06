@@ -27,14 +27,14 @@ class LoadViewController extends Controller
         }else{
             $id = $request->id;
         }
-        
+
         $level = $request->level;
         $status = $request->status;
         $where_level = 'whereIn';
         $value_level = [];
         if($level=='All' || $level==''){
             $where_level = 'whereNotIn';
-            
+
         }else{
             foreach($level as $lev){
                 $value_level[] = $lev;
@@ -43,7 +43,7 @@ class LoadViewController extends Controller
         $where_status = 'whereIn';
         $value_status = [];
         if($status=='All' || $status==''){
-            $where_status = 'whereNotIn';            
+            $where_status = 'whereNotIn';
         }else{
             foreach($status as $stat){
                 $value_status[] = $stat;
@@ -63,7 +63,7 @@ class LoadViewController extends Controller
                         ->$where_status('status_id',$value_status)->pluck('grade_level_id')->toArray();
         $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
         if($query->count()>0){
-            $period = EducGradePeriod::with(['courses' => function ($query) 
+            $period = EducGradePeriod::with(['courses' => function ($query)
                             use ($where_status,$id,$value_status) {
                             $query->where('curriculum_id', $id);
                             $query->$where_status('status_id', $value_status);
@@ -93,7 +93,7 @@ class LoadViewController extends Controller
         $value_level = [];
         if($level=='All' || $level==''){
             $where_level = 'whereNotIn';
-            
+
         }else{
             foreach($level as $lev){
                 $value_level[] = $lev;
@@ -102,7 +102,7 @@ class LoadViewController extends Controller
         $where_status = 'whereIn';
         $value_status = [];
         if($status=='All' || $status==''){
-            $where_status = 'whereNotIn';            
+            $where_status = 'whereNotIn';
         }else{
             foreach($status as $stat){
                 $value_status[] = $stat;
@@ -125,14 +125,14 @@ class LoadViewController extends Controller
 
         $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
 
-        $period = EducGradePeriod::with(['courses' => function ($query) 
+        $period = EducGradePeriod::with(['courses' => function ($query)
                             use ($where_status,$id,$value_status) {
                             $query->where('curriculum_id', $id);
                             $query->$where_status('status_id', $value_status);
                             $query->orderBy('grade_period_id','ASC');
                             $query->orderBy('grade_level_id','ASC');
                         }])->whereIn('id',$period_ids)->get();
-        
+
         $data = array(
             'id' => $id,
             'query' => $query,
@@ -157,7 +157,7 @@ class LoadViewController extends Controller
         $period_ids = EducCourses::where('curriculum_id',$id)->pluck('grade_period_id')->toArray();
         $year_level_ids = EducCourses::where('curriculum_id',$id)->pluck('grade_level_id')->toArray();
         $year_level = EducYearLevel::whereIn('id',$year_level_ids)->get();
-        $period = EducGradePeriod::with(['courses' => function ($query) 
+        $period = EducGradePeriod::with(['courses' => function ($query)
                 use ($id,$course_id) {
                 $query->where('curriculum_id', $id);
                 $query->where('id','<>', $course_id);
@@ -180,14 +180,14 @@ class LoadViewController extends Controller
         $curriculum = EducCurriculum::with('status')->where('id',$id)->orderBy('year_from','DESC')->first();
         $curriculums = EducCurriculum::with('status')->where('program_id',$curriculum->programs->id)->orderBy('year_from','DESC')->get();
         $status = EducCourseStatus::get();
-        $year_level = EducYearLevel::where('program_level_id',$curriculum->programs->program_level_id)->orderBy('level','ASC')->get();       
+        $year_level = EducYearLevel::where('program_level_id',$curriculum->programs->program_level_id)->orderBy('level','ASC')->get();
         $data = array(
             'id' => $id,
             'curriculum' => $curriculum,
             'curriculums' => $curriculums,
             'year_level' => $year_level,
             'status' => $status,
-            'user_access_level' => $user_access_level            
+            'user_access_level' => $user_access_level
         );
         return view('rims/programs/curriculumInfo',$data);
     }

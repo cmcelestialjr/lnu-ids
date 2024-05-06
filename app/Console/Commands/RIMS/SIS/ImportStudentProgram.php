@@ -37,7 +37,7 @@ class ImportStudentProgram extends Command
         //2. ImportStudentProgram
         //3. ImportStudentCurriculum
         //4. ImportStudentInfo
-        
+
         $connectionName = 'sis_student';
         DB::connection($connectionName)->getPdo();
 
@@ -47,7 +47,7 @@ class ImportStudentProgram extends Command
             ->orderBy('id','ASC')
             ->pluck('stud_id')
             ->toArray();
-        
+
         DB::connection($connectionName)->statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
         $student_courses = DB::connection($connectionName)->table('course')
                                 ->whereIn('stud_id',$stud_ids)
@@ -59,8 +59,13 @@ class ImportStudentProgram extends Command
         if($student_courses->count()>0){
             foreach($student_courses as $row){
                 $student = Users::where('stud_id',$row->stud_id)->first();
+
                 $program = EducPrograms::where('id',$row->course)->first();
                 $program_code = EducProgramsCode::where('program_id',$program->id)->orderBy('branch_id','ASC')->first();
+                if($program_code==NULL){
+                    $this->error($row->stud_id.' '.$program->id);
+                    exit;
+                }
                 $get_first_course = DB::connection($connectionName)->table('course')
                     ->where('stud_id',$row->stud_id)
                     ->where('course',$row->course)
@@ -79,14 +84,14 @@ class ImportStudentProgram extends Command
                         ->orderBy('terms','DESC')
                         ->first();
                     if($get_latest_course!=NULL){
-                        $date_graduate = (date('Y-m-d', strtotime($get_latest_course->graduated_on))==$get_latest_course->graduated_on) ? $get_latest_course->graduated_on : NULL;                
+                        $date_graduate = (date('Y-m-d', strtotime($get_latest_course->graduated_on))==$get_latest_course->graduated_on) ? $get_latest_course->graduated_on : NULL;
                         if ($get_first_course->sy == $get_latest_course->sy) {
-                            $student_status_id = 1; 
+                            $student_status_id = 1;
                         } else {
-                            $student_status_id = 2; 
+                            $student_status_id = 2;
                         }
                         if ($get_latest_course->status=='graduated') {
-                            $student_status_id = 7; 
+                            $student_status_id = 7;
                         }
                         $get_latest_course_sy = $get_latest_course->sy;
                         $remarks = $get_latest_course->remarks;
@@ -98,7 +103,7 @@ class ImportStudentProgram extends Command
                         if($getCurriculum){
                             $curriculum_id = $getCurriculum->id;
                         }
-                        $insert = new StudentsProgram(); 
+                        $insert = new StudentsProgram();
                         $insert->user_id = $student->id;
                         $insert->program_id = $row->course;
                         $insert->program_level_id = $program->program_level_id;
@@ -116,8 +121,8 @@ class ImportStudentProgram extends Command
                         $insert->save();
                     }
                 }
-            }   
+            }
         }
-        
+
     }
 }

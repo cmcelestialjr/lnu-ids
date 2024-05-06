@@ -11,7 +11,7 @@ $(document).on('click', '#studentDiv #new button[name="submit"]', function (e) {
 $(document).on('click', '#studentViewModal #tor', function (e) {
     var thisBtn = $(this);
     var id = $('#studentViewModal input[name="id"]').val();
-    var program_level = $('#studentViewModal input[name="program_level"]').val();    
+    var program_level = $('#studentViewModal input[name="program_level"]').val();
     tor(id,program_level,thisBtn);
 });
 $(document).on('click', '#studentViewModal #curriculum', function (e) {
@@ -92,4 +92,27 @@ $(document).on('click', '#studentViewModal #shift', function (e) {
         id:id
     };
     loadModal(form_data,thisBtn);
+});
+$(document).off('click', '#studentViewModal .studentInfoEdit').on('click', '#studentViewModal .studentInfoEdit', function (e) {
+    var thisBtn = $(this);
+    var val = thisBtn.data('val');
+    var array = ['Info','Contact','Educ','Fam'];
+
+    if ($.inArray(val, array) !== -1) {
+
+        var id = $('#studentViewModal input[name="id"]').val();
+        var url = base_url+'/rims/student/studentEditInfo';
+        var modal = 'info';
+        var modal_size = 'modal-xl';
+        var form_data = {
+            url:url,
+            modal:modal,
+            modal_size:modal_size,
+            static:'',
+            w_table:'wo',
+            id:id,
+            val:val
+        };
+        loadModal(form_data,thisBtn);
+    }
 });

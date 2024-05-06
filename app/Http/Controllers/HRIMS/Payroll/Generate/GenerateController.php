@@ -35,7 +35,7 @@ class GenerateController extends Controller
     }
     public function generate(Request $request){
         return $this->_generate($request);
-        
+
     }
     public function newSubmit(Request $request){
         return $this->_newSubmit($request);
@@ -48,7 +48,7 @@ class GenerateController extends Controller
     }
     public function table(Request $request){
         $payroll = HRPayrollType::find($request->payroll_type);
-        
+
         if($payroll==NULL){
             return 'error';
         }
@@ -163,7 +163,7 @@ class GenerateController extends Controller
                     }
                 }
             }
-            
+
             if(in_array(5,$emp_stats)){
                 $user_ids = $query->pluck('id')->toArray();
                 $getMonths = HRPayrollMonths::whereIn('user_id',$user_ids)
@@ -176,13 +176,13 @@ class GenerateController extends Controller
                         $nonExistingValues = array_diff($months, $getMonths1);
                         if (!empty($nonExistingValues)) {
                             $listUser[] = $row;
-                        } 
+                        }
                     }
                     $query = $query->whereIn('id',$listUser);
                 }
-                
+
             }else{
-                
+
                 $query =  $query->whereDoesntHave('payrolls', function ($query) use ($year,$month,$months,$payroll_type,$emp_stats,$fund_sources,$fund_services,$option,$day_from,$day_to) {
                         $query->whereHas('payroll', function ($query) use ($year,$month,$payroll_type,$emp_stats,$fund_sources,$fund_services,$option,$day_from,$day_to) {
                             $query->where('year',$year);
@@ -231,7 +231,7 @@ class GenerateController extends Controller
                         $query->whereIn('fund_services_id',$fund_services);
                     }
                     $getWork = $getWork->orderBy('date_from','DESC')->first();
-                    
+
                     if($getWork){
                         $salary = $getWork->salary;
                         $emp_stat = $getWork->emp_stat_id;
@@ -241,7 +241,7 @@ class GenerateController extends Controller
                         $column_amount = 0;
                         $column_amount2 = 0;
                         $include = 'Y';
-                        
+
                         if($payroll_type==1){
                             if($emp_stat!=5){
                                 $this->updatePhilHealth($salary,$user_id,$gov,$year,$month,$payroll_type,$emp_stat,$duration,$option,$day_from,$day_to);
@@ -256,10 +256,10 @@ class GenerateController extends Controller
                             $earned = $this->getEarned($year,$month,$amount,$gov,1,$option,$day_from,$day_to);
                         }else{
                             if($payroll->aggregate==1){
-                                $rendered_months = $work_services->rendered_months_aggregate($user_id,$gov_service,$payroll);   
+                                $rendered_months = $work_services->rendered_months_aggregate($user_id,$gov_service,$payroll);
                             }else{
-                                $rendered_months = $work_services->rendered_months($user_id,$gov_service);   
-                            }  
+                                $rendered_months = $work_services->rendered_months($user_id,$gov_service);
+                            }
                             if($rendered_months>=$payroll->month_no){
                                 if($payroll->w_salary=='Yes'){
                                     $w_salary_amount = $salary;
@@ -363,7 +363,7 @@ class GenerateController extends Controller
             'include_pera' => 'required|string',
             'account_title' => 'required|integer'
         ]);
-        
+
         if ($validator->fails()) {
             $response = ['result' => 'error'];
             return response()->json($response);
@@ -374,7 +374,7 @@ class GenerateController extends Controller
         $tracking_services = new TrackingServices;
 
         DB::beginTransaction();
-        try {            
+        try {
             $year = $request->year;
             $month = $request->month;
             $months = $request->months;
@@ -402,7 +402,7 @@ class GenerateController extends Controller
             $last_day = date('t',strtotime($year.'-'.$month.'-01'));
             $checkGov = EmploymentStatus::whereIn('id',$emp_stats)->pluck('gov')->toArray();
             $countGov = count(array_unique($checkGov));
-            
+
             if($countGov==1){
                 $gov = $checkGov[0];
                 $getDays = $this->getDays($day_from,$day_to,$year,$month,$option,$duration,$gov);
@@ -412,7 +412,7 @@ class GenerateController extends Controller
                 $updated_by = $user->id;
                 $payroll = HRPayrollType::with('guideline')->where('id',$payroll_type)->first();
                 $gov_service = $payroll->gov_service;
-                $grant_separated = $payroll->grant_separated;                            
+                $grant_separated = $payroll->grant_separated;
 
                 if(in_array('5',$emp_stats)){
                     $month = $months[0];
@@ -447,10 +447,10 @@ class GenerateController extends Controller
                 if($gov=='N'){
                     $include_pera = 'No';
                 }
-                
-                $payroll_id = $this->getPayrollId($year,$month);               
 
-                $insert = new HRPayroll(); 
+                $payroll_id = $this->getPayrollId($year,$month);
+
+                $insert = new HRPayroll();
                 $insert->payroll_id = $payroll_id;
                 $insert->year = $year;
                 $insert->month = $month;
@@ -471,16 +471,16 @@ class GenerateController extends Controller
 
                 foreach($emp_stats as $emp_stat){
                     $emp_status = EmploymentStatus::find($emp_stat);
-                    $insert = new HRPayrollEmpStat(); 
+                    $insert = new HRPayrollEmpStat();
                     $insert->payroll_id = $payroll_id;
                     $insert->emp_stat_id = $emp_stat;
                     $insert->gov = $emp_status->gov;
                     $insert->updated_by = $updated_by;
                     $insert->save();
                 }
-                
+
                 foreach($fund_sources as $fund_source){
-                    $insert = new HRPayrollFundSource(); 
+                    $insert = new HRPayrollFundSource();
                     $insert->payroll_id = $payroll_id;
                     $insert->fund_source_id = $fund_source;
                     $insert->updated_by = $updated_by;
@@ -488,7 +488,7 @@ class GenerateController extends Controller
                 }
                 if($fund_services!=''){
                     foreach($fund_services as $fund_service){
-                        $insert = new HRPayrollFundService(); 
+                        $insert = new HRPayrollFundService();
                         $insert->payroll_id = $payroll_id;
                         $insert->fund_service_id = $fund_service;
                         $insert->updated_by = $updated_by;
@@ -502,14 +502,14 @@ class GenerateController extends Controller
                         ->whereIn('emp_stat_id',$emp_stats)
                         ->whereIn('fund_source_id',$fund_sources)
                         ->orderBy('date_from','DESC')->first();
-                        
+
                     $salary = $getWork->salary;
                     $include = 'Y';
                     $w_salary_amount = 0;
                     $column_amount = 0;
                     $column_amount2 = 0;
 
-                    if($payroll_type==1){                            
+                    if($payroll_type==1){
                         $earned = $this->getEarned($year,$month,$salary,$gov,$duration,$option,$day_from,$day_to);
                         $amount_base = $salary;
                     }elseif($payroll_type==2){
@@ -520,9 +520,9 @@ class GenerateController extends Controller
                         if($payroll->aggregate==1){
                             $rendered_months = $work_services->rendered_months_aggregate($employee,$gov_service,$payroll);
                         }else{
-                            $rendered_months = $work_services->rendered_months($employee,$gov_service);   
-                        }  
-                        
+                            $rendered_months = $work_services->rendered_months($employee,$gov_service);
+                        }
+
                         if($rendered_months>=$payroll->month_no){
                             if($payroll->w_salary=='Yes'){
                                 $w_salary_amount = $salary;
@@ -561,9 +561,9 @@ class GenerateController extends Controller
                         if($include=='Y'){
                             $amount_base = $w_salary_amount;
                             $earned = $w_salary_amount+$column_amount+$column_amount2;
-                        }                        
+                        }
                     }
-                    
+
                     if($include=='Y'){
                         $allowance = $this->getAllowance($emp_stat,$payroll_type,$include_pera);
                         $deduction = $this->getDeduction($emp_stat,$payroll_type,$employee);
@@ -600,7 +600,7 @@ class GenerateController extends Controller
                         $insert->updated_by = $updated_by;
                         $insert->save();
 
-                        $payroll_list_id = $insert->id;                    
+                        $payroll_list_id = $insert->id;
                         $emp_stat = $getWork->emp_stat_id;
                         $emp_fund_services[] = $getWork->fund_services_id;
 
@@ -666,7 +666,7 @@ class GenerateController extends Controller
                 $get_et_al = $list->orderBy('fund_services_id','ASC')
                     ->orderBy('lastname','ASC')
                     ->orderBy('firstname','ASC')
-                    ->first();                
+                    ->first();
                 $ob = ($gross) == null ? '' : number_format($gross,2);
                 $dv = ($netpay) == null ? '' : number_format($netpay,2);
                 $etal = '';
@@ -689,11 +689,11 @@ class GenerateController extends Controller
                 }else{
                     $period = date('M',strtotime($year.'-'.$month.'-01')).' '.$day_from.'-'.$day_to.', '.$year;
                 }
-                
-                $particulars = $payroll_name.' '.$period;  
+
+                $particulars = $payroll_name.' '.$period;
                 $tracking_id = $tracking_services->tracking_id($year,$month);
 
-                $insert = new Tracking(); 
+                $insert = new Tracking();
                 $insert->tracking_id = $tracking_id;
                 $insert->tracking_type_id = 1;
                 $insert->office_id = 1;
@@ -704,8 +704,8 @@ class GenerateController extends Controller
                 $insert->updated_by = $updated_by;
                 $insert->save();
                 $tracking_id = $insert->id;
-                
-                $update = HRPayroll::find($payroll_id); 
+
+                $update = HRPayroll::find($payroll_id);
                 $update->name = $payroll_name;
                 $update->period = $period;
                 $update->etal = $etal;
@@ -713,7 +713,7 @@ class GenerateController extends Controller
                 $update->dv = $netpay;
                 $update->tracking_id = $tracking_id;
                 $update->save();
-                
+
                 if($fund_services==''){
                     $emp_fund_service = array_unique($emp_fund_services);
                     foreach ($emp_fund_service as $fund_service) {
@@ -786,17 +786,17 @@ class GenerateController extends Controller
             $user = Auth::user();
             $updated_by = $user->id;
             $getPhilHealth = HRDeduction::where('id',36)->first();
-            $last_day = date('t',strtotime($year.'-'.$month.'-01'));        
-            
+            $last_day = date('t',strtotime($year.'-'.$month.'-01'));
+
             if($option==1){
                 $philhealth = round(($salary*($getPhilHealth->percent/100)),2);
             }else{
                 $getDays = $this->getDays($day_from,$day_to,$year,$month,$option,$duration,$gov);
                 $weekdays = $getDays['weekdays'];
-                        
+
                 $philhealth = round(($salary/22*$weekdays*($getPhilHealth->percent/100)),2);
             }
-        
+
             if($philhealth>=$getPhilHealth->ceiling){
                 $philhealth = $getPhilHealth->ceiling;
             }
@@ -840,7 +840,7 @@ class GenerateController extends Controller
             $weekends = $getDays['weekends'];
 
             $getGSIS = HRDeduction::where('id',3)->first();
-            if($weekdays>=22){            
+            if($weekdays>=22){
                 $ps = round(($salary*($getGSIS->percent/100)),2);
                 $gs = round(($salary*($getGSIS->percent_employer/100)),2);
             }else{
@@ -919,7 +919,7 @@ class GenerateController extends Controller
         $weekdays = 0;
         $last_day = date('t',strtotime($year.'-'.$month.'-01'));
         if($option==1){
-            $weekdays = 22;            
+            $weekdays = 22;
         }else{
             if($duration>1 && $gov=='N'){
                 $weekdays = 11;
@@ -927,9 +927,9 @@ class GenerateController extends Controller
                 if(($day_from==1 && $day_to==15) || ($day_from==16 && $day_to>=$last_day)){
                     $weekdays = 11;
                 }else{
-                    for($i=$day_from; $i <= $day_to; $i++){ 
+                    for($i=$day_from; $i <= $day_to; $i++){
                         $wkday = date('l',strtotime($year.'-'.$month.'-'.$i));
-                        
+
                         if($wkday == 'Sunday' || $wkday == 'Saturday'){
                             $weekends++;
                         }else{
@@ -940,7 +940,7 @@ class GenerateController extends Controller
                         $weekdays = 22;
                     }
                 }
-            }            
+            }
         }
         $getDays['weekdays'] = $weekdays;
         $getDays['weekends'] = $weekends;

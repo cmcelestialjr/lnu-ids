@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\RIMS;
 use App\Http\Controllers\Controller;
 use App\Models\DTRlogs;
+use App\Models\EducBranch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ValidateAccessServices;
@@ -33,7 +34,7 @@ class PageController extends Controller
         $this->validate = new ValidateAccessServices;
     }
     public function home($data){
-        
+
         $connectionName = 'sis_student';
         $connectionSIScourses = 'sis_courses';
         $connectionCpanel = 'cpanel';
@@ -114,7 +115,7 @@ class PageController extends Controller
 
             //     // DB::table('students_program')->insert($data_program);
             // }
-            // $users = Users::where('stud_id','!=',NULL)->pluck('stud_id')->toArray();  
+            // $users = Users::where('stud_id','!=',NULL)->pluck('stud_id')->toArray();
             // $users_student = DB::connection($connectionName)->table('info')
             //             ->whereNotIn('stud_id',$users)
             //             ->get();
@@ -135,12 +136,20 @@ class PageController extends Controller
         $data['date_graduate'] = StudentsProgram::select(DB::raw('YEAR(date_graduate) as year'))->orderBy('year','DESC')->groupBy('year')->get();
         return view($this->page.'/student/student',$data);
     }
-    public function departments($data){   
+    public function departments($data){
         return view($this->page.'/departments/departments',$data);
     }
-    public function programs($data){   
+    public function programs($data){
         $data['statuses'] = EducCourseStatus::get();
+        $data['branches'] = EducBranch::get();
+        $data['program_levels'] = EducProgramLevel::where('program','w')->get();
         return view($this->page.'/programs/programs',$data);
+    }
+    public function curriculums($data){
+        $data['statuses'] = EducCourseStatus::get();
+        $data['programs'] = EducProgramLevel::where('program','w')->get();
+        $data['branches'] = EducBranch::get();
+        return view($this->page.'/curriculums/curriculums',$data);
     }
     public function buildings($data){
         $data['statuses'] = Status::whereHas('status_list', function ($query) {
@@ -154,14 +163,14 @@ class PageController extends Controller
             })->get();
         return view($this->page.'/rooms/rooms',$data);
     }
-    public function courses_list($data){        
+    public function courses_list($data){
         return view($this->page.'/courses_list',$data);
     }
-    public function sections($data){        
+    public function sections($data){
         $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
         return view($this->page.'/sections/sections',$data);
     }
-    public function school_year($data){        
+    public function school_year($data){
         $data['grade_period'] = EducGradePeriod::get();
         return view($this->page.'/schoolYear/school_year',$data);
     }
@@ -201,7 +210,7 @@ class PageController extends Controller
         return view($this->page.'/ludong/student_ludong',$data);
     }
     // public function grades($data){
-    //     $level_ids = array(1,2,3); 
+    //     $level_ids = array(1,2,3);
     //     $validate = $this->validate->check($data,$level_ids);
     //     if($validate=='success'){
     //         return view($this->page.'/home',$data);

@@ -31,8 +31,9 @@ $(document).off('change', '#certificationModal select[name="program_level"]').on
         },
         data:form_data,
         cache: false,
+        dataType: 'json',
         beforeSend: function() {
-            selectOption.attr('disabled','disabled'); 
+            selectOption.attr('disabled','disabled');
             $('#certificationModal #program_level').removeClass('border-require');
         },
         success : function(data){
@@ -40,7 +41,7 @@ $(document).off('change', '#certificationModal select[name="program_level"]').on
             if(data.result=='success'){
                 $('#certificationModal select[name="school_year"]').empty();
                 $('#certificationModal select[name="period"]').empty();
-                $('#certificationModal select[name="school_year"]').append('<option value="">Please select School Year</option>');                
+                $('#certificationModal select[name="school_year"]').append('<option value="">Please select School Year</option>');
                 $('#certificationModal select[name="period"]').append('<option value="">Please select Period</option>');
                 $.each(data.school_years, function(index, item) {
                     $('#certificationModal select[name="school_year"]').append('<option value="' + item + '">' + item + '</option>');
@@ -51,7 +52,7 @@ $(document).off('change', '#certificationModal select[name="program_level"]').on
             }else{
                 toastr.error(data.result);
             }
-            
+
         },
         error: function (){
             toastr.error('Error!');
@@ -63,10 +64,10 @@ $(document).off('click', '#certificationModal #certificationSubmit').on('click',
     var thisBtn = $(this);
     var id = thisBtn.data('id');
     var certification = $('#certificationModal select[name="certification"] option:selected').val();
-        
+
     var x = 0;
 
-    $('#certificationModal #certification').removeClass('border-require');    
+    $('#certificationModal #certification').removeClass('border-require');
 
     if (!$.isNumeric(id)) {
         toastr.error('Error');
@@ -82,7 +83,7 @@ $(document).off('click', '#certificationModal #certificationSubmit').on('click',
     var x = x+form_data.x;
 
     if(x==0 && form_data!=0){
-        
+
         $.ajax({
             url: base_url+'/rims/student/certificationSubmit',
             type: 'POST',
@@ -92,12 +93,12 @@ $(document).off('click', '#certificationModal #certificationSubmit').on('click',
             data:form_data,
             cache: false,
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
+                thisBtn.removeClass('input-loading');
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
@@ -122,7 +123,7 @@ $(document).off('click', '#certificationModal #certificationSubmit').on('click',
                     thisBtn.removeClass('input-success');
                     thisBtn.removeClass('input-error');
                 }, 3000);
-                
+
             },
             error: function (){
                 toastr.error('Error!');

@@ -18,7 +18,7 @@
                 <input type="checkbox" class="form-control" id="all" checked>
             </th>
             <th data-field="f3" data-sortable="true" data-align="center">Name</th>
-            <th data-field="f4" data-sortable="true" data-align="center">Position</th>            
+            <th data-field="f4" data-sortable="true" data-align="center">Position</th>
             <th data-field="f5" data-sortable="true" data-align="center">Salary</th>
             @if($payroll->w_salary=='Yes' && $payroll->w_salary_name!=NULL)
             <th data-field="f6" data-sortable="true" data-align="center">{{$payroll->w_salary_name}}</th>

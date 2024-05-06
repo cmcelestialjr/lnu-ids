@@ -19,8 +19,8 @@ class ImportController extends Controller
     public function import(Request $request)
     {
         // Import data using DataImport class
-        Excel::import(new DataImport, $request->file('file')->store('temp'));
-        //Excel::import(new DTRImport, $request->file('file')->store('temp'));
+        //Excel::import(new DataImport, $request->file('file')->store('temp'));
+        Excel::import(new DTRImport, $request->file('file')->store('temp'));
         return back();
     }
 

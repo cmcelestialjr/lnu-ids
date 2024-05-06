@@ -24,7 +24,7 @@ use Session;
 
 class IndexController extends Controller
 {
-    public function view(Request $request){        
+    public function view(Request $request){
         $role = UsersRole::get();
         $data = array(
             'role' => $role
@@ -42,7 +42,7 @@ class IndexController extends Controller
         $user = Auth::user();
         $user_id = $user->id;
         $roles = UsersRoleList::where('user_id',$user_id)->pluck('role_id')->toArray();
-        
+
         $systems = Systems::whereHas('user_system', function ($query) use ($user_id) {
                 $query->where('user_id',$user_id);
             })
@@ -77,7 +77,7 @@ class IndexController extends Controller
                 ];
             })->toArray();
         $count_systems = count($systems);
-        $encrypt = Crypt::encryptString('1234'.Hash::make('josh').'1234');           
+        $encrypt = Crypt::encryptString('1234'.Hash::make('josh').'1234');
         //$this->checkUserDevicesAccess();
         $data = array(
             'user' => $user,
@@ -94,10 +94,10 @@ class IndexController extends Controller
         $system_selected = mb_strtoupper($request->system_selected);
         $nav_selected = $request->nav_selected;
         $type = $request->type;
-        
+
         try{
             $name_services = new NameServices;
-            
+
             $systems = Systems::with(['navs' => function ($q) use($user_id) {
                         $q->whereHas('user_nav', function ($query) use ($user_id) {
                             $query->where('user_id',$user_id);
@@ -116,16 +116,16 @@ class IndexController extends Controller
                     $query->where('user_id',$user_id);
                 })
                 ->pluck('id')->toArray();
-            
+
             $name = $name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname);
-            
+
             if($user->picture==''){
                 $profile_url = 'assets/images/icons/png/user.png';
             }else{
                 $profile_url = $user->picture;
             }
-            
-            if($system_selected!='USERS'){                
+
+            if($system_selected!='USERS'){
                 $systems_selected = Systems::where('shorten',$system_selected)->first();
                 $systems_selected_id = $systems_selected->id;
                 if($type=='n'){
@@ -148,7 +148,7 @@ class IndexController extends Controller
                 $nav_selecteds_name = '';
                 $request->session()->put('user_access_level','');
             }
-            
+
             $data = array(
                 'system_selected' => $system_selected,
                 'nav_selected' => $nav_selected,
@@ -160,7 +160,7 @@ class IndexController extends Controller
                 'user_access' => $user_access
                 );
             $request->session()->put('system_selected', $system_selected);
-            
+
             if($system_selected=='USERS' && $nav_selected=='list'){
                 return app('App\Http\Controllers\USERS\UserController')->user($data);
             }else{
@@ -180,7 +180,7 @@ class IndexController extends Controller
     }
     private function checkUserDevicesAccess(){
         $user = Auth::user();
-        $user_id = $user->id;        
+        $user_id = $user->id;
         $checkSystem = UsersSystems::select('id')->where('user_id',$user_id)->where('system_id',6)->first();
         $checkSystemNav = UsersSystemsNav::select('id')->where('user_id',$user_id)->where('system_nav_id',28)->first();
         if($checkSystem!=NULL && $checkSystemNav!=NULL){

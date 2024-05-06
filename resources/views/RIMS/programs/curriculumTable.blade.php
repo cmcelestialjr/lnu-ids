@@ -3,7 +3,7 @@
     <div class="col-lg-12">
         <div class="card card-primary card-outline">
             <div class="card-body">
-                <label>{{$level->name}}</label>                
+                <label>{{$level->name}}</label>
                 <div class="row">
                     @foreach($period as $per)
                         @php
@@ -47,7 +47,7 @@
                                                 <th style="width: 10%;padding:7px">Units</th>
                                                 <th style="width: 15%;padding:7px">Pre-req</th>
                                                 <th style="width: 10%;padding:7px">Status</th>
-                                                @endif                                    
+                                                @endif
                                             </thead>
                                             <tbody>
                                                 @foreach($per->courses as $course)
@@ -73,7 +73,7 @@
                                                             @else
                                                                 {{$course->pre_name}}
                                                             @endif --}}
-                                                            {{$course->pre_name}}
+                                                            @if($course->pre_name=='')None @else{{$course->pre_name}}@endif
                                                         </td>
                                                         <td style="padding:7px" class="center">
                                                             @php

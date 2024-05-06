@@ -47,7 +47,7 @@ class ImportProgram extends Command
                 }elseif($department_id==15 || $department_id==8){
                     $department_id = 2;
                 }
-                $insert = new EducPrograms(); 
+                $insert = new EducPrograms();
                 $insert->id = $row->course_id;
                 $insert->department_id = $department_id;
                 $insert->department_unit_id = $department_unit;
@@ -59,12 +59,12 @@ class ImportProgram extends Command
                 $insert->save();
             }
         }
-        
+
         $program_ids = EducProgramsCode::pluck('program_id')->toArray();
         $programs = EducPrograms::whereNotIn('id',$program_ids)->get();
         if($programs->count()>0){
             foreach($programs as $row){
-                $insert = new EducProgramsCode(); 
+                $insert = new EducProgramsCode();
                 $insert->program_id = $row->id;
                 $insert->name = 'M';
                 $insert->branch_id = 1;
@@ -72,7 +72,7 @@ class ImportProgram extends Command
                 $insert->updated_by = 1;
                 $insert->save();
 
-                $insert = new EducProgramsCode(); 
+                $insert = new EducProgramsCode();
                 $insert->program_id = $row->id;
                 $insert->name = 'S';
                 $insert->branch_id = 2;
