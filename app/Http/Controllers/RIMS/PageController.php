@@ -30,7 +30,7 @@ class PageController extends Controller
     private $validate;
     public function __construct()
     {
-        $this->page = 'rims';
+        $this->page = 'RIMS';
         $this->validate = new ValidateAccessServices;
     }
     public function home($data){
@@ -128,11 +128,7 @@ class PageController extends Controller
         }
         $data['query'] = $query;
         $data['students_data'] = $students_data;
-        //return view($this->page.'/home',$data);
-        $data = array(
-            'role' => 1
-            );
-        return view('index/index',$data);
+        return view($this->page.'/home',$data);
     }
     public function students($data){
         $data['program_level'] = EducProgramLevel::get();
