@@ -95,7 +95,7 @@ class IndexController extends Controller
         $nav_selected = $request->nav_selected;
         $type = $request->type;
 
-        try{
+        // try{
             $name_services = new NameServices;
 
             $systems = Systems::with(['navs' => function ($q) use($user_id) {
@@ -174,9 +174,9 @@ class IndexController extends Controller
                     return app(str_replace('"',"",'App\Http\Controllers\"'.$system_selected.'\PageController'))->$nav_selected($data);
                 }
             }
-        }catch(Exception $e){
-            return view('layouts/error/404');
-        }
+        // }catch(Exception $e){
+        //     return view('layouts/error/404');
+        // }
     }
     private function checkUserDevicesAccess(){
         $user = Auth::user();
