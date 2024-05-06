@@ -17,18 +17,11 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $now = now();
-       if ($now->isBetween('6:30', '10:01') || $now->isBetween('11:00', '13:31') || $now->isBetween('14:59', '19:31')) {
-            // $schedule->command('app:dtr-machine-check')->everyThirtySeconds();
-            // $schedule->command('app:sky-hr-import')->everyMinute();
+       if ($now->isBetween('6:00', '10:00') || $now->isBetween('11:00', '13:30') || $now->isBetween('15:00', '20:30')) {
             $schedule->command('app:dtr-machine-check')->everyTwoMinutes();
             $schedule->command('app:sky-hr-import')->everyThreeMinutes();
-            // $schedule->command('app:dtr-machine-check')->everyThreeMinutes();
-            // $schedule->command('app:sky-hr-import')->everyTwoMinutes();
-
+            $schedule->command('app:link-dtr')->everyFiveMinutes();
         }
-        //$schedule->command('app:dtr-machine-check')->everyTwoSeconds();
-        //$schedule->command('app:sky-hr-import')->everyMinute();
-
     }
 
     /**
