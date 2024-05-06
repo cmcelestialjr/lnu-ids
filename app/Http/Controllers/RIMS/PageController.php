@@ -128,6 +128,7 @@ class PageController extends Controller
         }
         $data['query'] = $query;
         $data['students_data'] = $students_data;
+        dd(view($this->page.'/home'));
         return view($this->page.'/home',$data);
     }
     public function students($data){
