@@ -129,7 +129,11 @@ class PageController extends Controller
         $data['query'] = $query;
         $data['students_data'] = $students_data;
         dd(view($this->page.'/home'));
-        return view($this->page.'/home',$data);
+        //return view($this->page.'/home',$data);
+        $data = array(
+            'role' => 1
+            );
+        return view('index/index',$data);
     }
     public function students($data){
         $data['program_level'] = EducProgramLevel::get();
