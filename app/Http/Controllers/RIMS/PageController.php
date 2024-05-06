@@ -128,13 +128,13 @@ class PageController extends Controller
         }
         $data['query'] = $query;
         $data['students_data'] = $students_data;
-        return view($this->page.'.home',$data);
+        return view($this->page.'/home',$data);
     }
     public function students($data){
         $data['program_level'] = EducProgramLevel::get();
         $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
         $data['date_graduate'] = StudentsProgram::select(DB::raw('YEAR(date_graduate) as year'))->orderBy('year','DESC')->groupBy('year')->get();
-        return view($this->page.'.student.student',$data);
+        return view($this->page.'/student/student',$data);
     }
     public function departments($data){
         return view($this->page.'/departments/departments',$data);
