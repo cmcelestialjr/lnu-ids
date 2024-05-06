@@ -30,7 +30,7 @@ class PageController extends Controller
     private $validate;
     public function __construct()
     {
-        $this->page = 'RIMS';
+        $this->page = 'rims';
         $this->validate = new ValidateAccessServices;
     }
     public function home($data){
