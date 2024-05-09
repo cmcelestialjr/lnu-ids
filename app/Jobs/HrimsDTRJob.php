@@ -40,33 +40,33 @@ class HrimsDTRJob implements ShouldQueue
         $staff = _PersonalInfo::whereHas('user', function ($q) use ($id_no) {
             $q->where('id_no', $id_no);
         })->first();
-
-        try {
-            if ($staff) {
-                $date = date("Y-m-d", strtotime($this->details['dateTime']));
-                $logs = DTRlogs::where('id_no', $id_no)
-                    ->whereRaw("DATE(dateTime) = ?", [$date])
-                    ->get();
-                $logs_count = $logs->count();
-                $x = 0;
-                if($logs_count==1){
+        if ($staff) {
+            $date = date("Y-m-d", strtotime($this->details['dateTime']));
+            $logs = DTRlogs::where('id_no', $id_no)
+                ->whereRaw("DATE(dateTime) = ?", [$date])
+                ->get();
+            $logs_count = $logs->count();
+            $x = 0;
+            if($logs_count==1){
+                $x++;
+            }else{
+                if($type==1){
                     $x++;
-                }else{
-                    if($type==1){
-                        $x++;
-                    }
-                }
-                if($x>0){
-                    $email = $staff->email_official;
-                    if($email){
-                        Mail::to($email)->send(new HrimsDTRMail($this->details));
-                    }
                 }
             }
-        } catch (\Exception $e) {
-            // Handle the exception, log it, or send notifications
-            Log::error('Failed to send email: ' . $e->getMessage());
+            if($x>0){
+                $email = $staff->email_official;
+                if($email){
+                    Mail::to($email)->send(new HrimsDTRMail($this->details));
+                }
+            }
         }
+        // try {
+
+        // } catch (\Exception $e) {
+        //     // Handle the exception, log it, or send notifications
+        //     Log::error('Failed to send email: ' . $e->getMessage());
+        // }
     }
 }
 
