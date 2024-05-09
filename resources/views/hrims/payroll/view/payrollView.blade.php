@@ -5,27 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>LNU - IDS</title>
-  
+
   @include('layouts.stylesheet')
-  
-</head>   
+
+</head>
 <body class="hold-transition layout-top-nav">
 <div class="wrapper">
     <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
     <img class="animation__shake" src="{{ asset('assets/images/logo/lnu_logo.png') }}" alt="IDSLogo" height="150" width="150">
   </div>
-  
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Main content -->
     <div class="content">
       <div class="row">
-        <div class="col-lg-12">  
+        <div class="col-lg-12">
           <div class="card card-info card-outline">
-            <div class="card-body {{$bg_color}}">   
+            <div class="card-body {{$bg_color}}">
               <div class="row">
-                <div class="col-lg-2"> 
+                <div class="col-lg-2">
                   <input type="hidden" id="payroll_id" value="{{$payroll_id}}">
                   @php
                     $payrollHide = '';
@@ -37,7 +37,7 @@
                     <button class="btn btn-success btn-success-scan btn-sm" name="generate"><span class="fa fa-check"></span> Generate Payroll</button>
                   @endif
                 </div>
-                <div class="col-lg-8 center">             
+                <div class="col-lg-8 center">
                   <h5>Payroll
                         @php
                         if(count($query->months)>0){
@@ -92,16 +92,16 @@
                       </div>
                       <div class="col-lg-6">
                         <form method="GET" target="_blank">
-                          <button class="btn btn-primary btn-primary-scan btn-sm {{$payrollHide}}" 
+                          <button class="btn btn-primary btn-primary-scan btn-sm {{$payrollHide}}"
                             formaction="{{ route('pdf.view', ['pdf_option' => $pdf_option]) }}" style="float:right;">
                             <span class="fa fa-print"></span> Payroll
                           </button>
-                          <button class="btn btn-info btn-primary-scan btn-sm {{$payrollHide}}" id="dvPrintModal" style="float:right;">
+                          {{-- <button class="btn btn-info btn-primary-scan btn-sm {{$payrollHide}}" id="dvPrintModal" style="float:right;">
                             <span class="fa fa-print"></span> DV
                           </button>
                           <button class="btn btn-primary btn-primary-scan btn-sm {{$payrollHide}}" id="orsPrintModal" style="float:right;">
                             <span class="fa fa-print"></span> ORS
-                          </button>
+                          </button> --}}
                         </form>
                       </div>
                     </div>
@@ -157,7 +157,7 @@
                                         foreach($group_count as $deduction){
                                             $deduction_group_count[$deduction->group_id] = $deduction->count;
                                         }
-                                    }                                        
+                                    }
                                     @endphp
                                     @foreach($deduction_group as $group)
                                         <th data-align="center" colspan="{{$deduction_group_count[$group->id]}}">{{$group->name}}</th>
@@ -199,7 +199,7 @@
   @include('layouts.modal')
   @include('layouts.script')
   <script src="{{ asset('assets/js/search/employeePayroll.js') }}"></script>
-  <script src="{{ asset('assets/js/hrims/payroll/view/payroll_view.js') }}"></script>  
+  <script src="{{ asset('assets/js/hrims/payroll/view/payroll_view.js') }}"></script>
 </div>
 <!-- ./wrapper -->
 

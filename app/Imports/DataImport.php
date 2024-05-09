@@ -39,13 +39,13 @@ class DataImport implements ToModel, WithHeadingRow
     {
         return 1;
     }
-    
-    
+
+
     // public function model(array $row)
     // {
     //     $user = Auth::User();
     //     $user_id = $user->id;
-    //     $insert = new EducPrograms();        
+    //     $insert = new EducPrograms();
     //     $insert->department_id = $row["department_id"];
     //     $insert->program_level_id = $row["program_level_id"];
     //     $insert->name = $row["name"];
@@ -54,12 +54,12 @@ class DataImport implements ToModel, WithHeadingRow
     //     $insert->save();
     // }
 
-    //psgc    
+    //psgc
     // public function model(array $row)
     // {
     //     // $user = Auth::User();
     //     // $user_id = $user->id;
-    //     // $insert = new PSGCBrgys();        
+    //     // $insert = new PSGCBrgys();
     //     // $insert->name = $row["name"];
     //     // $insert->uacs = $row["uacs"];
     //     // $insert->city_mun_uacs = $row["city_mun_uacs"];
@@ -70,7 +70,7 @@ class DataImport implements ToModel, WithHeadingRow
     //                             ->update(['type' => $row["type"]
     //                                     ]);
     // }
-    
+
     //dtr
     // public function model(array $row){
     //     $id_no = $row['id_no'];
@@ -168,7 +168,7 @@ class DataImport implements ToModel, WithHeadingRow
     //                                         'dateTime' => $timestamp,
     //                                         'time_type' => NULL,
     //                                         'updated_at' => date('Y-m-d H:i:s')]);
-    //                 }   
+    //                 }
     //                 $check = UsersDTR::where('id_no',$id_no)
     //                 ->where('date',$date)->first();
     //         if($check!=NULL){
@@ -193,29 +193,34 @@ class DataImport implements ToModel, WithHeadingRow
     //                                 'state_out_pm' => NULL,
     //                                 'ipaddress_out_pm' => NULL]);
     //             }
-    //         }                 
+    //         }
     //     }
-        
+
     // }
 
     //educ_course
     public function model(array $row)
     {
-        $user = Auth::User();
-        $user_id = $user->id;
-        $insert = new EducCourses();
-        $insert->curriculum_id = $row["curriculum_id"];
-        $insert->grade_level_id = $row["grade_level_id"];
-        $insert->grade_period_id = $row["grade_period_id"];
-        $insert->name = $row["name"];
-        $insert->shorten = $row["shorten"];
-        $insert->code = $row["code"];
-        $insert->units = $row["units"];
-        $insert->pay_units = $row["units"];
-        $insert->description = $row["name"];
-        $insert->course_type_id = $row["course_type_id"];
-        $insert->updated_by = $user_id;
-        $insert->save();
+        // $user = Auth::User();
+        // $user_id = $user->id;
+        // $insert = new EducCourses();
+        // $insert->curriculum_id = $row["curriculum_id"];
+        // $insert->grade_level_id = $row["grade_level_id"];
+        // $insert->grade_period_id = $row["grade_period_id"];
+        // $insert->name = $row["name"];
+        // $insert->shorten = $row["shorten"];
+        // $insert->code = $row["code"];
+        // $insert->units = $row["units"];
+        // $insert->pay_units = $row["units"];
+        // $insert->description = $row["name"];
+        // $insert->course_type_id = $row["course_type_id"];
+        // $insert->updated_by = $user_id;
+        // $insert->save();
+
+        _PersonalInfo::where('user_id', $row["id"])
+                ->update([
+                    'email_official' => $row["email_official"]
+                ]);
     }
 
     //educ_curriculum
@@ -264,7 +269,7 @@ class DataImport implements ToModel, WithHeadingRow
     //     $password = Crypt::encryptString('1234'.Hash::make('1234').'1234');
     //     $user = Auth::User();
     //     $user_id = $user->id;
-    //     $insert = new Users();        
+    //     $insert = new Users();
     //     $insert->username = $row["id_no"];
     //     $insert->password = $password;
     //     $insert->lastname = mb_strtoupper($row["lastname"]);
@@ -278,7 +283,7 @@ class DataImport implements ToModel, WithHeadingRow
     //     $insert->save();
     //     $get_id = $insert->id;
 
-    //     $insert = new _PersonalInfo();        
+    //     $insert = new _PersonalInfo();
     //     $insert->user_id = $get_id;
     //     $insert->email = $row["email"];
     //     $insert->email_official = $row["email"];
@@ -293,7 +298,7 @@ class DataImport implements ToModel, WithHeadingRow
     //     $insert->save();
 
     //     if($row['position_title']!=''){
-    //         $insert = new _Work();        
+    //         $insert = new _Work();
     //         $insert->user_id = $get_id;
     //         $insert->role_id = $row['faculty'];
     //         $insert->emp_stat_id = $row["emp_stat"];
@@ -306,15 +311,15 @@ class DataImport implements ToModel, WithHeadingRow
     //         $insert->save();
     //     }
 
-    //     $insert = new UsersSystems();        
-    //     $insert->user_id = $get_id;        
+    //     $insert = new UsersSystems();
+    //     $insert->user_id = $get_id;
     //     $insert->system_id = 6;
     //     $insert->role_id = $row['faculty'];
     //     $insert->level_id = 6;
     //     $insert->updated_by = $user_id;
     //     $insert->save();
 
-    //     $insert = new UsersSystemsNav();        
+    //     $insert = new UsersSystemsNav();
     //     $insert->user_id = $get_id;
     //     $insert->system_nav_id = 27;
     //     $insert->role_id = $row['faculty'];
@@ -358,7 +363,7 @@ class DataImport implements ToModel, WithHeadingRow
     //     }
     //     $user = Auth::User();
     //     $user_id = $user->id;
-    //     $insert = new EducPrograms();        
+    //     $insert = new EducPrograms();
     //     $insert->id = $row["id"];
     //     $insert->department_id = $row["department_id"];
     //     $insert->department_unit_id = $department_unit_id;
@@ -374,7 +379,7 @@ class DataImport implements ToModel, WithHeadingRow
 
     //educ_curriculum
     // public function model(array $row)
-    // {   
+    // {
     //     $program_id = $row["program_id"];
     //     $program = EducPrograms::find($program_id);
     //     $query = EducCurriculum::where('program_id',$program_id)
@@ -387,14 +392,14 @@ class DataImport implements ToModel, WithHeadingRow
     //     }
     //     $user = Auth::User();
     //     $user_id = $user->id;
-    //     $insert = new EducCurriculum();        
+    //     $insert = new EducCurriculum();
     //     $insert->id = $row["id"];
     //     $insert->program_id = $program_id;
     //     $insert->name = $row["name"];
     //     $insert->year_from = $row["year_from"];
     //     $insert->code = $code;
     //     $insert->status_id = $program->status_id;
-    //     $insert->remarks = $row["remarks"];        
+    //     $insert->remarks = $row["remarks"];
     //     $insert->updated_by = $user_id;
     //     $insert->save();
     // }
@@ -403,8 +408,8 @@ class DataImport implements ToModel, WithHeadingRow
     //     $add = 0;
     //     if(strlen($letter)>1){
     //         $add = $letter[1];
-    //         $letter = $letter[0];            
-    //     }        
+    //         $letter = $letter[0];
+    //     }
     //     if($letter!=NULL){
     //         $key = array_search($letter, $alphabet);
     //     }else{
@@ -423,7 +428,7 @@ class DataImport implements ToModel, WithHeadingRow
 
     // educ_courses
     // public function model(array $row)
-    // {   
+    // {
     //     $curriculum_id = $row["curriculum_id"];
     //     $curriculum = EducCurriculum::find($curriculum_id);
     //     $user = Auth::User();
@@ -444,7 +449,7 @@ class DataImport implements ToModel, WithHeadingRow
     // }
 
     // public function model(array $row)
-    // {  
+    // {
     //     $publisher = ($row["publisher"]=='') ? NULL : $row["publisher"];
     //     $subject = ($row["subject"]=='') ? NULL : $row["subject"];
     //     $year = ($row["year"]=='') ? NULL : $row["year"];
@@ -458,7 +463,7 @@ class DataImport implements ToModel, WithHeadingRow
     // }
 
     // public function model(array $row)
-    // {  
+    // {
     //     $name = ($row["name"]=='') ? NULL : $row["name"];
     //     $code = ($row["code"]=='') ? NULL : $row["code"];
 

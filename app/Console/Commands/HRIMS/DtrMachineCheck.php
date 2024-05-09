@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\HRIMS;
 
+use App\Jobs\HrimsDTRJob;
 use App\Models\Devices;
 use App\Models\DTRlogs;
 use App\Models\DTRlogsCopy;
@@ -94,6 +95,14 @@ class DtrMachineCheck extends Command
                         $insert->ipaddress = $ipaddress;
                         $insert->save();
                         $recordsCheck++;
+
+                        $details = [
+                            'id_no' => $id_no,
+                            'dateTime' => $dateTime,
+                            'type' => $type
+                        ];
+                        dispatch(new HrimsDTRJob($details));
+
                         DB::commit();
                     } catch (\Exception $e) {
                         DB::rollBack();

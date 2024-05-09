@@ -24,7 +24,7 @@
                   <div class="col-lg-3">
                       <label>Year</label>
                       <select class="form-control select2" name="year">
-                          @for($i=date('Y'); $i >= 2022; $i--) 
+                          @for($i=date('Y'); $i >= 2022; $i--)
                               <option value="{{$i}}">{{$i}}</option>
                           @endfor
                       </select>
@@ -32,9 +32,9 @@
                   <div class="col-lg-3" id="monthDiv">
                       <label>Month</label>
                       <select class="form-control select2" name="month">
-                          @for($i=1; $i <= 12; $i++) 
+                          @for($i=1; $i <= 12; $i++)
                               @php
-                              $month = date('m', strtotime(date('Y').'-'.$i.'-01')); 
+                              $month = date('m', strtotime(date('Y').'-'.$i.'-01'));
                               $month_name =  date('F', strtotime(date('Y').'-'.$i.'-01'));
                               @endphp
                               @if(date('m')==$month)
@@ -44,7 +44,7 @@
                               @endif
                           @endfor
                       </select>
-                  </div>                        
+                  </div>
                   <div class="col-lg-3">
                       <label>Type</label>
                       <select class="form-control select2" name="type">
@@ -58,8 +58,8 @@
                       </button>
                   </div>
                   <div class="col-lg-12">
-                      
-                      <br>                                         
+
+                      <br>
                       <table id="listTable" class="table table-bordered table-fixed"
                           data-toggle="table"
                           data-search="true"
@@ -80,8 +80,8 @@
                                   <th data-field="f3" data-sortable="true" data-align="center">Et Al</th>
                                   <th data-field="f4" data-sortable="true" data-align="center">Type</th>
                                   <th data-field="f5" data-sortable="true" data-align="center">Amount</th>
-                                  <th data-field="f6" data-sortable="true" data-align="center">Bank</th>
-                                  @if($user_access->level_id==1 || $user_access->level_id==2 || $user_access->level_id==3)                                    
+                                  {{-- <th data-field="f6" data-sortable="true" data-align="center">Bank</th> --}}
+                                  @if($user_access->level_id==1 || $user_access->level_id==2 || $user_access->level_id==3)
                                     <th data-field="f7" data-sortable="true" data-align="center">Delete</th>
                                   @endif
                               </tr>
@@ -91,7 +91,7 @@
               </div>
             </div>
             <div class="card-footer">
-              
+
             </div>
         </div>
     </div>

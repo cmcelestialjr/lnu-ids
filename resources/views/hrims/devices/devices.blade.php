@@ -37,7 +37,7 @@
                           <th data-field="f5" data-sortable="true" data-align="center">Remarks</th>
                           <th data-field="f6" data-sortable="true" data-align="center">Status</th>
                           <th data-field="f7" data-sortable="true" data-align="center">DateTime</th>
-                          <th data-field="f8" data-sortable="true" data-align="center">Logs Device</th>
+                          {{-- <th data-field="f8" data-sortable="true" data-align="center">Logs Device</th> --}}
                           <th data-field="f9" data-sortable="true" data-align="center">Edit</th>
                         </tr>
                       </thead>
@@ -46,7 +46,7 @@
             </div>
           </div>
           <div class="card-footer">
-              
+
           </div>
       </div>
   </div>

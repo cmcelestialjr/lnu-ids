@@ -42,7 +42,7 @@ class LinkDtr extends Command
                 $link = 2;
                 $time = date('H:i',strtotime($dateTime));
                 $date = date('Y-m-d',strtotime($dateTime));
-                
+
                 $check = UsersDTR::where('id_no',$id_no)
                     ->where('date',$date)->first();
                 if($time<'12:00'){
@@ -77,7 +77,7 @@ class LinkDtr extends Command
                             $ip_column = 'ipaddress_out_am';
                             $check_where = 5;
                         }
-                        
+
                     }
                 }elseif($time>='12:00' && $time<='13:00'){
                     if($type==0 || $type==3){
@@ -104,7 +104,7 @@ class LinkDtr extends Command
                         $check_where = 9;
                     }
                 }
-                
+
                 if($check==NULL){
                     $insert = new UsersDTR();
                     $insert->id_no = $id_no;
@@ -132,7 +132,7 @@ class LinkDtr extends Command
                                         'ipaddress' => $ipaddress,
                                         'dateTime' => $dateTime,
                                         'updated_at' => date('Y-m-d H:i:s')]);
-                        $link = 1;                                        
+                        $link = 1;
                     }
                     UsersDTR::where('id_no',$id_no)
                                 ->where('date',$date)
@@ -166,7 +166,7 @@ class LinkDtr extends Command
                                     'ipaddress_out_pm' => NULL]);
                     }
                 }
-                $dtr_log_ids[] = $dtr_log_id;                
+                $dtr_log_ids[] = $dtr_log_id;
             }
             DTRlogs::whereIn('id',$dtr_log_ids)
                     ->update(['link' => $link,

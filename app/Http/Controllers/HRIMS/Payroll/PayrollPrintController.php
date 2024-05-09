@@ -35,12 +35,12 @@ class PayrollPrintController extends Controller
             $code = $exp[2];
             $code_services = new CodeServices;
             $decode = $code_services->decode($code,$payroll_id);
-            
+
             if($decode=='error'){
                 $payroll_id = '';
                 return  response()->json('error');
             }
-            
+
             $payroll = HRPayroll::with('fund_source.fund_source','emp_stat.emp_stat','payroll_type','months','account_title')->where('payroll_id',$payroll_id)->first();
             if($payroll){
                 $src = $this->qr($payroll,$pdf_option);
@@ -110,14 +110,14 @@ class PayrollPrintController extends Controller
                 $query->where('payroll_id',$payroll_id_id);
             })->orderBy('id','ASC')->get();
         $allowance_all = HRPayrollAllowance::with('list')
-            ->where('payroll_id',$payroll_id_id)->get(); 
+            ->where('payroll_id',$payroll_id_id)->get();
         $deduction_all = HRPayrollDeduction::with('list')
-            ->where('payroll_id',$payroll_id_id)->get(); 
+            ->where('payroll_id',$payroll_id_id)->get();
         $deduction_list = HRDeduction::whereHas('payroll_deduction', function ($query) use ($payroll_id_id) {
                 $query->where('payroll_id',$payroll_id_id);
             })->whereNotNull('group_id')
             ->orderBy('group_id','ASC')
-            ->orderBy('id','ASC')->get();        
+            ->orderBy('id','ASC')->get();
         $deduction_other = HRDeduction::whereHas('payroll_deduction', function ($query) use ($payroll_id_id) {
                 $query->where('payroll_id',$payroll_id_id);
             })->whereNull('group_id')
@@ -240,7 +240,7 @@ class PayrollPrintController extends Controller
                 $pdf->SetXY(5,-5);
                 $pdf->Cell(320, '', date('M d, Y h:i a'), 0, 1, 'R', 0, '', 1);
         });
-        
+
         $fund_source = '';
         if(count($payroll->fund_source)>0){
             foreach($payroll->fund_source as $fund){
@@ -283,7 +283,7 @@ class PayrollPrintController extends Controller
         $pdf::SetXY($x, $y);
         $pdf::SetFont('arial','',7);
         $pdf::Cell(95, '', 'ENTITY NAME: LEYTE NORMAL UNIVERSITY', 0, 1, 'L', 0, '', 1);
-        
+
         $y_add = $y_add+4;
         $pdf::SetXY($x, $y+$y_add);
         $pdf::Cell(95, '', 'FUND CLUSTER: '.$fund_source, 0, 1, 'L', 0, '', 1);
@@ -292,11 +292,11 @@ class PayrollPrintController extends Controller
         $pdf::SetXY($x, $y+$y_add);
         $pdf::SetFont('arial','b',7);
         $pdf::Cell(95, '', 'PAYROLL: '.mb_strtoupper($payroll->payroll_type->name), 0, 1, 'L', 0, '', 1);
-        
+
         $y_add = $y_add+4;
         $pdf::SetXY($x, $y+$y_add);
         $pdf::Cell(95, '', 'FOR THE '.mb_strtoupper($payroll_month), 0, 1, 'L', 0, '', 1);
-        
+
         //325
         $y_add = $y_add+10;
         $pdf::SetXY($x, $y+$y_add);
@@ -315,13 +315,13 @@ class PayrollPrintController extends Controller
         if($payroll->payroll_type->column_name2!=NULL){
             $add_column++;
         }
-        
+
         //318 total lenght allocated
         //60 for default allocated
         //258 allocated for column
         $column_count = 9+$add_column+(count($payroll->months)+count($payroll->unclaimeds)+$allowance_list->count()+$deduction_list->count()+$deduction_other->count());
         $allocated_per_column = 258/$column_count;
-      
+
         $x_add = 7;
         $pdf::SetXY($x+$x_add, $y+$y_add);
         $pdf::Cell(25+$allocated_per_column, 6.6, 'Name', 1, 1, 'C', 0, '', 1);
@@ -415,7 +415,7 @@ class PayrollPrintController extends Controller
             if($group_count->count()>0){
                 foreach($group_count as $deduction){
                     $deduction_group_count[$deduction->group_id] = $deduction->count;
-                }            
+                }
                 $x_add_group = 0;
                 foreach($deduction_group as $deduction){
                     $pdf::SetXY($x+$x_add+$x_add_group, $y+$y_add);
@@ -423,7 +423,7 @@ class PayrollPrintController extends Controller
                     $x_add_group = $allocated_per_column*$deduction_group_count[$deduction->id];
                     $deduction_x++;
                 }
-            } 
+            }
             $deduction_x = 0;
             foreach($deduction_list as $deduction){
                 if($deduction_x>0){
@@ -459,7 +459,7 @@ class PayrollPrintController extends Controller
         $x_add = $x_add+$allocated_per_column+5;
         $pdf::SetXY($x+$x_add, $y+$y_add);
         $pdf::Cell(5+$allocated_per_column, 6.6, 'NetPay', 1, 1, 'C', 0, '', 1);
-                
+
         if($with_half_netpay=='Yes'){
             $x_add = $x_add+$allocated_per_column+5;
             $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -469,10 +469,10 @@ class PayrollPrintController extends Controller
             $pdf::SetXY($x+$x_add, $y+$y_add);
             $pdf::Cell(5+$allocated_per_column, 6.6, date('M 16-t',strtotime($year.'-'.$month.'-01')), 1, 1, 'C', 0, '', 1);
         }
-        
+
         if(count($payroll_list)>0 && $fund_services->count()>0){
             $list_x_fund = 1;
-            $list_x = 1;            
+            $list_x = 1;
             $y_add = $y_add+6.6;
 
             $hours_services = 0;
@@ -545,21 +545,21 @@ class PayrollPrintController extends Controller
                 if($fund_services->count()>1){
                     if($list_x_fund>1){
                         $y_add = $y_add+5;
-                    }             
+                    }
                     $pdf::SetXY($x, $y+$y_add);
                     $pdf::Cell($x+$x_add+$allocated_per_column+2, 5, '', 1, 1, 'L', 0, '', 1);
                     $pdf::SetXY($x+7, $y+$y_add);
                     $pdf::Cell(200, 5, $fund_service->fund_services->name.' ('.$fund_service->fund_services->shorten.')', 0, 1, 'L', 0, '', 1);
                     $list_x_fund++;
-                    
+
                     if($group_services!=$fund_service->fund_services->group){
                         $group_services_count = 1;
                     }
 
                 }
-                
+
                 $pdf::SetFont('arial','',6);
-                
+
                 foreach($payroll_list as $list){
                     $fund_services_id = $list['fund_services_id'];
                     if($fund_service->fund_services_id==$fund_services_id){
@@ -579,10 +579,10 @@ class PayrollPrintController extends Controller
                             if($group_services==$fund_service->fund_services->group){
                                 $services_group_name[] = $fund_service->fund_services->shorten;
                                 $total_salary_services_group += $list['salary_amount'];
-                                $total_earned_services_group += $list['earned_amount']; 
+                                $total_earned_services_group += $list['earned_amount'];
                                 $total_amount_base_services_group += $list['amount_base_amount'];
                                 $total_column_amount_services_group += $list['column_amount_amount'];
-                                $total_column_amount2_services_group += $list['column_amount2_amount'];                               
+                                $total_column_amount2_services_group += $list['column_amount2_amount'];
                             }else{
                                 $services_group_name = [];
                                 $services_group_name[] = $fund_service->fund_services->shorten;
@@ -590,7 +590,7 @@ class PayrollPrintController extends Controller
                                 $total_earned_services_group = $list['earned_amount'];
                                 $total_amount_base_services_group = $list['amount_base_amount'];
                                 $total_column_amount_services_group = $list['column_amoun_amountt'];
-                                $total_column_amount2_services_group = $list['column_amount2_amount']; 
+                                $total_column_amount2_services_group = $list['column_amount2_amount'];
                             }
                         }else{
                             if($list_x>1){
@@ -603,7 +603,7 @@ class PayrollPrintController extends Controller
                         $total_amount_base += $list['amount_base_amount'];
                         $total_column_amount += $list['column_amount_amount'];
                         $total_column_amount2 += $list['column_amount2_amount'];
-                        
+
                         $pdf::SetXY($x, $y+$y_add);
                         $pdf::Cell(7, 5, $list_x, 1, 1, 'C', 0, '', 1);
 
@@ -624,13 +624,13 @@ class PayrollPrintController extends Controller
                             $pdf::SetXY($x+$x_add, $y+$y_add);
                             $pdf::Cell(5+$allocated_per_column, 5, $list['amount_base'], 1, 1, 'R', 0, '', 1);
                         }
-                
+
                         if($payroll->payroll_type->column_name!=NULL){
                             $x_add = $x_add+$allocated_per_column+5;
                             $pdf::SetXY($x+$x_add, $y+$y_add);
                             $pdf::Cell(5+$allocated_per_column, 5, $list['column_amount'], 1, 1, 'R', 0, '', 1);
                         }
-                
+
                         if($payroll->payroll_type->column_name2!=NULL){
                             $x_add = $x_add+$allocated_per_column+5;
                             $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -646,7 +646,7 @@ class PayrollPrintController extends Controller
                                 if($month_row_x>0){
                                     $x_add = $x_add+$allocated_per_column;
                                 }
-                                
+
                                 $month_amount = '-';
                                 if(count($list['months'])>0){
                                     if(isset($list['months'][$month_row->month])){
@@ -672,7 +672,7 @@ class PayrollPrintController extends Controller
                                 $month_row_x++;
                             }
 
-                            if(count($payroll->unclaimeds)>0){        
+                            if(count($payroll->unclaimeds)>0){
                                 foreach($payroll->unclaimeds as $unclaimeds_row){
                                     $month_amount = '-';
                                     if(count($list['unclaimeds'])>0){
@@ -681,12 +681,12 @@ class PayrollPrintController extends Controller
                                                 $month_amount = number_format($list['unclaimeds'][$unclaimeds_row->month],2);
                                             }
                                         }
-                                    }                                    
+                                    }
                                     $total_unclaimeds[$unclaimeds_row->month] += $list['months'][$unclaimeds_row->month];
 
                                     if($fund_services->count()>1){
                                         $total_unclaimeds_services[$fund_services_id_main][$unclaimeds_row->month] += $list['months'][$unclaimeds_row->month];
-    
+
                                         if($group_services==$fund_service->fund_services->group){
                                             $total_unclaimeds_services_group[$unclaimeds_row->month] += $list['months'][$unclaimeds_row->month];
                                         }else{
@@ -702,7 +702,7 @@ class PayrollPrintController extends Controller
 
                             $hours_amount = '-';
                             $hours = 0;
-                            if(count($list['month_unclaimed'])>0){                                
+                            if(count($list['month_unclaimed'])>0){
                                 foreach($list['month_unclaimed'] as $month_row){
                                     $hours += $month_row->amount;
                                     $hours_services += $month_row->amount;
@@ -728,7 +728,7 @@ class PayrollPrintController extends Controller
                             $pdf::SetXY($x+$x_add, $y+$y_add);
                             $pdf::Cell($allocated_per_column, 5, $hours_amount, 1, 1, 'R', 0, '', 1);
                             $x_add = $x_add+$allocated_per_column;
-                            
+
                         }else{
                             $x_add = $x_add+$allocated_per_column+5;
                         }
@@ -753,10 +753,10 @@ class PayrollPrintController extends Controller
                                 }
 
                                 $total_allowance[$allowance->id] += $list['allowance'][$allowance->id];
-                                
+
                                 if($fund_services->count()>1){
                                     $total_allowance_services[$fund_services_id_main][$allowance->id] += $list['allowance'][$allowance->id];
-    
+
                                     if($group_services==$fund_service->fund_services->group){
                                         $total_allowance_services_group[$allowance->id] += $list['allowance'][$allowance->id];
                                     }else{
@@ -770,8 +770,8 @@ class PayrollPrintController extends Controller
                             }
                             $x_add = $x_add+$allocated_per_column;
                         }
-                
-                        if($deduction_list->count()>0){ 
+
+                        if($deduction_list->count()>0){
                             $deduction_x = 0;
                             foreach($deduction_list as $deduction){
                                 if($deduction_x>0){
@@ -785,12 +785,12 @@ class PayrollPrintController extends Controller
                                         }
                                     }
                                 }
-                                
+
                                 $total_deductions[$deduction->id] += $list['deductions'][$deduction->id];
 
                                 if($fund_services->count()>1){
                                     $total_deductions_services[$fund_services_id_main][$deduction->id] += $list['deductions'][$deduction->id];
-    
+
                                     if($group_services==$fund_service->fund_services->group){
                                         $total_deductions_services_group[$deduction->id] += $list['deductions'][$deduction->id];
                                     }else{
@@ -804,7 +804,7 @@ class PayrollPrintController extends Controller
                             }
                             $x_add = $x_add+$allocated_per_column;
                         }
-                
+
                         if($deduction_other->count()>0){
                             $deduction_other_x = 0;
                             foreach($deduction_other as $deduction){
@@ -819,12 +819,12 @@ class PayrollPrintController extends Controller
                                         }
                                     }
                                 }
-                                
+
                                 $total_deductions_other[$deduction->id] += $list['deductions'][$deduction->id];
 
                                 if($fund_services->count()>1){
                                     $total_deductions_other_services[$fund_services_id_main][$deduction->id] += $list['deductions'][$deduction->id];
-    
+
                                     if($group_services==$fund_service->fund_services->group){
                                         $total_deductions_other_services_group[$deduction->id] += $list['deductions'][$deduction->id];
                                     }else{
@@ -838,7 +838,7 @@ class PayrollPrintController extends Controller
                             }
                             $x_add = $x_add+$allocated_per_column;
                         }
-                        
+
                         $total_lwop += $list['lwop_amount'];
                         $total_deduction += $list['deduction_amount'];
                         $total_netpay += $list['netpay_amount'];
@@ -869,18 +869,18 @@ class PayrollPrintController extends Controller
                         $x_add = $x_add+$allocated_per_column+5;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
                         $pdf::Cell(5+$allocated_per_column, 5, $list['netpay'], 1, 1, 'R', 0, '', 1);
-                                
+
                         if($with_half_netpay=='Yes'){
                             $netpay_half_1 = round(($list['netpay_amount']/2),2);
                             $netpay_half_2 = $list['netpay_amount']-$netpay_half_1;
-                            
+
                             $total_netpay_half_1 += $netpay_half_1;
                             $total_netpay_half_2 += $netpay_half_2;
 
                             if($fund_services->count()>1){
                                 $total_netpay_half_1_services[$fund_services_id_main] += $netpay_half_1;
                                 $total_netpay_half_2_services[$fund_services_id_main] += $netpay_half_2;
-    
+
                                 if($group_services==$fund_service->fund_services->group){
                                     $total_netpay_half_1_services_group += $netpay_half_1;
                                     $total_netpay_half_2_services_group += $netpay_half_2;
@@ -906,7 +906,7 @@ class PayrollPrintController extends Controller
                         $y = 10;
                         $y_add = 0;
                     }
-                    
+
                 }
                 if($fund_services->count()>1){
                     $y_add = $y_add+5;
@@ -932,13 +932,13 @@ class PayrollPrintController extends Controller
                         $pdf::SetXY($x+$x_add, $y+$y_add);
                         $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_amount_base_services[$fund_services_id_main]), 1, 1, 'R', 0, '', 1);
                     }
-            
+
                     if($payroll->payroll_type->column_name!=NULL){
                         $x_add = $x_add+$allocated_per_column+5;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
                         $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_column_amount_services[$fund_services_id_main]), 1, 1, 'R', 0, '', 1);
                     }
-            
+
                     if($payroll->payroll_type->column_name2!=NULL){
                         $x_add = $x_add+$allocated_per_column+5;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -951,12 +951,12 @@ class PayrollPrintController extends Controller
                         foreach($payroll->months as $month_row){
                             if($month_row_x>0){
                                 $x_add = $x_add+$allocated_per_column;
-                            }                        
+                            }
                             $pdf::SetXY($x+$x_add, $y+$y_add);
                             $pdf::Cell($allocated_per_column, 5, $this->check_zero($total_months_services[$fund_services_id_main][$month_row->month]), 1, 1, 'R', 0, '', 1);
                             $month_row_x++;
                         }
-                        if(count($payroll->unclaimeds)>0){        
+                        if(count($payroll->unclaimeds)>0){
                             foreach($payroll->unclaimeds as $unclaimeds_row){
                                 $x_add = $x_add+$allocated_per_column;
                                 $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -989,8 +989,8 @@ class PayrollPrintController extends Controller
                         }
                         $x_add = $x_add+$allocated_per_column;
                     }
-                
-                    if($deduction_list->count()>0){ 
+
+                    if($deduction_list->count()>0){
                         $deduction_x = 0;
                         foreach($deduction_list as $deduction){
                             if($deduction_x>0){
@@ -1002,7 +1002,7 @@ class PayrollPrintController extends Controller
                         }
                         $x_add = $x_add+$allocated_per_column;
                     }
-                
+
                     if($deduction_other->count()>0){
                         $deduction_other_x = 0;
                         foreach($deduction_other as $deduction){
@@ -1026,7 +1026,7 @@ class PayrollPrintController extends Controller
                     $x_add = $x_add+$allocated_per_column+5;
                     $pdf::SetXY($x+$x_add, $y+$y_add);
                     $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_netpay_services[$fund_services_id_main]), 1, 1, 'R', 0, '', 1);
-                                
+
                     if($with_half_netpay=='Yes'){
                         $x_add = $x_add+$allocated_per_column+5;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -1059,19 +1059,19 @@ class PayrollPrintController extends Controller
                         $x_add = $x_add+$allocated_per_column+5;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
                         $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_salary_services_group1[$fund_services_id_main]), 1, 1, 'R', 0, '', 1);
-                        
+
                         if($payroll->payroll_type->w_salary=='Yes' && $payroll->payroll_type->w_salary_name!=NULL){
                             $x_add = $x_add+$allocated_per_column+5;
                             $pdf::SetXY($x+$x_add, $y+$y_add);
                             $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_amount_base_services_group1[$fund_services_id_main]), 1, 1, 'R', 0, '', 1);
                         }
-                
+
                         if($payroll->payroll_type->column_name!=NULL){
                             $x_add = $x_add+$allocated_per_column+5;
                             $pdf::SetXY($x+$x_add, $y+$y_add);
                             $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_column_amount_services_group1[$fund_services_id_main]), 1, 1, 'R', 0, '', 1);
                         }
-                
+
                         if($payroll->payroll_type->column_name2!=NULL){
                             $x_add = $x_add+$allocated_per_column+5;
                             $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -1084,32 +1084,32 @@ class PayrollPrintController extends Controller
                             foreach($payroll->months as $month_row){
                                 if($month_row_x>0){
                                     $x_add = $x_add+$allocated_per_column;
-                                }                        
+                                }
                                 $pdf::SetXY($x+$x_add, $y+$y_add);
                                 $pdf::Cell($allocated_per_column, 5, $this->check_zero($total_months_services_group[$month_row->month]), 1, 1, 'R', 0, '', 1);
                                 $month_row_x++;
                             }
-                            if(count($payroll->unclaimeds)>0){        
+                            if(count($payroll->unclaimeds)>0){
                                 foreach($payroll->unclaimeds as $unclaimeds_row){
                                     $x_add = $x_add+$allocated_per_column;
                                     $pdf::SetXY($x+$x_add, $y+$y_add);
                                     $pdf::Cell($allocated_per_column, 5, $this->check_zero($total_unclaimeds_services_group[$unclaimeds_row->month]), 1, 1, 'R', 0, '', 1);
                                 }
                             }
-            
+
                             $x_add = $x_add+$allocated_per_column;
                             $pdf::SetXY($x+$x_add, $y+$y_add);
                             $pdf::Cell($allocated_per_column, 5, $this->check_zero($total_hours_services_group), 1, 1, 'R', 0, '', 1);
                             $x_add = $x_add+$allocated_per_column;
-            
+
                         }else{
                             $x_add = $x_add+$allocated_per_column+5;
                         }
-            
+
                         $pdf::SetXY($x+$x_add, $y+$y_add);
                         $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_earned_services_group), 1, 1, 'R', 0, '', 1);
                         $x_add = $x_add+$allocated_per_column+5;
-            
+
                         if($allowance_list->count()>0){
                             $allowance_x = 0;
                             foreach($allowance_list as $allowance){
@@ -1122,8 +1122,8 @@ class PayrollPrintController extends Controller
                             }
                             $x_add = $x_add+$allocated_per_column;
                         }
-                            
-                        if($deduction_list->count()>0){ 
+
+                        if($deduction_list->count()>0){
                             $deduction_x = 0;
                             foreach($deduction_list as $deduction){
                                 if($deduction_x>0){
@@ -1135,7 +1135,7 @@ class PayrollPrintController extends Controller
                             }
                             $x_add = $x_add+$allocated_per_column;
                         }
-                            
+
                         if($deduction_other->count()>0){
                             $deduction_other_x = 0;
                             foreach($deduction_other as $deduction){
@@ -1148,23 +1148,23 @@ class PayrollPrintController extends Controller
                             }
                             $x_add = $x_add+$allocated_per_column;
                         }
-            
+
                         $pdf::SetXY($x+$x_add, $y+$y_add);
                         $pdf::Cell($allocated_per_column, 5, $this->check_zero($total_lwop_services_group), 1, 1, 'R', 0, '', 1);
-            
+
                         $x_add = $x_add+$allocated_per_column;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
                         $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_deduction_services_group), 1, 1, 'R', 0, '', 1);
-            
+
                         $x_add = $x_add+$allocated_per_column+5;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
                         $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_netpay_services_group), 1, 1, 'R', 0, '', 1);
-                                            
+
                         if($with_half_netpay=='Yes'){
                             $x_add = $x_add+$allocated_per_column+5;
                             $pdf::SetXY($x+$x_add, $y+$y_add);
                             $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_netpay_half_1_services_group), 1, 1, 'R', 0, '', 1);
-            
+
                             $x_add = $x_add+$allocated_per_column+5;
                             $pdf::SetXY($x+$x_add, $y+$y_add);
                             $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_netpay_half_2_services_group), 1, 1, 'R', 0, '', 1);
@@ -1176,7 +1176,7 @@ class PayrollPrintController extends Controller
                         $y_add = 0;
                     }
                 }
-                
+
                 $group_services = $fund_service->fund_services->group;
                 $group_services_count++;
             }
@@ -1201,13 +1201,13 @@ class PayrollPrintController extends Controller
                 $pdf::SetXY($x+$x_add, $y+$y_add);
                 $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_amount_base), 1, 1, 'R', 0, '', 1);
             }
-    
+
             if($payroll->payroll_type->column_name!=NULL){
                 $x_add = $x_add+$allocated_per_column+5;
                 $pdf::SetXY($x+$x_add, $y+$y_add);
                 $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_column_amount), 1, 1, 'R', 0, '', 1);
             }
-    
+
             if($payroll->payroll_type->column_name2!=NULL){
                 $x_add = $x_add+$allocated_per_column+5;
                 $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -1220,12 +1220,12 @@ class PayrollPrintController extends Controller
                 foreach($payroll->months as $month_row){
                     if($month_row_x>0){
                         $x_add = $x_add+$allocated_per_column;
-                    }                        
+                    }
                     $pdf::SetXY($x+$x_add, $y+$y_add);
                     $pdf::Cell($allocated_per_column, 5, $this->check_zero($total_months[$month_row->month]), 1, 1, 'R', 0, '', 1);
                     $month_row_x++;
                 }
-                if(count($payroll->unclaimeds)>0){        
+                if(count($payroll->unclaimeds)>0){
                     foreach($payroll->unclaimeds as $unclaimeds_row){
                         $x_add = $x_add+$allocated_per_column;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -1260,8 +1260,8 @@ class PayrollPrintController extends Controller
                 }
                 $x_add = $x_add+$allocated_per_column;
             }
-                
-            if($deduction_list->count()>0){ 
+
+            if($deduction_list->count()>0){
                 $deduction_x = 0;
                 foreach($deduction_list as $deduction){
                     if($deduction_x>0){
@@ -1273,7 +1273,7 @@ class PayrollPrintController extends Controller
                 }
                 $x_add = $x_add+$allocated_per_column;
             }
-                
+
             if($deduction_other->count()>0){
                 $deduction_other_x = 0;
                 foreach($deduction_other as $deduction){
@@ -1297,7 +1297,7 @@ class PayrollPrintController extends Controller
             $x_add = $x_add+$allocated_per_column+5;
             $pdf::SetXY($x+$x_add, $y+$y_add);
             $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_netpay), 1, 1, 'R', 0, '', 1);
-                                
+
             if($with_half_netpay=='Yes'){
                 $x_add = $x_add+$allocated_per_column+5;
                 $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -1307,14 +1307,14 @@ class PayrollPrintController extends Controller
                 $pdf::SetXY($x+$x_add, $y+$y_add);
                 $pdf::Cell(5+$allocated_per_column, 5, $this->check_zero($total_netpay_half_2), 1, 1, 'R', 0, '', 1);
             }
-            
+
             if($fund_services->count()>0){
                 $pdf::SetFont('arial','',7);
                 $y_add = $y_add+10;
                 $x_add = 20;
                 $pdf::SetXY($x+$x_add, $y+$y_add);
                 $pdf::Cell(50, '', 'Recapitulation:', 0, 1, 'L', 0, '', 1);
-                
+
                 $x_add = $x_add+53;
                 $pdf::SetXY($x+$x_add, $y+$y_add);
                 $pdf::Cell(30, '', 'Account Code', 0, 1, 'C', 0, '', 1);
@@ -1322,7 +1322,7 @@ class PayrollPrintController extends Controller
                 $group_services_count = 1;
                 $group_services = $fund_services_first->fund_services->group;
                 $services_group_name = [];
-                
+
                 $pdf::SetFont('arial','u',7);
                 for ($i = 0; $i < $fund_services->count(); $i++) {
                     $fund_service = $fund_services[$i];
@@ -1334,12 +1334,12 @@ class PayrollPrintController extends Controller
                         $services_group_name = [];
                         $services_group_name[] = $fund_service->fund_services->shorten;
                     }
-                    
+
                     $group_services_next = NULL;
                     if($fund_service_next){
                         $group_services_next = $fund_service_next->fund_services->group;
                     }
-                    
+
                     if($group_services_next!=$fund_service->fund_services->group){
                         $x_add = $x_add+40;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
@@ -1355,8 +1355,8 @@ class PayrollPrintController extends Controller
                 $pdf::Cell(40, '', 'TOTAL', 0, 1, 'C', 0, '', 1);
 
                 $pdf::SetFont('arial','',7);
-                
-                
+
+
                 if($account_title_payroll->count()>0){
                     foreach($account_title_payroll as $row){
                         if(($row->column==NULL && $row->payroll_type->w_salary=='Yes') ||
@@ -1365,8 +1365,8 @@ class PayrollPrintController extends Controller
                             ($row->column=='column_amount2' && $row->payroll_type->column_name2!=NULL)){
                             $x_add = 20;
                             $y_add = $y_add+3;
-                            $pdf::SetXY($x+$x_add, $y+$y_add);                        
-                            
+                            $pdf::SetXY($x+$x_add, $y+$y_add);
+
                             $pdf::Cell(50, '', $row->account_title->name, 0, 1, 'L', 0, '', 1);
 
                             $x_add = $x_add+48;
@@ -1376,17 +1376,17 @@ class PayrollPrintController extends Controller
                             $group_services_count = 1;
                             $group_services = $fund_services_first->fund_services->group;
                             $total_salary_services_group = 0;
-                            
+
                             for ($i = 0; $i < $fund_services->count(); $i++) {
                                 $fund_service = $fund_services[$i];
                                 $fund_service_next = $fund_services[$i + 1];
-                                $salary_services_group = 0;                            
+                                $salary_services_group = 0;
                                 if($group_services==$fund_service->fund_services->group){
                                     $services_group_name[] = $fund_service->fund_services->shorten;
                                 }else{
                                     $services_group_name = [];
                                     $services_group_name[] = $fund_service->fund_services->shorten;
-                                }                            
+                                }
                                 $group_services_next = NULL;
                                 if($fund_service_next){
                                     $group_services_next = $fund_service_next->fund_services->group;
@@ -1447,11 +1447,11 @@ class PayrollPrintController extends Controller
                                 $services_group_name = [];
                                 $services_group_name[] = $fund_service->fund_services->shorten;
                             }
-                            
+
                             $group_services_next = NULL;
                             if($fund_service_next){
                                 $group_services_next = $fund_service_next->fund_services->group;
-                            } 
+                            }
 
                             foreach($allowance_all as $list){
                                 $fund_services_id = $list->list->fund_services_id;
@@ -1506,11 +1506,11 @@ class PayrollPrintController extends Controller
                                 $services_group_name = [];
                                 $services_group_name[] = $fund_service->fund_services->shorten;
                             }
-                            
+
                             $group_services_next = NULL;
                             if($fund_service_next){
                                 $group_services_next = $fund_service_next->fund_services->group;
-                            } 
+                            }
 
                             foreach($deduction_all as $list){
                                 $fund_services_id = $list->list->fund_services_id;
@@ -1545,12 +1545,12 @@ class PayrollPrintController extends Controller
 
                 $x_add = $x_add+48;
                 $pdf::SetXY($x+$x_add, $y+$y_add);
-                $pdf::Cell(28, '', $payroll->account_title->code, 0, 1, 'R', 0, '', 1);                
+                $pdf::Cell(28, '', $payroll->account_title->code, 0, 1, 'R', 0, '', 1);
 
                 $x_add = $x_add+20;
                 for ($i = 0; $i < $fund_services->count(); $i++) {
                     $fund_service = $fund_services[$i];
-                    $fund_service_next = $fund_services[$i + 1];                    
+                    $fund_service_next = $fund_services[$i + 1];
                     $deduction_services_group = 0;
 
                     if($group_services_next!=$fund_service->fund_services->group){
@@ -1558,7 +1558,7 @@ class PayrollPrintController extends Controller
                         $pdf::SetXY($x+$x_add, $y+$y_add);
                         $pdf::Cell(20, '', $this->check_zero($total_netpay_services_group1[$fund_service->fund_services_id]
                                                         -$total_deduction_services_group1[$fund_service->fund_services_id]), 0, 1, 'R', 0, '', 1);
-                        
+
                         $pdf::SetXY($x+$x_add-17, $y+$y_add+3);
                         $pdf::Cell(37, '', '', 'TB', 1, 'L', 0, '', 1);
 
@@ -1575,11 +1575,11 @@ class PayrollPrintController extends Controller
                     }
                     $group_services = $fund_service->fund_services->group;
                 }
-                
+
                 $x_add = $x_add+40;
                 $pdf::SetXY($x+$x_add, $y+$y_add);
                 $pdf::Cell(20, '', $this->check_zero($total_netpay), 0, 1, 'R', 0, '', 1);
-                
+
                 $pdf::SetXY($x+$x_add-17, $y+$y_add+3);
                 $pdf::Cell(37, '', '', 'TB', 1, 'L', 0, '', 1);
                 $pdf::SetXY($x+$x_add-17, $y+$y_add+3);
@@ -1626,7 +1626,7 @@ class PayrollPrintController extends Controller
                         $post_nominal = '';
                         if($row->post_nominal!='' || $row->post_nominal!=NULL){
                             $post_nominal = ', '.$row->post_nominal;
-                        }                        
+                        }
                         $signatory_name = $honorofic.$name_services->firstname($row->signatory->lastname,$row->signatory->firstname,$row->signatory->middlename,$row->signatory->extname)
                             .$post_nominal;
                         if($row->option=='a'){
@@ -1645,7 +1645,7 @@ class PayrollPrintController extends Controller
                     }
                 }
             }
-            
+
             $pdf::SetFont('arial','b',9);
             $y_add = $y_add+10;
             $x_add = 20;
@@ -1679,7 +1679,7 @@ class PayrollPrintController extends Controller
             $x_add = 20;
             $pdf::SetXY($x+$x_add, $y+$y_add);
             $pdf::Cell(100, '', 'B.  CERTIFIED:  Supporting documents complete and proper and cash available in the', 0, 1, 'L', 0, '', 1);
-            
+
             $x_add = $x_add+140;
             $pdf::SetXY($x+$x_add, $y+$y_add);
             $pdf::Cell(100, '', 'D.  CERTIFIED:  Each employee whose name appears on the payroll has been paid the', 0, 1, 'L', 0, '', 1);

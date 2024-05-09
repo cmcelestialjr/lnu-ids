@@ -56,7 +56,7 @@ class SkyHRImportUsers extends Command
                     $check_users = Users::where('username',$row->IdNo)->first();
 
                     if($check_users!=NULL){
-                        
+
                     }
                 }
             }

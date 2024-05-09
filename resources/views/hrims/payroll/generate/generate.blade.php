@@ -179,7 +179,7 @@
                                         data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
                                         <thead>
                                             <tr>
-                                                <th data-field="f1" data-sortable="true" data-align="center">#aaa</th>
+                                                <th data-field="f1" data-sortable="true" data-align="center">#</th>
                                                 <th data-field="f2" data-align="center">
                                                     <input type="checkbox" class="form-control" id="" checked>
                                                 </th>

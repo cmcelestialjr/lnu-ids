@@ -83,7 +83,7 @@ class PayrollViewController extends Controller
             $bg_color = 'bg-yellow-light';
         }
         $pdf_option = 'Payroll: '.$request->payroll_id.' Code: '.$request->encoded;
-        
+
         $data = array(
             'query' => $query,
             'deduction_group' => $deduction_group,
@@ -143,7 +143,7 @@ class PayrollViewController extends Controller
 
         $user = Auth::user();
         $updated_by = $user->id;
-            
+
         $payroll = HRPayroll::where('payroll_id',$payroll_id)->first();
         if($payroll==NULL){
             return  response()->json($response_data);
@@ -160,7 +160,7 @@ class PayrollViewController extends Controller
         $day_to = $payroll->day_to;
         $include_pera = $payroll->include_pera;
         $emp_stats = $payroll->emp_stat()->pluck('emp_stat_id')->toArray();
-        $fund_sources = $payroll->fund_source()->pluck('fund_source_id')->toArray();            
+        $fund_sources = $payroll->fund_source()->pluck('fund_source_id')->toArray();
         $payroll_type_query = HRPayrollType::with('guideline')->where('id',$payroll_type)->first();
         if($payroll_type_query==NULL){
             return  response()->json($response_data);
@@ -190,14 +190,14 @@ class PayrollViewController extends Controller
         $column_amount = 0;
         $column_amount2 = 0;
         $earned = 0;
-        if($payroll_type==1){    
+        if($payroll_type==1){
             if($emp_stat!=5){
                 $payroll_update_services->updatePhilHealth($salary,$employee,$gov,$year,$month,$payroll_type,$emp_stat,$duration,$option,$day_from,$day_to);
                 $payroll_update_services->updatePagibig($employee,$gov,$payroll_type,$emp_stat);
                 if($gov=='Y'){
                     $payroll_update_services->updateGSIS($salary,$employee,$gov,$year,$month,$payroll_type,$emp_stat,$duration,$option,$day_from,$day_to);
                 }
-            }                        
+            }
             $earned = $payroll_update_services->getEarned1($year,$month,$salary,$gov,$duration,$option,$day_from,$day_to);
             $amount_base = $salary;
         }elseif($payroll_type==2){
@@ -206,10 +206,10 @@ class PayrollViewController extends Controller
             $earned = $payroll_update_services->getEarned1($year,$month,$amount,$gov,$duration,$option,$day_from,$day_to);
         }else{
             if($payroll->aggregate==1){
-                $rendered_months = $work_services->rendered_months_aggregate($employee,$gov_service,$payroll_type_query);   
+                $rendered_months = $work_services->rendered_months_aggregate($employee,$gov_service,$payroll_type_query);
             }else{
-                $rendered_months = $work_services->rendered_months($employee,$gov_service);   
-            }  
+                $rendered_months = $work_services->rendered_months($employee,$gov_service);
+            }
             if($rendered_months>=$payroll_type_query->month_no){
                 if($payroll_type_query->w_salary=='Yes'){
                     $w_salary_amount = $salary;
@@ -248,15 +248,14 @@ class PayrollViewController extends Controller
             if($include=='Y'){
                 $amount_base = $w_salary_amount;
                 $earned = $w_salary_amount+$column_amount+$column_amount2;
-            }  
+            }
         }
         if($include=='Y'){
             $getDays = $payroll_update_services->getDays($day_from,$day_to,$year,$month,$option,$duration,$gov);
             $weekdays = $getDays['weekdays'];
-                    
+
             $allowance = $payroll_update_services->getAllowance1($emp_stat,$payroll_type,$include_pera);
             $deduction = $payroll_update_services->getDeduction1($emp_stat,$payroll_type,$employee);
-            $earned = $earned;
             $netpay = $earned-$deduction;
 
             $insert = new HRPayrollList();
@@ -289,8 +288,8 @@ class PayrollViewController extends Controller
             $insert->updated_by = $updated_by;
             $insert->save();
 
-            $payroll_list_id = $insert->id;                    
-            
+            $payroll_list_id = $insert->id;
+
             $payroll_update_services->insertEmployeeAllowance($emp_stat,$payroll_type,$include_pera,$gov,$payroll_list_id,$payroll_id,$employee,$updated_by);
             $payroll_update_services->insertEmployeeDeduction($emp_stat,$payroll_type,$payroll_list_id,$payroll_id,$employee,$updated_by);
 
@@ -342,7 +341,7 @@ class PayrollViewController extends Controller
                     }
                 }
             }
-            
+
             $payroll_update_services->payrollUpdateInfo($payroll_id,$updated_by);
         }
         $response = array('result' => 'success');
@@ -353,10 +352,10 @@ class PayrollViewController extends Controller
      * Display the specified resource.
      */
     public function show(Request $request)
-    {        
+    {
         $data = array();
         $name_services = new NameServices;
-        $code_services = new CodeServices;        
+        $code_services = new CodeServices;
         $decode = $code_services->decode($request->code,$request->payroll_id);
         $payroll_id = '';
 
@@ -365,12 +364,12 @@ class PayrollViewController extends Controller
         }
 
         $payroll_id = $request->payroll_id;
-        $payroll = HRPayroll::where('payroll_id',$payroll_id)->first();    
-        
+        $payroll = HRPayroll::where('payroll_id',$payroll_id)->first();
+
         if($payroll==NULL){
             return response()->json($data);
         }
-        
+
         $payroll_id = $payroll->id;
         $query = HRPayrollList::with('allowance','deductions','months','unclaimeds','month_unclaimed')
                 ->where('payroll_id',$payroll_id);
@@ -383,7 +382,7 @@ class PayrollViewController extends Controller
                     $name = $name_services->lastname_middlename_last($query->lastname,$query->firstname,$query->middlename,$query->extname);
                 }else{
                     $name = $name_services->lastname($query->lastname,$query->firstname,$query->middlename,$query->extname);
-                }                
+                }
                 return [
                     'id' => $query->id,
                     'name' => $name,
@@ -419,7 +418,7 @@ class PayrollViewController extends Controller
                 $data_list['w_salary_amount'] = '<span class="text-primary" id="amount_base_'.$r['id'].'">'.$r['amount_base'].'</span>';
                 $data_list['column_amount'] = '<span class="text-primary" id="column_amount_'.$r['id'].'">'.$r['column_amount'].'</span>';
                 $data_list['column_amount2'] = '<span class="text-primary" id="column_amount2_'.$r['id'].'">'.$r['column_amount2'].'</span>';
-                $data_list['earned'] = '<span class="text-primary" id="earned_'.$r['id'].'">'.$r['earned'].'</span>';                
+                $data_list['earned'] = '<span class="text-primary" id="earned_'.$r['id'].'">'.$r['earned'].'</span>';
                 $data_list['lwop'] = '<span id="lwop_'.$r['id'].'">'.$r['lwop'].'</span>';
                 $data_list['deduction'] = '<button class="btn btn-danger btn-danger-scan btn-sm deductionModal"
                                             data-id="'.$r['id'].'">
@@ -441,7 +440,7 @@ class PayrollViewController extends Controller
                 if(count($r['months'])>0){
                     foreach($r['months'] as $month){
                         if($month->status=='unclaimed'){
-                            $data_list[$month->month.'_month'] = '<input type="number" class="form-control month_input" 
+                            $data_list[$month->month.'_month'] = '<input type="number" class="form-control month_input"
                                                                     data-id="'.$month->id.'"
                                                                     data-t="default"
                                                                     value="'.$month->amount.'" style="width:80px;">';
@@ -453,7 +452,7 @@ class PayrollViewController extends Controller
                 if(count($r['unclaimeds'])>0){
                     foreach($r['unclaimeds'] as $month){
                         if($month->status=='unclaimed'){
-                            $data_list[$month->month.'_unclaimed'] = '<input type="number" class="form-control month_input" 
+                            $data_list[$month->month.'_unclaimed'] = '<input type="number" class="form-control month_input"
                                                                         data-id="'.$month->id.'"
                                                                         data-t="unclaimed"
                                                                         value="'.$month->amount.'" style="width:80px;">';
@@ -498,7 +497,7 @@ class PayrollViewController extends Controller
         if ($validator->fails()) {
             return  response()->json($response_data);
         }
-        
+
         $user_access_level = $request->session()->get('user_access_level');
         $user_access_levels = array(1,2,3);
 
@@ -647,7 +646,7 @@ class PayrollViewController extends Controller
         $rules = [
             'payroll_id' => 'required|string'
         ];
-        
+
         $customMessages = [
             'payroll_id.required' => 'Payroll ID is required',
             'payroll_id.string' => 'Payroll ID must be a string',
@@ -668,7 +667,7 @@ class PayrollViewController extends Controller
             'id' => 'required|numeric',
             'val' => 'required|numeric'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',
@@ -690,7 +689,7 @@ class PayrollViewController extends Controller
         $rules = [
             'id' => 'required|numeric'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number'
