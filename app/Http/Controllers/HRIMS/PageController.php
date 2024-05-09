@@ -54,16 +54,16 @@ class PageController extends Controller
         $resultFinger = '';
         $getTime = '';
         $query = [];
-        $idNo = '990405';
+        $idNo = '230209';
         $dateTime = '2024-05-08 08:05:56';
         $type = '0';
         $ipaddress = '10.5.201.137';
-        // $details = [
-        //     'id_no' => $idNo,
-        //     'dateTime' => $dateTime,
-        //     'type' => 1
-        // ];
-        // dispatch(new HrimsDTRJob($details));
+        $details = [
+            'id_no' => $idNo,
+            'dateTime' => $dateTime,
+            'type' => 1
+        ];
+        dispatch(new HrimsDTRJob($details));
         //$deviceId = DB::connection('skyhr')->table('skyhr.db_owner.tblDevices')->where('IP',$ipaddress)->value('DeviceId');
 
         // $dataToInsert = [
