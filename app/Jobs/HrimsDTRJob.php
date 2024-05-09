@@ -30,11 +30,11 @@ class HrimsDTRJob implements ShouldQueue
     public function handle()
     {
         // Set up SMTP configuration
-        Config::set('mail.mailers.smtp.host', 'smtp.gmail.com');
-        Config::set('mail.mailers.smtp.port', 587);
-        Config::set('mail.mailers.smtp.username', 'hr@lnu.edu.ph');
-        Config::set('mail.mailers.smtp.password', 'LNU@hrmo2024');
-        Config::set('mail.mailers.smtp.encryption', 'tls');
+        // Config::set('mail.mailers.smtp.host', 'smtp.gmail.com');
+        // Config::set('mail.mailers.smtp.port', 587);
+        // Config::set('mail.mailers.smtp.username', 'hr@lnu.edu.ph');
+        // Config::set('mail.mailers.smtp.password', 'LNU@hrmo2024');
+        // Config::set('mail.mailers.smtp.encryption', 'tls');
         $id_no = $this->details['id_no'];
         $type = $this->details['type'];
         $staff = _PersonalInfo::whereHas('user', function ($q) use ($id_no) {
@@ -61,12 +61,6 @@ class HrimsDTRJob implements ShouldQueue
                 }
             }
         }
-        // try {
-
-        // } catch (\Exception $e) {
-        //     // Handle the exception, log it, or send notifications
-        //     Log::error('Failed to send email: ' . $e->getMessage());
-        // }
     }
 }
 
