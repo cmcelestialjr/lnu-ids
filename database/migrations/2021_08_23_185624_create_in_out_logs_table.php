@@ -13,15 +13,17 @@ class CreateInOutLogsTable extends Migration
      */
     public function up()
     {
-        Schema::create('in_out_logs', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('user_id');
-            $table->time('in_time')->nullable();
-            $table->time('out_time')->nullable();
-            $table->double('time_calc')->nullable();
-            $table->date('date')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('in_out_logs')) {
+            Schema::create('in_out_logs', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedInteger('user_id');
+                $table->time('in_time')->nullable();
+                $table->time('out_time')->nullable();
+                $table->double('time_calc')->nullable();
+                $table->date('date')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

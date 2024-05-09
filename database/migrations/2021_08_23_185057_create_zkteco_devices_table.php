@@ -13,14 +13,16 @@ class CreateZktecoDevicesTable extends Migration
      */
     public function up()
     {
-        Schema::create('devices', function (Blueprint $table) {
-            $table->id();
-            $table->ipAddress('ip');
-            $table->string('port',10);
-            $table->string('model_name');
-            $table->tinyInteger('status')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('devices')) {
+            Schema::create('devices', function (Blueprint $table) {
+                $table->id();
+                $table->ipAddress('ip');
+                $table->string('port',10);
+                $table->string('model_name');
+                $table->tinyInteger('status')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
