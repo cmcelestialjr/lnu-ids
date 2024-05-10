@@ -57,7 +57,7 @@ class HrimsDTRJob implements ShouldQueue
             if($x>0){
                 $email = $staff->email_official;
                 if($email){
-                    //Mail::to($email)->send(new HrimsDTRMail($this->details));
+                    Mail::to($email)->send(new HrimsDTRMail($this->details));
                 }
             }
         }
