@@ -51,7 +51,7 @@ class ImportStudentCourseLudong extends Command
         $courses = DB::connection($connectionName)->table('mark')
             // ->where('sy','2024')
             // ->where('stud_id','2305785')
-            ->where('submitted_on','>=','2024-04-15 11:18:42')
+            ->where('submitted_on','>=','2024-05-09 07:34:06')
             ->orderBy('sy','ASC')
             ->orderBy('term','ASC')
             ->orderBy('terms','ASC')
