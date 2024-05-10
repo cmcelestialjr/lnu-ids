@@ -30,6 +30,7 @@ class HrimsDTRJob implements ShouldQueue
     public function handle()
     {
         // Set up SMTP configuration
+
         Config::set('mail.mailers.smtp.host', 'smtp.gmail.com');
         Config::set('mail.mailers.smtp.port', 587);
         Config::set('mail.mailers.smtp.username', 'hr@lnu.edu.ph');
