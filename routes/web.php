@@ -82,6 +82,11 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 Route::post('/systemsNavSubView', 'USERS\SystemsController@navSubView');
             });
 
+            Route::group(['prefix'=>'pagination'], function(){
+                Route::get('/search', 'PaginationController@index');
+                Route::get('/paginate', 'PaginationController@show');
+            });
+
             Route::group(['prefix'=>'search'], function(){
                 Route::post('/courseCode', 'SEARCH\CourseCodeController@courseCode');
                 Route::post('/courseDesc', 'SEARCH\CourseDescController@courseDesc');
