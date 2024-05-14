@@ -38,54 +38,55 @@ class SkyHRImport extends Command
                 $type = $row->type;
                 $ipaddress = $row->ipaddress;
 
-                $deviceId = DB::connection('skyhr')->table('skyhr.db_owner.tblDevices')->where('IP',$ipaddress)->value('DeviceId');
-
-                $checkDeviceLog = DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')
-                    ->where('IdNo',$idNo)
-                    ->where('LogDate',$dateTime.'.000')
-                    ->first();
-                if($checkDeviceLog==NULL){
-                    $dataToInsert = [
-                        'DeviceId' => $deviceId,
-                        'IdNo' => $idNo,
-                        'LogDate' => $dateTime.'.000',
-                        'Mode' => $type
-                    ];
-                    DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')->insert($dataToInsert);
-
-                    $lastInsertedId = DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')
-                        ->where('IdNo',$idNo)
-                        ->where('LogDate',$dateTime)
-                        ->orderBy('Id', 'desc')
-                        ->value('Id');
-                }else{
-                    $lastInsertedId = $checkDeviceLog->Id;
-                }
-
                 $employeeId = DB::connection('skyhr')->table('tblEmployees')
                     ->where('IdNo',$idNo)
                     ->value('EmployeeId');
+                if($employeeId){
+                    $deviceId = DB::connection('skyhr')->table('skyhr.db_owner.tblDevices')->where('IP',$ipaddress)->value('DeviceId');
 
-                $checkEmployeeLog = DB::connection('skyhr')->table('tblEmployee_TimeLog')
-                    ->where('EmployeeId',$employeeId)
-                    ->where('TimeLog',$dateTime.'.000')
-                    ->first();
+                    $checkDeviceLog = DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')
+                        ->where('IdNo',$idNo)
+                        ->where('LogDate',$dateTime.'.000')
+                        ->first();
+                    if($checkDeviceLog==NULL){
+                        $dataToInsert = [
+                            'DeviceId' => $deviceId,
+                            'IdNo' => $idNo,
+                            'LogDate' => $dateTime.'.000',
+                            'Mode' => $type
+                        ];
+                        DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')->insert($dataToInsert);
 
-                if($checkEmployeeLog==NULL && $employeeId){
-                    $dataToInsert = [
-                        'EmployeeId' => $employeeId,
-                        'TimeLog' => $dateTime.'.000',
-                        'EntryType' => 0,
-                        'DeviceLogId' => $lastInsertedId,
-                        'Mode' => $type,
-                        'DeviceReference' => 'DEVICE_ID-'.$deviceId
-                    ];
-                    DB::connection('skyhr')->table('tblEmployee_TimeLog')->insert($dataToInsert);
+                        $lastInsertedId = DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')
+                            ->where('IdNo',$idNo)
+                            ->where('LogDate',$dateTime)
+                            ->orderBy('Id', 'desc')
+                            ->value('Id');
+                    }else{
+                        $lastInsertedId = $checkDeviceLog->Id;
+                    }
+
+                    $checkEmployeeLog = DB::connection('skyhr')->table('tblEmployee_TimeLog')
+                        ->where('EmployeeId',$employeeId)
+                        ->where('TimeLog',$dateTime.'.000')
+                        ->first();
+
+                    if($checkEmployeeLog==NULL && $employeeId){
+                        $dataToInsert = [
+                            'EmployeeId' => $employeeId,
+                            'TimeLog' => $dateTime.'.000',
+                            'EntryType' => 0,
+                            'DeviceLogId' => $lastInsertedId,
+                            'Mode' => $type,
+                            'DeviceReference' => 'DEVICE_ID-'.$deviceId
+                        ];
+                        DB::connection('skyhr')->table('tblEmployee_TimeLog')->insert($dataToInsert);
+                    }
+
+                    $data = ['skyhrImport' => 1];
+                    $update = DTRlogs::where('id', $row->id)
+                                ->update($data);
                 }
-
-                $data = ['skyhrImport' => 1];
-                $update = DTRlogs::where('id', $row->id)
-                            ->update($data);
             }
             $this->info('Command executed successfully!');
         }
