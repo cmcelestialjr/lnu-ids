@@ -16,6 +16,10 @@ class DTSDocsHistory extends Model
     {
         return $this->belongsTo(Office::class, 'office_id', 'id');
     }
+    public function action_office()
+    {
+        return $this->belongsTo(Office::class, 'action_office_id', 'id');
+    }
     public function option()
     {
         return $this->belongsTo(DTSOption::class, 'option_id', 'id');

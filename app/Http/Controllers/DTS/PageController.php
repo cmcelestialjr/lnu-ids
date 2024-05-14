@@ -19,5 +19,9 @@ class PageController extends Controller
     public function receive($data){
         return view($this->page.'/receive',$data);
     }
+
+    public function search($data){
+        return view($this->page.'/searchNone',$data);
+    }
 }
 ?>

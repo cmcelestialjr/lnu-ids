@@ -83,8 +83,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
             });
 
             Route::group(['prefix'=>'pagination'], function(){
-                Route::get('/search', 'PaginationController@index');
-                Route::get('/paginate', 'PaginationController@show');
+                Route::get('/paginate', 'PaginationController@index');
             });
 
             Route::group(['prefix'=>'search'], function(){
@@ -705,6 +704,12 @@ Route::group(['middleware' => ['HTTPS']], function(){
                         });
                     });
                 });
+            });
+            Route::group(['prefix'=>'dts'], function(){
+                Route::post('/receive', 'DTS\ReceiveController@index');
+
+                Route::post('/forward', 'DTS\ForwardController@index');
+                Route::post('/forwardSubmit', 'DTS\ForwardController@submit');
             });
         // });
     });

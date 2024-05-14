@@ -29,8 +29,8 @@ class DeductionGroupController extends Controller
             ->map(function($query) {
                 $emp_stat = '';
                 $payroll_type = '';
-                if(isset($query->emp_stat)){    
-                    $emp_stat_array = array();                
+                if(isset($query->emp_stat)){
+                    $emp_stat_array = array();
                     foreach($query->emp_stat as $row){
                         $emp_stat_array[] = $row->emp_stat->name;
                     }
@@ -59,11 +59,11 @@ class DeductionGroupController extends Controller
                 $data_list['f6'] = $r['payroll_type'];
                 $data_list['f3'] = '<button class="btn btn-primary btn-primary-scan btn-sm update"
                                         data-id="'.$r['id'].'">
-                                        <span class="fa fa-edit"></span> 
+                                        <span class="fa fa-edit"></span>
                                     </button>';
                 $data_list['f4'] = '<button class="btn btn-success btn-success-scan btn-sm view"
                                         data-id="'.$r['id'].'">
-                                        <span class="fa fa-eye"></span> 
+                                        <span class="fa fa-eye"></span>
                                     </button>';
                 array_push($data,$data_list);
                 $x++;
@@ -121,24 +121,24 @@ class DeductionGroupController extends Controller
         try{
             $user = Auth::user();
             $updated_by = $user->id;
-            $insert = new HRDeductionGroup(); 
+            $insert = new HRDeductionGroup();
             $insert->name = $name;
             $insert->updated_by = $updated_by;
             $insert->save();
             $group_id = $insert->id;
             foreach($emp_stats as $emp_stat){
-                $insert = new HRadgEmpStat(); 
+                $insert = new HRadgEmpStat();
                 $insert->group_id = $group_id;
                 $insert->emp_stat_id = $emp_stat;
                 $insert->updated_by = $updated_by;
                 $insert->save();
             }
             foreach($payroll_types as $payroll_type){
-                $insert = new HRadgPayrollType(); 
+                $insert = new HRadgPayrollType();
                 $insert->group_id = $group_id;
                 $insert->payroll_type_id = $payroll_type;
                 $insert->updated_by = $updated_by;
-                $insert->save(); 
+                $insert->save();
             }
 
             $data_response = array('result' => 'success');
@@ -228,7 +228,7 @@ class DeductionGroupController extends Controller
         if ($validator->fails()) {
             return view('layouts/error/404');
         }
-        
+
         $id = $request->id;
         $query = HRDeductionGroup::where('id',$id)->first();
 
@@ -238,7 +238,7 @@ class DeductionGroupController extends Controller
 
         $emp_stat = EmploymentStatus::get();
         $payroll_type = HRPayrollType::get();
-        
+
         $data = array(
             'query' => $query,
             'emp_stat' => $emp_stat,
@@ -261,7 +261,7 @@ class DeductionGroupController extends Controller
         if ($validator->fails()) {
             return  response()->json($data_response);
         }
-        
+
         $user_access_level = $request->session()->get('user_access_level');
         $user_access_levels = array(1,2,3);
 
@@ -284,7 +284,7 @@ class DeductionGroupController extends Controller
         if($check){
             return  response()->json($data_response);
         }
-        
+
         try{
             HRDeductionGroup::where('id', $id)
                 ->update([
@@ -296,19 +296,19 @@ class DeductionGroupController extends Controller
             $delete = HRadgEmpStat::whereNotIn('emp_stat_id', $emp_stats)
                 ->where('group_id', $id)->delete();
             $auto_increment = DB::update("ALTER TABLE hr_adg_emp_stat AUTO_INCREMENT = 0;");
-            
+
             $deductions = HRDeduction::where('group_id',$id)->pluck('id')->toArray();
 
             foreach($emp_stats as $emp_stat){
                 $check = HRadgEmpStat::where('emp_stat_id',$emp_stat)
                     ->where('group_id',$id)->first();
                 if($check==NULL){
-                    $insert = new HRadgEmpStat(); 
+                    $insert = new HRadgEmpStat();
                     $insert->group_id = $id;
                     $insert->emp_stat_id = $emp_stat;
                     $insert->updated_by = $updated_by;
                     $insert->save();
-                }                    
+                }
                 if(count($deductions)>0){
                     foreach($deductions as $deduction_id){
                         $delete = HRadgEmpStat::where('deduction_id', $deduction_id)
@@ -317,7 +317,7 @@ class DeductionGroupController extends Controller
                         $check = HRadgEmpStat::where('emp_stat_id',$emp_stat)
                             ->where('deduction_id',$deduction_id)->first();
                         if($check==NULL){
-                            $insert = new HRadgEmpStat(); 
+                            $insert = new HRadgEmpStat();
                             $insert->deduction_id = $deduction_id;
                             $insert->emp_stat_id = $emp_stat;
                             $insert->updated_by = $updated_by;
@@ -330,7 +330,7 @@ class DeductionGroupController extends Controller
             $delete = HRadgPayrollType::whereNotIn('payroll_type_id', $payroll_types)
                 ->where('group_id', $id)->delete();
             $auto_increment = DB::update("ALTER TABLE hr_adg_payroll_type AUTO_INCREMENT = 0;");
-            
+
             foreach($payroll_types as $payroll_type){
                 $check = HRadgPayrollType::where('payroll_type_id',$payroll_type)
                     ->where('group_id',$id)->first();
@@ -348,7 +348,7 @@ class DeductionGroupController extends Controller
                         $check = HRadgPayrollType::where('payroll_type_id',$payroll_type)
                             ->where('deduction_id',$deduction_id)->first();
                         if($check==NULL){
-                            $insert = new HRadgPayrollType(); 
+                            $insert = new HRadgPayrollType();
                             $insert->deduction_id = $deduction_id;
                             $insert->payroll_type_id = $payroll_type;
                             $insert->updated_by = $updated_by;
@@ -390,7 +390,7 @@ class DeductionGroupController extends Controller
         $rules = [
             'id' => 'required|numeric'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',
@@ -412,7 +412,7 @@ class DeductionGroupController extends Controller
             'emp_stats' => 'required|array',
             'payroll_types' => 'required|array'
         ];
-        
+
         $customMessages = [
             'name.required' => 'Name is required',
             'name.string' => 'Name must be a string',
@@ -439,7 +439,7 @@ class DeductionGroupController extends Controller
             'emp_stats' => 'required|array',
             'payroll_types' => 'required|array'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',

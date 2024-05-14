@@ -24,6 +24,10 @@ class DTSDocs extends Model
     {
         return $this->hasMany(DTSDocsHistory::class, 'doc_id', 'id');
     }
+    public function latest()
+    {
+        return $this->belongsTo(DTSDocsHistory::class, 'id', 'doc_id')->orderBy('created_at','ASC');
+    }
     public function created_by_info()
     {
         return $this->belongsTo(Users::class, 'created_by', 'id');
