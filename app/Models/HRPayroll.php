@@ -54,7 +54,7 @@ class HRPayroll extends Model
     }
     public function tracking()
     {
-        return $this->belongsTo(Tracking::class, 'tracking_id', 'id');
+        return $this->belongsTo(DTSDocs::class, 'tracking_id', 'id');
     }
     public function get_generated_by()
     {

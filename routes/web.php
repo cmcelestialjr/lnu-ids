@@ -46,6 +46,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
             Route::get('/systems', 'IndexController@systems');
 
             Route::get('/ids/{system_selected}/{nav_selected}/{type}', 'IndexController@ids');
+            Route::get('/ids/{system_selected}/{nav_selected}/{type}/{search}', 'IndexController@ids');
 
             Route::get('/students/tor/{id_no}/{level}/{dateTime}', 'RIMS\Student\TORController@tor');
 
@@ -706,10 +707,29 @@ Route::group(['middleware' => ['HTTPS']], function(){
                 });
             });
             Route::group(['prefix'=>'dts'], function(){
+                Route::get('/inboxPaginate', 'DTS\InboxController@paginate');
+                Route::get('/inboxCount', 'DTS\InboxController@count');
+
                 Route::post('/receive', 'DTS\ReceiveController@index');
+                Route::post('/receiveTab', 'DTS\ReceiveController@receiveTab');
+                Route::post('/receivedTab', 'DTS\ReceiveController@receivedTab');
+                Route::get('/receivePaginate', 'DTS\ReceiveController@paginate');
+                Route::get('/receivedPaginate', 'DTS\ReceiveController@paginate1');
 
                 Route::post('/forward', 'DTS\ForwardController@index');
                 Route::post('/forwardSubmit', 'DTS\ForwardController@submit');
+                Route::post('/forwardTab', 'DTS\ForwardController@forwardTab');
+                Route::post('/forwardedTab', 'DTS\ForwardController@forwardedTab');
+                Route::get('/forwardPaginate', 'DTS\ForwardController@paginate');
+                Route::get('/forwardedPaginate', 'DTS\ForwardController@paginate1');
+
+                Route::post('/search', 'DTS\SearchController@index');
+                Route::get('/searchPaginate', 'DTS\SearchController@paginate');
+
+                Route::post('/status', 'DTS\StatusController@index');
+                Route::post('/statusSubmit', 'DTS\StatusController@submit');
+
+                Route::post('/newSubmit', 'DTS\NewController@create');
             });
         // });
     });

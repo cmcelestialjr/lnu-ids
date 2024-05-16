@@ -10,7 +10,6 @@ use App\Models\HRPayrollList;
 use App\Models\HRPayrollMonths;
 use App\Models\HRPayrollType;
 use App\Models\HRPayrollTypeGuideline;
-use App\Models\Tracking;
 use App\Services\NameServices;
 use App\Services\PayrollUpdateServices;
 use App\Services\WorkServices;
@@ -157,7 +156,7 @@ class PayrollLWOPController extends Controller
             'n' => 'nullable|numeric',
             'val' => 'required|string'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',

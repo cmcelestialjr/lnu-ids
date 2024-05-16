@@ -35,14 +35,14 @@ class EmployeeController extends Controller
         $name_services = new NameServices;
         $option = $request->option;
         $status = $request->status;
-        
+
         $query = Users::with('employee_info.emp_stat','instructor_info.emp_stat','employee_default.emp_stat')
             ->whereHas('user_role', function ($query) use ($option,$status) {
                 if($option=='all'){
                     $query->where('role_id','>',1);
                 }else{
                     $query->where('role_id',$option);
-                }                
+                }
                 if($status=='all'){
                     $query->where('emp_status_id',1);
                 }elseif($status=='sep'){
@@ -132,13 +132,13 @@ class EmployeeController extends Controller
         }else{
             $name = $name_services->lastname($query->lastname,$query->firstname,$query->middlename,$query->extname);
         }
-        
+
         if($query->staff_status=='2'){
             $class = 'bg-light-red';
         }else{
             $class = '';
         }
-        
+
         $data = array(
             'query' => $query,
             'name' => $name,
@@ -172,7 +172,7 @@ class EmployeeController extends Controller
         if($query!=NULL){
             $imageExtensions = ['jpg','jpeg','png'];
             $imageExtension = strtolower($file->extension());
-            if(in_array($imageExtension, $imageExtensions) ){   
+            if(in_array($imageExtension, $imageExtensions) ){
                 $name = $query->id_no;
                 $imageName = $name.'.png';
                 $path = 'storage\hrims\employee/'.$query->id_no.'\image/';
@@ -185,7 +185,7 @@ class EmployeeController extends Controller
                 })->save($path.'/'.$imageName);
 
                 //$file->move($path, $imageName);
-                
+
                 $data = ['image' => $path.$imageName];
                 $update = Users::where('id', $id)
                             ->update($data);
@@ -220,7 +220,7 @@ class EmployeeController extends Controller
                 })->get();
         }
         if($check->count()>0){
-            
+
         }else{
             $result = $this->_employeeNewSubmitProceed($request);
         }

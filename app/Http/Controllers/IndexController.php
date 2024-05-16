@@ -77,14 +77,11 @@ class IndexController extends Controller
                 ];
             })->toArray();
         $count_systems = count($systems);
-        $encrypt = Crypt::encryptString('1234'.Hash::make('josh').'1234');
-        //$this->checkUserDevicesAccess();
         $data = array(
             'user' => $user,
             'roles' => $roles,
             'systems' => $systems,
-            'count_systems' => $count_systems,
-            'encrypt' => $encrypt
+            'count_systems' => $count_systems
             );
         return view('index/system',$data);
     }
@@ -94,6 +91,7 @@ class IndexController extends Controller
         $system_selected = mb_strtoupper($request->system_selected);
         $nav_selected = $request->nav_selected;
         $type = $request->type;
+        $search_value = $request->search;
 
         // try{
             $name_services = new NameServices;
@@ -157,7 +155,8 @@ class IndexController extends Controller
                 'profile_url' => $profile_url,
                 'systems' => $systems,
                 'systems_nav_array' => $systems_nav_array,
-                'user_access' => $user_access
+                'user_access' => $user_access,
+                'search_value' => $search_value
                 );
             $request->session()->put('system_selected', $system_selected);
 

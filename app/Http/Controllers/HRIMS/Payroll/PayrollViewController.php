@@ -4,6 +4,8 @@ namespace App\Http\Controllers\HRIMS\Payroll;
 
 use App\Http\Controllers\Controller;
 use App\Models\_Work;
+use App\Models\DTSDocs;
+use App\Models\DTSDocsHistory;
 use App\Models\HRAllowance;
 use App\Models\HRDeduction;
 use App\Models\HRDeductionGroup;
@@ -17,7 +19,6 @@ use App\Models\HRPayrollList;
 use App\Models\HRPayrollMonths;
 use App\Models\HRPayrollType;
 use App\Models\HRPayrollTypeGuideline;
-use App\Models\Tracking;
 use App\Models\Users;
 use App\Services\CodeServices;
 use App\Services\NameServices;
@@ -619,8 +620,10 @@ class PayrollViewController extends Controller
             $delete = HRPayrollFundService::where('payroll_id', $payroll_id)->delete();
             $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_service` AUTO_INCREMENT = 0;");
             if($tracking_id){
-                $delete = Tracking::where('id', $tracking_id)->delete();
-                $auto_increment = DB::update("ALTER TABLE `tracking` AUTO_INCREMENT = 0;");
+                $delete = DTSDocsHistory::where('doc_id', $tracking_id)->delete();
+                $auto_increment = DB::update("ALTER TABLE `dts_docs_history` AUTO_INCREMENT = 0;");
+                $delete = DTSDocs::where('id', $tracking_id)->delete();
+                $auto_increment = DB::update("ALTER TABLE `dts_docs` AUTO_INCREMENT = 0;");
             }
             $delete = HRPayroll::where('id', $payroll_id)->delete();
             $auto_increment = DB::update("ALTER TABLE `hr_payroll` AUTO_INCREMENT = 0;");

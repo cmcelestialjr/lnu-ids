@@ -34,10 +34,8 @@
  <!-- loader -->
  <link rel="stylesheet" href="{{ asset('assets/css/loader.css') }}" nonce="{{ csp_nonce() }}">
  <link rel="stylesheet" href="{{ asset('assets/css/loader-skeleton.css') }}" nonce="{{ csp_nonce() }}">
+  <!-- timeline -->
+  <link rel="stylesheet" href="{{ asset('assets/master/master.css') }}" nonce="{{ csp_nonce() }}">
  <!-- master style -->
- <link rel="stylesheet" href="{{ asset('assets/master/master.css') }}" nonce="{{ csp_nonce() }}">
- <!-- Progressive Web Apps (PWA) -->
- {{-- <meta name="theme-color" content="#6777ef"/>
- <link rel="apple-touch-icon" href="{{ asset('logo.PNG') }}" nonce="{{ csp_nonce() }}">
- <link rel="manifest" href="{{ asset('manifest.json') }}" nonce="{{ csp_nonce() }}"> --}}
+ <link rel="stylesheet" href="{{ asset('assets/css/timeline.css') }}" nonce="{{ csp_nonce() }}">
  @livewireStyles

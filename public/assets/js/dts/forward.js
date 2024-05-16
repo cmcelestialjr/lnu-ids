@@ -3,6 +3,29 @@ $(document).ready(function() {
     .on('click', '#forwardModal button[name="submit"]', function (e) {
         forwardSubmit($(this));
     });
+    $(document).off('click', '.docs-option')
+    .on('click', '.docs-option', function (e) {
+        var id = $(this).data('id');
+        var option = $(this).data('o');
+        if(option=='Receive'){
+            receiveDoc(id,$(this));
+        }else if(option=='Forward'){
+            forwardDoc(id,$(this));
+        }else if(option=='History'){
+            historyDoc(id);
+        }
+    });
+    $(document).off('click', '#forward-link')
+    .on('click', '#forward-link', function (e) {
+        forwardTab();
+    });
+    $(document).off('click', '#forwarded-link')
+    .on('click', '#forwarded-link', function (e) {
+        forwardedTab();
+    });
+    if ($('#forward-tab').length>0) {
+        forwardTab();
+    }
 });
 function forwardDoc(id,thisBtn){
     var id_name = thisBtn.closest('tr').find('.latest_action').attr('id');
@@ -68,6 +91,44 @@ function forwardSubmit(thisBtn){
             thisBtn.removeAttr('disabled');
             thisBtn.removeClass('input-success');
             thisBtn.removeClass('input-error');
+        }
+    });
+}
+function forwardTab(){
+    $.ajax({
+        url: base_url+'/dts/forwardTab',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        cache: false,
+        beforeSend: function() {
+            $('#forwarded-tab').html('');
+        },
+        success : function(data){
+            $('#forward-tab').html(data);
+        },
+        error: function (){
+
+        }
+    });
+}
+function forwardedTab(){
+    $.ajax({
+        url: base_url+'/dts/forwardedTab',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        cache: false,
+        beforeSend: function() {
+            $('#forward-tab').html('');
+        },
+        success : function(data){
+            $('#forwarded-tab').html(data);
+        },
+        error: function (){
+
         }
     });
 }

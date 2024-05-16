@@ -13,7 +13,6 @@ use App\Models\HRPayrollList;
 use App\Models\HRPayrollMonths;
 use App\Models\HRPayrollType;
 use App\Models\HRPayrollTypeGuideline;
-use App\Models\Tracking;
 use App\Services\NameServices;
 use App\Services\PayrollUpdateServices;
 use App\Services\WorkServices;
@@ -39,7 +38,7 @@ class PayrollDeductionController extends Controller
         if ($validator->fails()) {
             return view('layouts/error/404');
         }
-        
+
         $id = $request->id;
         $query = HRPayrollList::find($id);
 
@@ -52,8 +51,8 @@ class PayrollDeductionController extends Controller
             ->groupBy('salary')
             ->pluck('salary')
             ->toArray();
-        $allowance = $query->allowance; 
-        $deductions = $query->deductions; 
+        $allowance = $query->allowance;
+        $deductions = $query->deductions;
         $per_salary = $payroll_update_services->getPerSalary($query->salary);
         $data = array(
             'query' => $query,
@@ -102,7 +101,7 @@ class PayrollDeductionController extends Controller
         if ($employee==NULL) {
             return  response()->json($data);
         }
-        
+
         $emp_stat = $employee->emp_stat_id;
         $query = HRDeduction::orderBy('group_id')
                 ->whereHas('emp_stat', function ($query) use ($emp_stat) {
@@ -125,9 +124,9 @@ class PayrollDeductionController extends Controller
                     $date_from = NULL;
                     $date_to = NULL;
                     $docs = NULL;
-                    $remarks = NULL;                    
+                    $remarks = NULL;
                     if($employee_deduction){
-                        $amount = $employee_deduction->amount;                        
+                        $amount = $employee_deduction->amount;
                     }
                     if($employee_deduction_main){
                         $date_from = $employee_deduction_main->date_from;
@@ -141,7 +140,7 @@ class PayrollDeductionController extends Controller
                     if($date_to){
                         $date_to = date('m/d/Y',strtotime($date_to));
                     }
-                    
+
                     return [
                         'id' => $query->id,
                         'name' => $query->name,
@@ -212,7 +211,7 @@ class PayrollDeductionController extends Controller
         }
 
         $payroll_update_services = new PayrollUpdateServices;
-        $values = NULL;        
+        $values = NULL;
         $id = $request->id;
         $did = $request->did;
         $amount = $request->amount;
@@ -221,11 +220,11 @@ class PayrollDeductionController extends Controller
         if ($query==NULL) {
             return  response()->json($data);
         }
-            
+
         $user = Auth::user();
         $updated_by = $user->id;
 
-        try{ 
+        try{
             if($amount>0){
                 $percent = NULL;
                 $percent_employer = NULL;
@@ -235,7 +234,7 @@ class PayrollDeductionController extends Controller
                     ->where('deduction_id',$did)
                     ->where('payroll_type_id',$query->payroll->payroll_type_id)
                     ->where('emp_stat_id',$query->emp_stat_id)
-                    ->first();               
+                    ->first();
 
                 if($deduction){
                     $percent = $deduction->percent;
@@ -261,13 +260,13 @@ class PayrollDeductionController extends Controller
                 );
             }else{
                 $delete = HRPayrollDeduction::where('payroll_list_id', $id)
-                    ->where('deduction_id',$did)->delete();                    
+                    ->where('deduction_id',$did)->delete();
                 $auto_increment = DB::update("ALTER TABLE `hr_payroll_deduction` AUTO_INCREMENT = 0;");
             }
 
             $values = $payroll_update_services->updatePayrollList($id,$updated_by);
 
-            return response()->json(['result' => 'success', 
+            return response()->json(['result' => 'success',
                                      'values' => $values]);
         } catch (QueryException $e) {
             // Handle database query exceptions
@@ -287,7 +286,7 @@ class PayrollDeductionController extends Controller
     public function destroy(string $id)
     {
         //
-    }   
+    }
 
     /**
      * Validate the request data.
@@ -300,7 +299,7 @@ class PayrollDeductionController extends Controller
         $rules = [
             'id' => 'required|numeric'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',
@@ -322,7 +321,7 @@ class PayrollDeductionController extends Controller
             'did' => 'required|numeric',
             'amount' => 'nullable|numeric'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',

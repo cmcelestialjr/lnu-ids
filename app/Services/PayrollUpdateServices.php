@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Models\DTSDocs;
 use App\Models\HRAllowance;
 use App\Models\HRDeduction;
 use App\Models\HRDeductionEmployee;
@@ -11,7 +12,6 @@ use App\Models\HRPayrollList;
 use App\Models\HRPayrollMonths;
 use App\Models\HRPayrollType;
 use App\Models\HRPayrollTypeGuideline;
-use App\Models\Tracking;
 use Illuminate\Support\Facades\Auth;
 
 class PayrollUpdateServices
@@ -19,14 +19,14 @@ class PayrollUpdateServices
     public function updateLwop($id,$updated_by){
         $query = HRPayrollList::find($id);
         $gov = $query->emp_stat->gov;
-        $lwop = 0;            
+        $lwop = 0;
         if($gov=='N'){
             $getPerSalary = $this->getPerSalary($query->salary);
             $lwop_day = round(($getPerSalary['day']*$query->lwop_day),2);
             $lwop_hour = round(($getPerSalary['hour']*$query->lwop_hour),2);
             $lwop_minute = round(($getPerSalary['minute']*$query->lwop_minute),2);
             $lwop = $lwop_day+$lwop_hour+$lwop_minute;
-            
+
             HRPayrollList::where('id', $id)
                 ->update([
                     'lwop' => $lwop,
@@ -63,16 +63,16 @@ class PayrollUpdateServices
             }else{
                 $earned = $this->getEarned($salary,$day_accu);
             }
-            
+
         }elseif($payroll_type==2){
             $amount = $query->amount_base;
             $earned = $this->getEarned($amount,$day_accu);
         }else{
             if($payroll->aggregate==1){
-                $rendered_months = $work_services->rendered_months_aggregate($user_id,$gov_service,$payroll);   
+                $rendered_months = $work_services->rendered_months_aggregate($user_id,$gov_service,$payroll);
             }else{
-                $rendered_months = $work_services->rendered_months($user_id,$gov_service);   
-            }  
+                $rendered_months = $work_services->rendered_months($user_id,$gov_service);
+            }
             if($rendered_months>=$payroll->month_no){
                 if($payroll->w_salary=='Yes'){
                     $w_salary_amount = $salary;
@@ -134,7 +134,7 @@ class PayrollUpdateServices
                         'updated_by' => $updated_by,
                         'updated_at' => date('Y-m-d H:i:s'),
         ]);
-        
+
         $this->payrollUpdateInfo($payroll_id,$updated_by);
         $values['salary'] = $salary;
         $values['amount_base'] = $w_salary_amount;
@@ -221,17 +221,17 @@ class PayrollUpdateServices
             $user = Auth::user();
             $updated_by = $user->id;
             $getPhilHealth = HRDeduction::where('id',34)->first();
-            $last_day = date('t',strtotime($year.'-'.$month.'-01'));        
-            
+            $last_day = date('t',strtotime($year.'-'.$month.'-01'));
+
             if($option==1){
                 $philhealth = round(($salary*($getPhilHealth->percent/100)),2);
             }else{
                 $getDays = $this->getDays($day_from,$day_to,$year,$month,$option,$duration,$gov);
                 $weekdays = $getDays['weekdays'];
-                        
+
                 $philhealth = round(($salary/22*$weekdays*($getPhilHealth->percent/100)),2);
             }
-        
+
             if($philhealth>=$getPhilHealth->ceiling){
                 $philhealth = $getPhilHealth->ceiling;
             }
@@ -275,7 +275,7 @@ class PayrollUpdateServices
             $weekends = $getDays['weekends'];
 
             $getGSIS = HRDeduction::where('id',1)->first();
-            if($weekdays>=22){            
+            if($weekdays>=22){
                 $ps = round(($salary*($getGSIS->percent/100)),2);
                 $gs = round(($salary*($getGSIS->percent_employer/100)),2);
             }else{
@@ -339,13 +339,13 @@ class PayrollUpdateServices
                             ->where('emp_stat_id',$emp_stat)
                             ->where('user_id',$user_id)->sum('amount');
         return $deduction;
-    }    
+    }
     public function getDays($day_from,$day_to,$year,$month,$option,$duration,$gov){
         $weekends = 0;
         $weekdays = 0;
         $last_day = date('t',strtotime($year.'-'.$month.'-01'));
         if($option==1){
-            $weekdays = 22;            
+            $weekdays = 22;
         }else{
             if($duration>1 && $gov=='N'){
                 $weekdays = 11;
@@ -353,9 +353,9 @@ class PayrollUpdateServices
                 if(($day_from==1 && $day_to==15) || ($day_from==16 && $day_to>=$last_day)){
                     $weekdays = 11;
                 }else{
-                    for($i=$day_from; $i <= $day_to; $i++){ 
+                    for($i=$day_from; $i <= $day_to; $i++){
                         $wkday = date('l',strtotime($year.'-'.$month.'-'.$i));
-                        
+
                         if($wkday == 'Sunday' || $wkday == 'Saturday'){
                             $weekends++;
                         }else{
@@ -366,7 +366,7 @@ class PayrollUpdateServices
                         $weekdays = 22;
                     }
                 }
-            }            
+            }
         }
         $getDays['weekdays'] = $weekdays;
         $getDays['weekends'] = $weekends;
@@ -428,7 +428,7 @@ class PayrollUpdateServices
         $get_et_al = $list->orderBy('fund_services_id','ASC')
             ->orderBy('lastname','ASC')
             ->orderBy('firstname','ASC')
-            ->first();                
+            ->first();
         $ob = ($gross) == null ? '' : number_format($gross,2);
         $dv = ($netpay) == null ? '' : number_format($netpay,2);
         $etal = '';
@@ -450,15 +450,16 @@ class PayrollUpdateServices
             $payroll_name = $payroll->name;
         }
         $period = date('M',strtotime($payroll->year.'-'.$payroll->month.'-01')).' '.$payroll->day_from.'-'.$payroll->day_to.', '.$payroll->year;
-        $particulars = $payroll_name.' '.$period;  
+        $particulars = $payroll_name.' '.$period;
 
-        $update = Tracking::find($payroll->tracking_id);
-        $update->subject = $etal.' OB: '.$ob.' DV: '.$dv;
-        $update->particulars = $particulars;
+        $update = DTSDocs::find($payroll->tracking_id);
+        $update->particulars = $etal.' OB: '.$ob.' DV: '.$dv;
+        $update->description = $particulars;
+        $update->amount = $gross;
         $update->updated_by = $updated_by;
         $update->save();
 
-        $update = HRPayroll::find($payroll_id); 
+        $update = HRPayroll::find($payroll_id);
         $update->name = $payroll_name;
         $update->period = $period;
         $update->etal = $etal;

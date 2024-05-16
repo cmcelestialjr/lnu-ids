@@ -295,7 +295,7 @@ class DeductionGroupController extends Controller
 
             $delete = HRadgEmpStat::whereNotIn('emp_stat_id', $emp_stats)
                 ->where('group_id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE hr_adg_emp_stat AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE hr_adg_emp_stat AUTO_INCREMENT = 1;");
 
             $deductions = HRDeduction::where('group_id',$id)->pluck('id')->toArray();
 
@@ -313,7 +313,7 @@ class DeductionGroupController extends Controller
                     foreach($deductions as $deduction_id){
                         $delete = HRadgEmpStat::where('deduction_id', $deduction_id)
                             ->whereNotIn('emp_stat_id',$emp_stats)->delete();
-                        $auto_increment = DB::update("ALTER TABLE hr_adg_emp_stat AUTO_INCREMENT = 0;");
+                        $auto_increment = DB::update("ALTER TABLE hr_adg_emp_stat AUTO_INCREMENT = 1;");
                         $check = HRadgEmpStat::where('emp_stat_id',$emp_stat)
                             ->where('deduction_id',$deduction_id)->first();
                         if($check==NULL){
@@ -329,7 +329,7 @@ class DeductionGroupController extends Controller
 
             $delete = HRadgPayrollType::whereNotIn('payroll_type_id', $payroll_types)
                 ->where('group_id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE hr_adg_payroll_type AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE hr_adg_payroll_type AUTO_INCREMENT = 1;");
 
             foreach($payroll_types as $payroll_type){
                 $check = HRadgPayrollType::where('payroll_type_id',$payroll_type)
@@ -344,7 +344,7 @@ class DeductionGroupController extends Controller
                     foreach($deductions as $deduction_id){
                         $delete = HRadgPayrollType::where('deduction_id', $deduction_id)
                             ->whereNotIn('payroll_type_id',$payroll_types)->delete();
-                        $auto_increment = DB::update("ALTER TABLE hr_adg_payroll_type AUTO_INCREMENT = 0;");
+                        $auto_increment = DB::update("ALTER TABLE hr_adg_payroll_type AUTO_INCREMENT = 1;");
                         $check = HRadgPayrollType::where('payroll_type_id',$payroll_type)
                             ->where('deduction_id',$deduction_id)->first();
                         if($check==NULL){

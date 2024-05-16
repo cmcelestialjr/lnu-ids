@@ -4,6 +4,8 @@ namespace App\Http\Controllers\HRIMS\Payroll\Generate;
 use App\Http\Controllers\Controller;
 use App\Models\_Work;
 use App\Models\AccAccountTitle;
+use App\Models\DTSDocs;
+use App\Models\DTSDocsHistory;
 use App\Models\EmploymentStatus;
 use App\Models\HRAllowance;
 use App\Models\HRDeduction;
@@ -18,10 +20,9 @@ use App\Models\HRPayrollList;
 use App\Models\HRPayrollMonths;
 use App\Models\HRPayrollType;
 use App\Models\HRPayrollTypeGuideline;
-use App\Models\Tracking;
 use App\Models\Users;
+use App\Services\DTSServices;
 use App\Services\NameServices;
-use App\Services\TrackingServices;
 use App\Services\WorkServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -371,7 +372,7 @@ class GenerateController extends Controller
 
         $name_services = new NameServices;
         $work_services = new WorkServices;
-        $tracking_services = new TrackingServices;
+        $dts_services = new DTSServices;
 
         DB::beginTransaction();
         try {
@@ -691,19 +692,23 @@ class GenerateController extends Controller
                 }
 
                 $particulars = $payroll_name.' '.$period;
-                $tracking_id = $tracking_services->tracking_id($year,$month);
+                $dts_id = $dts_services->dts_id();
 
-                $insert = new Tracking();
-                $insert->tracking_id = $tracking_id;
-                $insert->tracking_type_id = 1;
-                $insert->office_id = 1;
-                $insert->subject = $etal.' OB: '.$ob.' DV: '.$dv;
-                $insert->particulars = $particulars;
+                $user = Users::with('employee_default')->where('id',$updated_by)->first();
+                $user_office_id = $user->employee_default->office_id;
+
+                $insert = new DTSDocs();
+                $insert->dts_id = $dts_id;
+                $insert->type_id = 1;
+                $insert->office_id = $user_office_id;
+                $insert->particulars = $etal.' OB: '.$ob.' DV: '.$dv;
+                $insert->description = $particulars;
+                $insert->amount = $gross;
                 $insert->status_id = 1;
                 $insert->created_by = $updated_by;
                 $insert->updated_by = $updated_by;
                 $insert->save();
-                $tracking_id = $insert->id;
+                $doc_id = $insert->id;
 
                 $update = HRPayroll::find($payroll_id);
                 $update->name = $payroll_name;
@@ -711,7 +716,7 @@ class GenerateController extends Controller
                 $update->etal = $etal;
                 $update->ob = $gross;
                 $update->dv = $netpay;
-                $update->tracking_id = $tracking_id;
+                $update->tracking_id = $doc_id;
                 $update->save();
 
                 if($fund_services==''){

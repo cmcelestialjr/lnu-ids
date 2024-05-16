@@ -28,6 +28,10 @@ class DTSDocs extends Model
     {
         return $this->belongsTo(DTSDocsHistory::class, 'id', 'doc_id')->orderBy('created_at','ASC');
     }
+    public function change_by_info()
+    {
+        return $this->belongsTo(Users::class, 'status_change_by', 'id');
+    }
     public function created_by_info()
     {
         return $this->belongsTo(Users::class, 'created_by', 'id');

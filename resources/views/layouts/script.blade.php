@@ -24,7 +24,7 @@
 <!-- select2 -->
 <script src="{{ asset('_adminLTE/plugins/select2/js/select2.full.min.js') }}"></script>
 <!-- SweetAlert2 -->
-<script src="{{ asset('_adminLTE/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+<script src="{{ asset('_adminLTE/plugins/sweetalert2/sweetalert2@11.min.js') }}"></script>
 <!-- Toastr -->
 <script src="{{ asset('_adminLTE/plugins/toastr/toastr.min.js') }}"></script>
 <!-- Summernote -->
@@ -34,7 +34,7 @@
 <!-- Master -->
 <script src="{{ asset('assets/master/master.js') }}"></script>
 <script src="{{ asset('assets/master/navigation_scroll.js') }}"></script>
-  
+
 {{-- <script src="{{ asset('sw.js') }}"></script> --}}
 <script nonce="{{ csp_nonce() }}">
 // if (!navigator.serviceWorker.controller) {

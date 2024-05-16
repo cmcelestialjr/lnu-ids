@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\HRIMS\Payroll;
 
 use App\Http\Controllers\Controller;
+use App\Models\DTSDocs;
+use App\Models\DTSDocsHistory;
 use App\Models\HRPayroll;
 use App\Models\HRPayrollAllowance;
 use App\Models\HRPayrollDeduction;
@@ -11,7 +13,6 @@ use App\Models\HRPayrollFundService;
 use App\Models\HRPayrollFundSource;
 use App\Models\HRPayrollList;
 use App\Models\HRPayrollMonths;
-use App\Models\Tracking;
 use App\Services\CodeServices;
 use App\Services\NameServices;
 use Exception;
@@ -28,7 +29,7 @@ class PayrollListController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {        
+    {
 
         $data_response = array();
 
@@ -46,9 +47,9 @@ class PayrollListController extends Controller
         $payroll_type = $request->payroll_type;
         $by = $request->by;
         $year = $request->year;
-        $month = $request->month;        
+        $month = $request->month;
         $type = $request->type;
-        
+
         $query = HRPayroll::with('emp_stat')
             ->where('generate_option',$type)
             ->where('year',$year);
@@ -84,9 +85,9 @@ class PayrollListController extends Controller
         if(count($query)>0){
             $x = 1;
             $code_services = new CodeServices;
-            foreach($query as $r){       
-                $payroll_id = $r['payroll_id'];         
-                $encoded = $code_services->encode($payroll_id).'1';                
+            foreach($query as $r){
+                $payroll_id = $r['payroll_id'];
+                $encoded = $code_services->encode($payroll_id).'1';
                 $data_list['f1'] = $x;
                 $data_list['f2'] = '<form action="'.url('hrims/payroll/view/'.$payroll_id.'/'.$encoded).'" method="GET" target="_blank">
                                         <button type="submit" class="btn btn-primary btn-primary-scan">
@@ -226,7 +227,7 @@ class PayrollListController extends Controller
             $auto_increment = DB::update("ALTER TABLE `hr_payroll_months` AUTO_INCREMENT = 0;");
             $delete = HRPayrollList::where('payroll_id', $id)->delete();
             $auto_increment = DB::update("ALTER TABLE `hr_payroll_list` AUTO_INCREMENT = 0;");
-            
+
             $delete = HRPayrollEmpStat::where('payroll_id', $id)->delete();
             $auto_increment = DB::update("ALTER TABLE `hr_payroll_emp_stat` AUTO_INCREMENT = 0;");
             $delete = HRPayrollFundSource::where('payroll_id', $id)->delete();
@@ -234,8 +235,10 @@ class PayrollListController extends Controller
             $delete = HRPayrollFundService::where('payroll_id', $id)->delete();
             $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_service` AUTO_INCREMENT = 0;");
             if($tracking_id){
-                $delete = Tracking::where('id', $tracking_id)->delete();
-                $auto_increment = DB::update("ALTER TABLE `tracking` AUTO_INCREMENT = 0;");
+                $delete = DTSDocsHistory::where('doc_id', $tracking_id)->delete();
+                $auto_increment = DB::update("ALTER TABLE `dts_docs_history` AUTO_INCREMENT = 0;");
+                $delete = DTSDocs::where('id', $tracking_id)->delete();
+                $auto_increment = DB::update("ALTER TABLE `dts_docs` AUTO_INCREMENT = 0;");
             }
             $delete = HRPayroll::where('id', $id)->delete();
             $auto_increment = DB::update("ALTER TABLE `hr_payroll` AUTO_INCREMENT = 0;");
@@ -263,7 +266,7 @@ class PayrollListController extends Controller
      */
     private function indexValidateRequest($request)
     {
-        
+
         $rules = [
             'payroll_type' => 'required',
             'by' => 'required|string',
@@ -271,7 +274,7 @@ class PayrollListController extends Controller
             'month' => 'required|string',
             'type' => 'required|string'
         ];
-        
+
         $customMessages = [
             'payroll_type.required' => 'Payroll Type is required',
             'by.required' => 'By is required',
@@ -298,7 +301,7 @@ class PayrollListController extends Controller
         $rules = [
             'id' => 'required|numeric'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',

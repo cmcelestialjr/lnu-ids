@@ -3,7 +3,7 @@
         <a href="" class="navbar-brand">
             <img src="{{ asset('assets/images/logo/ids_logo_dark.png') }}" alt="LNU IDS Logo" class="brand-image elevation-3" style="opacity: .8">
             <span class="brand-text font-weight-light">LNU IDS</span>
-        </a> 
+        </a>
 
       <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -26,7 +26,7 @@
                             @php
                             if(count($nav->navSubs)>=1){
                                 $system_nav_href = '#';
-                            }else{                            
+                            }else{
                                 $system_nav_href = url('/ids/'.mb_strtolower($row->shorten).'/'.$nav->url.'/n');
                             }
                             @endphp
@@ -34,7 +34,7 @@
                                 <li><a href="{{$system_nav_href}}" class="dropdown-item"><i class="{{$nav->icon}} text-info nav-icon"></i> {{$nav->name}} </a></li>
                             @else
                                 <li class="dropdown-submenu dropdown-hover">
-                                    <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle"><i class="{{$nav->icon}} text-info nav-icon"></i> 
+                                    <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle"><i class="{{$nav->icon}} text-info nav-icon"></i>
                                         {{$nav->name}}
                                     </a>
                                     <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
@@ -76,12 +76,12 @@
                         </li>
                     </ul>
                 </li>
-            @endif 
+            @endif
         </ul>
       </div>
 
       <!-- Right navbar links -->
-      <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">        
+      <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item">
             <a class="nav-link" data-widget="navbar-search" href="#" role="button">
@@ -133,7 +133,7 @@
   </nav>
   <!-- /.navbar -->
 
-{{-- 
+{{--
 <style>
 .top-bar {
     display: flex;
@@ -165,4 +165,3 @@
 <div class="top-bar">
     <button class="round-bottom-button">Click me</button>
 </div> --}}
-        
