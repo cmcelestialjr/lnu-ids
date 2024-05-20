@@ -23,7 +23,7 @@ class BranchController extends Controller
      * @return \Illuminate\Contracts\View\View
      */
     public function index(Request $request)
-    {   
+    {
         // Find the EducPrograms record based on the requested ID
         $program = EducPrograms::find($request->id);
 
@@ -60,7 +60,7 @@ class BranchController extends Controller
     public function show(Request $request)
     {
         // Get the user's access level from the session
-        $user_access_level = $request->session()->get('user_access_level'); 
+        $user_access_level = $request->session()->get('user_access_level');
 
         // Initialize an empty data array
         $data = array();
@@ -148,22 +148,22 @@ class BranchController extends Controller
         }
 
         // Start a database transaction
-        DB::beginTransaction();  
+        DB::beginTransaction();
         try{
             $user = Auth::user();
             $updated_by = $user->id;
             $id = $request->id;
-            
+
             // Check if the program code exists
             $check = EducProgramsCode::find($id);
-            
+
             if($check){
                 $check_status = $check->status_id;
                 $program_id = $check->program_id;
                 $status_id = 1;
                 $btn = 'btn btn-success btn-success-scan';
                 $text = 'Open';
-                
+
                 // Toggle the status and update
                 if($check_status == 1){
                     $status_id = 2;
@@ -177,7 +177,7 @@ class BranchController extends Controller
                         'updated_by' => $updated_by,
                         'updated_at' => now(), // Use the now() function to get the current timestamp
                     ]);
-                
+
                 // Update the associated program
                 $this->updateProgram($program_id);
 
@@ -217,11 +217,11 @@ class BranchController extends Controller
         try{
             // Find the program by ID
             $program = EducPrograms::find($id);
-            
+
             if($program){
                 // Find program codes associated with the program that have status 1 (Open)
                 $program_code = EducProgramsCode::where('program_id', $id)->where('status_id', 1)->get();
-                
+
                 if($program_code->count() > 0){
                     // If there are open program codes, set the program status to 1 (Open)
                     EducPrograms::where('id', $id)

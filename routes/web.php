@@ -439,6 +439,14 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/addSubmit', 'RIMS\AddDrop\AddDropController@addSubmit');
                 });
 
+                Route::group(['prefix'=>'nstp'], function(){
+                    Route::post('/nstpTable', 'RIMS\NstpController@index');
+                    Route::post('/newModal', 'RIMS\NstpController@create');
+                    Route::post('/newSubmit', 'RIMS\NstpController@store');
+                    Route::post('/viewModal', 'RIMS\NstpController@show');
+                    Route::post('/getCount', 'RIMS\NstpController@getCount');
+                });
+
                 Route::group(['prefix'=>'ludong'], function(){
                     Route::post('/studentTable', 'RIMS\Ludong\StudentController@table');
                 });

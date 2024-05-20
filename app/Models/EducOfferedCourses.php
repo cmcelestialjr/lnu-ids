@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class EducOfferedCourses extends Model
 {
     protected $table = 'educ__offered_courses';
+    public function school_year()
+    {
+        return $this->belongsTo(EducOfferedSchoolYear::class, 'school_year_id', 'id')->withDefault();
+    }
     public function curriculum()
     {
         return $this->belongsTo(EducOfferedCurriculum::class, 'offered_curriculum_id', 'id')->withDefault();
@@ -15,6 +19,10 @@ class EducOfferedCourses extends Model
     public function course()
     {
         return $this->belongsTo(EducCourses::class, 'course_id', 'id')->withDefault();
+    }
+    public function nstp()
+    {
+        return $this->belongsTo(EducCoursesNstp::class, 'nstp_id', 'id')->withDefault();
     }
     public function status()
     {

@@ -12,4 +12,8 @@ class EducBranch extends Model
     {
         return $this->hasMany(EducProgramsCode::class, 'branch_id', 'id');
     }
+    public function programs_offered()
+    {
+        return $this->hasMany(EducOfferedPrograms::class, 'branch_id', 'id');
+    }
 }

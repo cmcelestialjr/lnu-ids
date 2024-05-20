@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>LNU - IDS</title>
-  
+
   @include('layouts.stylesheet')
-  
-</head>   
+
+</head>
 {{-- <body class="hold-transition sidebar-mini layout-fixed"> --}}
 <body class="hold-transition layout-top-nav">
 <div class="wrapper">
@@ -29,7 +29,7 @@
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Main content -->
-    <div class="row">   
+    <div class="row">
       <div class="col-lg-12">
         <div class="float-sm-right">
           <span class="navigation-selected">{{$system_selected}} /</span>
@@ -41,10 +41,10 @@
 
   </div>
   <!-- /.content-wrapper -->
- 
+
   @include('layouts.modal')
   @include('layouts.footer')
-  
+
 </div>
 <!-- ./wrapper -->
 

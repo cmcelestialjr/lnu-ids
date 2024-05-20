@@ -6,9 +6,9 @@
         <div class="card-body">
             <div class="tab-content">
                 <div class="row">
-                    <div class="col-lg-2 col-2">
+                    <div class="col-lg-2 col-md-1 col-sm-0">
                     </div>
-                    <div class="col-lg-2 col-2">
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
                         <div class="small-box-mini small-box bg-success">
                             <div class="inner">
                               <h3 id="total-docs-count">0</h3>
@@ -19,7 +19,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-2 col-2">
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
                         <div class="small-box-mini small-box bg-primary">
                             <div class="inner">
                               <h3 id="received-docs-count">0</h3>
@@ -30,7 +30,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-2 col-2">
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
                         <div class="small-box-mini small-box bg-info">
                             <div class="inner">
                               <h3 id="forwarded-docs-count">0</h3>
@@ -41,7 +41,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-2 col-2">
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
                         <div class="small-box-mini small-box bg-warning">
                             <div class="inner">
                               <h3 id="returned-docs-count">0</h3>

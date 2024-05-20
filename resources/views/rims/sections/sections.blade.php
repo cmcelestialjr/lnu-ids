@@ -21,7 +21,7 @@
               aria-controls="nstp"
               aria-selected="false">NSTP</a>
           </li>
-        <li class="nav-item">
+        {{-- <li class="nav-item">
           <a class="nav-link"
             id="summary-tab"
             data-toggle="pill"
@@ -29,7 +29,7 @@
             role="summary"
             aria-controls="summary"
             aria-selected="false">Summary</a>
-        </li>
+        </li> --}}
       </ul>
     </div>
     <div class="card-body">
@@ -105,41 +105,92 @@
                     <div class="col-lg-4">
                         <label>Branch</label>
                         <select class="form-control select2" name="branch">
-
+                            @foreach($branches as $row)
+                                <option value="{{$row->id}}">{{$row->code}}-{{$row->name}}</option>
+                            @endforeach
                         </select>
                     </div>
+                    <div class="col-lg-12"></div>
                     <div class="col-lg-12"><br>
                         <div class="card card-info card-outline">
                             <div class="card-body table-responsive">
-                                @if($user_access->level_id==1 || $user_access->level_id==2)
-                                <button class="btn btn-primary btn-primary-scan nstpNewModal">
-                                    <span class="fa fa-plus-square"></span> New Section
-                                </button>
-                                @endif
-                                <table id="nstpTable" class="table table-bordered table-fixed"
-                                data-toggle="table"
-                                data-search="true"
-                                data-height="460"
-                                data-buttons-class="primary"
-                                data-show-export="true"
-                                data-show-columns-toggle-all="true"
-                                data-mobile-responsive="true"
-                                data-pagination="true"
-                                data-page-size="10"
-                                data-page-list="[10, 50, 100, All]"
-                                data-loading-template="loadingTemplate"
-                                data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']"
-                                style="width: 100%">
-                                    <thead>
-                                        <tr>
-                                            <th data-field="f1" data-sortable="true" data-align="center">#</th>
-                                            <th data-field="f2" data-sortable="true" data-align="center">NSTP</th>
-                                            <th data-field="f3" data-sortable="true" data-align="center">Section</th>
-                                            <th data-field="f4" data-sortable="true" data-align="center">Max No.</th>
-                                            <th data-field="f5" data-sortable="true" data-align="center">No. of Students</th>
-                                        </tr>
-                                    </thead>
-                                </table>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
+                                        <div class="small-box-mini small-box bg-success">
+                                            <div class="inner">
+                                              <p>
+                                                CWTS<br>
+                                                Section: <span id="cwts-section-count"></span><br>
+                                                Student: <span id="cwts-student-count"></span><br>
+                                              </p>
+                                            </div>
+                                            <div class="icon">
+                                              <i class="fa fa-handshake-o"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
+                                        <div class="small-box-mini small-box bg-primary">
+                                            <div class="inner">
+                                              <p>
+                                                LTS<br>
+                                                Section: <span id="lts-section-count"></span><br>
+                                                Student: <span id="lts-student-count"></span><br>
+                                              </p>
+                                            </div>
+                                            <div class="icon">
+                                              <i class="fa fa-book"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
+                                        <div class="small-box-mini small-box bg-info">
+                                            <div class="inner">
+                                              <p>
+                                                ROTC<br>
+                                                Section: <span id="rotc-section-count"></span><br>
+                                                Student: <span id="rotc-student-count"></span><br>
+                                              </p>
+                                            </div>
+                                            <div class="icon">
+                                              <i class="fa fa-shield"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-6">
+                                        @if($user_access->level_id==1 || $user_access->level_id==2)
+                                            <button class="btn btn-primary btn-primary-scan  nstpNewModal" style="float:right">
+                                                <span class="fa fa-plus-square"></span> New Section
+                                            </button>
+                                        @endif
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <table id="nstpTable" class="table table-bordered table-fixed"
+                                        data-toggle="table"
+                                        data-search="true"
+                                        data-height="460"
+                                        data-buttons-class="primary"
+                                        data-show-export="true"
+                                        data-show-columns-toggle-all="true"
+                                        data-mobile-responsive="true"
+                                        data-pagination="true"
+                                        data-page-size="10"
+                                        data-page-list="[10, 50, 100, All]"
+                                        data-loading-template="loadingTemplate"
+                                        data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']"
+                                        style="width: 100%">
+                                            <thead>
+                                                <tr>
+                                                    <th data-field="f1" data-sortable="true" data-align="center">#</th>
+                                                    <th data-field="f2" data-sortable="true" data-align="center">NSTP</th>
+                                                    <th data-field="f3" data-sortable="true" data-align="center">Section</th>
+                                                    <th data-field="f4" data-sortable="true" data-align="center">Max No.</th>
+                                                    <th data-field="f5" data-sortable="true" data-align="center">No. of Students</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -155,5 +206,5 @@
 <script src="{{ asset('assets/js/rims/sections/new.js') }}"></script>
 <script src="{{ asset('assets/js/rims/sections/update.js') }}"></script>
 <script src="{{ asset('assets/js/rims/sections/modal.js') }}"></script>
-
+<script src="{{ asset('assets/js/rims/sections/nstp.js') }}"></script>
 @endsection

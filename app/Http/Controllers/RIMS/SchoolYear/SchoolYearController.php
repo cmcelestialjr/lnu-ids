@@ -356,12 +356,16 @@ class SchoolYearController extends Controller
                             ->whereIn('offered_program_id', $programs_id)
                             ->get();
                 foreach($query as $row){
+                    $branch_id = $row->offered_program->branch_id;
                     $courses = EducCourses::with('grade_level')->where('curriculum_id', $row->curriculum_id)
+                                    ->where('status_id', 1)
                                     ->where('grade_period_id',$grade_period)
                                     ->where('shorten','NOT LIKE','%nstp%')
                                     ->get();
                     foreach($courses as $course){
                         $datas[] = [
+                                    'school_year_id' => $id,
+                                    'branch_id' => $branch_id,
                                     'offered_curriculum_id' => $row->id,
                                     'course_id' => $course->id,
                                     'min_student' => $time_max->min_student,

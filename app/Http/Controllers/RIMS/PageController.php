@@ -168,6 +168,8 @@ class PageController extends Controller
     }
     public function sections($data){
         $data['school_year'] = EducOfferedSchoolYear::with('grade_period')->orderBy('grade_period_id','DESC')->orderBy('id','DESC')->get();
+        $data['branches'] = EducBranch::whereHas('programs_offered', function ($query) { })
+            ->get();
         return view($this->page.'/sections/sections',$data);
     }
     public function school_year($data){
