@@ -144,6 +144,7 @@ class LinkDtr extends Command
                                             'time_type' => NULL,
                                             'updated_at' => date('Y-m-d H:i:s')]);
                     }
+                    $this->info($column);
                     $check = UsersDTR::where('id_no',$id_no)
                         ->where('date',$date)->first();
                     if($check){

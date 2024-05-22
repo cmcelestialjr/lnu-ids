@@ -56,7 +56,7 @@ class LoadViewController extends Controller
         //     $program_ids = EducPrograms::whereHas('program_level', function ($query) use ($period) {
         //                     $query->where('period', $period);
         //                 })->pluck('id')->toArray();
-        // }        
+        // }
         $results = Users::select('id','lastname','firstname','middlename','extname','stud_id')
                     ->where(function($query) use ($search) {
                         $query->where('lastname', 'LIKE', "%$search%")
@@ -86,7 +86,7 @@ class LoadViewController extends Controller
             }
         }
         return response()->json($data);
-    }   
+    }
     public function studentTORDiv(Request $request){
         $id = $request->id;
         $program_level = $request->program_level;
@@ -155,7 +155,7 @@ class LoadViewController extends Controller
                     'program_shorten' => $query->program_shorten
                 ];
             })->toArray();
-            
+
         $data = array(
             'id' => $id,
             'query' => $query
@@ -316,7 +316,7 @@ class LoadViewController extends Controller
                 $data_list['text'] = $r->year_from.'-'.$r->year_to.' ('.$r->code.')';
                 array_push($datas,$data_list);
             }
-            
+
         }
         $response = array('result' => $result,
                           'datas' => $datas);
@@ -339,7 +339,7 @@ class LoadViewController extends Controller
             ->groupBy('program_code_id')
             ->pluck('program_code_id')
             ->toArray();
-        
+
         $program_id = $student_program->program_id;
         $curriculum_id = $student_program->curriculum_id;
         $curriculum = EducCurriculum::where('program_id',$program_id)
@@ -353,7 +353,7 @@ class LoadViewController extends Controller
                 $data_list['value'] = $r->id;
                 $data_list['text'] = $r->year_from.'-'.$r->year_to.' ('.$r->code.')';
                 array_push($curriculums,$data_list);
-            }            
+            }
         }
         $branch = EducProgramsCode::with('branch')->whereIn('id',$branch_ids)->get();
         $branches = [];
@@ -363,7 +363,7 @@ class LoadViewController extends Controller
                 $data_list['value'] = $r->id;
                 $data_list['text'] = $r->name.'-'.$r->branch->name;
                 array_push($branches,$data_list);
-            }            
+            }
         }
         $response = array('result' => $result,
                           'curriculum_id' => $curriculum_id,

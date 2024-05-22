@@ -32,7 +32,7 @@ function date_list(){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
@@ -79,7 +79,7 @@ function program_code(){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
             $('#enrollModal #studentInformationDiv #programCoursesDiv').addClass('opacity6');
         },
@@ -88,7 +88,7 @@ function program_code(){
             thisBtn.removeClass('input-loading');
             if(data=='error'){
                 toastr.error('Error.');
-                thisBtn.addClass('input-error');                
+                thisBtn.addClass('input-error');
             }else{
                 thisBtn.addClass('input-success');
                 $('#enrollModal #studentInformationDiv #programCodeDiv').html(data);
@@ -127,7 +127,7 @@ function program_curriculum(){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
             $('#enrollModal #studentInformationDiv #programCoursesDiv').addClass('opacity6');
         },
@@ -136,7 +136,7 @@ function program_curriculum(){
             thisBtn.removeClass('input-loading');
             if(data=='error'){
                 toastr.error('Error.');
-                thisBtn.addClass('input-error');                
+                thisBtn.addClass('input-error');
             }else{
                 thisBtn.addClass('input-success');
                 $('#enrollModal #studentInformationDiv #programCurriculumDiv').html(data);
@@ -175,7 +175,7 @@ function program_section(){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
             $('#enrollModal #studentInformationDiv #programCoursesDiv').addClass('opacity6');
         },
@@ -184,7 +184,7 @@ function program_section(){
             thisBtn.removeClass('input-loading');
             if(data=='error'){
                 toastr.error('Error.');
-                thisBtn.addClass('input-error');                
+                thisBtn.addClass('input-error');
             }else{
                 thisBtn.addClass('input-success');
                 $('#enrollModal #studentInformationDiv #programSectionDiv').html(data);
@@ -211,10 +211,12 @@ function program_courses(){
     var curriculum_id = $('#enrollModal #studentInformationDiv #programCurriculumDiv select[name="program_curriculum"] option:selected').val();
     var section = $('#enrollModal #studentInformationDiv #programSectionDiv select[name="program_section"] option:selected').val();
     var student_id = $('#enrollModal select[name="student"] option:selected').val();
+    var program_code_id = $('#enrollModal #studentInformationDiv #programCodeDiv select[name="program_code"] option:selected').val();
     var form_data = {
         curriculum_id:curriculum_id,
         section:section,
-        student_id:student_id        
+        student_id:student_id,
+        program_code_id:program_code_id
     };
     $.ajax({
         url: base_url+'/rims/enrollment/programCoursesDiv',
@@ -225,14 +227,14 @@ function program_courses(){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('opacity6');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
             thisBtn.removeClass('opacity6');
             if(data=='error'){
-                toastr.error('Error.');              
+                toastr.error('Error.');
             }else{
                 toastr.success('Success');
                 $('#enrollModal #studentInformationDiv #programCoursesDiv').html(data);
@@ -252,12 +254,12 @@ function program_add_curriculum(){
     var program_id = $('#courseAddModal select[name="program"]').val();
     var student_id = $('#enrollModal select[name="student"] option:selected').val();
     var curriculum_id_selected = $('#enrollModal #studentInformationDiv #programCurriculumDiv select[name="program_curriculum"] option:selected').val();
-    var section_selected = $('#enrollModal #studentInformationDiv #programSectionDiv select[name="program_section"] option:selected').val();    
+    var section_selected = $('#enrollModal #studentInformationDiv #programSectionDiv select[name="program_section"] option:selected').val();
     var form_data = {
         program_id:program_id,
         student_id:student_id,
         curriculum_id_selected:curriculum_id_selected
-    };    
+    };
     $.ajax({
         url: base_url+'/rims/enrollment/programAddSelect',
         type: 'POST',
@@ -268,7 +270,7 @@ function program_add_curriculum(){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             $('#courseAddModal button[name="submit"]').addClass('hide');
             $('#courseAddModal select[name="curriculum"]').empty();
             $('#courseAddModal select[name="section"]').empty();
@@ -276,7 +278,7 @@ function program_add_curriculum(){
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            if(data.result=='success'){                             
+            if(data.result=='success'){
                 $.each(data.curriculum, function(index, value) {
                     $('#courseAddModal select[name="curriculum"]').append($('<option>', {
                         value: value['id'],
@@ -293,7 +295,7 @@ function program_add_curriculum(){
                 var courses = [];
                 $('#enrollModal #studentInformationDiv #courseAddedDiv .courseCheck:checked').each(function () {
                     courses.push($(this).data('id'));
-                }); 
+                });
                 var form_data = {
                     student_id:student_id,
                     school_year_id:school_year_id,
@@ -301,16 +303,16 @@ function program_add_curriculum(){
                     section_selected:section_selected,
                     curriculum_id:data.curriculum_id,
                     section:1,
-                    courses:courses      
+                    courses:courses
                 };
                 program_add_courses(form_data);
             }else if(data.result=='blank'){
                 $('#courseAddModal #programAddCourseDiv').html('<br><br><br><br><br><br><br><br><br><br><br>');
             }else if(data.result=='Unavailable'){
-                toastr.error('Unavailable.'); 
+                toastr.error('Unavailable.');
                 $('#courseAddModal #programAddCourseDiv').html('<br><br><br><br><br><br><br><br><br><br><br>');
             }else{
-                toastr.error('Error.'); 
+                toastr.error('Error.');
                 $('#courseAddModal #programAddCourseDiv').html('<br><br><br><br><br><br><br><br><br><br><br>');
             }
         },
@@ -330,7 +332,7 @@ function program_add_courses(form_data){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            $('#courseAddModal #programAddCourseDiv').addClass('opacity6');            
+            $('#courseAddModal #programAddCourseDiv').addClass('opacity6');
         },
         success : function(data){
             $('#courseAddModal #programAddCourseDiv').removeClass('opacity6');
@@ -374,15 +376,15 @@ function student_information(){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
-            thisBtn.addClass('input-loading');            
+            thisBtn.attr('disabled','disabled');
+            thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
             thisBtn.removeClass('input-loading');
             if(data=='error'){
                 toastr.error('Error.');
-                thisBtn.addClass('input-error');                
+                thisBtn.addClass('input-error');
             }else{
                 thisBtn.addClass('input-success');
                 $('#enrollModal #courseAddModal').removeClass('hide');
@@ -406,7 +408,7 @@ function student_information(){
     });
 }
 function student_list(){
-    var thisBtn = $('#enrollmentViewModal select');    
+    var thisBtn = $('#enrollmentViewModal select');
     var id = $('#enrollmentViewModal input[name="id"]').val();
     var curriculum = $('#enrollmentViewModal select[name="curriculum"] option:selected').val();
     var section = $('#enrollmentViewModal select[name="section"] option:selected').val();
@@ -420,7 +422,7 @@ function student_list(){
     loadTablewLoader(form_data,thisBtn);
 }
 function regIreg_list(){
-    var thisBtn = $('#regIreg select[name="type"]');    
+    var thisBtn = $('#regIreg select[name="type"]');
     var id = $('#enrollmentViewModal input[name="id"]').val();
     var curriculum = $('#regIreg select[name="type"] option:selected').val();
     var section = $('#enrollmentViewModal select[name="section"] option:selected').val();

@@ -76,7 +76,7 @@
                                                        Enrolled
                                                     </button>
                                                 @endif
-                                                
+
                                             </td>
                                         </tr>
                                         @php
@@ -97,21 +97,21 @@
                               </tbody>
                               @if(count($advised)>0)
                                 <tfoot>
-                                        
+
                                 </tfoot>
                               @endif
                         </table>
                         @if(count($advised)>0)
                             <button class="btn btn-success btn-success-scan" name="submit_advisement" style="width: 100%">
                                 <span class="fa fa-check"></span> Enroll Student
-                            </button>                            
+                            </button>
                         @else
                             <button class="btn btn-success btn-success-scan" style="width: 100%" disabled>
                                 <span class="fa fa-check"></span> Enroll Student
                             </button>
                         @endif
                     </div>
-                </div>                
+                </div>
             </div>
             @endif
             @if($type!='add')
@@ -124,12 +124,12 @@
                     $year_level = '';
                     $course_units = 0;
                 @endphp
-                <label>Courses</label> 
+                <label>Courses</label>
                 @if($type!='add') &nbsp;
                 <button class="btn btn-info btn-info-scan btn-sm" id="courseAddModal">
                     <span class="fa fa-plus-square"></span> Add Course
                 </button>
-                    <label class="text-primary" style="float:right">Total Unit: 
+                    <label class="text-primary" style="float:right">Total Unit:
                         <span id="courseTotalUnits"></span></label>
                 @endif
                 <table class="table table-bordered hide" style="font-size:11px;" id="courseAddedDiv">
@@ -151,7 +151,7 @@
                         $checked_input = 'checked';
                     }else{
                         $checked_input = '';
-                    }    
+                    }
                     @endphp
                 <div class="card card-primary card-outline">
                     <div class="card-body">
@@ -168,12 +168,12 @@
                                     <th style="width: 14%">Instructor</th>
                                     <th style="width: 5%">Status</th>
                                     <th style="width: 10%">Availability</th>
-                                    <th style="width: 5%">                        
+                                    <th style="width: 5%">
                                         <input type="checkbox" class="form-control year_check" value="{{$row['year_level1']}}" {{$checked_input}}>
                                     </th>
                                     <th style="width: 10%">Choose<br>another</th>
                                 </thead>
-                                <tbody>                    
+                                <tbody>
                                     @foreach($row['courses'] as $list)
                                         @php
                                             $course_units+=$list['units'];
@@ -200,7 +200,7 @@
                                                         {{$list['availability_name']}}</button></td>
                                                 @if($list['availability_name']=='Full')
                                                     <td>
-                                                        <input type="checkbox" class="form-control courseCheck hide" 
+                                                        <input type="checkbox" class="form-control courseCheck hide"
                                                             id="course_checked{{$list['offered_course_id']}}"
                                                             value="{{$row['year_level1']}}"
                                                             data-id="{{$list['offered_course_id']}}"
@@ -236,7 +236,7 @@
                                                 <td>
                                                     @if(($type!='add' && ($year_level=='' || $year_level==$row['year_level1'])) || $list['course_conflict']=='')
                                                         @if($course_units>$row['unit_limit'])
-                                                            <input type="checkbox" class="form-control courseCheck course_check{{$row['year_level1']}}" 
+                                                            <input type="checkbox" class="form-control courseCheck course_check{{$row['year_level1']}}"
                                                                 id="course_checked{{$list['offered_course_id']}}"
                                                                 value="{{$row['year_level1']}}"
                                                                 data-id="{{$list['offered_course_id']}}"
@@ -244,7 +244,7 @@
                                                                 data-cid=""
                                                                 {{$checked_input}}>
                                                         @else
-                                                            <input type="checkbox" class="form-control courseCheck course_check{{$row['year_level1']}}" 
+                                                            <input type="checkbox" class="form-control courseCheck course_check{{$row['year_level1']}}"
                                                                 id="course_checked{{$list['offered_course_id']}}"
                                                                 value="{{$row['year_level1']}}"
                                                                 data-id="{{$list['offered_course_id']}}"
@@ -252,7 +252,7 @@
                                                                 data-cid="">
                                                         @endif
                                                     @else
-                                                        <input type="checkbox" class="form-control courseCheck hide course_check{{$row['year_level1']}}" 
+                                                        <input type="checkbox" class="form-control courseCheck hide course_check{{$row['year_level1']}}"
                                                             id="course_checked{{$list['offered_course_id']}}"
                                                             value="{{$row['year_level1']}}"
                                                             data-id="{{$list['offered_course_id']}}"
@@ -265,7 +265,7 @@
                                                             data-id="{{$list['offered_course_id']}}">
                                                             <span class="fa fa-refresh"></span> Another</button>
                                                     @endif
-                                                </td>                                
+                                                </td>
                                             @endif
                                             @php
                                                 if(($list['course_conflict']!='' && $list['availability']==0 && $availability_check=='') || $list['availability_name']=='Ongoing'){

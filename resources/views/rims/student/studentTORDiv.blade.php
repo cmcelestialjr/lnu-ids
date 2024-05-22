@@ -50,6 +50,14 @@
                                 $program_shorten = '';
                             }
                         }
+                        $course_grade = '';
+                        $inc = '';
+                        if($courses->final_grade>0){
+                            $course_grade = number_format($courses->final_grade,1);
+                        }
+                        if($courses->inc=='INC'){
+                            $inc = 'INC ';
+                        }
                         $final_grade = 0;
                         if (is_numeric($courses->final_grade)) {
                             $final_grade = $courses->final_grade;
@@ -84,7 +92,7 @@
                             {{$courses->course_desc}}
                         </td>
                         <td class="center">
-                            {{$courses->final_grade}}
+                            {{$inc}}{{$course_grade}}
                         </td>
                         <td class="center">
                             {{$course_units}}

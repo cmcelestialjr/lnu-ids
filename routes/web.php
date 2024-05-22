@@ -445,6 +445,10 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/newSubmit', 'RIMS\NstpController@store');
                     Route::post('/viewModal', 'RIMS\NstpController@show');
                     Route::post('/getCount', 'RIMS\NstpController@getCount');
+                    Route::post('/studentList', 'RIMS\NstpController@show');
+                    Route::post('/studentListTable', 'RIMS\NstpController@showTable');
+                    Route::post('/editCount', 'RIMS\NstpController@edit');
+                    Route::post('/editCountSubmit', 'RIMS\NstpController@update');
                 });
 
                 Route::group(['prefix'=>'ludong'], function(){

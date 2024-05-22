@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RIMS\Enrollment;
 use App\Http\Controllers\Controller;
 use App\Models\EducCourses;
 use App\Models\EducCoursesPre;
+use App\Models\EducGradePeriod;
 use App\Models\EducOfferedCourses;
 use App\Models\EducOfferedCurriculum;
 use App\Models\EducOfferedPrograms;
@@ -11,8 +12,10 @@ use App\Models\EducOfferedSchedule;
 use App\Models\EducPrograms;
 use App\Models\StudentsCourses;
 use App\Models\StudentsCoursesAdvise;
+use App\Models\StudentsCoursesCredit;
 use App\Models\StudentsCourseStatus;
 use App\Models\StudentsInfo;
+use App\Models\StudentsProgram;
 use App\Services\NameServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +53,10 @@ class LoadViewController extends Controller
         $student = StudentsInfo::where('user_id',$student_id)->first();
         $program_curriculum = EducOfferedCurriculum::where('offered_program_id',$program_code_id)
             ->where('curriculum_id',$student->curriculum_id)->get();
+        if($program_curriculum->count()<=0){
+            $program_curriculum = EducOfferedCurriculum::where('offered_program_id',$program_code_id)
+                ->orderBy('curriculum_id','DESC')->get();
+        }
         $data = array(
             'program_curriculum' => $program_curriculum,
             'student' => $student
@@ -72,14 +79,26 @@ class LoadViewController extends Controller
         return view('rims/enrollment/programSectionDiv',$data);
     }
     public function programCoursesDiv(Request $request){
+        $student_id = $request->student_id;
+        $program_code_id = $request->program_code_id;
+        $student = StudentsInfo::where('user_id',$student_id)->first();
+        $program_curriculum = EducOfferedCurriculum::where('offered_program_id',$program_code_id)
+            ->where('curriculum_id',$student->curriculum_id)->get();
+        if($program_curriculum->count()>0){
+            return $this->programCoursesDiv1($request);
+        }else{
+            return $this->studentCurriculumDiv($request);
+        }
+    }
+    private function programCoursesDiv1($request){
         $name_services = new NameServices;
         $student_id = $request->student_id;
         $curriculum_id = $request->curriculum_id;
         $section = $request->section;
         $student = StudentsInfo::where('user_id',$student_id)->first();
-        $unit_limit = EducOfferedCurriculum::where('id',$curriculum_id)->first();
+        $unit_limit = EducOfferedCurriculum::with('offered_program')->where('id',$curriculum_id)->first();
         $school_year_id = $unit_limit->offered_program->school_year_id;
-        
+
         $curriculum_ids = EducOfferedCurriculum::where('id',$curriculum_id)
                             ->pluck('curriculum_id')
                             ->toArray();
@@ -114,7 +133,7 @@ class LoadViewController extends Controller
                                                 $course_id = $course->id;
                                                 $passed_statuses = StudentsCourseStatus::where('option',1)->pluck('id')->toArray();
                                                 $pre_req_ids = EducCoursesPre::where('course_id',$course_id)
-                                                            ->pluck('pre_id')->toArray();                                                                                               
+                                                            ->pluck('pre_id')->toArray();
                                                 $pre_req = StudentsCourses::where(function ($query) use ($pre_req_ids){
                                                                 $query->whereIn('course_id',$pre_req_ids)
                                                                 ->orWhereHas('courses_credit', function ($query) use ($pre_req_ids) {
@@ -134,7 +153,7 @@ class LoadViewController extends Controller
                                                                 ->orWhereHas('courses_credit', function ($query) use ($course_id) {
                                                                     $query->where('course_id',$course_id);
                                                                 });
-                                                                
+
                                                             })
                                                             ->where('user_id',$student_id)
                                                             ->whereIn('student_course_status_id',$passed_statuses)
@@ -160,14 +179,14 @@ class LoadViewController extends Controller
                                                 if($student->program_id!=NULL && $student->program_id!=$course->curriculum->programs->id){
                                                     $availability = 1;
                                                     $availability_name = 'Conflict Program';
-                                                }                                                                                                
+                                                }
                                                 $offered_course = EducOfferedCourses::where('course_id', $course->id)
                                                             ->where('offered_curriculum_id',$curriculum_id)
                                                             ->where('section',$section)->first();
                                                 if($offered_course!=NULL){
                                                     $offered_course_id = $offered_course->id;
                                                     $max_student_check = StudentsCourses::where('offered_course_id',$offered_course->id)
-                                                                ->get()->count(); 
+                                                                ->get()->count();
                                                     if($offered_course->instructor_id!=NULL){
                                                         $instructor = $name_services->firstname($offered_course->instructor->lastname,$offered_course->instructor->firstname,$offered_course->instructor->middlename,$offered_course->instructor->extname);
                                                     }
@@ -230,7 +249,7 @@ class LoadViewController extends Controller
                                     'year_level' => $query->grade_level->name,
                                     'year_level1' => $query->grade_level->level,
                                     'unit_limit' => $unit_limit->offered_program->school_year->unit_limit,
-                                    'courses' => $courses                                    
+                                    'courses' => $courses
                                 ];
                             })->toArray();
         $advised = StudentsCoursesAdvise::where('school_year_id',$school_year_id)
@@ -298,6 +317,151 @@ class LoadViewController extends Controller
         );
         return view('rims/enrollment/programCoursesDiv',$data);
     }
+
+    private function studentCurriculumDiv($request){
+        $system_selected = $request->session()->get('system_selected');
+        $id = $request->student_id;
+        $program_code_id = $request->program_code_id;
+        $offered_curriculum_id = $request->curriculum_id;
+        $program_offered = EducOfferedPrograms::with('school_year','program')
+            ->where('id',$program_code_id)
+            ->first();
+        $grade_period_id = $program_offered->school_year->grade_period_id;
+        $program_level_id = $program_offered->program->program_level_id;
+        $student_program = StudentsProgram::where('user_id',$id)
+            ->where('program_level_id',$program_level_id)
+            ->select('curriculum_id','specialization_name')
+            ->orderBy('year_from','DESC')
+            ->orderBy('id','DESC')
+            ->first();
+        $curriculum_id = $student_program->curriculum_id;
+        $specialization_name = $student_program->specialization_name;
+        $specialization = EducCourses::where('curriculum_id',$curriculum_id)
+            ->where('specialization_name','!=','')
+            ->select('specialization_name')
+            ->groupBy('specialization_name')
+            ->get();
+        $query = EducCourses::with('grade_level')
+            ->where('curriculum_id',$curriculum_id)
+            ->select('grade_level_id')
+            ->groupBy('grade_level_id')
+            ->orderBy('grade_level_id','ASC')
+            ->get()
+            ->map(function($query) use ($id,$curriculum_id,$student_program,$grade_period_id) {
+                $grade_level_id = $query->grade_level_id;
+                $grade_period = EducCourses::with('grade_period')
+                    ->where('curriculum_id',$curriculum_id)
+                    ->where('grade_period_id',$grade_period_id)
+                    ->select('grade_period_id')
+                    ->groupBy('grade_period_id')
+                    ->orderBy('grade_period_id','ASC')
+                    ->get()
+                    ->map(function($query) use ($id,$curriculum_id,$grade_level_id,$student_program,$grade_period_id) {
+                        $courses = EducCourses::where('curriculum_id',$curriculum_id)
+                            ->where('grade_level_id',$grade_level_id)
+                            ->where('grade_period_id',$grade_period_id)
+                            ->where(function ($query) use ($student_program){
+                                $query->where('specialization_name',$student_program->specialization_name);
+                                $query->orWhere('specialization_name',NULL);
+                                $query->orWhere('specialization_name','');
+                            })
+                            ->select('id','code','name','units','lab','pre_name')
+                            ->get()
+                            ->map(function($query) use ($id,$curriculum_id,$grade_level_id,$grade_period_id) {
+                                $status = '<button class="btn btn-default btn-xs" style="font-size:10px">Required</button>';
+                                $student_course_status = NULL;
+                                $course_id = $query->id;
+                                $check = StudentsCourses::where('user_id',$id)
+                                    ->where(function ($query) use ($course_id){
+                                        $query->where('course_id',$course_id)
+                                        ->orWhereHas('courses_credit', function ($query) use ($course_id) {
+                                            $query->where('course_id',$course_id);
+                                        });
+                                    })
+                                    ->select('student_course_status_id')
+                                    ->orderBy('year_from','DESC')
+                                    ->first();
+                                if($check!=NULL){
+                                    if($check->student_course_status_id==NULL){
+                                        $status = '<button class="btn btn-info btn-info-scan btn-xs" style="font-size:10px">NG</button>';
+                                    }else{
+                                        $student_course_status = $check->student_course_status_id;
+                                        if($check->status->option==1){
+                                            $status = '<button class="btn btn-success btn-success-scan btn-xs" style="font-size:10px">'.$check->status->name.'</button>';
+                                        }else{
+                                            $status = '<button class="btn btn-danger btn-danger-scan btn-xs" style="font-size:10px">'.$check->status->name.'</button>';
+                                        }
+                                    }
+                                }
+                                $course_other = StudentsCoursesCredit::with('student_course')
+                                    ->where('user_id',$id)
+                                    ->where('course_id',$course_id)
+                                    ->first();
+                                return [
+                                    'id' => $query->id,
+                                    'code' => $query->code,
+                                    'name' => $query->name,
+                                    'units' => $query->units,
+                                    'lab' => $query->lab,
+                                    'pre_name' => $query->pre_name,
+                                    'status' => $status,
+                                    'student_course_status' => $student_course_status,
+                                    'course_other' => $course_other
+                                ];
+                            })->toArray();
+                        return [
+                            'grade_period' => $query->grade_period->name,
+                            'courses' => $courses
+                        ];
+                    })->toArray();
+                return [
+                    'year_level' => $query->grade_level->name,
+                    'grade_period' => $grade_period
+                ];
+            })->toArray();
+        $courses_id = EducCourses::where('curriculum_id',$curriculum_id)
+            ->pluck('id')
+            ->toArray();
+        DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+        $course_other = StudentsCourses::where('user_id',$id)
+            ->where('year_from','>',1)
+            ->select('year_from','year_to','grade_period_id','program_shorten','school_name')
+            ->groupBy('year_from')
+            ->groupBy('grade_period_id')
+            ->orderBy('year_from','ASC')
+            ->orderBy('grade_period_id','ASC')
+            ->get()
+            ->map(function($query) use ($id,$courses_id){
+                $grade_period = EducGradePeriod::where('id',$query->grade_period_id)->first();
+                $courses = StudentsCourses::where('user_id',$id)
+                    ->where('grade_period_id',$query->grade_period_id)
+                    ->where('year_from',$query->year_from)
+                    ->where(function ($query) use ($courses_id){
+                        $query->where('course_id',NULL)
+                        ->orWhereNotIn('course_id',$courses_id);
+                    })
+                    ->get();
+                return [
+                    'school_name' => $query->school_name,
+                    'grade_period' => $grade_period->name,
+                    'period' => $query->year_from.'-'.$query->year_to,
+                    'courses' => $courses,
+                    'program_shorten' => $query->program_shorten
+                ];
+            })->toArray();
+        $passed_statuses = StudentsCourseStatus::where('option',1)->pluck('id')->toArray();
+
+        $data = array(
+            'id' => $id,
+            'query' => $query,
+            'course_other' => $course_other,
+            'passed_statuses' => $passed_statuses,
+            'specialization' => $specialization,
+            'system_selected' => $system_selected,
+            'specialization_name' => $specialization_name
+        );
+        return view('rims/enrollment/programCoursesDiv1',$data);
+    }
     public function programAddSelect(Request $request){
         $result = 'Unavailable';
         $program_id = $request->program_id;
@@ -312,7 +476,7 @@ class LoadViewController extends Controller
                         ->where('curriculum_id','<>',$student->curriculum_id)
                         ->where('id','<>',$curriculum_id_selected);
             $curriculum = $offered_curriculum->orderBy('curriculum_id','ASC')
-                        ->first();            
+                        ->first();
             if($curriculum!=NULL){
                 $curriculums = $offered_curriculum->orderBy('curriculum_id','ASC')
                             ->get()
@@ -365,7 +529,7 @@ class LoadViewController extends Controller
                             ->groupBy('year_level')
                             ->orderBy('year_level','ASC')
                             ->get()
-                            ->map(function($query) 
+                            ->map(function($query)
                                     use ($name_services,
                                         $curriculum_id,
                                         $student_id,
@@ -378,7 +542,7 @@ class LoadViewController extends Controller
                                             ->where('section',$section)
                                             ->whereNotIn('id',$courses_sel)
                                             ->get()
-                                            ->map(function($course) 
+                                            ->map(function($course)
                                                     use ($name_services,
                                                         $curriculum_id,
                                                         $student_id,
@@ -397,7 +561,7 @@ class LoadViewController extends Controller
                                                 $max_student_check = StudentsCourses::where('offered_course_id',$course_id)
                                                             ->get()->count();
                                                 $pre_req_ids = EducCoursesPre::where('course_id',$course_id)
-                                                            ->pluck('pre_id')->toArray();                                                                                               
+                                                            ->pluck('pre_id')->toArray();
                                                 $pre_req = StudentsCourses::where(function ($query) use ($pre_req_ids){
                                                                 $query->whereIn('course_id',$pre_req_ids)
                                                                 ->orWhereHas('courses_credit', function ($query) use ($pre_req_ids) {
@@ -501,7 +665,7 @@ class LoadViewController extends Controller
                                     'year_level' => $query->course->grade_level->name,
                                     'year_level1' => $query->course->grade_level->level,
                                     'unit_limit' => $unit_limit->offered_program->school_year->unit_limit,
-                                    'courses' => $courses                                    
+                                    'courses' => $courses
                                 ];
                             })->toArray();
         $data = array(
@@ -537,9 +701,9 @@ class LoadViewController extends Controller
                                                                 $query->whereIn('day', $days);
                                                             })
                                                             ->pluck('offered_course_id')->toArray();
-        if(count($conflict)>0){     
+        if(count($conflict)>0){
             $conflict_codes = EducOfferedCourses::whereIn('id',$conflict)
-                    ->pluck('code')->toArray();                                                       
+                    ->pluck('code')->toArray();
             foreach($conflict_codes as $con){
                 $course_con[] = $con;
             }

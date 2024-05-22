@@ -46,7 +46,11 @@ class ImportStudentCourseLudong extends Command
         //4. ImportStudentCourse
 
         $connectionName = 'sis_student';
+        $connectionCollege = 'sis_college';
+        $connectionTools = 'sis_tools';
         DB::connection($connectionName)->getPdo();
+        DB::connection($connectionCollege)->getPdo();
+        DB::connection($connectionTools)->getPdo();
 
         $courses = DB::connection($connectionName)->table('mark')
             // ->where('sy','2024')
@@ -74,7 +78,7 @@ class ImportStudentCourseLudong extends Command
                     if($school_id==528){
                         $school_name = 'Leyte Normal University';
                     }else{
-                        $getSchool = LudongSchools::where('school_id',$school_id)->first();
+                        $getSchool = DB::connection($connectionTools)->table('schools')->where('school_id',$school_id)->first();
                         if($getSchool){
                             $school_name = $getSchool->school_name;
                         }
@@ -83,12 +87,12 @@ class ImportStudentCourseLudong extends Command
                         $grade_period_id = 4;
                     }
                     if($course->catalog_id>0){
-                        $getSubject = LudongCollegeSubjectsExt::where('catalog_id',$course_code_id)->first();
+                        $getSubject = DB::connection($connectionCollege)->table('subjects_ext')->where('catalog_id',$course_code_id)->first();
                         if($getSubject){
                             $course_desc = $getSubject->desc_title;
                         }
                     }else{
-                        $getSubject = LudongCollegeSubjects::where('catalog_no',$course_code)->first();
+                        $getSubject = DB::connection($connectionCollege)->table('subjects')->where('catalog_no',$course_code)->first();
                         if($getSubject){
                             $course_desc = $getSubject->description;
                             $units = $getSubject->load_units;
