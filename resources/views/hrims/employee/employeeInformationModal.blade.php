@@ -22,10 +22,10 @@
                             data-t="info"
                              style="width:100%">Personal Information</button>
                         <br><br>
-                        <button class="btn btn-primary btn-primary-scan buttonDisp"
+                        {{-- <button class="btn btn-primary btn-primary-scan buttonDisp"
                             data-t="offices"
                              style="width:100%">Division/Section</button>
-                        <br><br>
+                        <br><br> --}}
                         <button class="btn btn-primary btn-primary-scan buttonDisp"
                             data-t="fam"
                              style="width:100%">Family Background</button>
@@ -64,7 +64,7 @@
                         <br><br><br><br>
                     </div>
                     {{-- <div class="col-md-9 callout callout-info hide" id="loader_div" style="background-color:#f4f0ec">
-                            <img src="{{ asset('/assets/images/loader/loader_gif_no_bg.gif') }}" 
+                            <img src="{{ asset('/assets/images/loader/loader_gif_no_bg.gif') }}"
                                 style="height: 100%;
                                         position: absolute;
                                         top: 40%;

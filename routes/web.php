@@ -466,11 +466,17 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/uploadImage', 'HRIMS\Employee\EmployeeController@uploadImage');
                     Route::post('/workTable', 'HRIMS\Employee\WorkController@workTable');
 
+
                     Route::post('/personalInfo', 'HRIMS\Employee\Information\PersonalInfoController@personalInfo');
                     Route::post('/schedule', 'HRIMS\Employee\Information\ScheduleController@schedule');
                     Route::post('/employeeStatus', 'HRIMS\Employee\StatusController@status');
                     Route::post('/employeeStatusSubmit', 'HRIMS\Employee\StatusController@submit');
 
+                    Route::post('/familyInfo', 'HRIMS\Employee\Information\FamilyInfoController@index');
+                    Route::post('/familyTable', 'HRIMS\Employee\Information\FamilyInfoController@show');
+
+                    Route::post('/paginate', 'HRIMS\Employee\EmployeePaginateController@paginate');
+                    Route::post('/counts', 'HRIMS\Employee\EmployeePaginateController@counts');
 
                     Route::group(['prefix'=>'information'], function(){
                         Route::post('/infoSubmit', 'HRIMS\Employee\Information\PersonalInfoController@infoSubmit');

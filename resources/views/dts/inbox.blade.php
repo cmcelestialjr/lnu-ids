@@ -53,8 +53,8 @@
                         </div>
                     </div>
                     <div class="col-md-12"></div>
-                    <div class="col-md-9"></div>
-                    <div class="col-md-3">
+                    <div class="col-md-10"></div>
+                    <div class="col-md-2">
                         <div class="input-group">
                             <input type="text" id="search-pagination" class="form-control" placeholder="Search...">
                             <div class="input-group-append">
@@ -63,19 +63,64 @@
                         </div>
                     </div>
                     <div class="col-md-12 table-responsive">
-                        <table class="table table-bordered table-fixed" style="margin-bottom: 5px; margin-top: 5px;">
+                        <table class="table table-bordered table-fixed table-paginate" style="margin-bottom: 5px; margin-top: 5px;">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>DTS No.</th>
-                                    <th>Owner</th>
-                                    <th>Document</th>
-                                    <th>Particulars</th>
-                                    <th>Description</th>
-                                    <th>Created At</th>
-                                    <th>Duration</th>
-                                    <th>Latest Action</th>
-                                    <th>Status</th>
+                                    <th class="th-paginate" data-column="1" data-sort="asc">DTS No.
+                                        <div style="float:right">
+                                            <span class="sort-paginate fa fa-long-arrow-up">
+                                            </span><span class="sort-paginate fa fa-long-arrow-down"></span>
+                                        </div>
+                                    </th>
+                                    <th class="th-paginate" data-column="2" data-sort="asc">Owner
+                                        <div style="float:right">
+                                            <span class="sort-paginate fa fa-long-arrow-up">
+                                            </span><span class="sort-paginate fa fa-long-arrow-down"></span>
+                                        </div>
+                                    </th>
+                                    <th class="th-paginate" data-column="3" data-sort="asc">Document
+                                        <div style="float:right">
+                                            <span class="sort-paginate fa fa-long-arrow-up">
+                                            </span><span class="sort-paginate fa fa-long-arrow-down"></span>
+                                        </div>
+                                    </th>
+                                    <th class="th-paginate" data-column="4" data-sort="asc">Particulars
+                                        <div style="float:right">
+                                            <span class="sort-paginate fa fa-long-arrow-up">
+                                            </span><span class="sort-paginate fa fa-long-arrow-down"></span>
+                                        </div>
+                                    </th>
+                                    <th class="th-paginate" data-column="5" data-sort="asc">Description
+                                        <div style="float:right">
+                                            <span class="sort-paginate fa fa-long-arrow-up">
+                                            </span><span class="sort-paginate fa fa-long-arrow-down"></span>
+                                        </div>
+                                    </th>
+                                    <th class="th-paginate" data-column="6" data-sort="asc">Created At
+                                        <div style="float:right">
+                                            <span class="sort-paginate fa fa-long-arrow-up">
+                                            </span><span class="sort-paginate fa fa-long-arrow-down"></span>
+                                        </div>
+                                    </th>
+                                    <th class="th-paginate" data-column="7" data-sort="asc">Duration
+                                        <div style="float:right">
+                                            <span class="sort-paginate fa fa-long-arrow-up">
+                                            </span><span class="sort-paginate fa fa-long-arrow-down"></span>
+                                        </div>
+                                    </th>
+                                    <th class="th-paginate" data-column="8" data-sort="asc">Latest Action
+                                        <div style="float:right">
+                                            <span class="sort-paginate fa fa-long-arrow-up">
+                                            </span><span class="sort-paginate fa fa-long-arrow-down"></span>
+                                        </div>
+                                    </th>
+                                    <th class="th-paginate" data-column="9" data-sort="asc">Status
+                                        <div style="float:right">
+                                            <span class="sort-paginate fa fa-long-arrow-up">
+                                            </span><span class="sort-paginate fa fa-long-arrow-down"></span>
+                                        </div>
+                                    </th>
                                     <th>Options</th>
                                 </tr>
                             </thead>

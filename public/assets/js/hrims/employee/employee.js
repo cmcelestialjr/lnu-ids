@@ -1,10 +1,10 @@
 employee_table();
 $(document).off('change', '#employeeDiv select[name="option"]').on('change', '#employeeDiv select[name="option"]', function (e) {
     var thisBtn = $('#employeeDiv select[name="option"]');
-    var val = $(this).val();    
-    employee_stat(thisBtn,val);    
+    var val = $(this).val();
+    employee_stat(thisBtn,val);
 });
-$(document).off('click', '#employeeDiv .btn-group button').on('click', '#employeeDiv .btn-group button', function (e) {
+$(document).off('click', '#employeeDiv #selectionDiv button').on('click', '#employeeDiv #selectionDiv button', function (e) {
     var thisBtn = $(this);
     var status = $(this).data('id');
     employee_fetch(thisBtn,status);
@@ -18,8 +18,8 @@ $(document).off('click', '#workDiv button[name="newModal"]').on('click', '#workD
     workNewModal(thisBtn,status);
 });
 $(document).off('click', '#workDiv .workEditModal').on('click', '#workDiv .workEditModal', function (e) {
-    var thisBtn = $(this); 
-    workEditModal(thisBtn);   
+    var thisBtn = $(this);
+    workEditModal(thisBtn);
 });
 function employee_table(){
     var thisBtn = $('#employeeDiv select[name="option"]');
@@ -67,7 +67,7 @@ function employee_stat(thisBtn,val){
     //     cache: false,
     //     dataType: 'json',
     //     beforeSend: function() {
-    //         thisBtn.attr('disabled','disabled'); 
+    //         thisBtn.attr('disabled','disabled');
     //         thisBtn.addClass('input-loading');
     //     },
     //     success : function(data){

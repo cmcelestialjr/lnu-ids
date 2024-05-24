@@ -53,8 +53,8 @@ function updatePaginationButtons(data) {
     var prevPage = currentPage - 5;
     var nextPage = currentPage + 5;
 
-    var showing_from = parseInt(data.current_page)*10-10+1;
-    var showing_to = parseInt(data.current_page)*10;
+    var showing_from = parseInt(data.current_page)*data.perPage-data.perPage+1;
+    var showing_to = parseInt(data.current_page)*data.perPage;
     if(showing_to>=data.total_query){
         var showing_to = data.total_query;
     }
@@ -79,7 +79,7 @@ function updateDisplayedContent(data) {
     $('#table-body-pagination').html('');
     var x = 1;
     if(data.current_page>1){
-        var x = parseInt(data.current_page)*10-10+1;
+        var x = parseInt(data.current_page)*data.perPage-data.perPage+1;
     }
     $.each(data.list, function(index, item) {
         var view = '<span class="span-paginate fa fa-search btn btn-success btn-success-scan docs-option" title="History" data-id="'+item.dts_id+'" data-o="History"></span> ';

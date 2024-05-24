@@ -110,8 +110,11 @@ class DtrMachineCheck extends Command
                     }
                 }
             }
-            if($recordsCheck>0){
-                $zk->clearAttendance();
+            $now = now();
+            if ($now->isBetween('10:05', '10:35') || $now->isBetween('13:35', '14:05') || $now->isBetween('20:35', '21:05')) {
+                if($recordsCheck>0){
+                    $zk->clearAttendance();
+                }
             }
             //$this->info('Command executed successfully!');
             // if (!empty($recordsToInsert)) {

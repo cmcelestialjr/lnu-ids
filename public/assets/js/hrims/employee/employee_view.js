@@ -1,7 +1,7 @@
 
 $(document).off('click', '.employeeView').on('click', '.employeeView', function (e) {
-    var thisBtn = $(this);       
-    employee_view(thisBtn);    
+    var thisBtn = $(this);
+    employee_view(thisBtn);
 });
 $(document).off('change', '#staff_img_upload').on('change', '#staff_img_upload', function (e) {
     readURL(this,'#staff_open_img_upload');
@@ -11,12 +11,12 @@ $(document).off('click', '#staff_open_img_upload').on('click', '#staff_open_img_
     $("#staff_img_upload").trigger("click");
 });
 $(document).off('click', '#staff_img_upload_submit').on('click', '#staff_img_upload_submit', function (e) {
-    var thisBtn = $(this); 
-    employee_image_upload(thisBtn);   
+    var thisBtn = $(this);
+    employee_image_upload(thisBtn);
 });
 $(document).off('click', '#employeeInformation').on('click', '#employeeInformation', function (e) {
-    var thisBtn = $(this); 
-    employee_information(thisBtn);   
+    var thisBtn = $(this);
+    employee_information(thisBtn);
 });
 function readURL(input,imgID) {
     if (input.files && input.files[0]) {
@@ -31,7 +31,7 @@ function employee_view(thisBtn){
     var id = thisBtn.data('id');
     var url = base_url+'/hrims/employee/employeeView';
     var modal = 'default';
-    var modal_size = 'modal-xl';
+    var modal_size = 'modal-xxl';
     var form_data = {
         url:url,
         modal:modal,
@@ -48,7 +48,7 @@ function employee_information(thisBtn){
     var id = thisBtn.data('id');
     var url = base_url+'/hrims/employee/employeeInformation';
     var modal = 'primary';
-    var modal_size = 'modal-xl';
+    var modal_size = 'modal-xxl';
     var form_data = {
         url:url,
         modal:modal,
@@ -62,7 +62,7 @@ function employee_information(thisBtn){
     loadModal(form_data,thisBtn);
 }
 function employee_image_upload(thisBtn){
-    var id = thisBtn.data('id');    
+    var id = thisBtn.data('id');
     var form_data = new FormData();
     var ins = document.getElementById('staff_img_upload').files.length;
     if(ins>0){
@@ -79,7 +79,7 @@ function employee_image_upload(thisBtn){
             contentType: false,
             processData: false,
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 $('#staff_open_img_upload').addClass('hide');
                 $("#staff_loader_img").removeClass("hide");
             },
@@ -89,7 +89,7 @@ function employee_image_upload(thisBtn){
                     $('#staff_loader_img').addClass('hide');
                     $("#staff_open_img_upload").removeClass("hide");
                     if(data.result=='error'){
-                        toastr.error('Error!');                    
+                        toastr.error('Error!');
                     }else{
                         toastr.success('Success!');
                         $('#staff_img_upload').val('');

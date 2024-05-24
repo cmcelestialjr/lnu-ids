@@ -34,8 +34,10 @@ class WorkController extends Controller
     public function editSubmit(Request $request){
         return $this->_editSubmit($request);
     }
-    
+
     private function table($request){
+        $user_access_level = $request->session()->get('user_access_level');
+        if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
         $data = array();
         $id = $request->id;
         $query = _Work::with('role','emp_stat')
@@ -75,10 +77,14 @@ class WorkController extends Controller
             $x = 1;
             foreach($query as $r){
                 $data_list['f1'] = $x;
-                $data_list['f2'] = '<button class="btn btn-primary btn-primary-scan btn-sm workEditModal"
-                                        data-id="'.$r['id'].'">
-                                        '.$r['date_from'].'
-                                    </button>';
+                if($user_access_level==5 || $user_access_level==2 || $user_access_level==3){
+                    $data_list['f2'] = '<button class="btn btn-primary btn-primary-scan btn-sm workEditModal"
+                                            data-id="'.$r['id'].'">
+                                            '.$r['date_from'].'
+                                        </button>';
+                }else{
+                    $data_list['f2'] =  $r['date_from'];
+                }
                 $data_list['f3'] = $r['date_to'];
                 $data_list['f4'] = $r['position_title'];
                 $data_list['f5'] = $r['designation_title'];
@@ -194,7 +200,7 @@ class WorkController extends Controller
             }
             $result = 'success';
         }
-        
+
         $data = array('result' => $result,
                       'title' => $title,
                       'shorten' => $shorten,
@@ -254,7 +260,7 @@ class WorkController extends Controller
             if($credit_type=='none'){
                 $credit_type = NULL;
             }
-            
+
             $getDesignation = HRDesignation::find($designation);
             if($getDesignation){
                 $designation_title = $getDesignation->name;
@@ -326,7 +332,7 @@ class WorkController extends Controller
                 _Work::where('user_id',$id)
                         ->where('date_from','<=',$date_from)
                         ->update(['status' => $employee->emp_status_id]);
-                
+
                 if($position_option!='None' && $date_to=='present'){
                     $update = HRPosition::find($position_id);
                     $update->current_user_id = $id;
@@ -413,7 +419,7 @@ class WorkController extends Controller
                     ->where('type_id',$type)
                     ->where('date_to','present')
                     ->first();
-            }            
+            }
             if($check_date!=NULL){
                 $result = 'Date from already exists!';
                 $x++;
@@ -428,7 +434,7 @@ class WorkController extends Controller
             if($fund_services=='none'){
                 $fund_services = NULL;
             }
-            
+
             if($x==0){
                 $data = ['date_from' => $date_from,
                         'date_to' => $date_to,
@@ -458,7 +464,7 @@ class WorkController extends Controller
                         'updated_at' => date('Y-m-d H:i:s')];
                 $update = _Work::where('id', $id)
                             ->update($data);
-                            
+
                 if($update){
 
                     $employee = Users::find($user_id);
@@ -472,7 +478,7 @@ class WorkController extends Controller
                         $update->current_user_id = $user_id;
                         $update->save();
                     }
-        
+
                     if($getDesignation){
                         $update = HRDesignation::find($designation);
                         $update->current_user_id = $user_id;

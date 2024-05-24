@@ -38,7 +38,7 @@
                             </button>
                             @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)
                                 <input type="file" id="staff_img_upload" accept="image/*" style="display:none"/>
-                                <button class="btn btn-success btn-success-scan btn-sm hide" 
+                                <button class="btn btn-success btn-success-scan btn-sm hide"
                                     id="staff_img_upload_submit"
                                     data-id="{{$query->id}}">
                                 <span class="fa fa-upload"></span> Upload
@@ -60,7 +60,7 @@
                                 {{$query->employee_default->position_title}} ({{$query->employee_default->position_shorten}})
                             @endif
                             </b>
-                        </td>                        
+                        </td>
                     </tr>
                     <tr>
                         <td>Civil Status:</td>
@@ -76,7 +76,7 @@
                                 {{number_format($query->employee_default->salary,2)}}
                             @endif
                             </b>
-                        </td>                        
+                        </td>
                     </tr>
                     <tr>
                         <td>Birthdate:</td>
@@ -143,10 +143,12 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
+                                @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)
                                 <button class="btn btn-info btn-info-scan" name="newModal"
                                     data-id="{{$query->id}}">
                                     <span class="fa fa-plus"></span> New
                                 </button>
+                                @endif
                                 <table id="workTable" class="table table-bordered table-fixed"
                                     data-toggle="table"
                                     data-search="true"

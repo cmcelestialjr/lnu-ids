@@ -34,11 +34,11 @@ $(document).off('change', '#deductionModal select[name="emp_stat"]').on('change'
     }
 });
 $(document).off('blur', '#deductionModal .input').on('blur', '#deductionModal .input', function (e) {
-    var thisBtn = $(this);    
+    var thisBtn = $(this);
     deduction_input(thisBtn);
 });
 $(document).off('click', '#docsModal #new button[name="submit"]').on('click', '#docsModal #new button[name="submit"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     e.preventDefault();
     deduction_docs_submit(thisBtn);
 });
@@ -46,7 +46,7 @@ $(document).off('click', '#docsModal #docs button[name="submit"]').on('click', '
     docs_table();
 });
 $(document).off('click', '#docsModal #docs .viewDoc').on('click', '#docsModal #docs .viewDoc', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     docs_view_modal(thisBtn);
 });
 $(document).off('input', '#docsModal #new input[name="files[]"]').on('input', '#docsModal #new input[name="files[]"]', function (e) {
@@ -180,12 +180,12 @@ function deduction_input(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -223,7 +223,7 @@ function deduction_docs_submit(thisBtn){
     if(amount<=0 || amount==''){
         toastr.error('Please input amount');
         x++;
-    }    
+    }
     if(x==0){
         var id = $('#deductionModal input[name="id"]').val();
         var payroll_type = $('#deductionModal select[name="payroll_type"] option:selected').val();
@@ -254,12 +254,12 @@ function deduction_docs_submit(thisBtn){
                     progressBar.css('width', percent + '%').attr('aria-valuenow', percent);
                     progressText.text(percent + '%');
                   }
-                });        
+                });
                 return xhr;
             },
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
-                thisBtn.addClass('input-loading');                
+                thisBtn.attr('disabled','disabled');
+                thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
@@ -281,7 +281,7 @@ function deduction_docs_submit(thisBtn){
                     thisBtn.removeClass('input-error');
                     progressBar.css('width', '0%').attr('aria-valuenow', 0);
                     progressText.text('0%');
-                    
+
                 }, 3000);
             },
             error: function (xhr, status, error){

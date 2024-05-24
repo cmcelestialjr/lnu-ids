@@ -180,6 +180,7 @@ class ForwardController extends Controller
         return response()->json([
             'links' => $links,
             'current_page' => $page,
+            'perPage' => $perPage,
             'total_pages' => $totalPages,
             'total_query' => $totalQuery,
             'list' => $data,
@@ -243,6 +244,7 @@ class ForwardController extends Controller
         return response()->json([
             'links' => $links,
             'current_page' => $page,
+            'perPage' => $perPage,
             'total_pages' => $totalPages,
             'total_query' => $totalQuery,
             'list' => $data,
