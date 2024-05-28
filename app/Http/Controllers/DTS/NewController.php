@@ -113,7 +113,6 @@ class NewController extends Controller
 
     private function getDoc($request,$total_files,$dts_id)
     {
-        $doc = '';
         $oMerger = PDFMerger::init();
         $path = 'storage\dts/'.date('Y').'/'.date('m');
         $public_path = public_path($path);

@@ -33,7 +33,7 @@ class ProgramController extends Controller
         $level = $request->level;
         $school = $request->school;
         $data = [];
-        if($school<=2){
+        if($school>=1 && $school<=2){
             $results = EducPrograms::where('program_level_id',$level)
                 ->where(function($query) use ($search){
                     $query->where('name', 'LIKE', "%$search%")

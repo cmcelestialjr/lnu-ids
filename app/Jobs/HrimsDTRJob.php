@@ -34,7 +34,7 @@ class HrimsDTRJob implements ShouldQueue
         Config::set('mail.mailers.smtp.host', 'smtp.gmail.com');
         Config::set('mail.mailers.smtp.port', 587);
         Config::set('mail.mailers.smtp.username', 'hr@lnu.edu.ph');
-        Config::set('mail.mailers.smtp.password', 'LNU@hrmo2024');
+        Config::set('mail.mailers.smtp.password', 'HRMO@!TSO@lnu@2024');
         Config::set('mail.mailers.smtp.encryption', 'tls');
         $id_no = $this->details['id_no'];
         $type = $this->details['type'];

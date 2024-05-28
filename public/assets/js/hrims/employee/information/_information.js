@@ -7,6 +7,10 @@ $(document).off('click', '#employeeInformationModal .buttonDisp').on('click', '#
         var url = 'personalInfo';
     }else if(t=='fam'){
         var url = 'familyInfo';
+    }else if(t=='educ'){
+        var url = 'educInfo';
+    }else if(t=='elig'){
+        var url = 'eligInfo';
     }else if(t=='sched'){
         var url = 'schedule';
     }

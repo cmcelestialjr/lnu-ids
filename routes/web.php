@@ -466,7 +466,6 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/uploadImage', 'HRIMS\Employee\EmployeeController@uploadImage');
                     Route::post('/workTable', 'HRIMS\Employee\WorkController@workTable');
 
-
                     Route::post('/personalInfo', 'HRIMS\Employee\Information\PersonalInfoController@personalInfo');
                     Route::post('/schedule', 'HRIMS\Employee\Information\ScheduleController@schedule');
                     Route::post('/employeeStatus', 'HRIMS\Employee\StatusController@status');
@@ -474,6 +473,32 @@ Route::group(['middleware' => ['HTTPS']], function(){
 
                     Route::post('/familyInfo', 'HRIMS\Employee\Information\FamilyInfoController@index');
                     Route::post('/familyTable', 'HRIMS\Employee\Information\FamilyInfoController@show');
+                    Route::post('/familyNew', 'HRIMS\Employee\Information\FamilyInfoController@create');
+                    Route::post('/familyNewSubmit', 'HRIMS\Employee\Information\FamilyInfoController@store');
+                    Route::post('/familyMoreInfo', 'HRIMS\Employee\Information\FamilyInfoController@showMore');
+                    Route::post('/familyEdit', 'HRIMS\Employee\Information\FamilyInfoController@edit');
+                    Route::post('/familyEditSubmit', 'HRIMS\Employee\Information\FamilyInfoController@update');
+                    Route::post('/familyDelete', 'HRIMS\Employee\Information\FamilyInfoController@delete');
+                    Route::post('/familyDeleteSubmit', 'HRIMS\Employee\Information\FamilyInfoController@destroy');
+
+                    Route::post('/educInfo', 'HRIMS\Employee\Information\EducInfoController@index');
+                    Route::post('/educTable', 'HRIMS\Employee\Information\EducInfoController@show');
+                    Route::post('/educNew', 'HRIMS\Employee\Information\EducInfoController@create');
+                    Route::post('/educNewSubmit', 'HRIMS\Employee\Information\EducInfoController@store');
+                    Route::post('/educEdit', 'HRIMS\Employee\Information\EducInfoController@edit');
+                    Route::post('/educEditSubmit', 'HRIMS\Employee\Information\EducInfoController@update');
+                    Route::post('/educDelete', 'HRIMS\Employee\Information\EducInfoController@delete');
+                    Route::post('/educDeleteSubmit', 'HRIMS\Employee\Information\EducInfoController@destroy');
+
+                    Route::post('/eligInfo', 'HRIMS\Employee\Information\EligInfoController@index');
+                    Route::post('/eligTable', 'HRIMS\Employee\Information\EligInfoController@show');
+                    Route::post('/eligDoc', 'HRIMS\Employee\Information\EligInfoController@showDoc');
+                    Route::post('/eligNew', 'HRIMS\Employee\Information\EligInfoController@create');
+                    Route::post('/eligNewSubmit', 'HRIMS\Employee\Information\EligInfoController@store');
+                    Route::post('/eligEdit', 'HRIMS\Employee\Information\EligInfoController@edit');
+                    Route::post('/eligEditSubmit', 'HRIMS\Employee\Information\EligInfoController@update');
+                    Route::post('/eligDelete', 'HRIMS\Employee\Information\EligInfoController@delete');
+                    Route::post('/eligDeleteSubmit', 'HRIMS\Employee\Information\EligInfoController@destroy');
 
                     Route::post('/paginate', 'HRIMS\Employee\EmployeePaginateController@paginate');
                     Route::post('/counts', 'HRIMS\Employee\EmployeePaginateController@counts');

@@ -611,7 +611,8 @@
                                                                 </td>
                                                             </tr>
                                                             <tr class="hide" id="program_tr_new">
-                                                                <td colspan="2"><label>Program</label> check if not in the list?
+                                                                <td colspan="2">
+                                                                    <label>Program</label> check if not in the list?
                                                                         <input type="checkbox"
                                                                             name="program_not_list_check_new">
                                                                     <div class="program_div_new" id="programSearch2">

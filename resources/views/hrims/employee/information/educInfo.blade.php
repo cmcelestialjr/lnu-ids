@@ -3,13 +3,13 @@
         <div class="row">
             <div class="col-lg-12">
                 @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)
-                <button class="btn btn-primary btn-primary-scan float-right" id="new-fam">
+                <button class="btn btn-primary btn-primary-scan float-right" id="new-educ">
                     <span class="fa fa-plus"></span> New
                 </button>
                 @endif
             </div>
             <div class="col-lg-12">
-                <table id="familyTable" class="table table-bordered table-fixed"
+                <table id="educTable" class="table table-bordered table-fixed"
                     data-toggle="table"
                     data-search="true"
                     data-buttons-class="primary"
@@ -24,13 +24,15 @@
                     <thead>
                         <tr>
                             <th data-field="f1" data-sortable="true" data-align="center">#</th>
-                            <th data-field="f2" data-sortable="true" data-align="center">Name</th>
-                            <th data-field="f3" data-sortable="true" data-align="center">Relation</th>
-                            <th data-field="f4" data-sortable="true" data-align="center">Birthdate</th>
-                            <th data-field="f5" data-sortable="true" data-align="center">Contact</th>
-                            <th data-field="f6" data-sortable="true" data-align="center">Email</th>
+                            <th data-field="f2" data-sortable="true" data-align="center">Level</th>
+                            <th data-field="f3" data-sortable="true" data-align="center">Name</th>
+                            <th data-field="f4" data-sortable="true" data-align="center">Period From</th>
+                            <th data-field="f5" data-sortable="true" data-align="center">Period To</th>
+                            <th data-field="f6" data-sortable="true" data-align="center">Units</th>
+                            <th data-field="f7" data-sortable="true" data-align="center">Year Grad</th>
+                            <th data-field="f8" data-sortable="true" data-align="center">Honors</th>
                             @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)
-                                <th data-field="f7" data-sortable="true" data-align="center">Option</th>
+                                <th data-field="f9" data-sortable="true" data-align="center">Option</th>
                             @endif
                         </tr>
                     </thead>
@@ -39,4 +41,4 @@
         </div>
     </div>
 </div>
-<script src="{{ asset('assets/js/hrims/employee/information/family_info.js') }}"></script>
+<script src="{{ asset('assets/js/hrims/employee/information/educ_info.js') }}"></script>

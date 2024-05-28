@@ -123,16 +123,30 @@
                     <tr>
                         <td>Status:</td>
                         <td><b>
-                            @if($query->emp_status_id==1)
-                            <span id="employee_status" class="btn btn-success btn-success-scan" data-id="{{$query->id}}">Active</span>
-                            @else
-                            <span id="employee_status" class="btn btn-danger btn-danger-scan" data-id="{{$query->id}}">InActive
-                                @if(isset($query->employee_default))
-                                    @if($query->employee_default->date_separation!=NULL)
-                                        <br>{{date('M d, Y',strtotime($query->employee_default->date_separation))}}
+                            @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)
+                                @if($query->emp_status_id==1)
+                                <span id="employee_status" class="btn btn-success btn-success-scan" data-id="{{$query->id}}">Active</span>
+                                @else
+                                <span id="employee_status" class="btn btn-danger btn-danger-scan" data-id="{{$query->id}}">InActive
+                                    @if(isset($query->employee_default))
+                                        @if($query->employee_default->date_separation!=NULL)
+                                            <br>{{date('M d, Y',strtotime($query->employee_default->date_separation))}}
+                                        @endif
                                     @endif
+                                </span>
                                 @endif
-                            </span>
+                            @else
+                                @if($query->emp_status_id==1)
+                                    <span class="btn btn-success btn-success-scan">Active</span>
+                                @else
+                                    <span class="btn btn-danger btn-danger-scan">InActive
+                                        @if(isset($query->employee_default))
+                                            @if($query->employee_default->date_separation!=NULL)
+                                                <br>{{date('M d, Y',strtotime($query->employee_default->date_separation))}}
+                                            @endif
+                                        @endif
+                                    </span>
+                                @endif
                             @endif
                         </b></td>
                     </tr>

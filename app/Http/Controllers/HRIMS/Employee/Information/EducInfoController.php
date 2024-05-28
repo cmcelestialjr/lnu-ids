@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\HRIMS\Employee\Information;
 
 use App\Http\Controllers\Controller;
-use App\Models\_FamilyBg;
-use App\Models\FamRelations;
-use App\Models\Users;
-use App\Services\NameServices;
+use App\Models\_EducationBg;
+use App\Models\EducProgramLevel;
+use App\Models\EducProgramsAll;
+use App\Models\School;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PDOException;
 
-class FamilyInfoController extends Controller
+class EducInfoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,15 +23,18 @@ class FamilyInfoController extends Controller
     public function index(Request $request)
     {
         $user_access_level = $request->session()->get('user_access_level');
+
         $id = $request->id;
-        $query = Users::with('family.fam_relation')
-            ->find($id);
+
+        $query = _EducationBg::with('level')
+            ->where('user_id',$id)
+            ->get();
 
         $data = array(
             'query' => $query,
             'user_access_level' => $user_access_level
         );
-        return view('hrims/employee/information/familyInfo',$data);
+        return view('hrims/employee/information/EducInfo',$data);
     }
 
     /**
@@ -44,12 +47,12 @@ class FamilyInfoController extends Controller
             return view('layouts/error/404');
         }
 
-        $relations = FamRelations::get();
+        $levels = EducProgramLevel::get();
 
         $data = array(
-            'relations' => $relations
+            'levels' => $levels
         );
-        return view('hrims/employee/information/familyInfoNew',$data);
+        return view('hrims/employee/information/EducInfoNew',$data);
     }
 
     /**
@@ -70,11 +73,8 @@ class FamilyInfoController extends Controller
             return  response()->json(['result' => 'error']);
         }
 
-        $check = _FamilyBg::where('user_id',$request->sid)
-            ->where('lastname',$request->lastname)
-            ->where('firstname',$request->firstname)
-            ->where('relation_id',$request->relation)
-            ->where('dob',date('Y-m-d',strtotime($request->dob)))
+        $check = _EducationBg::where('user_id',$request->sid)
+            ->where('period_from',$request->period_from)
             ->first();
 
         if($check){
@@ -85,20 +85,64 @@ class FamilyInfoController extends Controller
             $user = Auth::user();
             $user_id = $user->id;
 
-            $insert = new _FamilyBg();
+            if($request->school_check==1){
+                $checkSchool = School::where('name',$request->school_name)
+                    ->where('shorten',$request->school_shorten)
+                    ->first();
+                if(!$checkSchool){
+                    $insert = new School();
+                    $insert->name = $request->school_name;
+                    $insert->shorten = $request->school_shorten;
+                    $insert->updated_by = $user_id;
+                    $insert->save();
+                    $school_id = $insert->id;
+                    $school_name = $insert->name;
+                }else{
+                    $school_id = $checkSchool->id;
+                    $school_name = $checkSchool->name;
+                }
+            }else{
+                $school = School::find($request->school);
+                $school_id = $school->id;
+                $school_name = $school->name;
+            }
+
+            $program_id = $request->program;
+            if($request->program_check==1){
+                $checkProgram = EducProgramsAll::where('name',$request->program_name)
+                    ->first();
+                if(!$checkProgram){
+                    $insert = new EducProgramsAll();
+                    $insert->program_level_id = $request->level;
+                    $insert->name = $request->program_name;
+                    $insert->updated_by = $user_id;
+                    $insert->save();
+                    $program_id = $insert->id;
+                }else{
+                    $program_id = $checkProgram->id;
+                }
+            }
+
+            $period_to = NULL;
+            if($request->present_check==0){
+                $period_to = date('Y-m-d',strtotime($request->period_to));
+            }
+
+            if($program_id==0){
+                $program_id = NULL;
+            }
+
+            $insert = new _EducationBg();
             $insert->user_id = $request->sid;
-            $insert->lastname = $request->lastname;
-            $insert->firstname = $request->firstname;
-            $insert->middlename = $request->middlename;
-            $insert->extname = $request->extname;
-            $insert->relation_id = $request->relation;
-            $insert->dob = date('Y-m-d',strtotime($request->dob));
-            $insert->contact_no = $request->contact_no;
-            $insert->email = $request->email;
-            $insert->occupation = $request->occupation;
-            $insert->employer = $request->employer;
-            $insert->employer_contact = $request->employer_contact;
-            $insert->employer_address = $request->employer_address;
+            $insert->level_id = $request->level;
+            $insert->school_id = $school_id;
+            $insert->name = $school_name;
+            $insert->program_id = $program_id;
+            $insert->period_from = date('Y-m-d',strtotime($request->period_from));
+            $insert->period_to = $period_to;
+            $insert->units_earned = $request->units_earned;
+            $insert->year_grad = $request->year_grad;
+            $insert->honors = $request->honors;
             $insert->updated_by = $user_id;
             $insert->save();
 
@@ -124,87 +168,55 @@ class FamilyInfoController extends Controller
         $user_access_level = $request->session()->get('user_access_level');
         $data = array();
 
-        $name_services = new NameServices;
-
         $id = $request->id;
 
-        $query = _FamilyBg::with('fam_relation')
+        $query = _EducationBg::with('level')
             ->where('user_id',$id)
-            ->orderBy('dob','ASC')
+            ->orderBy('level_id','ASC')
+            ->orderBy('period_from','desc')
             ->get()
-            ->map(function($query) use ($name_services) {
-                $name = $name_services->lastname($query->lastname,$query->firstname,$query->middlename,$query->extname);
-                $contact_no = null;
-                if($query->contact_no){
-                    $contact_no = '0'.$query->contact_no;
+            ->map(function($query) {
+                $period_to = 'present';
+                if($query->period_to){
+                    $period_to = date('m/d/Y',strtotime($query->period_to));
                 }
                 return [
                     'id' => $query->id,
-                    'name' => $name,
-                    'relation' => $query->fam_relation->name,
-                    'dob' => date('m/d/Y', strtotime($query->dob)),
-                    'contact' => $contact_no,
-                    'email' => $query->email
+                    'level' => $query->level->name,
+                    'name' => $query->name,
+                    'period_from' => date('m/d/Y',strtotime($query->period_from)),
+                    'period_to' => $period_to,
+                    'units_earned' => $query->units_earned,
+                    'year_grad' => $query->year_grad,
+                    'honors' => $query->honors
                 ];
             })->toArray();
         if(count($query)>0){
             $x = 1;
             foreach($query as $r){
                 $data_list['f1'] = $x;
-                $data_list['f2'] = $r['name'];
-                $data_list['f3'] = $r['relation'];
-                $data_list['f4'] = $r['dob'];
-                $data_list['f5'] = $r['contact'];
-                $data_list['f6'] = $r['email'];
-                $button_options = '<button class="btn btn-primary btn-primary-scan more-info-fam"
-                                    data-id="'.$r['id'].'">
-                                    <span class="fa fa-bars"></span></button>';
+                $data_list['f2'] = $r['level'];
+                $data_list['f3'] = $r['name'];
+                $data_list['f4'] = $r['period_from'];
+                $data_list['f5'] = $r['period_to'];
+                $data_list['f6'] = $r['units_earned'];
+                $data_list['f7'] = $r['year_grad'];
+                $data_list['f8'] = $r['honors'];
                 if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
-                    $button_options .= ' <button class="btn btn-info btn-info-scan edit-fam"
+                    $button_options = ' <button class="btn btn-info btn-info-scan edit-educ"
                                                 data-id="'.$r['id'].'">
                                                 <span class="fa fa-edit"></span></button>
-                                        <button class="btn btn-danger btn-danger-scan delete-fam"
+                                        <button class="btn btn-danger btn-danger-scan delete-educ"
                                                 data-id="'.$r['id'].'">
                                                 <span class="fa fa-trash"></span></button>';
+                    $data_list['f9'] = $button_options;
                 }
-                $data_list['f7'] = $button_options;
 
                 array_push($data,$data_list);
                 $x++;
             }
         }
         return  response()->json($data);
-    }
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function showMore(Request $request)
-    {
-        // Validate the incoming request data
-        $validator = $this->showMoreValidateRequest($request);
-
-        // Check if validation fails
-        if ($validator->fails()) {
-            return view('layouts/error/404');
-        }
-
-        $id = $request->id;
-        $fid = $request->fid;
-
-        $check = _FamilyBg::where('user_id',$id)
-            ->where('id',$fid)
-            ->first();
-
-        if(!$check){
-            return view('layouts/error/404');
-        }
-
-        $data = array(
-            'query' => $check
-        );
-        return view('hrims/employee/information/familyInfoMore',$data);
     }
 
     /**
@@ -228,7 +240,8 @@ class FamilyInfoController extends Controller
         $id = $request->id;
         $fid = $request->fid;
 
-        $check = _FamilyBg::where('user_id',$id)
+        $check = _EducationBg::with('level','program')
+            ->where('user_id',$id)
             ->where('id',$fid)
             ->first();
 
@@ -236,13 +249,13 @@ class FamilyInfoController extends Controller
             return view('layouts/error/404');
         }
 
-        $relations = FamRelations::get();
+        $levels = EducProgramLevel::get();
 
         $data = array(
             'query' => $check,
-            'relations' => $relations
+            'levels' => $levels
         );
-        return view('hrims/employee/information/familyInfoEdit',$data);
+        return view('hrims/employee/information/educInfoEdit',$data);
     }
 
     /**
@@ -264,19 +277,16 @@ class FamilyInfoController extends Controller
             return  response()->json(['result' => 'error']);
         }
 
-        $check = _FamilyBg::where('user_id',$request->sid)
+        $check = _EducationBg::where('user_id',$request->sid)
             ->where('id',$request->id)
             ->first();
         if(!$check){
             return  response()->json(['result' => 'error']);
         }
 
-        $check = _FamilyBg::where('user_id',$request->sid)
+        $check = _EducationBg::where('user_id',$request->sid)
             ->where('id','!=',$request->id)
-            ->where('lastname',$request->lastname)
-            ->where('firstname',$request->firstname)
-            ->where('relation_id',$request->relation)
-            ->where('dob',date('Y-m-d',strtotime($request->dob)))
+            ->where('period_from',date('Y-m-d',strtotime($request->period_from)))
             ->first();
 
         if($check){
@@ -287,20 +297,63 @@ class FamilyInfoController extends Controller
             $user = Auth::user();
             $user_id = $user->id;
 
-            $update = _FamilyBg::find($request->id);
-            $update->user_id = $request->sid;
-            $update->lastname = $request->lastname;
-            $update->firstname = $request->firstname;
-            $update->middlename = $request->middlename;
-            $update->extname = $request->extname;
-            $update->relation_id = $request->relation;
-            $update->dob = date('Y-m-d',strtotime($request->dob));
-            $update->contact_no = $request->contact_no;
-            $update->email = $request->email;
-            $update->occupation = $request->occupation;
-            $update->employer = $request->employer;
-            $update->employer_contact = $request->employer_contact;
-            $update->employer_address = $request->employer_address;
+            $school = School::find($request->school);
+            $school_id = $school->id;
+            $school_name = $school->name;
+
+            if($request->school_check==1){
+                $checkSchool = School::where('name',$request->school_name)
+                    ->where('shorten',$request->school_shorten)
+                    ->first();
+                if(!$checkSchool){
+                    $insert = new School();
+                    $insert->name = $request->school_name;
+                    $insert->shorten = $request->school_shorten;
+                    $insert->updated_by = $user_id;
+                    $insert->save();
+                    $school_id = $insert->id;
+                    $school_name = $insert->school_name;
+                }else{
+                    $school_id = $checkSchool->id;
+                    $school_name = $checkSchool->name;
+                }
+            }
+
+            $program_id = $request->program;
+            if($request->program_check==1){
+                $checkProgram = EducProgramsAll::where('name',$request->program_name)
+                    ->first();
+                if(!$checkProgram){
+                    $insert = new EducProgramsAll();
+                    $insert->program_level_id = $request->level;
+                    $insert->name = $request->program_name;
+                    $insert->updated_by = $user_id;
+                    $insert->save();
+                    $program_id = $insert->id;
+                }else{
+                    $program_id = $checkSchool->id;
+                }
+            }
+
+            $period_to = NULL;
+            if($request->present_check==0){
+                $period_to = date('Y-m-d',strtotime($request->period_to));
+            }
+
+            if($program_id==0){
+                $program_id = NULL;
+            }
+
+            $update = _EducationBg::find($request->id);
+            $update->level_id = $request->level;
+            $update->school_id = $school_id;
+            $update->name = $school_name;
+            $update->program_id = $program_id;
+            $update->period_from = date('Y-m-d',strtotime($request->period_from));
+            $update->period_to = $period_to;
+            $update->units_earned = $request->units_earned;
+            $update->year_grad = $request->year_grad;
+            $update->honors = $request->honors;
             $update->updated_by = $user_id;
             $update->save();
 
@@ -334,8 +387,7 @@ class FamilyInfoController extends Controller
         $id = $request->id;
         $fid = $request->fid;
 
-        $check = _FamilyBg::with('fam_relation')
-            ->where('user_id',$id)
+        $check = _EducationBg::where('user_id',$id)
             ->where('id',$fid)
             ->first();
 
@@ -346,7 +398,7 @@ class FamilyInfoController extends Controller
         $data = array(
             'query' => $check
         );
-        return view('hrims/employee/information/familyInfoDelete',$data);
+        return view('hrims/employee/information/educInfoDelete',$data);
     }
 
     /**
@@ -375,7 +427,7 @@ class FamilyInfoController extends Controller
         $id = $request->id;
         $fid = $request->fid;
 
-        $check = _FamilyBg::where('user_id',$id)
+        $check = _EducationBg::where('user_id',$id)
             ->where('id',$fid)
             ->first();
 
@@ -383,10 +435,10 @@ class FamilyInfoController extends Controller
             return  response()->json(['result' => 'error']);
         }
 
-        $delete = _FamilyBg::find($fid);
+        $delete = _EducationBg::find($fid);
         $delete->delete();
 
-        DB::statement("ALTER TABLE _family_bg AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE _education_bg AUTO_INCREMENT = 1;");
 
         return  response()->json(['result' => 'success']);
     }
@@ -444,18 +496,20 @@ class FamilyInfoController extends Controller
     {
         $rules = [
             'sid' => 'required|numeric',
-            'relation' => 'required|numeric',
-            'lastname' => 'required|string',
-            'firstname' => 'required|string',
-            'middlename' => 'nullable|string',
-            'extname' => 'nullable|string',
-            'dob' => 'required|date',
-            'contact_no' => 'nullable|string',
-            'email' => 'nullable|string|email',
-            'occupation' => 'nullable|string',
-            'employer' => 'nullable|string',
-            'employer_contact' => 'nullable|string',
-            'employer_address' => 'nullable|string',
+            'level' => 'required|numeric',
+            'school' => 'required|numeric',
+            'school_name' => 'nullable|string',
+            'school_shorten' => 'nullable|string',
+            'program' => 'required|numeric',
+            'program_name' => 'nullable|string',
+            'period_from' => 'required|date',
+            'period_to' => 'nullable|date',
+            'units_earned' => 'nullable|string',
+            'year_grad' => 'nullable|numeric',
+            'honors' => 'nullable|string',
+            'present_check' => 'required|numeric',
+            'school_check' => 'required|numeric',
+            'program_check' => 'required|numeric',
         ];
 
         $customMessages = [

@@ -37,7 +37,7 @@ class WorkController extends Controller
 
     private function table($request){
         $user_access_level = $request->session()->get('user_access_level');
-        if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
+
         $data = array();
         $id = $request->id;
         $query = _Work::with('role','emp_stat')
@@ -77,7 +77,7 @@ class WorkController extends Controller
             $x = 1;
             foreach($query as $r){
                 $data_list['f1'] = $x;
-                if($user_access_level==5 || $user_access_level==2 || $user_access_level==3){
+                if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
                     $data_list['f2'] = '<button class="btn btn-primary btn-primary-scan btn-sm workEditModal"
                                             data-id="'.$r['id'].'">
                                             '.$r['date_from'].'
