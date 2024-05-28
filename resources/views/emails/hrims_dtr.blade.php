@@ -11,7 +11,7 @@
         alt="LNU"
         style="height: 70px; width: 80px;"/>
     <br>
-    Good day!
+    Good day.
     <br><br>
     Your Daily Time Record for {{date('F d, Y', strtotime($date))}}
     <br><br>
