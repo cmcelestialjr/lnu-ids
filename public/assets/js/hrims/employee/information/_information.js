@@ -11,6 +11,16 @@ $(document).off('click', '#employeeInformationModal .buttonDisp').on('click', '#
         var url = 'educInfo';
     }else if(t=='elig'){
         var url = 'eligInfo';
+    }else if(t=='exp'){
+        var url = 'expInfo';
+    }else if(t=='volun'){
+        var url = 'volunInfo';
+    }else if(t=='train'){
+        var url = 'learnInfo';
+    }else if(t=='other'){
+        var url = 'otherInfo';
+    }else if(t=='doc'){
+        var url = 'docInfo';
     }else if(t=='sched'){
         var url = 'schedule';
     }

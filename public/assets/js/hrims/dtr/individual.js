@@ -1,29 +1,29 @@
 dtr_table();
 $(document).off('click', '#dtrDiv button[name="submit"]').on('click', '#dtrDiv button[name="submit"]', function (e) {
-    dtr_table();    
+    dtr_table();
 });
 $(document).off('click', '.dtrInput').on('click', '.dtrInput', function (e) {
     var thisBtn = $(this);
-    dtr_input(thisBtn); 
+    dtr_input(thisBtn);
 });
 $(document).off('change', '#dtrInputModal select[name="time_type"]').on('change', '#dtrInputModal select[name="time_type"]', function (e) {
     var thisBtn = $(this);
-    dtr_input_table(thisBtn); 
+    dtr_input_table(thisBtn);
 });
 $(document).off('click', '#dtrInputModal button[name="submit"]').on('click', '#dtrInputModal button[name="submit"]', function (e) {
     var thisBtn = $(this);
-    dtr_input_submit(thisBtn); 
+    dtr_input_submit(thisBtn);
 });
 $(document).off('click', '#dtrDiv button[name="fill_duration"]').on('click', '#dtrDiv button[name="fill_duration"]', function (e) {
     var thisBtn = $(this);
-    dtr_input_duration(thisBtn); 
+    dtr_input_duration(thisBtn);
 });
 $(document).off('click', '#dtrDiv button[name="schedule"]').on('click', '#dtrDiv button[name="schedule"]', function (e) {
     var thisBtn = $(this);
-    schedule(thisBtn); 
+    schedule(thisBtn);
 });
 $(document).off('blur', '#dtrInputDurationModal input').on('blur', '#dtrInputDurationModal input', function (e) {
-    dtr_input_duration_check(); 
+    dtr_input_duration_check();
 });
 $(document).off('click', '#dtrInputDurationModal button[name="submit"]').on('click', '#dtrInputDurationModal button[name="submit"]', function (e) {
     var thisBtn = $(this);
@@ -31,11 +31,11 @@ $(document).off('click', '#dtrInputDurationModal button[name="submit"]').on('cli
 });
 $(document).off('click', '#dtrDiv button[name="department"]').on('click', '#dtrDiv button[name="department"]', function (e) {
     var thisBtn = $(this);
-    department(thisBtn); 
+    department(thisBtn);
 });
 $(document).off('click', '#departmentModal button[name="submit"]').on('click', '#departmentModal button[name="submit"]', function (e) {
     var thisBtn = $(this);
-    department_submit(thisBtn); 
+    department_submit(thisBtn);
 });
 $(document).off('click', '#dtrInputModal #dtrInputTable .change_travel').on('click', '#dtrInputModal #dtrInputTable .change_travel', function (e) {
     var thisBtn = $(this);
@@ -55,7 +55,7 @@ $(document).off('click', '#dtrInputModal #dtrInputTable .change_travel').on('cli
                         '<button type="button" class="btn btn-info btn-info-scan change_travel" data-val="travel" data-id="'+id+'">'+
                             '<span class="fa fa-refresh"></span></button>'+
                     '</div></div>');
-        
+
     }
 });
 $(document).off('click', '#dtrInputModal #dtrInputTable .change_vacant').on('click', '#dtrInputModal #dtrInputTable .change_vacant', function (e) {
@@ -76,7 +76,7 @@ $(document).off('click', '#dtrInputModal #dtrInputTable .change_vacant').on('cli
                         '<button type="button" class="btn btn-info btn-info-scan change_vacant" data-val="vacant" data-id="'+id+'">'+
                             '<span class="fa fa-refresh"></span></button>'+
                     '</div></div>');
-        
+
     }
 });
 function dtr_table(){
@@ -103,7 +103,7 @@ function dtr_table(){
         data:form_data,
         cache: false,
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
             $('#dtrDiv #not-found').addClass('hide');
             $('#dtrDiv #previewDiv').removeClass('hide');
@@ -111,7 +111,7 @@ function dtr_table(){
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data=='error'){
                 toastr.error('Error.');
                 thisBtn.addClass('input-error');
@@ -121,7 +121,7 @@ function dtr_table(){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
                 $('#dtrDiv #previewDiv').removeClass('opacity6');
-                $('#dtrDiv #previewDiv').html(data);                
+                $('#dtrDiv #previewDiv').html(data);
             }
             setTimeout(function() {
                 thisBtn.removeClass('input-success');
@@ -231,18 +231,18 @@ function dtr_input_submit(thisBtn){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
+                thisBtn.removeClass('input-loading');
                 if(data.result=='success'){
                     dtr_table();
                     $('#modal-primary').modal('hide');
                 }else{
                     toastr.error('Error.');
-                    thisBtn.addClass('input-error');                
+                    thisBtn.addClass('input-error');
                 }
                 setTimeout(function() {
                     thisBtn.removeClass('input-success');
@@ -308,22 +308,30 @@ function department(thisBtn){
     loadModal(form_data,thisBtn);
 }
 function dtr_input_duration_check(){
-    var day_from = $('#dtrInputDurationModal input[name="day_from"]').val();
-    var day_to = $('#dtrInputDurationModal input[name="day_to"]').val();
+    var year = $('#select-individual-year option:selected').val();
+    var month = $('#select-individual-month option:selected').val();
+    var day_from = parseInt($('#dtrInputDurationModal input[name="day_from"]').val());
+    var day_to = parseInt($('#dtrInputDurationModal input[name="day_to"]').val());
+    var lastDay = getLastDayOfMonth(year, month);
+
     var x = 0;
     $('#dtrInputDurationModal input[name="day_from"]').removeClass('border-require');
     $('#dtrInputDurationModal input[name="day_to"]').removeClass('border-require');
-    if(day_from>31){
-        $('#dtrInputDurationModal input[name="day_from"]').val(31);
+    if(day_from>lastDay){
+        $('#dtrInputDurationModal input[name="day_from"]').val(lastDay);
+        var day_from = lastDay;
     }
-    if(day_to>31){
-        $('#dtrInputDurationModal input[name="day_from"]').val(31);
+    if(day_to>lastDay){
+        $('#dtrInputDurationModal input[name="day_to"]').val(lastDay);
+        var day_to = lastDay;
     }
     if(day_from<1){
         $('#dtrInputDurationModal input[name="day_from"]').val(1);
+        var day_from = 1;
     }
     if(day_to<1){
         $('#dtrInputDurationModal input[name="day_from"]').val(1);
+        var day_to = 1;
     }
     if(day_from>day_to){
         $('#dtrInputDurationModal input[name="day_from"]').addClass('border-require');
@@ -332,6 +340,9 @@ function dtr_input_duration_check(){
         x++;
     }
     return x;
+}
+function getLastDayOfMonth(year, month) {
+    return new Date(year, month + 1, 0).getDate();
 }
 function dtr_input_duration_submit(thisBtn){
     var id_no = $('input[name="id_no"]').val();
@@ -360,18 +371,18 @@ function dtr_input_duration_submit(thisBtn){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
+                thisBtn.removeClass('input-loading');
                 if(data.result=='success'){
                     dtr_table();
                     $('#modal-primary').modal('hide');
                 }else{
                     toastr.error('Error.');
-                    thisBtn.addClass('input-error');                
+                    thisBtn.addClass('input-error');
                 }
                 setTimeout(function() {
                     thisBtn.removeClass('input-success');
@@ -404,17 +415,17 @@ function department_submit(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 $('#modal-primary').modal('hide');
             }else{
                 toastr.error('Error.');
-                thisBtn.addClass('input-error');                
+                thisBtn.addClass('input-error');
             }
             setTimeout(function() {
                 thisBtn.removeClass('input-success');

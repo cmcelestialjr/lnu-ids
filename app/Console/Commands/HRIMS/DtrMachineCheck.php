@@ -45,16 +45,24 @@ class DtrMachineCheck extends Command
                 ->get();
             if($query->count()>0){
                 foreach($query as $row){
+                    $id = $row->id;
                     $ipaddress = $row->ipaddress;
                     $port = $row->port;
-                    $this->data(new ZKTeco($ipaddress,$port),$ipaddress);
+                    $no = $row->no;
+                    $this->data(new ZKTeco($ipaddress,$port),$ipaddress,$id,$no);
                 }
             }
             //sleep(1);
         //}
     }
-    private function data($zk,$ipaddress){
+    private function data($zk,$ipaddress,$id,$no){
         if ($zk->connect()){
+
+            if($no==0){
+                $status = 'On';
+                $dateTime = date('Y-m-d H:i:s',strtotime($zk->getTime()));
+                $this->updateStatus($id,$status,$dateTime,1);
+            }
 
             $attendace = $zk->getAttendance();
             $recordsToInsert = [];
@@ -128,6 +136,16 @@ class DtrMachineCheck extends Command
             //         $this->error("Error during bulk insert: " . $e->getMessage());
             //     }
             // }
+        }else{
+            $status = 'Off';
+            $dateTime = NULL;
+            $this->updateStatus($id,$status,$dateTime,0);
         }
+    }
+    private function updateStatus($id,$status,$dateTime,$no){
+        Devices::where('id', $id)
+                ->update(['status' => $status,
+                        'no' => $no,
+                        'dateTime' => $dateTime]);
     }
 }

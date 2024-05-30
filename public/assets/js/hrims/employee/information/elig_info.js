@@ -36,6 +36,14 @@ $(document).ready(function() {
         .on('click', '#elig-edit-modal #elig_check', function (e) {
         eligNotList($(this),'edit');
     });
+    $(document).off('change', '#elig-new-modal #files')
+    .on('change', '#elig-new-modal #files', function (e) {
+        filesInfo($(this),'new');
+    });
+    $(document).off('change', '#elig-edit-modal #files')
+    .on('change', '#elig-edit-modal #files', function (e) {
+        filesInfo($(this),'edit');
+    });
 });
 function elig_table(){
     var id = $('#employeeInformationModal input[name="id_no"]').val();
@@ -64,7 +72,7 @@ function elig_doc(thisBtn){
     var fid = thisBtn.data('id');
     var url = base_url+'/hrims/employee/eligDoc';
     var modal = 'success';
-    var modal_size = 'modal-lg';
+    var modal_size = 'modal-xl';
     var form_data = {
         url:url,
         modal:modal,
@@ -120,9 +128,18 @@ function eligNotList(thisBtn,type){
         $('#elig-'+type+'-modal #elig_shorten').removeClass('hide');
     }
 }
+function filesInfo(thisBtn,type){
+    var total_files = $('#elig-'+type+'-modal #files')[0].files.length;
+    if(total_files==1){
+        var file_selected_count = total_files+' file';
+    }else{
+        var file_selected_count = total_files+' files';
+    }
+    $('#elig-'+type+'-modal #file-selected-count').html(file_selected_count+' selected..');
+}
 function elig_submit(id,thisBtn,type,url){
     var sid = $('#employeeInformationModal input[name="id_no"]').val();
-    var eligibility = $('#elig-'+type+'-modal #relation option:selected').val();
+    var eligibility = $('#elig-'+type+'-modal #eligibility option:selected').val();
     var elig_name = $('#elig-'+type+'-modal #elig_name').val();
     var elig_shorten = $('#elig-'+type+'-modal #elig_shorten').val();
     var rating = $('#elig-'+type+'-modal #rating').val();
@@ -135,6 +152,7 @@ function elig_submit(id,thisBtn,type,url){
     var x_check = 0;
     var elig_check = 0;
 
+    $('#elig-'+type+'-modal #elig_div').removeClass('border-require');
     $('#elig-'+type+'-modal #elig_name').removeClass('border-require');
     $('#elig-'+type+'-modal #elig_shorten').removeClass('border-require');
     $('#elig-'+type+'-modal #rating').removeClass('border-require');
@@ -158,10 +176,13 @@ function elig_submit(id,thisBtn,type,url){
         $('#elig-'+type+'-modal #license_no').addClass('border-require');
         x_check++;
     }
-    if($('#educ-'+type+'-modal #elig_check').is(':checked')){
+    if($('#elig-'+type+'-modal #elig_check').is(':checked')){
         var elig_check = 1;
     }
-
+    if(elig_check==0 && eligibility==0){
+        $('#elig-'+type+'-modal #elig_div').addClass('border-require');
+        x_check++;
+    }
     if(elig_check==1 && (elig_name=='') && (elig_shorten=='')){
         $('#elig-'+type+'-modal #elig_name').addClass('border-require');
         $('#elig-'+type+'-modal #elig_shorten').addClass('border-require');
@@ -188,6 +209,7 @@ function elig_submit(id,thisBtn,type,url){
         form_data.append('place', place);
         form_data.append('license_no', license_no);
         form_data.append('date_validity', date_validity);
+        form_data.append('total_files', total_files);
 
         $.ajax({
             url: base_url+'/hrims/employee/'+url,

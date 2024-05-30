@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\HRIMS\Employee\Information;
 
 use App\Http\Controllers\Controller;
-use App\Models\_Eligibility;
-use App\Models\Eligibilities;
+use App\Models\_Voluntary;
 use App\Models\Users;
 use App\Services\FileMergeServices;
 use Illuminate\Http\Request;
@@ -14,9 +13,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+
 use PDOException;
 
-class EligInfoController extends Controller
+
+class VolunInfoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,15 +28,14 @@ class EligInfoController extends Controller
 
         $id = $request->id;
 
-        $query = _Eligibility::with('eligibility')
-            ->where('user_id',$id)
+        $query = _Voluntary::where('user_id',$id)
             ->get();
 
         $data = array(
             'query' => $query,
             'user_access_level' => $user_access_level
         );
-        return view('hrims/employee/information/EligInfo',$data);
+        return view('hrims/employee/information/volunInfo',$data);
     }
 
     /**
@@ -48,12 +48,10 @@ class EligInfoController extends Controller
             return view('layouts/error/404');
         }
 
-        $eligibilities = Eligibilities::get();
-
         $data = array(
-            'eligibilities' => $eligibilities
+            '' => ''
         );
-        return view('hrims/employee/information/EligInfoNew',$data);
+        return view('hrims/employee/information/volunInfoNew',$data);
     }
 
     /**
@@ -74,9 +72,9 @@ class EligInfoController extends Controller
             return  response()->json(['result' => 'error']);
         }
 
-        $check = _Eligibility::where('user_id',$request->sid)
-            ->where('eligibility_id',$request->eligibility)
-            ->where('date',$request->date)
+        $check = _Voluntary::where('user_id',$request->sid)
+            ->where('name',$request->name)
+            ->where('date_from',$request->date_from)
             ->first();
 
         if($check){
@@ -89,45 +87,25 @@ class EligInfoController extends Controller
 
             $employee = Users::find($request->sid);
 
-            if($request->elig_check==1){
-                $checkElig = Eligibilities::where('name',$request->elig_name)
-                    ->where('shorten',$request->elig_shorten)
-                    ->first();
-                if(!$checkElig){
-                    $insert = new Eligibilities();
-                    $insert->name = $request->elig_name;
-                    $insert->shorten = $request->elig_shorten;
-                    $insert->updated_by = $user_id;
-                    $insert->save();
-                    $eligibility_id = $insert->id;
-                }else{
-                    $eligibility_id = $checkElig->id;
-                }
-            }else{
-                $elig = Eligibilities::find($request->eligibility);
-                $eligibility_id = $elig->id;
-            }
-
-            $date_validity = NULL;
-            if ($timestamp = strtotime($request->date_validity)) {
-                $date_validity = date('Y-m-d', $timestamp);
+            $date_to = NULL;
+            if ($request->present_check==0) {
+                $date_to = date('Y-m-d', strtotime($request->date_to));
             }
 
             $doc = NULL;
             if($request->total_files>0){
                 $file_merge = new FileMergeServices;
-                $path = 'storage\hrims\employee/'.$employee->id_no.'\elig';
+                $path = 'storage\hrims\employee/'.$employee->id_no.'\volun';
                 $doc = $file_merge->getDoc($request,$request->total_files,$employee->id_no,$path);
             }
 
-            $insert = new _Eligibility();
+            $insert = new _Voluntary();
             $insert->user_id = $request->sid;
-            $insert->eligibility_id = $eligibility_id;
-            $insert->rating = $request->rating;
-            $insert->date = date('Y-m-d',strtotime($request->date));
-            $insert->place = $request->place;
-            $insert->license_no = $request->license_no;
-            $insert->date_validity = $date_validity;
+            $insert->name = $request->name;
+            $insert->date_from = date('Y-m-d',strtotime($request->date_from));
+            $insert->date_to = $date_to;
+            $insert->hours = $request->hours;
+            $insert->position = $request->position;
             $insert->doc = $doc;
             $insert->updated_by = $user_id;
             $insert->save();
@@ -156,23 +134,21 @@ class EligInfoController extends Controller
 
         $id = $request->id;
 
-        $query = _Eligibility::with('eligibility')
-            ->where('user_id',$id)
-            ->orderBy('date','DESC')
+        $query = _Voluntary::where('user_id',$id)
+            ->orderBy('date_from','DESC')
             ->get()
             ->map(function($query) {
-                $date_validity = '-';
-                if($query->date_validity){
-                    $date_validity = date('m/d/Y',strtotime($query->date));
+                $date_to = 'present';
+                if($query->date_to){
+                    $date_to = date('m/d/Y',strtotime($query->date_to));
                 }
                 return [
                     'id' => $query->id,
-                    'eligibility' => $query->eligibility->name,
-                    'rating' => $query->rating,
-                    'date' => date('m/d/Y',strtotime($query->date)),
-                    'place' => $query->place,
-                    'license_no' => $query->license_no,
-                    'date_validity' => $date_validity,
+                    'name' => $query->name,
+                    'date_from' => date('m/d/Y',strtotime($query->date_from)),
+                    'date_to' => $date_to,
+                    'hours' => $query->hours,
+                    'position' => $query->position,
                     'doc' => $query->doc
                 ];
             })->toArray();
@@ -180,32 +156,31 @@ class EligInfoController extends Controller
             $x = 1;
             foreach($query as $r){
                 $data_list['f1'] = $x;
-                $data_list['f2'] = $r['eligibility'];
-                $data_list['f3'] = $r['rating'];
-                $data_list['f4'] = $r['date'];
-                $data_list['f5'] = $r['place'];
-                $data_list['f6'] = $r['license_no'];
-                $data_list['f7'] = $r['date_validity'];
+                $data_list['f2'] = $r['name'];
+                $data_list['f3'] = $r['date_from'];
+                $data_list['f4'] = $r['date_to'];
+                $data_list['f5'] = $r['hours'];
+                $data_list['f6'] = $r['position'];
                 if($r['doc']){
-                    $button_options = '<button class="btn btn-primary btn-primary-scan doc-elig"
+                    $button_options = '<button class="btn btn-primary btn-primary-scan doc-volun"
                                     data-id="'.$r['id'].'">
                                     <span class="fa fa-file"></span></button>';
                 }else{
-                    $button_options = '<button class="btn btn-warning btn-warning-scan doc-elig"
+                    $button_options = '<button class="btn btn-warning btn-warning-scan doc-volun"
                                     data-id="'.$r['id'].'">
                                     <span class="fa fa-file"></span></button>';
                 }
 
                 if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
-                    $button_options .= '<button class="btn btn-info btn-info-scan edit-elig"
+                    $button_options .= '<button class="btn btn-info btn-info-scan edit-volun"
                                                 data-id="'.$r['id'].'">
                                                 <span class="fa fa-edit"></span></button>
-                                        <button class="btn btn-danger btn-danger-scan delete-elig"
+                                        <button class="btn btn-danger btn-danger-scan delete-volun"
                                                 data-id="'.$r['id'].'">
                                                 <span class="fa fa-trash"></span></button>';
 
                 }
-                $data_list['f8'] = $button_options;
+                $data_list['f7'] = $button_options;
                 array_push($data,$data_list);
                 $x++;
             }
@@ -234,8 +209,7 @@ class EligInfoController extends Controller
         $id = $request->id;
         $fid = $request->fid;
 
-        $check = _Eligibility::with('eligibility')
-            ->where('user_id',$id)
+        $check = _Voluntary::where('user_id',$id)
             ->where('id',$fid)
             ->first();
 
@@ -243,13 +217,10 @@ class EligInfoController extends Controller
             return view('layouts/error/404');
         }
 
-        $eligibilities = Eligibilities::get();
-
         $data = array(
-            'query' => $check,
-            'eligibilities' => $eligibilities
+            'query' => $check
         );
-        return view('hrims/employee/information/eligInfoEdit',$data);
+        return view('hrims/employee/information/volunInfoEdit',$data);
     }
 
     public function showDoc(Request $request)
@@ -265,7 +236,7 @@ class EligInfoController extends Controller
         $id = $request->id;
         $fid = $request->fid;
 
-        $check = _Eligibility::where('user_id',$id)
+        $check = _Voluntary::where('user_id',$id)
             ->where('id',$fid)
             ->first();
 
@@ -281,7 +252,7 @@ class EligInfoController extends Controller
         $data = array(
             'doc' => $doc
         );
-        return view('hrims/employee/information/eligInfoDoc',$data);
+        return view('hrims/employee/information/volunInfoDoc',$data);
     }
 
     /**
@@ -303,17 +274,17 @@ class EligInfoController extends Controller
             return  response()->json(['result' => 'error']);
         }
 
-        $check = _Eligibility::where('user_id',$request->sid)
+        $check = _Voluntary::where('user_id',$request->sid)
             ->where('id',$request->id)
             ->first();
         if(!$check){
             return  response()->json(['result' => 'error']);
         }
 
-        $check_exists = _Eligibility::where('user_id',$request->sid)
+        $check_exists = _Voluntary::where('user_id',$request->sid)
             ->where('id','!=',$request->id)
-            ->where('eligibility_id',$request->eligibility_id)
-            ->where('date',date('Y-m-d',strtotime($request->date)))
+            ->where('name',$request->name)
+            ->where('date_from',date('Y-m-d',strtotime($request->date_from)))
             ->first();
 
         if($check_exists){
@@ -326,44 +297,24 @@ class EligInfoController extends Controller
 
             $employee = Users::find($request->sid);
 
-            if($request->elig_check==1){
-                $checkElig = Eligibilities::where('name',$request->elig_name)
-                    ->where('shorten',$request->elig_shorten)
-                    ->first();
-                if(!$checkElig){
-                    $insert = new Eligibilities();
-                    $insert->name = $request->elig_name;
-                    $insert->shorten = $request->elig_shorten;
-                    $insert->updated_by = $user_id;
-                    $insert->save();
-                    $eligibility_id = $insert->id;
-                }else{
-                    $eligibility_id = $checkElig->id;
-                }
-            }else{
-                $elig = Eligibilities::find($request->eligibility);
-                $eligibility_id = $elig->id;
-            }
-
-            $date_validity = NULL;
-            if ($timestamp = strtotime($request->date_validity)) {
-                $date_validity = date('Y-m-d', $timestamp);
+            $date_to = NULL;
+            if ($request->present_check==0) {
+                $date_to = date('Y-m-d', strtotime($request->date_to));
             }
 
             $doc = $check->doc;
             if($request->total_files>0){
                 $file_merge = new FileMergeServices;
-                $path = 'storage\hrims\employee/'.$employee->id_no.'\elig';
+                $path = 'storage\hrims\employee/'.$employee->id_no.'\volun';
                 $doc = $file_merge->getDoc($request,$request->total_files,$employee->id_no,$path);
             }
 
-            $update = _Eligibility::find($request->id);
-            $update->eligibility_id = $eligibility_id;
-            $update->rating = $request->rating;
-            $update->date = date('Y-m-d',strtotime($request->date));
-            $update->place = $request->place;
-            $update->license_no = $request->license_no;
-            $update->date_validity = $date_validity;
+            $update = _Voluntary::find($request->id);
+            $update->name = $request->name;
+            $update->date_from = date('Y-m-d',strtotime($request->date_from));
+            $update->date_to = $date_to;
+            $update->hours = $request->hours;
+            $update->position = $request->position;
             $update->doc = $doc;
             $update->updated_by = $user_id;
             $update->save();
@@ -398,7 +349,7 @@ class EligInfoController extends Controller
         $id = $request->id;
         $fid = $request->fid;
 
-        $check = _Eligibility::where('user_id',$id)
+        $check = _Voluntary::where('user_id',$id)
             ->where('id',$fid)
             ->first();
 
@@ -409,7 +360,7 @@ class EligInfoController extends Controller
         $data = array(
             'query' => $check
         );
-        return view('hrims/employee/information/eligInfoDelete',$data);
+        return view('hrims/employee/information/volunInfoDelete',$data);
     }
 
     /**
@@ -438,7 +389,7 @@ class EligInfoController extends Controller
         $id = $request->id;
         $fid = $request->fid;
 
-        $check = _Eligibility::with('user')
+        $check = _Voluntary::with('user')
             ->where('user_id',$id)
             ->where('id',$fid)
             ->first();
@@ -451,10 +402,10 @@ class EligInfoController extends Controller
             File::delete($check->doc);
         }
 
-        $delete = _Eligibility::find($fid);
+        $delete = _Voluntary::find($fid);
         $delete->delete();
 
-        DB::statement("ALTER TABLE _eligibility AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE _voluntary AUTO_INCREMENT = 1;");
 
         return  response()->json(['result' => 'success']);
     }
@@ -502,6 +453,8 @@ class EligInfoController extends Controller
         return Validator::make($request->all(), $rules, $customMessages);
     }
 
+
+
     /**
      * Validate the request data.
      *
@@ -512,15 +465,13 @@ class EligInfoController extends Controller
     {
         $rules = [
             'sid' => 'required|numeric',
-            'eligibility' => 'required|numeric',
-            'elig_name' => 'nullable|string',
-            'elig_shorten' => 'nullable|string',
-            'elig_check' => 'required|numeric',
-            'rating' => 'required|string',
-            'date' => 'required|date',
-            'place' => 'required|string',
-            'license_no' => 'required|string',
-            'date_validity' => 'nullable|date',
+            'name' => 'required|string',
+            'date_from' => 'required|date',
+            'date_to' => 'nullable|date',
+            'present_check' => 'required|numeric',
+            'hours' => 'required|string',
+            'position' => 'required|string',
+            'total_files' => 'required|numeric',
         ];
 
         $customMessages = [

@@ -9,7 +9,7 @@
       <input type="hidden" name="id_no" value="{{$id_no}}">
       <input type="hidden" name="dtr_type" value="1">
       <div class="row">
-          <div class="col-lg-12">              
+          <div class="col-lg-12">
               <div class="card card-primary card-outline">
                   <div class="card-body">
                     <div class="row">
@@ -17,7 +17,7 @@
                         <label>Year</label>
                       </div>
                       <div class="col-lg-2">
-                        <select class="form-control select2" name="year">
+                        <select class="form-control select2" name="year" id="select-individual-year">
                           @for ($i = date('Y'); $i >= 2023; $i--)
                             <option value="{{$i}}">{{$i}}</option>
                           @endfor
@@ -26,8 +26,8 @@
                       <div class="col-lg-1 center">
                         <label>Month</label>
                       </div>
-                      <div class="col-lg-2">                        
-                        <select class="form-control select2" name="month">
+                      <div class="col-lg-2">
+                        <select class="form-control select2" name="month" id="select-individual-month">
                             @for($i=1;$i<=12;$i++)
                               @if(date('m')==$i)
                                 <option value="{{$i}}" selected>{{date('F', strtotime(date('Y').'-'.$i.'-01'))}}</option>
@@ -40,7 +40,7 @@
                       <div class="col-lg-1 center">
                         <label>Range</label>
                       </div>
-                      <div class="col-lg-2">                        
+                      <div class="col-lg-2">
                         <select class="form-control select2" name="range">
                           <option value="1">Whole Month</option>
                           <option value="2">Half Month (1-15)</option>
@@ -58,7 +58,7 @@
                               </div>
                               <div class="col-lg-12 center" id="body">
                                 <section class="hide" id="not-found">
-                                  <div id="title"><br><br><br>                               
+                                  <div id="title"><br><br><br>
                                   </div>
                                   <div class="circles">
                                     <p><br>
@@ -77,7 +77,7 @@
                     </div>
                   </div>
                   <div class="card-footer">
-                      
+
                   </div>
               </div>
           </div>

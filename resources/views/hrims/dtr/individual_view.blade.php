@@ -18,7 +18,7 @@ $user = $users::with('employee_default.emp_stat')
             }
         }else{
             $emp_type = 'Personnel';
-        }        
+        }
 
         $user_dtr = $usersDtr::where('id_no',$id_no)
             ->whereYear('date',$year)
@@ -49,9 +49,9 @@ $user = $users::with('employee_default.emp_stat')
             $dtr[$m]['in_am'] = '';
             $dtr[$m]['out_am'] = '';
             $dtr[$m]['in_pm'] = '';
-            $dtr[$m]['out_pm'] = '';  
+            $dtr[$m]['out_pm'] = '';
             $dtr[$m]['time_from'] = '';
-            $dtr[$m]['time_to'] = '';          
+            $dtr[$m]['time_to'] = '';
             $dtr[$m]['time_type'] = '';
             $dtr[$m]['time_type_name'] = '';
             $dtr[$m]['time_in_am_type'] = '';
@@ -97,11 +97,11 @@ $user = $users::with('employee_default.emp_stat')
             //     }
             // }else{
             //     $day = $educOfferedScheduleDay::where('no',$weekDay)
-            //         ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {                        
+            //         ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {
             //             $query->whereHas('course', function ($query) use ($user_id,$year,$month) {
             //                 $query->where('instructor_id',$user_id);
             //                 $query->whereHas('curriculum', function ($query) use ($year,$month) {
-            //                     $query->whereHas('offered_program', function ($query) use ($year,$month) {                                    
+            //                     $query->whereHas('offered_program', function ($query) use ($year,$month) {
             //                         $query->whereHas('school_year', function ($query) use ($year,$month) {
             //                             $query->where('year_from','>=',$year);
             //                             $query->whereHas('grade_period', function ($query) use ($month) {
@@ -128,8 +128,8 @@ $user = $users::with('employee_default.emp_stat')
             //     $time_minutes = $educOfferedSchedule::whereIn('id',$day)
             //         ->whereHas('course', function ($query) {
             //             $query->where('load_type',1);
-            //         })->get();                
-            //     if($time_minutes->count()>0){                    
+            //         })->get();
+            //     if($time_minutes->count()>0){
             //         foreach($time_minutes as $row){
             //             $time_from_ = Carbon::parse($row->time_from);
             //             $time_to_ = Carbon::parse($row->time_to);
@@ -143,7 +143,7 @@ $user = $users::with('employee_default.emp_stat')
             //         $time_to =date('H:i',strtotime( $time_to_query->time_to));
             //     }
             // }
-            
+
             $schedTimeFrom = $usersSchedTime::where('user_id',$user_id)
                 ->where('option_id',1)
                 ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
@@ -196,9 +196,9 @@ $user = $users::with('employee_default.emp_stat')
                     $next_time_out_pm_for = date('H:i',strtotime($next_user_dtr->time_out_pm));
                 }
             }
-            
+
             if($user_dtr!=NULL){
-                $row = $user_dtr;                
+                $row = $user_dtr;
 
                 $date_day = date('j',strtotime($row->date));
                 $weekDay = date('w', strtotime($row->date));
@@ -216,11 +216,11 @@ $user = $users::with('employee_default.emp_stat')
                 //     }
                 // }else{
                 //     $day = $educOfferedScheduleDay::where('no',$weekDay)
-                //         ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {                        
+                //         ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {
                 //             $query->whereHas('course', function ($query) use ($user_id,$year,$month) {
                 //                 $query->where('instructor_id',$user_id);
                 //                 $query->whereHas('curriculum', function ($query) use ($year,$month) {
-                //                     $query->whereHas('offered_program', function ($query) use ($year,$month) {                                    
+                //                     $query->whereHas('offered_program', function ($query) use ($year,$month) {
                 //                         $query->whereHas('school_year', function ($query) use ($year,$month) {
                 //                             $query->where('year_from','>=',$year);
                 //                             $query->whereHas('grade_period', function ($query) use ($month) {
@@ -247,8 +247,8 @@ $user = $users::with('employee_default.emp_stat')
                 //     $time_minutes = $educOfferedSchedule::whereIn('id',$day)
                 //         ->whereHas('course', function ($query) {
                 //             $query->where('load_type',1);
-                //         })->get();                
-                //     if($time_minutes->count()>0){                    
+                //         })->get();
+                //     if($time_minutes->count()>0){
                 //         foreach($time_minutes as $r){
                 //             $time_from_ = Carbon::parse($r->time_from);
                 //             $time_to_ = Carbon::parse($r->time_to);
@@ -261,9 +261,9 @@ $user = $users::with('employee_default.emp_stat')
                 //     if($time_to_query!=NULL){
                 //         $time_to =date('H:i',strtotime( $time_to_query->time_to));
                 //     }
-                // }                
+                // }
                 $dtr[$date_day]['check'] = 'dtr';
-                
+
                 if($row->time_in_am==NULL){
                     $time_in_am = '';
                     $time_in_am_for = '';
@@ -291,7 +291,7 @@ $user = $users::with('employee_default.emp_stat')
                 }else{
                     $time_out_pm = date('h:ia',strtotime($row->time_out_pm));
                     $time_out_pm_for = date('H:i',strtotime($row->time_out_pm));
-                }                
+                }
                 if($time_from<'12:00' && $time_to>'12:00'){
                     if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
                         && $row->time_type==NULL){
@@ -331,9 +331,9 @@ $user = $users::with('employee_default.emp_stat')
                         $time_from = date('H:i',strtotime($rowSchedTime->time_from));
                         $time_to = date('H:i',strtotime($rowSchedTime->time_to));
                         $is_rotation_duty = $rowSchedTime->is_rotation_duty;
-                        
+
                         if($is_rotation_duty=='Yes'){
-                            if(($time_from<'12:00' && $time_in_am_for=='') || 
+                            if(($time_from<'12:00' && $time_in_am_for=='') ||
                                 ($time_from>='12:00' && $time_in_pm_for=='')){
                                 $count_days += 1;
                             }
@@ -397,7 +397,7 @@ $user = $users::with('employee_default.emp_stat')
                         //                 $hd_no = 1;
                         //                 if($emp_stat_gov=='N'){
                         //                     $total_minutes = $total_minutes+$get_hd_minutes;
-                        //                 }                                        
+                        //                 }
                         //             }elseif($rowSchedTime->time_type==3){
                         //                 $time_from_ = Carbon::parse('13:00');
                         //                 $time_to_ = Carbon::parse($time_to)->seconds(0);
@@ -406,7 +406,7 @@ $user = $users::with('employee_default.emp_stat')
                         //                 $hd_no = 1;
                         //                 if($emp_stat_gov=='N'){
                         //                     $total_minutes = $total_minutes+$get_hd_minutes;
-                        //                 }                                        
+                        //                 }
                         //             }elseif($rowSchedTime->time_type==1){
                         //                 $time_from_ = Carbon::parse($time_from)->seconds(0);
                         //                 $time_to_ = Carbon::parse($time_to)->seconds(0);
@@ -514,7 +514,7 @@ $user = $users::with('employee_default.emp_stat')
                                     }
                                 }
                             }
-                            
+
                             if($row->time_type==1 || $row->time_type==2 || $row->time_type==3){
                                 $time_from_ = Carbon::parse($time_from)->seconds(0);
                                 $time_to_ = Carbon::parse($time_to)->seconds(0);
@@ -537,7 +537,7 @@ $user = $users::with('employee_default.emp_stat')
                         //}
                     }
                 }
-                
+
                 $hours = 0;
                 $minutes = $total_minutes;
                 if($total_minutes>=60){
@@ -600,7 +600,7 @@ $user = $users::with('employee_default.emp_stat')
                 $dtr[$date_day]['abs_min'] = $abs_min;
                 $dtr[$date_day]['abs_no'] = $abs_no;
                 $dtr[$date_day]['is_rotation_duty'] = $is_rotation_duty;
-                
+
                 $count_days_with += 1;
             }else{
                 if($dtr[$m]['time_from']!=''){
@@ -621,7 +621,7 @@ $user = $users::with('employee_default.emp_stat')
             }
         }
         // foreach($user_dtr as $row){
-            
+
         // }
 @endphp
 <style>
@@ -682,17 +682,17 @@ table td{
             <button class="btn btn-primary btn-primary-scan" style="float:right" disabled>
                 <span class="fa fa-file-pdf"></span>
                 Print
-            </button>            
+            </button>
         @endif
 
         <input type="hidden" name="id_no" value="{{$id_no}}">
         <input type="hidden" name="user_information" value="{{$user_id}}">
-        @if($current_url=='dtr')
+
             <button class="btn btn-info btn-info-scan" name="fill_duration"><span class="fa fa-edit"></span> Fill in Duration</button>
             @if($check_user_role)
             <button class="btn btn-primary btn-primary-scan" name="department"><span class="fa fa-edit"></span> Department</button>
             @endif
-        @endif
+
         <button class="btn btn-primary btn-primary-scan" name="schedule" style="float:right"><span class="fa fa-edit"></span> Schedule</button>
     </div>
 </div>
@@ -748,7 +748,7 @@ table td{
     $hd_no_total = 0;
     $abs_min_total = 0;
     $abs_no_total = 0;
-    
+
         for($j=1;$j<=date('t',strtotime($year.'-'.$month.'-01'));$j++){
             echo '
             <tr>';
@@ -788,14 +788,14 @@ table td{
                                 echo '<td colspan="4">'.$td_name.'</td>';
                             }else{
                                 echo '<td colspan="4">
-                                    <button class="btn btn-default dtrInput" 
+                                    <button class="btn btn-default dtrInput"
                                         data-d="'.$j.'"
                                         data-time_type="'.$dtr[$j]['time_type'].'"
                                         style="width:100%;">
                                         <span class="fa fa-edit"></span> '.$td_name.'
                                     </button></td>';
                             }
-                            
+
                         }else{
                             if($dtr[$j]['time_type']=='2'){
                                 echo '<td colspan="2">Half Day</td>';
@@ -828,7 +828,7 @@ table td{
                                             if($current_url=='mydtr'){
                                                 echo '<td></td>';
                                             }else{
-                                                echo '<td><button class="btn btn-default dtrInput" 
+                                                echo '<td><button class="btn btn-default dtrInput"
                                                             data-d="'.$j.'"
                                                             data-time_type="'.$dtr[$j]['time_type'].'"
                                                             style="width:100%;">
@@ -837,7 +837,7 @@ table td{
                                                     </td>';
                                             }
                                         }else{
-                                            if($dtr[$j]['in_am']!='' && $dtr[$j]['time_in_am_type']==NULL && 
+                                            if($dtr[$j]['in_am']!='' && $dtr[$j]['time_in_am_type']==NULL &&
                                             $dtr[$j]['out_am']!='' && $dtr[$j]['time_out_am_type']==NULL &&
                                             $dtr[$j]['in_pm']!='' && $dtr[$j]['time_in_pm_type']==NULL &&
                                             $dtr[$j]['out_pm']!='' && $dtr[$j]['time_out_pm_type']==NULL
@@ -849,7 +849,7 @@ table td{
                                                     echo '<td>'.$dtr[$j]['in_am'].'</td>';
                                                 }else{
                                                     echo '<td>
-                                                            <button class="btn btn-default dtrInput" 
+                                                            <button class="btn btn-default dtrInput"
                                                                 data-d="'.$j.'"
                                                                 data-time_type="'.$dtr[$j]['time_type'].'"
                                                                 style="width:100%;color:'.$color.';'.$border_color.'">
@@ -882,7 +882,7 @@ table td{
                                                 echo '<td></td>';
                                             }else{
                                                 echo '<td>
-                                                        <button class="btn btn-default dtrInput" 
+                                                        <button class="btn btn-default dtrInput"
                                                             data-d="'.$j.'"
                                                             data-time_type="'.$dtr[$j]['time_type'].'"
                                                             style="width:100%;">
@@ -891,7 +891,7 @@ table td{
                                                     </td>';
                                             }
                                         }else{
-                                            if($dtr[$j]['in_am']!='' && $dtr[$j]['time_in_am_type']==NULL && 
+                                            if($dtr[$j]['in_am']!='' && $dtr[$j]['time_in_am_type']==NULL &&
                                             $dtr[$j]['out_am']!='' && $dtr[$j]['time_out_am_type']==NULL &&
                                             $dtr[$j]['in_pm']!='' && $dtr[$j]['time_in_pm_type']==NULL &&
                                             $dtr[$j]['out_pm']!='' && $dtr[$j]['time_out_pm_type']==NULL
@@ -903,7 +903,7 @@ table td{
                                                     echo '<td>'.$dtr[$j]['out_am'].'</td>';
                                                 }else{
                                                     echo '<td>
-                                                            <button class="btn btn-default dtrInput" 
+                                                            <button class="btn btn-default dtrInput"
                                                                 data-d="'.$j.'"
                                                                 data-time_type="'.$dtr[$j]['time_type'].'"
                                                                 style="width:100%;color:'.$color.';'.$border_color.'">
@@ -946,7 +946,7 @@ table td{
                                             if($current_url=='mydtr'){
                                                 echo '<td></td>';
                                             }else{
-                                                echo '<td><button class="btn btn-default dtrInput" 
+                                                echo '<td><button class="btn btn-default dtrInput"
                                                             data-d="'.$j.'"
                                                             data-time_type="'.$dtr[$j]['time_type'].'"
                                                             style="width:100%;">
@@ -955,7 +955,7 @@ table td{
                                                     </td>';
                                             }
                                         }else{
-                                            if($dtr[$j]['in_am']!='' && $dtr[$j]['time_in_am_type']==NULL && 
+                                            if($dtr[$j]['in_am']!='' && $dtr[$j]['time_in_am_type']==NULL &&
                                             $dtr[$j]['out_am']!='' && $dtr[$j]['time_out_am_type']==NULL &&
                                             $dtr[$j]['in_pm']!='' && $dtr[$j]['time_in_pm_type']==NULL &&
                                             $dtr[$j]['out_pm']!='' && $dtr[$j]['time_out_pm_type']==NULL
@@ -967,7 +967,7 @@ table td{
                                                     echo '<td>'.$dtr[$j]['in_pm'].'</td>';
                                                 }else{
                                                     echo '<td>
-                                                            <button class="btn btn-default dtrInput" 
+                                                            <button class="btn btn-default dtrInput"
                                                                 data-d="'.$j.'"
                                                                 data-time_type="'.$dtr[$j]['time_type'].'"
                                                                 style="width:100%;color:'.$color.';'.$border_color.'">
@@ -975,7 +975,7 @@ table td{
                                                             </button></td>';
                                                 }
                                             }
-                                        }                                
+                                        }
                                     }
                                 }
                                 if($dtr[$j]['time_out_pm_type']!=NULL && $dtr[$j]['time_out_pm_type']!='1'){
@@ -999,7 +999,7 @@ table td{
                                             if($current_url=='mydtr'){
                                                 echo '<td>'.$dtr[$j]['in_pm'].'</td>';
                                             }else{
-                                                echo '<td><button class="btn btn-default dtrInput" 
+                                                echo '<td><button class="btn btn-default dtrInput"
                                                             data-d="'.$j.'"
                                                             data-time_type="'.$dtr[$j]['time_type'].'"
                                                             style="width:100%;">
@@ -1020,7 +1020,7 @@ table td{
                                                     echo '<td>'.$dtr[$j]['out_pm'].'</td>';
                                                 }else{
                                                     echo '<td>
-                                                            <button class="btn btn-default dtrInput" 
+                                                            <button class="btn btn-default dtrInput"
                                                                 data-d="'.$j.'"
                                                                 data-time_type="'.$dtr[$j]['time_type'].'"
                                                                 style="width:100%;color:'.$color.';'.$border_color.'">
@@ -1029,14 +1029,14 @@ table td{
                                                 }
                                             }
                                         }
-                                        
+
                                     }
                                 }
-                            }                        
+                            }
                         // }
                     }
                 }
-            }   
+            }
             if($dtr[$j]['hours']>0){
                 $hours = $dtr[$j]['hours'];
             }else{
@@ -1148,8 +1148,8 @@ table td{
             $abs_no_total += $dtr[$j]['abs_no'];
         }
         echo '
-        <tr>';  
-        echo '<th colspan="5">TOTAL</th>'; 
+        <tr>';
+        echo '<th colspan="5">TOTAL</th>';
         $hours = 0;
         $minutes = $total_minutes;
         if($total_minutes>=60){
@@ -1268,7 +1268,7 @@ table td{
         echo '<th>'.$abs_hr.'</th>';
         echo '<th>'.$abs_min.'</th>';
         echo '<th>'.$abs_no_total.'</th>';
-        
+
         echo '
         </tr>';
 @endphp

@@ -14,7 +14,7 @@ use Rats\Zkteco\Lib\ZKTeco;
 class DevicesController extends Controller
 {
     public function table(Request $request){
-        $user_access_level = $request->session()->get('user_access_level'); 
+        $user_access_level = $request->session()->get('user_access_level');
         $data = array();
         $query = Devices::get()
             ->map(function($query) {
@@ -45,10 +45,10 @@ class DevicesController extends Controller
                                     <span class="fa fa-calendar"></span> '.$r['dateTime'].'
                                 </button>';
                 }
-                
+
                 if($r['status']=='' || $r['status']==NULL || $r['status']=='Off'){
                     $status = '<button class="btn btn-danger btn-danger-scan"><span class="fa fa-times"></span> Off</button>';
-                }                
+                }
                 if($user_access_level==1){
                     $clear = '<button class="btn btn-danger btn-danger-scan btn-sm logsClear"
                                 data-id="'.$r['id'].'">
@@ -92,7 +92,7 @@ class DevicesController extends Controller
         if($device){
             $data = array(
                 'device' => $device
-            );     
+            );
             return view('hrims/devices/devicesEditModal',$data);
         }else{
             return view('layouts/error/404');
@@ -105,14 +105,14 @@ class DevicesController extends Controller
             $data = array(
                 'id' => $id,
                 'device' => $device
-            );     
+            );
             return view('hrims/devices/dateTimeModal',$data);
         }else{
             return view('layouts/error/404');
         }
     }
     public function newModalSubmit(Request $request){
-        $user_access_level = $request->session()->get('user_access_level');        
+        $user_access_level = $request->session()->get('user_access_level');
         $result = 'error';
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
             $rules = [
@@ -120,15 +120,15 @@ class DevicesController extends Controller
                 'ipaddress' => 'required',
                 'port' => 'required|numeric'
             ];
-        
+
             $customMessages = [
                 'name.required' => 'Name is required.',
                 'ipaddress.required' => 'Ipaddress is required.',
                 'port.required' => 'Port is required.',
             ];
-        
+
             $validator = Validator::make($request->all(), $rules, $customMessages);
-        
+
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 400); // Return validation errors
             }
@@ -141,7 +141,7 @@ class DevicesController extends Controller
                     ->orWhere('ipaddress',$ipaddress)
                     ->first();
                 if($devicesCheck==NULL){
-                    $insert = new Devices(); 
+                    $insert = new Devices();
                     $insert->name = $name;
                     $insert->ipaddress = $ipaddress;
                     $insert->port = $port;
@@ -159,7 +159,7 @@ class DevicesController extends Controller
         return response()->json($response);
     }
     public function editModalSubmit(Request $request){
-        $user_access_level = $request->session()->get('user_access_level');        
+        $user_access_level = $request->session()->get('user_access_level');
         $result = 'error';
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
             $rules = [
@@ -168,16 +168,16 @@ class DevicesController extends Controller
                 'ipaddress' => 'required',
                 'port' => 'required|numeric'
             ];
-        
+
             $customMessages = [
                 'id.required' => 'ID is required.',
                 'name.required' => 'Name is required.',
                 'ipaddress.required' => 'Ipaddress is required.',
                 'port.required' => 'Port is required.',
             ];
-        
+
             $validator = Validator::make($request->all(), $rules, $customMessages);
-        
+
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 400); // Return validation errors
             }
@@ -211,7 +211,7 @@ class DevicesController extends Controller
         return response()->json($response);
     }
     public function updateStatus(Request $request){
-        $user_access_level = $request->session()->get('user_access_level');        
+        $user_access_level = $request->session()->get('user_access_level');
         $result = 'error';
         $devices = array();
         if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
@@ -251,7 +251,7 @@ class DevicesController extends Controller
                         })->toArray();
                 }
             }catch(Exception $e) {
-                    
+
             }
         }
         $response = array('result' => $result,
@@ -259,7 +259,7 @@ class DevicesController extends Controller
         return response()->json($response);
     }
     public function dateTimeModalSubmit(Request $request){
-        $user_access_level = $request->session()->get('user_access_level');        
+        $user_access_level = $request->session()->get('user_access_level');
         $result = 'error';
         $devices = array();
         $dateTime = '';
@@ -286,16 +286,16 @@ class DevicesController extends Controller
                 // $devices = Devices::where('device_status','Active')
                 //     ->where('id','>=',7)
                 //     ->where('id','<=',8)->get();
-                // if($devices->count()>0){   
-                //     $deviceIds = [];                 
-                //     foreach($devices as $device){                        
+                // if($devices->count()>0){
+                //     $deviceIds = [];
+                //     foreach($devices as $device){
                 //         $zk = new ZKTeco($device->ipaddress,$device->port);
                 //         if ($zk->connect()){
                 //             $dateTime = date('Y-m-d H:i:s');
                 //             //$zk->setTime('2023-08-24 10:26:15');
                 //             $zk->setTime($dateTime);
                 //             $deviceIds[] = $device->id;
-                            
+
                 //             $result = 'success';
                 //         }
                 //     }
@@ -305,7 +305,7 @@ class DevicesController extends Controller
                 // }
 
             }catch(Exception $e) {
-                    
+
             }
         }
         $response = array('result' => $result,

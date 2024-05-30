@@ -3,13 +3,13 @@
         <div class="row">
             <div class="col-lg-12">
                 @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)
-                <button class="btn btn-primary btn-primary-scan float-right" id="new-elig">
+                <button class="btn btn-primary btn-primary-scan float-right" id="new-learn">
                     <span class="fa fa-plus"></span> New
                 </button>
                 @endif
             </div>
             <div class="col-lg-12">
-                <table id="eligTable" class="table table-bordered table-fixed"
+                <table id="learnTable" class="table table-bordered table-fixed"
                     data-toggle="table"
                     data-search="true"
                     data-buttons-class="primary"
@@ -24,12 +24,12 @@
                     <thead>
                         <tr>
                             <th data-field="f1" data-sortable="true" data-align="center">#</th>
-                            <th data-field="f2" data-sortable="true" data-align="center">Eligibilty</th>
-                            <th data-field="f3" data-sortable="true" data-align="center">Rating</th>
-                            <th data-field="f4" data-sortable="true" data-align="center">Date of Examination</th>
-                            <th data-field="f5" data-sortable="true" data-align="center">Place of Examination</th>
-                            <th data-field="f6" data-sortable="true" data-align="center">License No.</th>
-                            <th data-field="f7" data-sortable="true" data-align="center">Date of Validity</th>
+                            <th data-field="f2" data-sortable="true" data-align="center">Title</th>
+                            <th data-field="f3" data-sortable="true" data-align="center">Date From</th>
+                            <th data-field="f4" data-sortable="true" data-align="center">Date To</th>
+                            <th data-field="f5" data-sortable="true" data-align="center">No. of Hours</th>
+                            <th data-field="f6" data-sortable="true" data-align="center">Type of LD</th>
+                            <th data-field="f7" data-sortable="true" data-align="center">Conducted By</th>
                             @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)
                                 <th data-field="f8" data-sortable="true" data-align="center">Option</th>
                             @endif
@@ -40,4 +40,4 @@
         </div>
     </div>
 </div>
-<script src="{{ asset('assets/js/hrims/employee/information/elig_info.js') }}"></script>
+<script src="{{ asset('assets/js/hrims/employee/information/learn_info.js') }}"></script>

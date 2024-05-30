@@ -51,7 +51,7 @@
                              style="width:100%">Trainings</button>
                         <br><br>
                         <button class="btn btn-primary btn-primary-scan buttonDisp"
-                            data-t="others"
+                            data-t="other"
                              style="width:100%">Other Information</button>
                         <br><br>
                         <button class="btn btn-primary btn-primary-scan buttonDisp"

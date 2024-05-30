@@ -1,5 +1,5 @@
 
-<div class="modal-content" id="elig-new-modal">
+<div class="modal-content" id="elig-edit-modal">
     <div class="modal-header">
         <span class="fa fa-plus-square"> New</span>
     </div>
@@ -11,34 +11,38 @@
                 <div id="elig_div">
                     <select class="form-control select2-info" id="eligibility">
                         @foreach($eligibilities as $row)
+                            @if($query->eligibility_id==$row->id)
+                            <option value="{{$row->id}}" selected>{{$row->shorten}} - {{$row->name}}</option>
+                            @else
                             <option value="{{$row->id}}">{{$row->shorten}} - {{$row->name}}</option>
+                            @endif
                         @endforeach
                         <option value="0">Please Select...</option>
                     </select>
                 </div>
-                <input type="text" class="form-control elig_new hide" name="elig_name" id="elig_name" placeholder="Please type new eligibility">
+                <input type="text" class="form-control hide" name="elig_name" id="elig_name" placeholder="Please type new eligibility">
 
-                <input type="text" class="form-control elig_new hide" name="elig_shorten" id="elig_shorten" placeholder="Please type new eligibility shorten">
+                <input type="text" class="form-control hide" name="elig_shorten" id="elig_shorten" placeholder="Please type new eligibility shorten">
             </div>
             <div class="col-lg-6">
                 <label for="rating">Rating:</label>
-                <input type="text" class="form-control" name="rating" id="rating">
+                <input type="text" class="form-control" name="rating" id="rating" value="{{$query->rating}}">
             </div>
             <div class="col-lg-6">
                 <label for="date">Date of Examination:</label>
-                <input type="text" class="form-control datepicker" name="date" id="date">
+                <input type="text" class="form-control datepicker" name="date" id="date" value="{{$query->date}}">
             </div>
             <div class="col-lg-6">
                 <label for="place">Place of Examination:</label>
-                <input type="text" class="form-control" name="place" id="place">
+                <input type="text" class="form-control" name="place" id="place" value="{{$query->place}}">
             </div>
             <div class="col-lg-6">
                 <label for="license_no">License No.:</label>
-                <input type="text" class="form-control" name="license_no" id="license_no">
+                <input type="text" class="form-control" name="license_no" id="license_no" value="{{$query->license_no}}">
             </div>
             <div class="col-lg-6">
                 <label for="date_validity">Date of Validity:</label>
-                <input type="text" class="form-control datepicker" name="date_validity" id="date_validity">
+                <input type="text" class="form-control datepicker" name="date_validity" id="date_validity" value="{{$query->date_validity}}">
             </div>
             <div class="col-lg-12">
                 <label for="file">File:</label>
@@ -53,7 +57,7 @@
     </div>
     <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-success btn-success-scan" id="submit"><span class="fa fa-save"></span> Submit</button>
+        <button type="button" class="btn btn-success btn-success-scan" id="submit" data-id="{{$query->id}}"><span class="fa fa-save"></span> Submit</button>
     </div>
 </div>
 <!-- /.modal-content -->

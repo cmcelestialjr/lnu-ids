@@ -500,6 +500,43 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/eligDelete', 'HRIMS\Employee\Information\EligInfoController@delete');
                     Route::post('/eligDeleteSubmit', 'HRIMS\Employee\Information\EligInfoController@destroy');
 
+                    Route::post('/expInfo', 'HRIMS\Employee\Information\ExpInfoController@index');
+                    Route::post('/expTable', 'HRIMS\Employee\Information\ExpInfoController@show');
+                    Route::post('/expDoc', 'HRIMS\Employee\Information\ExpInfoController@showDoc');
+
+                    Route::post('/volunInfo', 'HRIMS\Employee\Information\VolunInfoController@index');
+                    Route::post('/volunTable', 'HRIMS\Employee\Information\VolunInfoController@show');
+                    Route::post('/volunDoc', 'HRIMS\Employee\Information\VolunInfoController@showDoc');
+                    Route::post('/volunNew', 'HRIMS\Employee\Information\VolunInfoController@create');
+                    Route::post('/volunNewSubmit', 'HRIMS\Employee\Information\VolunInfoController@store');
+                    Route::post('/volunEdit', 'HRIMS\Employee\Information\VolunInfoController@edit');
+                    Route::post('/volunEditSubmit', 'HRIMS\Employee\Information\VolunInfoController@update');
+                    Route::post('/volunDelete', 'HRIMS\Employee\Information\VolunInfoController@delete');
+                    Route::post('/volunDeleteSubmit', 'HRIMS\Employee\Information\VolunInfoController@destroy');
+
+                    Route::post('/learnInfo', 'HRIMS\Employee\Information\LearnInfoController@index');
+                    Route::post('/learnTable', 'HRIMS\Employee\Information\LearnInfoController@show');
+                    Route::post('/learnDoc', 'HRIMS\Employee\Information\LearnInfoController@showDoc');
+                    Route::post('/learnNew', 'HRIMS\Employee\Information\LearnInfoController@create');
+                    Route::post('/learnNewSubmit', 'HRIMS\Employee\Information\LearnInfoController@store');
+                    Route::post('/learnEdit', 'HRIMS\Employee\Information\LearnInfoController@edit');
+                    Route::post('/learnEditSubmit', 'HRIMS\Employee\Information\LearnInfoController@update');
+                    Route::post('/learnDelete', 'HRIMS\Employee\Information\LearnInfoController@delete');
+                    Route::post('/learnDeleteSubmit', 'HRIMS\Employee\Information\LearnInfoController@destroy');
+
+                    Route::post('/otherInfo', 'HRIMS\Employee\Information\OtherInfoController@index');
+                    Route::post('/otherSkillTable', 'HRIMS\Employee\Information\OtherInfoController@showSkill');
+                    Route::post('/otherRecognitionTable', 'HRIMS\Employee\Information\OtherInfoController@showRecognition');
+                    Route::post('/otherOrganizationTable', 'HRIMS\Employee\Information\OtherInfoController@showOrganization');
+                    Route::post('/otherNew', 'HRIMS\Employee\Information\OtherInfoController@create');
+                    Route::post('/otherNewSubmit', 'HRIMS\Employee\Information\OtherInfoController@store');
+                    Route::post('/otherEdit', 'HRIMS\Employee\Information\OtherInfoController@edit');
+                    Route::post('/otherEditSubmit', 'HRIMS\Employee\Information\OtherInfoController@update');
+                    Route::post('/otherDelete', 'HRIMS\Employee\Information\OtherInfoController@delete');
+                    Route::post('/otherDeleteSubmit', 'HRIMS\Employee\Information\OtherInfoController@destroy');
+
+                    Route::post('/docInfo', 'HRIMS\Employee\Information\DocInfoController@index');
+
                     Route::post('/paginate', 'HRIMS\Employee\EmployeePaginateController@paginate');
                     Route::post('/counts', 'HRIMS\Employee\EmployeePaginateController@counts');
 
@@ -519,6 +556,10 @@ Route::group(['middleware' => ['HTTPS']], function(){
                             Route::post('/schedDeleteModal', 'HRIMS\Employee\Information\ScheduleController@schedDeleteModal');
                             Route::post('/schedDeleteSubmit', 'HRIMS\Employee\Information\ScheduleController@schedDeleteSubmit');
                         });
+                    });
+                    Route::group(['prefix'=>'doc'], function(){
+                        Route::post('/pdsInfo', 'HRIMS\Employee\Information\Doc\PdsDocController@index');
+
                     });
                     Route::group(['prefix'=>'deduction'], function(){
                         Route::post('/deductionModal', 'HRIMS\Employee\Deduction\DeductionController@deductionModal');
