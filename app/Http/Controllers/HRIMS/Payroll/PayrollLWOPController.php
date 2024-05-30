@@ -153,16 +153,17 @@ class PayrollLWOPController extends Controller
     {
         $rules = [
             'id' => 'required|numeric',
-            'n' => 'nullable|numeric',
-            'val' => 'required|string'
+            'n' => 'required|string',
+            'val' => 'required|numeric'
         ];
 
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',
-            'n.numeric' => 'N must be a number',
+            'n.required' => 'N must be a number',
+            'n.string' => 'N must be a string',
             'val.required' => 'Val is required',
-            'val.string' => 'Val must be a string',
+            'val.numeric' => 'Val must be a string',
         ];
 
         return Validator::make($request->all(), $rules, $customMessages);

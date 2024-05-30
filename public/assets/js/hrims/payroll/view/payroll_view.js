@@ -23,15 +23,15 @@ $(document).off('click', 'button[name="addEmployeeDivHide"]').on('click', 'butto
     $('#addEmployeeDiv').addClass('hide');
 });
 $(document).off('click', 'button[name="addEmployeeSubmit"]').on('click', 'button[name="addEmployeeSubmit"]', function (e) {
-    var thisBtn = $(this);    
+    var thisBtn = $(this);
     addEmployeeSubmit(thisBtn);
 });
 $(document).off('click', '.removeEmployeeModal').on('click', '.removeEmployeeModal', function (e) {
-    var thisBtn = $(this);    
+    var thisBtn = $(this);
     removeEmployeeModal(thisBtn);
 });
 $(document).off('click', '#removeEmployeeModal button[name="submit"]').on('click', '#removeEmployeeModal button[name="submit"]', function (e) {
-    var thisBtn = $(this);    
+    var thisBtn = $(this);
     removeEmployeeModalSubmit(thisBtn);
 });
 $(document).off('click', '#deductionModalDiv #allowanceLi').on('click', '#deductionModalDiv #allowanceLi', function (e) {
@@ -125,7 +125,7 @@ function deductionModal(thisBtn){
     };
     loadModal(form_data,thisBtn);
 }
-function payrollPrintModal(thisBtn){    
+function payrollPrintModal(thisBtn){
     var id = $('#payroll_id').val();
     var url = base_url+'/hrims/payroll/view/payrollPrintModal';
     var modal = 'default';
@@ -159,12 +159,12 @@ function deductionModalInput(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -209,12 +209,12 @@ function allowanceModalCheck(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -245,6 +245,9 @@ function lwopModalInput(thisBtn){
         n:n,
         val:val
     };
+    if(n=='day_accu' && val>22){
+        thisBtn.val(22);
+    }
     $.ajax({
         url: base_url+'/hrims/payroll/view/lwopModalInput',
         type: 'POST',
@@ -255,12 +258,12 @@ function lwopModalInput(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -307,12 +310,12 @@ function monthInput(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -353,12 +356,12 @@ function salaryChange(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -400,12 +403,12 @@ function addEmployeeSubmit(thisBtn){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
+                thisBtn.removeClass('input-loading');
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
@@ -444,12 +447,12 @@ function removeEmployeeModalSubmit(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -491,12 +494,12 @@ function generatePayroll(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
@@ -555,7 +558,7 @@ function lwopModalInputDisplay(thisBtn){
         $('#deductionModalDiv #lwopDayTotal').html('');
         $('#deductionModalDiv #lwopHourTotal').html('');
         $('#deductionModalDiv #lwopMinuteTotal').html('');
-        
+
         if(lwop_day>0){
             var lwop_day_total = round((day*lwop_day),2);
             $('#deductionModalDiv #lwopDayTotal').html(lwop_day_total);

@@ -10,15 +10,15 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-2">
-                        <label>Salary</label> 
+                        <label>Salary</label>
                         <select class="form-control select2-default" name="salary">
                             @foreach($salaries as $salary)
                                 @if($salary==$query->salary)
                                     <option value="{{$salary}}" selected>{{$salary}}</option>
                                 @else
                                     <option value="{{$salary}}">{{$salary}}</option>
-                                @endif                                
-                            @endforeach                            
+                                @endif
+                            @endforeach
                         </select>
                     </div>
                     @if($query->payroll->payroll_type_id<=2 && $query->emp_stat_id!=5)
@@ -50,7 +50,7 @@
                         <input type="text" class="form-control" name="earned" value="{{$query->earned}}" readonly>
                     </div>
                     <div class="col-lg-2">
-                        <label>Allowance</label>                        
+                        <label>Allowance</label>
                         <input type="text" class="form-control" name="allowance" value="{{$allowance->sum('amount')}}" readonly>
                     </div>
                     <div class="col-lg-2">
@@ -192,7 +192,7 @@
         </div>
     </div>
     <div class="modal-footer justify-content-between">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>        
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     </div>
 </div>
 <!-- /.modal-content -->
