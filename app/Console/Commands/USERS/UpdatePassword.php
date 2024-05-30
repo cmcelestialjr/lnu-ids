@@ -32,17 +32,19 @@ class UpdatePassword extends Command
     {
         $token = new TokenServices;
 
-        $users = Users::where('username','230211')->first();
+        //$user = Users::where('username','230211')->first();
 
-        $token1 = $token->token(4);
-        $token2 = $token->token(4);
-        $password = Crypt::encryptString($token1.Hash::make(str_replace(' ','',mb_strtolower($users->lastname))).$token2);
+        // $token1 = $token->token(4);
+        // $token2 = $token->token(4);
+        // $password = Crypt::encryptString($token1.Hash::make(str_replace(' ','',mb_strtolower($users->lastname))).$token2);
 
-        Users::where('id', $users->id)
-            ->update([
-                'password' => $password
-            ]);
-
-
+        $users = Users::get();
+        foreach($users as $user){
+            $password = Hash::make(str_replace(' ','',ucwords(mb_strtolower($user->lastname))));
+            Users::where('id', $user->id)
+                ->update([
+                    'password' => $password
+                ]);
+        }
     }
 }

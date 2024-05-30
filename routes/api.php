@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Passport\Http\Controllers\AccessTokenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +14,16 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::post('/oauth/token', [AccessTokenController::class, 'issueToken']);
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+//Route::group(['middleware' => ['verify.app.token']], function(){
+    Route::group(['prefix'=>'api'], function(){
+        Route::get('/login', 'API\ApiAuthController@login');
+    });
+//});
+Route::group(['middleware' => ['auth:api']], function(){
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
+

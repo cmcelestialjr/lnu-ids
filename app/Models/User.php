@@ -42,7 +42,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-    
+
     public function user_role()
     {
         return $this->hasMany(UsersRoleList::class, 'user_id', 'id');

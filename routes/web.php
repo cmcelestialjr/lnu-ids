@@ -15,6 +15,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/error/http', function () {
     return view('layouts.error.http');
 });
+
+//Route::group(['middleware' => ['verify.app.token']], function(){
+    Route::group(['prefix'=>'api'], function(){
+        Route::get('login', 'API\ApiAuthController@login');
+    });
+//});
+
+
 Route::group(['middleware' => ['HTTPS']], function(){
     Route::group(['middleware' => ['CheckUser']], function(){
         Route::get('/', 'IndexController@view')->name('indexpage');

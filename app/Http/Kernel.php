@@ -37,6 +37,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\LogoutUsers::class,
+            \Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,
             //\Spatie\Csp\AddCspHeaders::class,
             //\App\Http\Middleware\CSPMiddleware::class,
         ],
@@ -70,5 +71,6 @@ class Kernel extends HttpKernel
         'Login' => \App\Http\Middleware\Login::class,
         'CheckUser' => \App\Http\Middleware\CheckUser::class,
         'PreventBackHistory' => \App\Http\Middleware\PreventBackHistory::class,
+        'verify.app.token' => \App\Http\Middleware\VerifyAppToken::class,
     ];
 }

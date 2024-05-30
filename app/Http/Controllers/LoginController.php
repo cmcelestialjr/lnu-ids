@@ -25,16 +25,19 @@ class LoginController extends Controller
         $username = $request->username;
         $password = $request->password;
         $user = User::where('username',$username)->first();
-        if ($user && $this->checkPassword($user, $password)) {
-            //$encrypt = Crypt::encryptString($token(4).hash('123').$token(4));
-            if($user->status_id=='1'){
-                Auth::login($user);
-                $result = 'success';
-            }elseif($user->status_id=='3'){
-                $result = 'On-hold';
-            }else{
-                $result = 'Inactive';
+        if ($user) {
+            if(Hash::check($password, $user->password)){
+                //$encrypt = Crypt::encryptString($token(4).hash('123').$token(4));
+                if($user->status_id=='1'){
+                    Auth::login($user);
+                    $result = 'success';
+                }elseif($user->status_id=='3'){
+                    $result = 'On-hold';
+                }else{
+                    $result = 'Inactive';
+                }
             }
+
         }
         $response = array('result' => $result);
         return response()->json($response);
