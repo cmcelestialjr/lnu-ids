@@ -34,7 +34,7 @@ class DtrImport extends Command
         $insert->device_id = 0;
         $insert->id_no = '230209';
         $insert->state = 0;
-        $insert->dateTime = '2024-05-24 12:58:09';
+        $insert->dateTime = '2024-05-27 07:59:09';
         $insert->type = 0;
         $insert->link = 0;
         $insert->skyhrImport = 0;
