@@ -30,7 +30,6 @@ class LinkDtr extends Command
     {
         $query = DTRlogs::where('link',0)
             ->orderBy('dateTime','ASC')
-            ->where('id',332532)
             ->get();
         if($query->count() > 0){
             $dtr_log_ids = [];
@@ -108,7 +107,7 @@ class LinkDtr extends Command
                             $check_where = 9;
                         }
                     }
-                    $this->info($check_where);
+                    //$this->info($check_where);
                     if($check==NULL){
                         $insert = new UsersDTR();
                         $insert->id_no = $id_no;
