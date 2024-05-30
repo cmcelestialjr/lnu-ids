@@ -119,19 +119,19 @@ class DtrMachineCheck extends Command
                 }
             }
             $now = now();
-            if ($now->isBetween('07:05', '07:06') ||
-                $now->isBetween('08:35', '08:36') ||
-                $now->isBetween('09:01', '09:02') ||
-                $now->isBetween('12:35', '12:36') ||
-                $now->isBetween('13:01', '13:02') ||
-                $now->isBetween('17:35', '17:36') ||
-                $now->isBetween('18:01', '18:02') ||
-                $now->isBetween('20:35', '20:36') ||
-                $now->isBetween('23:35', '23:40')) {
+            // if ($now->isBetween('07:05', '07:06') ||
+            //     $now->isBetween('08:35', '08:36') ||
+            //     $now->isBetween('09:01', '09:02') ||
+            //     $now->isBetween('12:35', '12:36') ||
+            //     $now->isBetween('13:01', '13:02') ||
+            //     $now->isBetween('17:35', '17:36') ||
+            //     $now->isBetween('18:01', '18:02') ||
+            //     $now->isBetween('20:35', '20:36') ||
+            //     $now->isBetween('23:35', '23:40')) {
                 if($recordsCheck>0){
                     $zk->clearAttendance();
                 }
-            }
+           // }
             //$this->info('Command executed successfully!');
             // if (!empty($recordsToInsert)) {
             //     DB::beginTransaction();
