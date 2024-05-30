@@ -148,6 +148,7 @@ class DtrMachineCheck extends Command
             $status = 'Off';
             $dateTime = NULL;
             $this->updateStatus($id,$status,$dateTime,0);
+            exit(1);
         }
     }
     private function updateStatus($id,$status,$dateTime,$no){
