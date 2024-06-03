@@ -32,10 +32,10 @@ class DtrImport extends Command
     {
         $insert = new DTRlogs();
         $insert->device_id = 0;
-        $insert->id_no = '220806';
+        $insert->id_no = '230209';
         $insert->state = 0;
-        $insert->dateTime = '2024-05-29 12:30:09';
-        $insert->type = 0;
+        $insert->dateTime = '2024-05-02 17:03:09';
+        $insert->type = 1;
         $insert->link = 0;
         $insert->skyhrImport = 0;
         $insert->ipaddress = '10.5.201.137';
@@ -43,9 +43,9 @@ class DtrImport extends Command
 
         $insert = new DTRlogs();
         $insert->device_id = 0;
-        $insert->id_no = '220806';
+        $insert->id_no = '230209';
         $insert->state = 0;
-        $insert->dateTime = '2024-05-29 17:01:09';
+        $insert->dateTime = '2024-05-20 17:05:09';
         $insert->type = 1;
         $insert->link = 0;
         $insert->skyhrImport = 0;
