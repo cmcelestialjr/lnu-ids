@@ -18,7 +18,7 @@ class SystemsController extends Controller
         $count = $query->count();
         $data = array();
         if($count>0){
-            $x = 1;               
+            $x = 1;
             foreach($query as $r){
                 $data_list['f1'] = $x;
                 $data_list['f2'] = $r->name;
@@ -39,8 +39,8 @@ class SystemsController extends Controller
         $data = array(
             'id' => ''
         );
-        return view('users/modal_system_new',$data); 
-    }    
+        return view('users/modal_system_new',$data);
+    }
     public function edit(Request $request){
         $id = $request->id;
         $query = Systems::where('id',$id)->first();
@@ -48,7 +48,7 @@ class SystemsController extends Controller
             'id' => $id,
             'query' => $query
         );
-        return view('users/modal_system_edit',$data); 
+        return view('users/modal_system_edit',$data);
     }
     public function nav(Request $request){
         $id = $request->id;
@@ -59,7 +59,7 @@ class SystemsController extends Controller
             'query' => $query,
             'systems_nav' => $systems_nav
         );
-        return view('users/modal_system_nav',$data); 
+        return view('users/modal_system_nav',$data);
     }
     public function navView(Request $request){
         $id = $request->id;
@@ -67,7 +67,7 @@ class SystemsController extends Controller
         $data = array(
             'systems_nav' => $systems_nav
         );
-        return view('users/modal_system_nav_view',$data); 
+        return view('users/modal_system_nav_view',$data);
     }
     public function navEdit(Request $request){
         $id = $request->id;
@@ -76,7 +76,7 @@ class SystemsController extends Controller
             'id' => $id,
             'systems_nav' => $systems_nav
         );
-        return view('users/modal_system_nav_edit',$data); 
+        return view('users/modal_system_nav_edit',$data);
     }
     public function navNew(Request $request){
         $id = $request->id;
@@ -85,7 +85,7 @@ class SystemsController extends Controller
             'id' => $id,
             'query' => $query
         );
-        return view('users/modal_system_nav_new',$data); 
+        return view('users/modal_system_nav_new',$data);
     }
     public function navSubView(Request $request){
         $id = $request->id;
@@ -93,7 +93,7 @@ class SystemsController extends Controller
         $data = array(
             'systems_nav_sub' => $systems_nav_sub
         );
-        return view('users/modal_system_nav_sub_view',$data); 
+        return view('users/modal_system_nav_sub_view',$data);
     }
     public function navSub(Request $request){
         $id = $request->id;
@@ -104,7 +104,7 @@ class SystemsController extends Controller
             'query' => $query,
             'systems_nav_sub' => $systems_nav_sub
         );
-        return view('users/modal_system_nav_sub',$data); 
+        return view('users/modal_system_nav_sub',$data);
     }
     public function navSubNew(Request $request){
         $id = $request->id;
@@ -113,7 +113,7 @@ class SystemsController extends Controller
             'id' => $id,
             'query' => $query
         );
-        return view('users/modal_system_nav_sub_new',$data); 
+        return view('users/modal_system_nav_sub_new',$data);
     }
     public function navSubEdit(Request $request){
         $id = $request->id;
@@ -122,7 +122,7 @@ class SystemsController extends Controller
             'id' => $id,
             'systems_nav_sub' => $systems_nav_sub
         );
-        return view('users/modal_system_nav_sub_edit',$data); 
+        return view('users/modal_system_nav_sub_edit',$data);
     }
     public function navSubNewSubmit(Request $request){
         $user = Auth::user();
@@ -148,9 +148,9 @@ class SystemsController extends Controller
             $result = 'exists';
         }else{
             try{
-                $insert = new SystemsNavSub; 
+                $insert = new SystemsNavSub;
                 $insert->system_nav_id = $id;
-                $insert->name = $name; 
+                $insert->name = $name;
                 $insert->url = mb_strtolower($url);
                 $insert->icon = $icon;
                 $insert->order = $order;
@@ -158,7 +158,7 @@ class SystemsController extends Controller
                 $insert->save();
                 $result = 'success';
             }catch(Exception $e) {
-                
+
             }
         }
         $response = array('result' => $result);
@@ -198,8 +198,8 @@ class SystemsController extends Controller
                               'updated_at' => date('Y-m-d H:i:s')]);
                 $result = 'success';
             }catch(Exception $e) {
-                
-            }            
+
+            }
         }
         $response = array('result' => $result,
                           'id' => $systems_nav_sub->system_nav_id);
@@ -225,22 +225,23 @@ class SystemsController extends Controller
                         $query->where('url',$url);
                     })->first();
         $result = 'error';
+        dd($check.'-'.$check1);
         if($check!=NULL || $check1!=NULL){
             $result = 'exists';
         }else{
             try{
-                $insert = new SystemsNav; 
+                $insert = new SystemsNav;
                 $insert->system_id = $id;
-                $insert->name = $name; 
-                $insert->url = mb_strtolower($url);                
+                $insert->name = $name;
+                $insert->url = mb_strtolower($url);
                 $insert->icon = $icon;
                 $insert->order = $order;
                 $insert->user_id = $user_id;
                 $insert->save();
                 $result = 'success';
             }catch(Exception $e) {
-                
-            }            
+
+            }
         }
         $response = array('result' => $result);
         return response()->json($response);
@@ -280,8 +281,8 @@ class SystemsController extends Controller
                               'updated_at' => date('Y-m-d H:i:s')]);
                 $result = 'success';
             }catch(Exception $e) {
-                
-            }            
+
+            }
         }
         $response = array('result' => $result,
                           'id' => $systems_nav->system->id);
@@ -314,8 +315,8 @@ class SystemsController extends Controller
                               'updated_at' => date('Y-m-d H:i:s')]);
                 $result = 'success';
             }catch(Exception $e) {
-                
-            }            
+
+            }
         }
         $response = array('result' => $result);
         return response()->json($response);
@@ -337,7 +338,7 @@ class SystemsController extends Controller
         }else{
             try{
                 $query = Systems::orderBy('order','DESC')->first();
-                $insert = new Systems; 
+                $insert = new Systems;
                 $insert->name = $name;
                 $insert->shorten = mb_strtoupper($shorten);
                 $insert->icon = $icon;
@@ -347,8 +348,8 @@ class SystemsController extends Controller
                 $insert->save();
                 $result = 'success';
             }catch(Exception $e) {
-                
-            }            
+
+            }
         }
         $response = array('result' => $result);
         return response()->json($response);
