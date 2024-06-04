@@ -21,6 +21,8 @@ class Kernel extends ConsoleKernel
             $schedule->command('app:dtr-machine-check')->everyThirtySeconds();
             //$schedule->command('app:sky-hr-import')->everyFourMinutes();
             $schedule->command('app:link-dtr')->everyThreeMinutes();
+        }elseif($now->isBetween('5:00', '5:20') || $now->isBetween('10:10', '10:30') || $now->isBetween('13:40', '14:00') || $now->isBetween('20:40', '21:00')){
+            $schedule->command('app:dtr-machine-status')->everyTenMinutes();
         }
     }
 

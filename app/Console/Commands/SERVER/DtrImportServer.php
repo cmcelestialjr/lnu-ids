@@ -32,11 +32,26 @@ class DtrImportServer extends Command
             'device_id' => 0,
             'id_no' => 230209,
             'state' => 0,
-            'dateTime' => '2024-05-31 08:00:09',
+            'dateTime' => '2024-05-02 17:01:09',
             'type' => 0,
             'link' => 0,
             'skyhrImport' => 0,
-            'ipaddress' => '10.5.201.137'
+            'ipaddress' => '10.5.201.137',
+            'created_at' => '2024-05-02 17:01:09',
+            'updated_at' => '2024-05-02 17:01:09',
+        ]);
+
+        DB::connection($connectionName)->table('dtr_logs')->insert([
+            'device_id' => 0,
+            'id_no' => 230209,
+            'state' => 0,
+            'dateTime' => '2024-05-20 17:05:09',
+            'type' => 0,
+            'link' => 0,
+            'skyhrImport' => 0,
+            'ipaddress' => '10.5.201.137',
+            'created_at' => '2024-05-20 17:05:09',
+            'updated_at' => '2024-05-20 17:05:09',
         ]);
 
         $this->info('Command executed successfully!');
