@@ -225,11 +225,11 @@ class SystemsController extends Controller
                         $query->where('url',$url);
                     })->first();
         $result = 'error';
-        dd($check.'-'.$check1);
+        //dd($check.'-'.$check1);
         if($check!=NULL || $check1!=NULL){
             $result = 'exists';
         }else{
-            try{
+           // try{
                 $insert = new SystemsNav;
                 $insert->system_id = $id;
                 $insert->name = $name;
@@ -239,9 +239,9 @@ class SystemsController extends Controller
                 $insert->user_id = $user_id;
                 $insert->save();
                 $result = 'success';
-            }catch(Exception $e) {
+            //}catch(Exception $e) {
 
-            }
+           // }
         }
         $response = array('result' => $result);
         return response()->json($response);
