@@ -54,7 +54,7 @@
                                     <input type="text" class="form-control" name="position_shorten" value="{{$query->position_shorten}}">
                                 @else
                                     <input type="text" class="form-control" name="position_shorten" readonly value="{{$query->position_shorten}}">
-                                @endif                                
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -80,7 +80,7 @@
                             }else{
                                 $disabled = 'disabled';
                             }
-                        @endphp                       
+                        @endphp
                         <select class="form-control select2-primary" name="emp_stat" {{$disabled}}>
                             @foreach($emp_stat as $row)
                                 @if($query->emp_stat_id==$row->id)
@@ -130,7 +130,7 @@
                                 @endif
                             @endforeach
                         </select>
-                    </div>                    
+                    </div>
                     <div class="col-lg-3">
                         <label>Designation</label>
                         <div id="designationList">
@@ -145,7 +145,6 @@
                     <div class="col-lg-12"><br>
                     </div>
                     <div class="col-lg-3">
-                        <label>Designation Type<span class="text-require">*</span></label>
                         @php
                         if($query->designation_id==NULL){
                             $disabled1 = 'disabled';
@@ -153,6 +152,12 @@
                             $disabled1 = '';
                         }
                         @endphp
+                        <label>OIC?<span class="text-require">*</span></label>
+                        <input type="radio" name="oic" id="oic_yes" value="Yes" {{$disabled1}}> <label for="oic_yes">Yes</label> &nbsp;
+                        <input type="radio" name="oic" id="oic_no" value="No" checked {{$disabled1}}> <label for="oic_no">No</label>
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Designation Type<span class="text-require">*</span></label>
                         <select class="form-control select2-primary" name="credit_type" {{$disabled1}}>
                             <option value="none">None</option>
                             @foreach($credit_type as $row)
@@ -177,12 +182,25 @@
                         </select>
                     </div>
                     <div class="col-lg-3">
-                        <label>Office<span class="text-require">*</span></label>
+                        <label>Agency<span class="text-require">*</span></label>
                         <input type="text" class="form-control" name="office" value="{{$query->office}}">
-                    </div>                    
+                    </div>
+
                     <div class="col-lg-12"><br>
                     </div>
-                    
+                    <div class="col-lg-3">
+                        <label for="office">Office</label>
+                        <select class="form-control select2-primary" name="office_id" id="office">
+                            <option value="0">None</option>
+                            @foreach($offices as $row)
+                                @if($query->office_id==$row->id)
+                                    <option value="{{$row->id}}" selected>{{$row->shorten}} - {{$row->name}}</option>
+                                @else
+                                    <option value="{{$row->id}}">{{$row->shorten}} - {{$row->name}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="col-lg-3">
                         <label>Separation Cause</label>
                         <input type="text" class="form-control" name="cause" value="{{$query->cause}}">
@@ -204,7 +222,7 @@
                         </select>
                     </div>
                     <div class="col-lg-12"><br>
-                    </div>                    
+                    </div>
                     <div class="col-lg-4">
                         <label>LWOP</label>
                         <textarea name="lwop" style="width: 100%">{{$query->lwop}}</textarea>
@@ -219,7 +237,7 @@
             </div>
         </div>
     </div>
-    <div class="modal-footer justify-content-between">        
+    <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-success btn-success-scan" name="submit"><span class="fa fa-save"></span> Save</button>
     </div>

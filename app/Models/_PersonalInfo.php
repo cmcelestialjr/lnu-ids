@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class _PersonalInfo extends Model
 {
     protected $table = '_personal_info';
+
+    protected $fillable = [
+        'user_id',
+        'sex',
+        'dob',
+        'tin_no',
+    ];
+
     public function user()
     {
         return $this->belongsTo(Users::class, 'user_id', 'id');

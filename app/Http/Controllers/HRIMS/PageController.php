@@ -276,6 +276,10 @@ class PageController extends Controller
         return view($this->page.'/office/office',$data);
     }
 
+    public function import($data){
+        return view($this->page.'/import/import',$data);
+    }
+
     //my
     public function mydtr($data){
         $user = Auth::user();

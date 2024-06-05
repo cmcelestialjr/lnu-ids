@@ -1,54 +1,54 @@
 position_list('positionList');
 designation_list('designationList');
 $(document).off('click', '#workNewModal button[name="submit"]').on('click', '#workNewModal button[name="submit"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workNewModal';
     var url = 'newSubmit';
-    work_submit(thisBtn,div,url);   
+    work_submit(thisBtn,div,url);
 });
 $(document).off('change', '#workNewModal select[name="position_id"]').on('change', '#workNewModal select[name="position_id"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workNewModal';
-    position_shorten_get(thisBtn,div);   
+    position_shorten_get(thisBtn,div);
 });
 $(document).off('click', '#workNewModal input[name="date_to_option"]').on('click', '#workNewModal input[name="date_to_option"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workNewModal';
-    date_to_option(thisBtn,div); 
+    date_to_option(thisBtn,div);
 });
 $(document).off('change', '#workNewModal select[name="designation"]').on('change', '#workNewModal select[name="designation"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workNewModal';
     designation(thisBtn,div)
 });
 $(document).off('click', '#workNewModal input[name="position_option"]').on('click', '#workNewModal input[name="position_option"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workNewModal';
     position_option(thisBtn,div);
 });
 $(document).off('click', '#workEditModal button[name="submit"]').on('click', '#workEditModal button[name="submit"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workEditModal';
     var url = 'editSubmit';
-    work_submit(thisBtn,div,url);   
+    work_submit(thisBtn,div,url);
 });
 $(document).off('change', '#workEditModal select[name="position_id"]').on('change', '#workEditModal select[name="position_id"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workEditModal';
-    position_shorten_get(thisBtn,div);   
+    position_shorten_get(thisBtn,div);
 });
 $(document).off('click', '#workEditModal input[name="date_to_option"]').on('click', '#workEditModal input[name="date_to_option"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workEditModal';
-    date_to_option(thisBtn,div); 
+    date_to_option(thisBtn,div);
 });
 $(document).off('change', '#workEditModal select[name="designation"]').on('change', '#workEditModal select[name="designation"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workEditModal';
     designation(thisBtn,div)
 });
 $(document).off('click', '#workEditModal input[name="position_option"]').on('click', '#workEditModal input[name="position_option"]', function (e) {
-    var thisBtn = $(this); 
+    var thisBtn = $(this);
     var div = 'workEditModal';
     position_option(thisBtn,div);
 });
@@ -59,6 +59,7 @@ function work_submit(thisBtn,div,url){
     var date_to = $('#'+div+' input[name="date_to"]').val();
     var position_option = $('#'+div+' input[name="position_option"]:checked').val();
     var position_id = $('#'+div+' select[name="position_id"] option:selected').val();
+    var office_id = $('#'+div+' select[name="office_id"] option:selected').val();
     var position_title = $('#'+div+' input[name="position_title"]').val();
     var position_shorten = $('#'+div+' input[name="position_shorten"]').val();
     var salary = $('#'+div+' input[name="salary"]').val();
@@ -77,6 +78,7 @@ function work_submit(thisBtn,div,url){
     var separation = $('#'+div+' input[name="separation"]').val();
     var lwop = $('#'+div+' textarea[name="lwop"]').val();
     var remarks = $('#'+div+' textarea[name="remarks"]').val();
+    var oic = $('#'+div+' input[name="oic"]:checked').val();
     var x = 0;
     $('#'+div+' input[name="date_from"]').removeClass('border-require');
     $('#'+div+' input[name="date_to"]').removeClass('border-require');
@@ -96,7 +98,7 @@ function work_submit(thisBtn,div,url){
         toastr.error('Please input Date To');
         x++;
     }
-    
+
     if(position_option=='None'){
         if(position_title==''){
             $('#'+div+' input[name="position_title"]').addClass('border-require');
@@ -128,7 +130,7 @@ function work_submit(thisBtn,div,url){
             $('#'+div+' #positionList').addClass('border-require');
             toastr.error('Please select Position');
             x++;
-        }        
+        }
     }
     if(x==0){
         var form_data = {
@@ -155,6 +157,8 @@ function work_submit(thisBtn,div,url){
             cause:cause,
             separation:separation,
             lwop:lwop,
+            office_id:office_id,
+            oic:oic,
             remarks:remarks,
         };
         $.ajax({
@@ -167,13 +171,13 @@ function work_submit(thisBtn,div,url){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
-                if(data.result=='success'){                    
+                thisBtn.removeClass('input-loading');
+                if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
                     if(url=='newSubmit'){
@@ -216,15 +220,15 @@ function position_shorten_get(thisBtn,div){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
             $('#'+div+' input[name="position_title"]').val('');
             $('#'+div+' input[name="position_shorten"]').val('');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
-            if(data.result=='success'){                    
+            thisBtn.removeClass('input-loading');
+            if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
                 $('#'+div+' input[name="position_title"]').val(data.title);
@@ -240,7 +244,7 @@ function position_shorten_get(thisBtn,div){
                 $('#'+div+' select[name="designation"]').empty();
                 $('#'+div+' select[name="designation"]').append('<option value="'+data.designation+'">'+data.designation_name+'</option>');
                 $('#'+div+' select[name="credit_type"]').attr('disabled', true);
-                $('#'+div+' select[name="credit_type"]').val('none').change(); 
+                $('#'+div+' select[name="credit_type"]').val('none').change();
                 if(data.designation!='none'){
                     $('#'+div+' select[name="credit_type"]').attr('disabled', false);
                 }
@@ -327,9 +331,11 @@ function position_option(thisBtn,div){
 function designation(thisBtn,div){
     var val = thisBtn.val();
     $('#'+div+' select[name="credit_type"]').attr('disabled', false);
+    $('#'+div+' input[name="oic"]').attr('disabled', false);
     if(val=='none'){
         $('#'+div+' select[name="credit_type"]').val('none').change();
-        $('#'+div+' select[name="credit_type"]').attr('disabled', false);
+        $('#'+div+' select[name="credit_type"]').attr('disabled', true);
+        $('#'+div+' input[name="oic"]').attr('disabled', true);
     }
 }
 function date_to_option(thisBtn,div){

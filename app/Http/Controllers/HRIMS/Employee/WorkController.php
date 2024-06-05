@@ -10,6 +10,7 @@ use App\Models\FundSource;
 use App\Models\HRCreditType;
 use App\Models\HRDesignation;
 use App\Models\HRPosition;
+use App\Models\Office;
 use App\Models\Users;
 use App\Models\UsersRole;
 use Illuminate\Http\Request;
@@ -117,6 +118,7 @@ class WorkController extends Controller
             $credit_type = HRCreditType::get();
             $user_role = UsersRole::where('id','>',1)->get();
             $work_type = _WorkType::get();
+            $offices = Office::get();
             $data = array(
                 'query' => $query,
                 'emp_stat' => $emp_stat,
@@ -124,7 +126,8 @@ class WorkController extends Controller
                 'fund_services' => $fund_services,
                 'credit_type' => $credit_type,
                 'user_role' => $user_role,
-                'work_type' => $work_type
+                'work_type' => $work_type,
+                'offices' => $offices
             );
             return view('hrims/employee/work/newModal',$data);
         }else{
@@ -142,6 +145,7 @@ class WorkController extends Controller
             $credit_type = HRCreditType::get();
             $user_role = UsersRole::where('id','>',1)->get();
             $work_type = _WorkType::get();
+            $offices = Office::get();
             $data = array(
                 'query' => $query,
                 'emp_stat' => $emp_stat,
@@ -149,7 +153,8 @@ class WorkController extends Controller
                 'fund_services' => $fund_services,
                 'credit_type' => $credit_type,
                 'user_role' => $user_role,
-                'work_type' => $work_type
+                'work_type' => $work_type,
+                'offices' => $offices
             );
             return view('hrims/employee/work/editModal',$data);
         }else{
@@ -242,6 +247,8 @@ class WorkController extends Controller
             $role = $request->role;
             $type = $request->type;
             $office = $request->office;
+            $office_id = $request->office_id;
+            $oic = $request->oic;
             $separation = $request->separation;
             $cause = $request->cause;
             $lwop = $request->lwop;
@@ -259,6 +266,9 @@ class WorkController extends Controller
             }
             if($credit_type=='none'){
                 $credit_type = NULL;
+            }
+            if($office_id==0){
+                $office_id = NULL;
             }
 
             $getDesignation = HRDesignation::find($designation);
@@ -317,6 +327,8 @@ class WorkController extends Controller
                 $insert->designation_shorten = $designation_shorten;
                 $insert->credit_type_id = $credit_type;
                 $insert->office = $office;
+                $insert->office_id = $office_id;
+                $insert->oic = $oic;
                 $insert->separation = $separation;
                 $insert->cause = $cause;
                 $insert->lwop = $lwop;
@@ -333,17 +345,10 @@ class WorkController extends Controller
                         ->where('date_from','<=',$date_from)
                         ->update(['status' => $employee->emp_status_id]);
 
-                if($position_option!='None' && $date_to=='present'){
-                    $update = HRPosition::find($position_id);
-                    $update->current_user_id = $id;
-                    $update->save();
-                }
+                $this->updateCurrentPosition($position_option,$date_to,$position_id,$id,$office_id);
 
-                if($getDesignation){
-                    $update = HRDesignation::find($designation);
-                    $update->current_user_id = $id;
-                    $update->save();
-                }
+                $this->updateCurrentDesignation($getDesignation,$designation,$id);
+
                 $result = 'success';
             }
         }
@@ -377,6 +382,8 @@ class WorkController extends Controller
             $role = $request->role;
             $type = $request->type;
             $office = $request->office;
+            $office_id = $request->office_id;
+            $oic = $request->oic;
             $separation = $request->separation;
             $cause = $request->cause;
             $lwop = $request->lwop;
@@ -396,6 +403,9 @@ class WorkController extends Controller
             }
             if($credit_type=='none'){
                 $credit_type = NULL;
+            }
+            if($office_id==0){
+                $office_id = NULL;
             }
             $getDesignation = HRDesignation::find($designation);
             if($getDesignation){
@@ -454,6 +464,8 @@ class WorkController extends Controller
                         'designation_shorten' => $designation_shorten,
                         'credit_type_id' => $credit_type,
                         'office' => $office,
+                        'office_id' => $office_id,
+                        'oic' => $oic,
                         'separation' => $separation,
                         'cause' => $cause,
                         'lwop' => $lwop,
@@ -473,17 +485,9 @@ class WorkController extends Controller
                         ->where('date_from','<=',$date_from)
                         ->update(['status' => $employee->emp_status_id]);
 
-                    if($position_option!='None' && $date_to=='present'){
-                        $update = HRPosition::find($position_id);
-                        $update->current_user_id = $user_id;
-                        $update->save();
-                    }
+                    $this->updateCurrentPosition($position_option,$date_to,$position_id,$user_id,$office_id);
 
-                    if($getDesignation){
-                        $update = HRDesignation::find($designation);
-                        $update->current_user_id = $user_id;
-                        $update->save();
-                    }
+                    $this->updateCurrentDesignation($getDesignation,$designation,$user_id);
 
                     $result = 'success';
                 }
@@ -499,6 +503,23 @@ class WorkController extends Controller
                           'id' => $id
                         );
         return response()->json($response);
+    }
+    private function updateCurrentPosition($position_option,$date_to,$position_id,$user_id,$office_id)
+    {
+        if($position_option!='None' && $date_to=='present'){
+            $update = HRPosition::find($position_id);
+            $update->office_id = $office_id;
+            $update->current_user_id = $user_id;
+            $update->save();
+        }
+    }
+    private function updateCurrentDesignation($getDesignation,$designation,$user_id)
+    {
+        if($getDesignation){
+            $update = HRDesignation::find($designation);
+            $update->current_user_id = $user_id;
+            $update->save();
+        }
     }
     private function entryUpdate(){
 

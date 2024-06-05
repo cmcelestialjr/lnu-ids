@@ -702,6 +702,9 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::post('/officeUpdate/{id}', 'HRIMS\Office\OfficeController@edit');
                     Route::post('/officeUpdateSubmit/{id}', 'HRIMS\Office\OfficeController@update');
                 });
+                Route::group(['prefix'=>'import'], function(){
+                    Route::post('/import', 'HRIMS\Import\ImportController@index');
+                });
                 Route::group(['prefix'=>'my'], function(){
                     Route::post('/payslip', 'HRIMS\MY\PayslipController@index');
                 });

@@ -85,7 +85,7 @@
                             <option value="{{$row->id}}">{{$row->shorten}} ({{$row->name}})</option>
                             @endforeach
                         </select>
-                    </div>                    
+                    </div>
                     <div class="col-lg-3">
                         <label>Designation</label>
                         <div id="designationList">
@@ -95,7 +95,12 @@
                         </div>
                     </div>
                     <div class="col-lg-12"><br>
-                    </div>  
+                    </div>
+                    <div class="col-lg-3">
+                        <label>OIC?<span class="text-require">*</span></label>
+                        <input type="radio" name="oic" id="oic_yes" value="Y" disabled> <label for="oic_yes">Yes</label> &nbsp;
+                        <input type="radio" name="oic" id="oic_no" value="N" checked disabled> <label for="oic_no">No</label>
+                    </div>
                     <div class="col-lg-3">
                         <label>Designation Type<span class="text-require">*</span></label>
                         <select class="form-control select2-primary" name="credit_type" disabled>
@@ -118,7 +123,16 @@
                         <input type="text" class="form-control" name="office" value="LNU">
                     </div>
                     <div class="col-lg-12"><br>
-                    </div>                    
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="office">Office</label>
+                        <select class="form-control select2-primary" name="office_id" id="office">
+                            <option value="0">None</option>
+                            @foreach($offices as $row)
+                                <option value="{{$row->id}}">{{$row->shorten}} - {{$row->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="col-lg-3">
                         <label>Separation Cause</label>
                         <input type="text" class="form-control" name="separation">
@@ -136,7 +150,7 @@
                         </select>
                     </div>
                     <div class="col-lg-12"><br>
-                    </div>                    
+                    </div>
                     <div class="col-lg-4">
                         <label>LWOP</label>
                         <textarea name="lwop" style="width: 100%"></textarea>
@@ -151,7 +165,7 @@
             </div>
         </div>
     </div>
-    <div class="modal-footer justify-content-between">        
+    <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-success btn-success-scan" name="submit"><span class="fa fa-save"></span> Save</button>
     </div>
