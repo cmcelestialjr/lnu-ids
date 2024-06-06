@@ -99,14 +99,17 @@ class PageController extends Controller
         //$query = DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')->where('IdNo','230209')->get();
 
         // try{
-        //     $zk = new ZKTeco('10.5.200.16',4370);
-        //     $zk1 = new ZKTeco('10.5.200.17',4370);
+            //  $zk = new ZKTeco('10.5.205.97',4370);
+            //  $zk1 = new ZKTeco('10.5.205.55',4370);
         //     // $zk_guard = new ZKTeco('10.5.205.8',4370);
         //     // $zk = new ZKTeco('10.5.201.137',4370); //mis
         //     // $zk = new ZKTeco('10.5.205.11',4370); //kabilang guard
         //     // $zk = new ZKTeco('10.5.205.23',4370); //youngfield
         //     // $zk = new ZKTeco('10.5.205.137',4370); // admin
-        //     if ($zk->connect() && $zk1->connect()){
+            // if ($zk->connect() && $zk1->connect()){
+            //     $getUser = $zk->getUser();
+            //     $getUser1 = $zk1->getUser();
+            // }
         //     //     $zk->setTime(date('y-m-d H:i:s'));
         //     //     $zk->testVoice();
         //     //    $getTime = $zk->getTime();
@@ -161,9 +164,23 @@ class PageController extends Controller
         // }catch(Exception $e){
 
         // }
+       // dd($getUser);
+        // $main_ids = array();
+        // foreach($getUser as $row){
+        //     $main_ids[] = $row['userid'];
+        // }
+        // $ids = array();
+        // foreach($getUser1 as $row1){
+        //     $ids[] = $row1['userid'];
+        //     if (!in_array($row1['userid'], $main_ids)) {
+        //         //$zk1->removeUser($row1['uid']);
+        //         //$ids[] = $row1['uid'];
+        //         //$ids[] = $row1['uid'];
+        //     }
+        // }
         $data['deviceName'] = $deviceName;
         $data['getUser'] = $getUser;
-        $data['attendace'] = $attendace;
+        // $data['getUser1'] = $ids;
         $data['getFingerprint'] = $getFingerprint;
         $data['getTime'] = $query;
         return view($this->page.'/home',$data);

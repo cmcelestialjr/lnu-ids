@@ -2,14 +2,8 @@
 
 namespace App\Console\Commands\HRIMS;
 
-use App\Jobs\HrimsDTRJob;
 use App\Models\Devices;
-use App\Models\DTRlogs;
-use App\Models\DTRlogsCopy;
-use App\Models\UsersDTR;
-use App\Models\UsersDTRCopy;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Rats\Zkteco\Lib\ZKTeco;
 
 class DtrMachineStatus extends Command

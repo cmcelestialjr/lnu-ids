@@ -128,7 +128,7 @@ class DtrMachineCheck extends Command
                 $now->isBetween('18:01', '18:02') ||
                 $now->isBetween('20:35', '20:36') ||
                 $now->isBetween('23:35', '23:40')) {
-                if($recordsCheck>0){
+                if($recordsCheck==0){
                     $zk->clearAttendance();
                 }
             }
