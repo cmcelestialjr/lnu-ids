@@ -436,8 +436,8 @@ class DeductionGroupController extends Controller
         $rules = [
             'id' => 'required|numeric',
             'name' => 'required|string',
-            'emp_stats' => 'required|array',
-            'payroll_types' => 'required|array'
+            // 'emp_stats' => 'required|array',
+            // 'payroll_types' => 'required|array'
         ];
 
         $customMessages = [
@@ -445,10 +445,10 @@ class DeductionGroupController extends Controller
             'id.numeric' => 'ID must be a number',
             'name.required' => 'Name is required',
             'name.string' => 'Name must be a string',
-            'emp_stats.required' => 'Employment Status is required',
-            'emp_stats.array' => 'Employment Status must be an array',
-            'payroll_types.required' => 'Payroll Type is required',
-            'payroll_types.array' => 'Payroll Type must be an array',
+            // 'emp_stats.required' => 'Employment Status is required',
+            // 'emp_stats.array' => 'Employment Status must be an array',
+            // 'payroll_types.required' => 'Payroll Type is required',
+            // 'payroll_types.array' => 'Payroll Type must be an array',
         ];
 
         return Validator::make($request->all(), $rules, $customMessages);
