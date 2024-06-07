@@ -1,6 +1,6 @@
 <div class="modal-content" id="docsModal">
     <div class="modal-header">
-        <h4><span class="fa fa-edit"></span> {{$deduction->name}}</h4>        
+        <h4><span class="fa fa-edit"></span> {{$deduction->name}}</h4>
     </div>
     <div class="modal-body">
         <div class="card card-primary card-tabs">
@@ -22,7 +22,7 @@
                             <div class="col-lg-3">
                                 <label>Year</label>
                                 <select class="form-control select2-primary" name="year">
-                                    @for($i=date('Y'); $i >= 2022; $i--) 
+                                    @for($i=date('Y'); $i >= 2022; $i--)
                                         <option value="{{$i}}">{{$i}}</option>
                                     @endfor
                                 </select>
@@ -65,16 +65,24 @@
                             <input type="hidden" name="did" value="{{$deduction->id}}">
                             <div class="row">
                                 <div class="col-lg-3">
+                                    <label>Application No.</label>
+                                    <input type="text" class="form-control" name="account_no">
+                                </div>
+                                <div class="col-lg-3">
+                                    <label>Monthly</label>
+                                    <input type="number" class="form-control" name="amount">
+                                </div>
+                                <div class="col-lg-3">
+                                    <label>Total Loan</label>
+                                    <input type="number" class="form-control" name="total_amount">
+                                </div>
+                                <div class="col-lg-3">
                                     <label>Date From</label>
                                     <input type="text" class="form-control datePicker1" name="date_from">
                                 </div>
                                 <div class="col-lg-3">
                                     <label>Date To</label>
                                     <input type="text" class="form-control datePicker1" name="date_to">
-                                </div>
-                                <div class="col-lg-3">
-                                    <label>Amount</label>
-                                    <input type="number" class="form-control" name="amount">
                                 </div>
                                 <div class="col-lg-3">
                                     <label>Remarks</label>
@@ -104,7 +112,7 @@
         </div>
     </div>
     <div class="modal-footer justify-content-between">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>        
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     </div>
 </div>
 <!-- /.modal-content -->

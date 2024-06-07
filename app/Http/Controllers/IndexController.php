@@ -156,7 +156,8 @@ class IndexController extends Controller
                 'systems' => $systems,
                 'systems_nav_array' => $systems_nav_array,
                 'user_access' => $user_access,
-                'search_value' => $search_value
+                'search_value' => $search_value,
+                'request' => $request
                 );
             $request->session()->put('system_selected', $system_selected);
 

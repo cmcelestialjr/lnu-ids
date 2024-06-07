@@ -22,12 +22,12 @@
                                   <div class="col-lg-4">
                                       <label>Year</label>
                                       <select class="form-control select2" name="year">
-                                          @for($i=date('Y'); $i >= 2022; $i--) 
+                                          @for($i=date('Y'); $i >= 2022; $i--)
                                               <option value="{{$i}}">{{$i}}</option>
                                           @endfor
                                       </select>
                                   </div>
-                                  <div class="col-lg-12">                                            
+                                  <div class="col-lg-12">
                                       <table id="listTable" class="table table-bordered table-fixed"
                                           data-toggle="table"
                                           data-search="true"
@@ -45,7 +45,7 @@
                                               <tr>
                                                   <th data-field="f1" data-sortable="true" data-align="center">#</th>
                                                   <th data-field="f2" data-sortable="true" data-align="center">Deduction Group</th>
-                                                  <th data-field="f3" data-sortable="true" data-align="center">Year</th>                                                        
+                                                  <th data-field="f3" data-sortable="true" data-align="center">Year</th>
                                                   <th data-field="f4" data-sortable="true" data-align="center">Month</th>
                                                   <th data-field="f5" data-sortable="true" data-align="center">Import By</th>
                                                   <th data-field="f6" data-sortable="true" data-align="center">Import DateTime</th>
@@ -78,15 +78,15 @@
                                                   </select>
                                                   <label>Year</label>
                                                   <select class="form-control select2" name="year">
-                                                      @for($i=date('Y'); $i >= 2022; $i--) 
+                                                      @for($i=date('Y'); $i >= 2022; $i--)
                                                           <option value="{{$i}}">{{$i}}</option>
                                                       @endfor
                                                   </select>
                                                   <label>Month</label>
                                                   <select class="form-control select2" name="month">
-                                                      @for($i=1; $i <= 12; $i++) 
+                                                      @for($i=1; $i <= 12; $i++)
                                                           @php
-                                                          $month = date('m', strtotime(date('Y').'-'.$i.'-01')); 
+                                                          $month = date('m', strtotime(date('Y').'-'.$i.'-01'));
                                                           $month_name =  date('F', strtotime(date('Y').'-'.$i.'-01'));
                                                           @endphp
                                                           @if(date('m')==$month)
@@ -101,12 +101,12 @@
                                                   <div class="file-drop-area">
                                                       <button class="btn btn-primary btn-primary-scan">Choose file</button>
                                                       &nbsp; <span class="file-message">or drag and drop file here</span>
-                                                      <input class="file-input" type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                                                      <input class="file-input" type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
                                                   </div><br>
                                                   <button class="btn btn-primary btn-primary-scan" style="width: 100%;">Submit Import</button>
                                               </div>
                                           </div>
-                                      </form>  
+                                      </form>
                                   </div>
                               </div>
                           </div>
@@ -115,7 +115,7 @@
               </div>
             </div>
             <div class="card-footer">
-              
+
             </div>
         </div>
     </div>

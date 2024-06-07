@@ -215,13 +215,29 @@ function deduction_docs_submit(thisBtn){
     var thisForm = $('#docsModal #new #form');
     var x = 0;
     var files = $('#docsModal #new input[name="files[]"]')[0].files;
+    var account_no = $('#docsModal #new input[name="account_no"]').val();
+    var total_amount = $('#docsModal #new input[name="total_amount"]').val();
     var amount = $('#docsModal #new input[name="amount"]').val();
-    if(files.length<=0){
-        toastr.error('Please select a file');
+    // if(files.length<=0){
+    //     toastr.error('Please select a file');
+    //     x++;
+    // }
+    $('#docsModal #new input[name="account_no"]').removeClass('border-require');
+    $('#docsModal #new input[name="total_amount"]').removeClass('border-require');
+    $('#docsModal #new input[name="amount"]').removeClass('border-require');
+    if(account_no==''){
+        toastr.error('Please input application no.');
+        $('#docsModal #new input[name="account_no"]').addClass('border-require');
+        x++;
+    }
+    if(total_amount<=0 || total_amount==''){
+        toastr.error('Please input total loan');
+        $('#docsModal #new input[name="total_amount"]').addClass('border-require');
         x++;
     }
     if(amount<=0 || amount==''){
-        toastr.error('Please input amount');
+        toastr.error('Please input monthly');
+        $('#docsModal #new input[name="amount"]').addClass('border-require');
         x++;
     }
     if(x==0){
@@ -270,10 +286,15 @@ function deduction_docs_submit(thisBtn){
                     progressBar.css('width', '100%').attr('aria-valuenow', 100);
                     progressText.text('100%');
                     $('#docsModal #new input[name="files[]"]').val('');
+                    $('#docsModal #new input[name="account_no"]').val('');
                     $('#docsModal #new input[name="amount"]').val('');
+                    $('#docsModal #new input[name="total_amount"]').val('');
+                    $('#docsModal #new input[name="date_from"]').val('');
+                    $('#docsModal #new input[name="date_to"]').val('');
+
                     $('#docsModal #new .file-message').html('or drag and drop file here');
                 }else{
-                    toastr.error('Error');
+                    toastr.error(data.result);
                     thisBtn.addClass('input-error');
                 }
                 setTimeout(function() {

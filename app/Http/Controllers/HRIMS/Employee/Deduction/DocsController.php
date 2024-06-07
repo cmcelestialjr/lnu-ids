@@ -103,17 +103,27 @@ class DocsController extends Controller
         $uploadedFiles = [];
         $extension = ['jpg','jpeg','png','pdf'];
         $result = 'error';
-        if ($request->hasFile('files')) {
+       // if ($request->hasFile('files')) {
             // try{
-                $files = $request->file('files');
                 $id = $request->id;
                 $emp_stat = $request->emp_stat;
                 $payroll_type = $request->payroll_type;
                 $did = $request->did;
+                $account_no = $request->account_no;
                 $date_from = $request->date_from;
                 $date_to = $request->date_to;
                 $amount = $request->amount;
+                $total_amount = $request->total_amount;
                 $remarks = $request->remarks;
+
+                $check = HRDeductionDocs::where('account_no',$account_no)
+                    ->where('date_from',date('Y-m-d',strtotime($date_from)))
+                    ->first();
+                // if($check){
+                //     return response()->json([
+                //         'result' => 'Already exists'
+                //     ]);
+                // }
 
                 $user = Auth::user();
                 $updated_by = $user->id;
@@ -138,14 +148,16 @@ class DocsController extends Controller
                 );
 
                 $deduction_employee_id = $getDeductionID->id;
-
-                $employee = Users::find($id);
-                $path = 'public/hrims/employee/'.$employee->id_no.'/deduction/docs/'.$deduction_employee_id.'/';
-                $path_retrieve = 'storage/hrims/employee/'.$employee->id_no.'/deduction/docs/'.$deduction_employee_id.'/';
-                $name = 'docs';
-                $imageNameNew = $amount.'_'.date('Y-m-d_H-i-s');
-                $merge_import_services = new MergeImportServices;
-                $doc = $merge_import_services->do($request,$path,$path_retrieve,$extension,$name,$imageNameNew);
+                $doc = NULL;
+                if ($request->hasFile('files')) {
+                    $employee = Users::find($id);
+                    $path = 'public/hrims/employee/'.$employee->id_no.'/deduction/docs/'.$deduction_employee_id.'/';
+                    $path_retrieve = 'storage/hrims/employee/'.$employee->id_no.'/deduction/docs/'.$deduction_employee_id.'/';
+                    $name = 'docs';
+                    $imageNameNew = $amount.'_'.date('Y-m-d_H-i-s');
+                    $merge_import_services = new MergeImportServices;
+                    $doc = $merge_import_services->do($request,$path,$path_retrieve,$extension,$name,$imageNameNew);
+                }
                 // foreach ($files as $file) {
                 //     $filename = $file->getClientOriginalName();
                 //     $extension = $file->getClientOriginalExtension();
@@ -158,20 +170,30 @@ class DocsController extends Controller
 
                 $insert = new HRDeductionDocs();
                 $insert->deduction_employee_id = $deduction_employee_id;
+                $insert->account_no = $account_no;
                 $insert->date_from = $date_from;
                 $insert->date_to = $date_to;
                 $insert->amount = $amount;
+                $insert->total_amount = $total_amount;
                 $insert->remarks = $remarks;
                 $insert->doc = $doc;
                 $insert->updated_by = $updated_by;
                 $insert->save();
 
+                $total_deduction = HRDeductionDocs::where('deduction_employee_id',$deduction_employee_id)
+                    ->where('date_to','>=',date('Y-m-d',strtotime($date_from)))
+                    ->where('date_to','<=',date('Y-m-d',strtotime($date_to)))
+                    ->sum('amount');
 
+                $update = HRDeductionEmployee::find($deduction_employee_id);
+                $update->amount = $total_deduction;
+                $update->save();
+                dd($total_deduction.' '.$deduction_employee_id);
                 $result = 'success';
             // } catch (\Exception $e) {
             //     $result = 'error';
             // }
-        }
+      //  }
 
         return response()->json([
             'result' => $result

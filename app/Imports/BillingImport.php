@@ -4,7 +4,7 @@ namespace App\Imports;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithConditionalSheets;
 
-class BillingImport implements WithMultipleSheets 
+class BillingImport implements WithMultipleSheets
 {
     use WithConditionalSheets;
 
@@ -45,12 +45,13 @@ class BillingImport implements WithMultipleSheets
         $this->payroll_type = $payroll_type;
         $this->updated_by = $updated_by;
     }
-   
+
     public function conditionalSheets(): array
     {
         return [
             'GSIS' => new GSISImport($this->group, $this->billing_id, $this->payroll_type, $this->file, $this->updated_by),
             'PAGIBIG' => new PAGIBIGImport($this->group, $this->billing_id, $this->payroll_type, $this->file, $this->updated_by),
+            'CSB' => new PAGIBIGImport($this->group, $this->billing_id, $this->payroll_type, $this->file, $this->updated_by),
         ];
     }
 }

@@ -120,6 +120,9 @@ class EmployeeImport implements ToModel, WithHeadingRow
         if($remarks==''){
             $remarks = NULL;
         }
+        if($tin_no==''){
+            $tin_no = NULL;
+        }
         UsersRoleList::insert([
                 'user_id' => $user_id,
                 'role_id' => $role_id,
@@ -192,6 +195,9 @@ class EmployeeImport implements ToModel, WithHeadingRow
         }
         if($remarks==''){
             $remarks = NULL;
+        }
+        if($tin_no==''){
+            $tin_no = NULL;
         }
         DB::connection($connectionName)->table('users_role_list')->insert([
                 'user_id' => $user_id,
