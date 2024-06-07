@@ -133,6 +133,7 @@ class PAGIBIGImport implements ToModel
     private function processDataRows(array $row)
     {
         $deductionId = NULL;
+        $status = NULL;
          // Check if the second column has a value
         if ($row[1]) {
             // Determine the appropriate column name based on the value in the second column
@@ -173,6 +174,7 @@ class PAGIBIGImport implements ToModel
                                 'updated_at' => date('Y-m-d H:i:s'),
                             ]
                         );
+                        $status = 1;
                     }
                 }
             }
@@ -187,6 +189,7 @@ class PAGIBIGImport implements ToModel
             $insert->name = $row[1];
             $insert->amount = $row[2];
             $insert->option = null;
+            $insert->status = $status;
             $insert->updated_by = $this->updated_by;
             $insert->save();
         }

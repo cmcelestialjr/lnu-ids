@@ -17,7 +17,7 @@ class EmployeeController extends Controller
             $query->whereIn('role_id', [2,3]);
         };
        // with(['user_role' => $roleFilter])->whereHas('user_role', $roleFilter)
-       
+
        $data = [];
 
         // Validate the incoming request data
@@ -32,12 +32,12 @@ class EmployeeController extends Controller
                     ->where(function ($query) use ($search) {
                         $query->where(DB::raw("CONCAT(lastname,', ',firstname)"), 'LIKE', "%$search%");
                         $query->orWhere('id_no', 'LIKE', "%$search%");
-                    })                    
+                    })
                     ->orderBy('lastname')
                     ->orderBy('firstname')
                     ->limit(10)
                     ->get();
-        
+
         if($results->count()>0){
             foreach ($results as $result) {
                 $employee = $name_services->lastname($result->lastname,$result->firstname,$result->middlename,$result->extname);
@@ -67,12 +67,12 @@ class EmployeeController extends Controller
                     ->where(function ($query) use ($search) {
                         $query->where(DB::raw("CONCAT(lastname,', ',firstname)"), 'LIKE', "%$search%");
                         $query->orWhere('id_no', 'LIKE', "%$search%");
-                    })                    
+                    })
                     ->orderBy('lastname')
                     ->orderBy('firstname')
                     ->limit(10)
                     ->get();
-        
+
         if($results->count()>0){
             foreach ($results as $result) {
                 $employee = $name_services->lastname($result->lastname,$result->firstname,$result->middlename,$result->extname);
@@ -93,7 +93,7 @@ class EmployeeController extends Controller
         $rules = [
             'search' => 'nullable|string',
         ];
-        
+
         $customMessages = [
             'search.string' => 'Search must be a string',
         ];

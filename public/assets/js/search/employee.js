@@ -3,7 +3,7 @@ function employeeSearch(){
     $(document).ready(function() {
         $(".employeeSearch").select2({
             dropdownParent: $("#employeeSearch"),
-            ajax: { 
+            ajax: {
             url: base_url+'/search/employeeSearch',
             type: "post",
             dataType: 'json',

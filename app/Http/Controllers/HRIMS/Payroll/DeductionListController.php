@@ -34,8 +34,8 @@ class DeductionListController extends Controller
                 }
                 $emp_stat = '';
                 $payroll_type = '';
-                if(isset($query->emp_stat)){    
-                    $emp_stat_array = array();                
+                if(isset($query->emp_stat)){
+                    $emp_stat_array = array();
                     foreach($query->emp_stat as $row){
                         $emp_stat_array[] = $row->emp_stat->name;
                     }
@@ -66,7 +66,7 @@ class DeductionListController extends Controller
                 $data_list['f6'] = $r['payroll_type'];
                 $data_list['f4'] = '<button class="btn btn-primary btn-primary-scan btn-sm update"
                                         data-id="'.$r['id'].'">
-                                        <span class="fa fa-edit"></span> 
+                                        <span class="fa fa-edit"></span>
                                     </button>';
                 array_push($data,$data_list);
                 $x++;
@@ -120,39 +120,39 @@ class DeductionListController extends Controller
         $group = $request->group;
         $payroll_type = $request->payroll_type;
         $emp_stat = $request->emp_stat;
-        
+
         if($group=='None'){
             $group = NULL;
         }
-        
+
         $check = HRDeduction::where('name',$name)
-            ->where('group_id',$group)->first();        
+            ->where('group_id',$group)->first();
         if($check){
             return  response()->json($data_response);
         }
-        
+
         try{
-            $insert = new HRDeduction(); 
+            $insert = new HRDeduction();
             $insert->name = $name;
             $insert->group_id = $group;
             $insert->updated_by = $updated_by;
             $insert->save();
             $deduction_id = $insert->id;
-            if($group!=NULL){                    
+            if($group!=NULL){
                 $payroll_type = HRadgEmpStat::where('group_id',$group)->pluck('payroll_type_id')->toArray();
                 $emp_stat = HRadgEmpStat::where('group_id',$group)->pluck('emp_stat_id')->toArray();
             }
-            foreach($payroll_type as $payroll_type){
-                $insert = new HRadgPayrollType(); 
+            foreach($payroll_type as $payroll_type_id){
+                $insert = new HRadgPayrollType();
                 $insert->deduction_id = $deduction_id;
-                $insert->payroll_type_id = $payroll_type;
+                $insert->payroll_type_id = $payroll_type_id;
                 $insert->updated_by = $updated_by;
                 $insert->save();
             }
-            foreach($emp_stat as $emp_stat){
-                $insert = new HRadgEmpStat(); 
+            foreach($emp_stat as $emp_stat_id){
+                $insert = new HRadgEmpStat();
                 $insert->deduction_id = $deduction_id;
-                $insert->emp_stat_id = $emp_stat;
+                $insert->emp_stat_id = $emp_stat_id;
                 $insert->updated_by = $updated_by;
                 $insert->save();
             }
@@ -234,7 +234,7 @@ class DeductionListController extends Controller
         }
 
         $user = Auth::user();
-        $updated_by = $user->id;        
+        $updated_by = $user->id;
         $name = mb_strtoupper($request->name);
         $id = $request->id;
         $name = $request->name;
@@ -252,11 +252,11 @@ class DeductionListController extends Controller
             ->where(function ($query) use ($name,$group) {
                 $query->where('name',$name)
                 ->where('group_id',$group);
-            })->first();        
+            })->first();
         if($check){
             return  response()->json($data_response);
         }
-            
+
         try{
             $user = Auth::user();
             $updated_by = $user->id;
@@ -287,15 +287,15 @@ class DeductionListController extends Controller
             $delete = HRadgEmpStat::whereNotIn('emp_stat_id', $emp_stat)
                 ->where('deduction_id', $id)->delete();
             $auto_increment = DB::update("ALTER TABLE `hr_adg_emp_stat` AUTO_INCREMENT = 0;");
-                
-            foreach($emp_stat as $emp_stat){
+
+            foreach($emp_stat as $emp_stat_id){
                 $check = HRadgEmpStat::where('emp_stat_id',$emp_stat)
                     ->where('deduction_id',$id)->first();
                 if($check==NULL){
-                    $insert = new HRadgEmpStat(); 
+                    $insert = new HRadgEmpStat();
                     $insert->deduction_id = $id;
                     $insert->group_id = NULL;
-                    $insert->emp_stat_id = $emp_stat;
+                    $insert->emp_stat_id = $emp_stat_id;
                     $insert->updated_by = $updated_by;
                     $insert->save();
                 }
@@ -305,14 +305,14 @@ class DeductionListController extends Controller
                 ->where('deduction_id', $id)->delete();
             $auto_increment = DB::update("ALTER TABLE `hr_adg_payroll_type` AUTO_INCREMENT = 0;");
 
-            foreach($payroll_type as $payroll_type){
+            foreach($payroll_type as $payroll_type_id){
                 $check = HRadgPayrollType::where('payroll_type_id',$payroll_type)
                     ->where('deduction_id',$id)->first();
                 if($check==NULL){
                     $insert = new HRadgPayrollType();
                     $insert->deduction_id = $id;
                     $insert->group_id = NULL;
-                    $insert->payroll_type_id = $payroll_type;
+                    $insert->payroll_type_id = $payroll_type_id;
                     $insert->updated_by = $updated_by;
                     $insert->save();
                 }
@@ -350,7 +350,7 @@ class DeductionListController extends Controller
         $rules = [
             'id' => 'required|numeric'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',
@@ -371,10 +371,9 @@ class DeductionListController extends Controller
             'name' => 'required|string',
             'group' => 'nullable|numeric',
             'emp_stat' => 'required|array',
-            'payroll_type' => 'required|array',
             'payroll_type' => 'required|array'
         ];
-        
+
         $customMessages = [
             'name.required' => 'Name is required',
             'name.string' => 'Name must be a string',
@@ -406,7 +405,7 @@ class DeductionListController extends Controller
             'percent_employer' => 'nullable|numeric',
             'ceiling' => 'nullable|numeric',
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',

@@ -9,10 +9,10 @@ class HRDeductionDocs extends Model
 {
     protected $table = 'hr_deduction_docs';
     protected $fillable = [
-        'deduction_employee_id', 
-        'amount', 
+        'deduction_employee_id',
+        'amount',
         'date_from',
-        'date_to',        
+        'date_to',
         'doc',
         'remarks',
         'updated_by'

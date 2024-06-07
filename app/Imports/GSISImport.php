@@ -157,11 +157,11 @@ class GSISImport implements ToModel
     private function processDataRows(array $row)
     {
         // Get personal information based on GSIS BP number
-        $personalInfo = _PersonalInfo::where('gsis_bp_no', $row[0])->first();
+        $personalInfo = _PersonalInfo::with('user.employee_default')->where('gsis_bp_no', $row[0])->first();
 
         for ($i = 0; $i < count($row); $i++) {
             $deductionId = $this->deductionID[$i];
-
+            $status = NULL;
             if ($personalInfo !== null) {
                 // Delete the deduction if the amount is less than or equal to 0
                 if ($row[$i] <= 0) {
@@ -196,6 +196,7 @@ class GSISImport implements ToModel
                             'updated_at' => date('Y-m-d H:i:s'),
                         ]
                     );
+                    $status = 1;
                 }
             }
 
@@ -205,6 +206,7 @@ class GSISImport implements ToModel
             $insert->deduction_id = $deductionId;
             $insert->amount = $row[$i];
             $insert->option = null;
+            $insert->status = $status;
             $insert->updated_by = $this->updated_by;
             $insert->save();
         }

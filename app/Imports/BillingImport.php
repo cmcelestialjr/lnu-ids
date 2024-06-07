@@ -51,7 +51,7 @@ class BillingImport implements WithMultipleSheets
         return [
             'GSIS' => new GSISImport($this->group, $this->billing_id, $this->payroll_type, $this->file, $this->updated_by),
             'PAGIBIG' => new PAGIBIGImport($this->group, $this->billing_id, $this->payroll_type, $this->file, $this->updated_by),
-            'CSB' => new PAGIBIGImport($this->group, $this->billing_id, $this->payroll_type, $this->file, $this->updated_by),
+            'CSB' => new CSBImport($this->group, $this->billing_id, $this->payroll_type, $this->file, $this->updated_by),
         ];
     }
 }

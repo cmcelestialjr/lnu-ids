@@ -181,7 +181,6 @@ class DocsController extends Controller
                 $insert->save();
 
                 $total_deduction = HRDeductionDocs::where('deduction_employee_id',$deduction_employee_id)
-                    ->where('date_to','>=',date('Y-m-d',strtotime($date_from)))
                     ->where('date_to','<=',date('Y-m-d',strtotime($date_to)))
                     ->sum('amount');
 

@@ -60,7 +60,7 @@
                               <div class="row">
                                   <div class="col-lg-12">
                                       <label>Import Billing</label><br>
-                                      <form action="{{ url('/import/billing') }}" method="POST" enctype="multipart/form-data">
+                                      <form action="{{ url('/hrims/payroll/billing/import') }}" method="POST" enctype="multipart/form-data">
                                           @csrf
                                           <div class="row">
                                               <div class="col-lg-5">

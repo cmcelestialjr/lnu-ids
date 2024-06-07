@@ -42,7 +42,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
         Route::middleware(['throttle:10,1'])->group(function () {
             Route::group(['prefix'=>'import'], function(){
                 Route::post('/import', 'ImportController@import');
-                Route::post('/billing', 'ImportController@billing');
+
             });
         });
         // Route::middleware(['throttle:60,1'])->group(function () {
@@ -658,6 +658,11 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     });
                     Route::group(['prefix'=>'billing'], function(){
                         Route::post('/table', 'HRIMS\Payroll\BillingController@index');
+                        Route::post('/show', 'HRIMS\Payroll\BillingController@show');
+                        Route::post('/showTable', 'HRIMS\Payroll\BillingController@showTable');
+                        Route::post('/assign', 'HRIMS\Payroll\BillingController@assign');
+                        Route::post('/assignSubmit', 'HRIMS\Payroll\BillingController@assignSubmit');
+                        Route::post('/import', 'HRIMS\Payroll\BillingController@import');
                     });
                 });
                 Route::group(['prefix'=>'position'], function(){

@@ -2,10 +2,11 @@
 
 namespace App\Imports;
 
-use App\Models\_PersonalInfo;
 use App\Models\HRBillingList;
 use App\Models\HRDeduction;
+use App\Models\HRDeductionDocs;
 use App\Models\HRDeductionEmployee;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Support\Facades\DB;
 
@@ -133,63 +134,67 @@ class CSBImport implements ToModel
     private function processDataRows(array $row)
     {
         $deductionId = NULL;
+        $user_id = NULL;
+        $status = NULL;
          // Check if the second column has a value
-        if ($row[1]) {
-            // Determine the appropriate column name based on the value in the second column
-            if ($row[1] == 'MPL') {
-                $pagibig_no = 'pagibig_mpl_app_no';
-            } elseif ($row[1] == 'MP2') {
-                $pagibig_no = 'pagibig2_no';
-            } elseif ($row[1] == 'CAL') {
-                $pagibig_no = 'pagibig_cal_app_no';
-            } elseif ($row[1] == 'HOUSING') {
-                $pagibig_no = 'pagibig_housing_app_no';
-            }else{
-                $pagibig_no = NULL;
-            }
 
-            if($pagibig_no){
-                // Get the deduction ID based on the column name and value in the second column
-                $deductionId = $this->shouldCreateDeduction($row[1]);
+        //if ($row[0]) {
+            // Get the deduction ID based on the column name and value in the second column
+            $deductionId = $this->shouldCreateDeduction();
+           // dd($deductionId);
+            // Find the personal information using the appropriate column name and value in the first column
+            $employee = HRDeductionDocs::where('account_no', $row[0])
+                ->first();
 
-                // Find the personal information using the appropriate column name and value in the first column
-                $personalInfo = _PersonalInfo::where($pagibig_no, $row[0])->first();
+            // If personal information is found
+            if ($employee) {
+                // Check if the amount in the third column is greater than 0
+                if ($row[2]) {
+                    // Update or create an HRDeductionDocs record based on the user, payroll type, and deduction ID
+                    $user_id = $employee->employee->user_id;
 
-                // If personal information is found
-                if ($personalInfo !== null) {
-                    // Check if the amount in the third column is greater than 0
-                    if ($row[2]) {
-                        // Update or create an HRDeductionEmployee record based on the user, payroll type, and deduction ID
-                        HRDeductionEmployee::updateOrCreate(
-                            [
-                                'user_id' => $personalInfo->user_id,
-                                'payroll_type_id' => $this->payroll_type,
-                                'deduction_id' => $deductionId,
-                            ],
-                            [
-                                'emp_stat_id' => $personalInfo->user->employee_default->emp_stat_id,
-                                'amount' => $row[2],
-                                'updated_by' => $this->updated_by,
-                                'updated_at' => date('Y-m-d H:i:s'),
-                            ]
-                        );
-                    }
+                    HRDeductionDocs::updateOrCreate(
+                        [
+                            'account_no' => $row[0],
+                        ],
+                        [
+                            'date_from' => Carbon::create(1899, 12, 30)->addDays($row[4])->format('Y-m-d'),
+                            'date_to' => Carbon::create(1899, 12, 30)->addDays($row[5])->format('Y-m-d'),
+                            'amount' => $row[2],
+                            'total_amount' => $row[3],
+                            'updated_by' => $this->updated_by,
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]
+                    );
+                    $total_deduction = HRDeductionDocs::where('date_to','>=',date('Y-m-d'))
+                        ->where('deduction_employee_id',$employee->deduction_employee_id)
+                        ->sum('amount');
+                    $update = HRDeductionEmployee::find($employee->deduction_employee_id);
+                    $update->amount = $total_deduction;
+                    $update->save();
+                    $status = 1;
                 }
             }
-        }
 
-        if($deductionId){
-            // Create a new HRBillingList record with the data from the row
-            $insert = new HRBillingList();
-            $insert->staff_no = $row[0];
-            $insert->billing_id = $this->billing_id;
-            $insert->deduction_id = $deductionId;
-            $insert->name = $row[1];
-            $insert->amount = $row[2];
-            $insert->option = null;
-            $insert->updated_by = $this->updated_by;
-            $insert->save();
-        }
+
+            if($deductionId){
+                // Create a new HRBillingList record with the data from the row
+                $insert = new HRBillingList();
+                $insert->billing_id = $this->billing_id;
+                $insert->user_id = $user_id;
+                $insert->staff_no = $row[0];
+                $insert->deduction_id = $deductionId;
+                $insert->name = $row[1];
+                $insert->amount = $row[2];
+                $insert->total_amount = $row[3];
+                $insert->date_from = Carbon::create(1899, 12, 30)->addDays($row[4])->format('Y-m-d');
+                $insert->date_to = Carbon::create(1899, 12, 30)->addDays($row[5])->format('Y-m-d');
+                $insert->option = null;
+                $insert->status = $status;
+                $insert->updated_by = $this->updated_by;
+                $insert->save();
+            }
+        //}
     }
 
     /**
@@ -198,13 +203,13 @@ class CSBImport implements ToModel
      * @param string $deductionName
      * @return int
      */
-    private function shouldCreateDeduction($deductionName)
+    private function shouldCreateDeduction()
     {
         // Check if the deduction already exists based on group ID and name
         $deduction = HRDeduction::firstOrCreate(
             [
                 'group_id' => $this->group->id,
-                'name' => mb_strtoupper($deductionName),
+                'name' => 'LOAN',
             ],
             [
                 'updated_by' => $this->updated_by,
