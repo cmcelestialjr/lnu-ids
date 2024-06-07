@@ -58,13 +58,13 @@ class PayrollController extends Controller
                         $nonExistingValues = array_diff($months, $getMonths1);
                         if (!empty($nonExistingValues)) {
                             $listUser[] = $row;
-                        } 
+                        }
                     }
                     $query = $query->whereIn('id',$listUser);
                 }
-                
+
             }else{
-                
+
                 $query =  $query->whereDoesntHave('payrolls', function ($query) use ($year,$month,$months,$payroll_type,$emp_stats,$fund_sources,$option,$day_from,$day_to) {
                         $query->whereHas('payroll', function ($query) use ($year,$month,$payroll_type,$emp_stats,$fund_sources,$option,$day_from,$day_to) {
                             $query->where('year',$year);

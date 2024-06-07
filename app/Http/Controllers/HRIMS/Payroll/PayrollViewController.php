@@ -591,6 +591,7 @@ class PayrollViewController extends Controller
         $result = 'error';
         $check = 1;
         $id = $request->id;
+
         $list = HRPayrollList::with('payroll')->where('id',$id)->first();
         if ($list==NULL) {
             return  response()->json($data);
@@ -603,30 +604,31 @@ class PayrollViewController extends Controller
         }
 
         $delete = HRPayrollAllowance::where('payroll_list_id', $id)->delete();
-        $auto_increment = DB::update("ALTER TABLE `hr_payroll_allowance` AUTO_INCREMENT = 0;");
+        $auto_increment = DB::update("ALTER TABLE `hr_payroll_allowance` AUTO_INCREMENT = 1;");
         $delete = HRPayrollDeduction::where('payroll_list_id', $id)->delete();
-        $auto_increment = DB::update("ALTER TABLE `hr_payroll_deduction` AUTO_INCREMENT = 0;");
+        $auto_increment = DB::update("ALTER TABLE `hr_payroll_deduction` AUTO_INCREMENT = 1;");
         $delete = HRPayrollMonths::where('payroll_list_id', $id)->delete();
-        $auto_increment = DB::update("ALTER TABLE `hr_payroll_months` AUTO_INCREMENT = 0;$");
+        $auto_increment = DB::update("ALTER TABLE `hr_payroll_months` AUTO_INCREMENT = 1;");
         $delete = HRPayrollList::where('id', $id)->delete();
-        $auto_increment = DB::update("ALTER TABLE `hr_payroll_list` AUTO_INCREMENT = 0;");
+        $auto_increment = DB::update("ALTER TABLE `hr_payroll_list` AUTO_INCREMENT = 1;");
 
         $check = HRPayrollList::where('payroll_id',$payroll_id)->count();
         if($check==0){
             $delete = HRPayrollEmpStat::where('payroll_id', $payroll_id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_emp_stat` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_emp_stat` AUTO_INCREMENT = 1;");
             $delete = HRPayrollFundSource::where('payroll_id', $payroll_id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_source` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_source` AUTO_INCREMENT = 1;");
             $delete = HRPayrollFundService::where('payroll_id', $payroll_id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_service` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_service` AUTO_INCREMENT = 1;");
+            $delete = HRPayroll::where('id', $payroll_id)->delete();
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll` AUTO_INCREMENT = 1;");
             if($tracking_id){
                 $delete = DTSDocsHistory::where('doc_id', $tracking_id)->delete();
-                $auto_increment = DB::update("ALTER TABLE `dts_docs_history` AUTO_INCREMENT = 0;");
+                $auto_increment = DB::update("ALTER TABLE `dts_docs_history` AUTO_INCREMENT = 1;");
                 $delete = DTSDocs::where('id', $tracking_id)->delete();
-                $auto_increment = DB::update("ALTER TABLE `dts_docs` AUTO_INCREMENT = 0;");
+                $auto_increment = DB::update("ALTER TABLE `dts_docs` AUTO_INCREMENT = 1;");
             }
-            $delete = HRPayroll::where('id', $payroll_id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll` AUTO_INCREMENT = 0;");
+
         }else{
             $user = Auth::user();
             $updated_by = $user->id;

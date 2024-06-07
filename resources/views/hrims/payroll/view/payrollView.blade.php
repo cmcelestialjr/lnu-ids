@@ -117,8 +117,8 @@
                                 data-show-columns-toggle-all="true"
                                 data-mobile-responsive="true"
                                 data-pagination="true"
-                                data-page-size="5"
-                                data-page-list="[5, 50, 100, All]"
+                                data-page-size="All"
+                                data-page-list="[All]"
                                 data-loading-template="loadingTemplate"
                                 data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
                             <thead style="font-size:12px;">

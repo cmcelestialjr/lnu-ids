@@ -34,7 +34,7 @@ function listTable(){
     };
     loadTablewLoader(form_data,thisBtn);
 }
-function deletePayroll(thisBtn){    
+function deletePayroll(thisBtn){
     var id = thisBtn.data('id');
     var url = base_url+'/hrims/payroll/view/delete';
     var modal = 'default';
@@ -64,16 +64,17 @@ function deletePayrollSubmit(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
+            thisBtn.removeClass('input-loading');
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
                 $('#deletePayroll'+id).closest('tr').remove();
+                $('#modal-default').modal('hide');
             }else{
                 toastr.error(data.result);
                 thisBtn.addClass('input-error');

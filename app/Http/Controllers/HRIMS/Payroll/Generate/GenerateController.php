@@ -124,6 +124,12 @@ class GenerateController extends Controller
                     }
                 });
 
+            if($status==1){
+                $query = $query->where('emp_status_id',1);
+            }else{
+                $query = $query->where('emp_status_id','>',1);
+            }
+
             if($payroll->month_as_of!=NULL && $payroll->day_as_of!=NULL){
                 if($grant_separated==0){
                     $date_as_of = date('Y-m-d',strtotime($year.'-'.$payroll->month_as_of.'-'.$payroll->day_as_of));

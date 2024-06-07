@@ -63,7 +63,6 @@
                       <table id="listTable" class="table table-bordered table-fixed"
                           data-toggle="table"
                           data-search="true"
-                          data-height="600"
                           data-buttons-class="primary"
                           data-show-export="true"
                           data-show-columns-toggle-all="true"

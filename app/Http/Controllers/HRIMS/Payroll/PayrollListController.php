@@ -234,14 +234,14 @@ class PayrollListController extends Controller
             $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_source` AUTO_INCREMENT = 0;");
             $delete = HRPayrollFundService::where('payroll_id', $id)->delete();
             $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_service` AUTO_INCREMENT = 0;");
+            $delete = HRPayroll::where('id', $id)->delete();
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll` AUTO_INCREMENT = 0;");
             if($tracking_id){
                 $delete = DTSDocsHistory::where('doc_id', $tracking_id)->delete();
                 $auto_increment = DB::update("ALTER TABLE `dts_docs_history` AUTO_INCREMENT = 0;");
                 $delete = DTSDocs::where('id', $tracking_id)->delete();
                 $auto_increment = DB::update("ALTER TABLE `dts_docs` AUTO_INCREMENT = 0;");
             }
-            $delete = HRPayroll::where('id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll` AUTO_INCREMENT = 0;");
 
             return response()->json(['result' => 'success']);
 
