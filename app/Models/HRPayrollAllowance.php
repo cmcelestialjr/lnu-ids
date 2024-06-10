@@ -10,10 +10,10 @@ class HRPayrollAllowance extends Model
     protected $table = 'hr_payroll_allowance';
 
     protected $fillable = [
-        'payroll_list_id', 
-        'payroll_id', 
+        'payroll_list_id',
+        'payroll_id',
         'user_id',
-        'allowance_id',        
+        'allowance_id',
         'amount',
         'updated_by',
         'updated_at',

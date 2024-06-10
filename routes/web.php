@@ -598,6 +598,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
                     Route::group(['prefix'=>'view'], function(){
                         Route::post('/table', 'HRIMS\Payroll\PayrollListController@index');
                         Route::post('/delete', 'HRIMS\Payroll\PayrollListController@delete');
+                        Route::post('/bank', 'HRIMS\Payroll\PayrollListController@bank');
+                        Route::post('/bankSubmit', 'HRIMS\Payroll\PayrollListController@bankSubmit');
                         Route::post('/deleteSubmit', 'HRIMS\Payroll\PayrollListController@destroy');
                         Route::get('/{payroll_id}/{encoded}', 'HRIMS\Payroll\PayrollViewController@index');
                         Route::post('/payroll_table', 'HRIMS\Payroll\PayrollViewController@show');

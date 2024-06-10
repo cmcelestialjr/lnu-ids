@@ -256,6 +256,9 @@ class PageController extends Controller
         $data['payroll_type'] = $payroll_type;
         return view($this->page.'/payroll/billing/billing',$data);
     }
+    public function summary($data){
+        return view($this->page.'/payroll/summary/summary',$data);
+    }
 
     public function signatory($data){
         $signatory_type = Signatory::where('system_shorten',strtoupper($this->page))

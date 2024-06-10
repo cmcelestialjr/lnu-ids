@@ -79,7 +79,7 @@
                                   <th data-field="f3" data-sortable="true" data-align="center">Et Al</th>
                                   <th data-field="f4" data-sortable="true" data-align="center">Type</th>
                                   <th data-field="f5" data-sortable="true" data-align="center">Amount</th>
-                                  {{-- <th data-field="f6" data-sortable="true" data-align="center">Bank</th> --}}
+                                  <th data-field="f6" data-sortable="true" data-align="center">Bank</th>
                                   @if($user_access->level_id==1 || $user_access->level_id==2 || $user_access->level_id==3)
                                     <th data-field="f7" data-sortable="true" data-align="center">Delete</th>
                                   @endif

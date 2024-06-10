@@ -30,7 +30,6 @@
                                     <th data-field="f{{$x}}" data-sortable="true" data-align="center">{{$row->name}}</th>
                                     @php $x++ @endphp
                                     @endforeach
-                                    <th>Status</th>
                                 </tr>
                             </thead>
                          </table>

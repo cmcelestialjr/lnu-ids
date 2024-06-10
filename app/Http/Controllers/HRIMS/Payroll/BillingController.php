@@ -65,28 +65,68 @@ class BillingController extends Controller
     public function showTable(IdRequest $request)
     {
         $data = array();
-        $query = HRBillingList::where('billing_id',$request->id)
-            ->where('option',NULL)
-            ->orderBy('status','ASC')
-            ->cursor();
+        $billing = HRBilling::find($request->id);
 
-        if ($query->isNotEmpty()) {
-            $x = 1;
-            foreach($query as $r){
-                $status = '<button class="btn btn-danger btn-danger-scan assign" data-id="'.$r->id.'"><span class="fa fa-times"></span> Assign</button>';
-                if($r->status==1){
-                    $status = '<button class="btn btn-success btn-success-scan assign" data-id="'.$r->id.'"><span class="fa fa-check"></span> Done</button>';
+        if(!$billing){
+            return  response()->json($data);
+        }
+
+        if($billing->group_id==1){
+            $query = HRBillingList::where('billing_id',$request->id)
+                ->where('option',NULL)
+                ->groupBy('staff_no')
+                ->select('staff_no')
+                ->cursor();
+            if ($query->isNotEmpty()) {
+                $x = 1;
+                foreach($query as $row){
+                    $data_list['f1'] = $x;
+                    $statusCheck = HRBillingList::where('billing_id',$request->id)
+                        ->where('staff_no',$row->staff_no)
+                        ->where('status',1)
+                        ->count();
+                    $list = HRBillingList::where('billing_id',$request->id)
+                        ->where('staff_no',$row->staff_no)
+                        ->get();
+                    //if ($list->isNotEmpty()) {
+                        $x_r = 3;
+                        foreach($list as $r){
+                            $status = '<button class="btn btn-danger btn-danger-scan assign" data-id="'.$r->id.'"><span class="fa fa-times"></span> Assign</button>';
+                            if($statusCheck>=1){
+                                $status = '<button class="btn btn-success btn-success-scan assign" data-id="'.$r->id.'"><span class="fa fa-check"></span> Done</button>';
+                            }
+                            $data_list['f2'] = $status;
+                            $data_list['f'.$x_r] = $r->amount;
+                            $x_r++;
+                        }
+                    //}
+                    array_push($data,$data_list);
                 }
-                $data_list['f1'] = $x;
-                $data_list['f2'] = $status;
-                $data_list['f3'] = $r->staff_no;
-                $data_list['f4'] = $r->name;
-                $data_list['f5'] = $r->amount;
-                $data_list['f6'] = $r->total_amount;
-                $data_list['f7'] = date('m/d/Y',strtotime($r->date_from));
-                $data_list['f8'] = date('m/d/Y',strtotime($r->date_to));
-                array_push($data,$data_list);
-                $x++;
+            }
+        }else{
+            $query = HRBillingList::where('billing_id',$request->id)
+                ->where('option',NULL)
+                ->orderBy('status','ASC')
+                ->cursor();
+
+            if ($query->isNotEmpty()) {
+                $x = 1;
+                foreach($query as $r){
+                    $status = '<button class="btn btn-danger btn-danger-scan assign" data-id="'.$r->id.'"><span class="fa fa-times"></span> Assign</button>';
+                    if($r->status==1){
+                        $status = '<button class="btn btn-success btn-success-scan assign" data-id="'.$r->id.'"><span class="fa fa-check"></span> Done</button>';
+                    }
+                    $data_list['f1'] = $x;
+                    $data_list['f2'] = $status;
+                    $data_list['f3'] = $r->staff_no;
+                    $data_list['f4'] = $r->name;
+                    $data_list['f5'] = $r->amount;
+                    $data_list['f6'] = $r->total_amount;
+                    $data_list['f7'] = date('m/d/Y',strtotime($r->date_from));
+                    $data_list['f8'] = date('m/d/Y',strtotime($r->date_to));
+                    array_push($data,$data_list);
+                    $x++;
+                }
             }
         }
         return  response()->json($data);

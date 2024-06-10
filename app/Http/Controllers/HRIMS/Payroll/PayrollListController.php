@@ -7,6 +7,7 @@ use App\Models\DTSDocs;
 use App\Models\DTSDocsHistory;
 use App\Models\HRPayroll;
 use App\Models\HRPayrollAllowance;
+use App\Models\HRPayrollBank;
 use App\Models\HRPayrollDeduction;
 use App\Models\HRPayrollEmpStat;
 use App\Models\HRPayrollFundService;
@@ -18,6 +19,7 @@ use App\Services\NameServices;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -50,7 +52,7 @@ class PayrollListController extends Controller
         $month = $request->month;
         $type = $request->type;
 
-        $query = HRPayroll::with('emp_stat')
+        $query = HRPayroll::with('emp_stat','bank')
             ->where('generate_option',$type)
             ->where('year',$year);
         if($payroll_type!='All'){
@@ -62,8 +64,22 @@ class PayrollListController extends Controller
         $query = $query->get()
             ->map(function($query) use ($name_services) {
                 $payroll_id = $query->id;
+                $day_from = $query->day_from;
+                $day_to = $query->day_to;
                 foreach($query->emp_stat as $row){
                     $emp_stats[] = $row->gov;
+                }
+                $bank = 'Period:';
+                if($query->bank){
+                    foreach($query->bank as $r_bank){
+                        if($r_bank->type==1){
+                            $bank .= 'Period: '.$day_from.'-15 Date: '.date('m/d/Y h:ia',strtotime($r_bank->dateTime)).'<br>';
+                        }elseif($r_bank->type==2){
+                            $bank .= 'Period: 16-'.$day_to.' Date: '.date('m/d/Y h:ia',strtotime($r_bank->dateTime)).'<br>';
+                        }elseif($r_bank->type==3){
+                            $bank .= 'Period: '.$day_from.'-'.$day_to.' Date: '.date('m/d/Y h:ia',strtotime($r_bank->dateTime));
+                        }
+                    }
                 }
                 return [
                     'id' => $query->id,
@@ -72,12 +88,13 @@ class PayrollListController extends Controller
                     'option' => $query->option_id,
                     'etal' => $query->etal,
                     'payroll_type' => $query->name.'<br>'.$query->period,
-                    'amount' => 'OB:'.$query->ob.'<br>DV:'.$query->dv,
+                    'amount' => 'OB:'.number_format($query->ob,2).'<br>DV:'.number_format($query->dv,2),
                     'emp_stats' => $emp_stats,
                     'year' => $query->year,
                     'month' => $query->month,
                     'day_from' => $query->day_from,
                     'day_to' => $query->day_to,
+                    'bank' => $bank,
                     'generated_at' => $query->generated_at,
                 ];
             })->toArray();
@@ -97,23 +114,16 @@ class PayrollListController extends Controller
                 $data_list['f4'] = $r['payroll_type'];
                 $data_list['f5'] = $r['amount'];
 
-                if($r['payroll_type_id']==1 && $r['option']==1 && in_array('Y', $r['emp_stats'])){
-                    $bank = 'Period: 1-5 - Date: '.$r['generated_at'].'<br>
-                             Period: 16-'.$r['day_to'].' - ';
-                }else{
-                    $bank = 'Period: '.$r['day_from'].'-'.$r['day_to'].' - ';
-                }
-
                 if($user_access_level==1 || $user_access_level==2 || $user_access_level==3){
-                    $data_list['f6'] = '<button class="btn btn-primary btn-primary-scan btn-xs bank"
-                                            data-id="'.$r['id'].'">
-                                            '.$bank.'
+                    $data_list['f6'] = '<button class="btn btn-info btn-info-scan btn-xs bank"
+                                            id="bank'.$x.'"
+                                            data-id="'.$r['id'].'"
+                                            data-x="'.$x.'">
+                                            '.$r['bank'].'
                                         </button>';
                 }else{
-                    $data_list['f6'] = $bank.' '.$r['generated_at'];
+                    $data_list['f6'] = $r['bank'];
                 }
-
-                $data_list['f6'] = $bank.' Date: '.date('M d, Y h:ia',strtotime($r['generated_at']));
 
                 $data_list['f7'] = '<button class="btn btn-danger btn-danger-scan btn-xs delete"
                                         id="deletePayroll'.$r['id'].'"
@@ -154,17 +164,151 @@ class PayrollListController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function bank(Request $request)
     {
-        //
+        $user_access_level = $request->session()->get('user_access_level');
+
+        $hide_1 = '';
+        $hide_2 = 'hide';
+        $hide_3 = 'hide';
+        $date_1 = '';
+        $date_2 = '';
+        $date_3 = '';
+        $time_1 = '';
+        $time_2 = '';
+        $time_3 = '';
+        $time_view_1 = '';
+        $time_view_2 = '';
+        $time_view_3 = '';
+        $day_from = '';
+        $day_to = '';
+
+        $query = HRPayroll::with('emp_stat','bank')
+            ->where('id',$request->id)->first();
+
+        if (!$query) {
+            return view('layouts/error/404');
+        }
+
+        $day_from = $query->day_from;
+        $day_to = $query->day_to;
+
+        foreach($query->emp_stat as $emp_stat){
+            $emp_stats[] = $emp_stat->gov;
+        }
+
+        if($query->bank){
+            foreach($query->bank as $bank){
+                if($bank->type==1){
+                    $date_1 = date('Y-m-d', strtotime($bank->dateTime));
+                    $time_1 = date('H:i:s', strtotime($bank->dateTime));
+                    $time_view_1 = date('h:i:a', strtotime($bank->dateTime));
+                }elseif($bank->type==2){
+                    $date_2 = date('Y-m-d', strtotime($bank->dateTime));
+                    $time_2 = date('H:i:s', strtotime($bank->dateTime));
+                    $time_view_2 = date('h:i:a', strtotime($bank->dateTime));
+                }elseif($bank->type==3){
+                    $date_3 = date('Y-m-d', strtotime($bank->dateTime));
+                    $time_3 = date('H:i:s', strtotime($bank->dateTime));
+                    $time_view_3 = date('h:i:a', strtotime($bank->dateTime));
+                }
+            }
+        }
+
+        if($query->payroll_type_id==1 && $query->option_id==1 && in_array('Y', $emp_stats)){
+            $hide_2 = '';
+            $hide_3 = '';
+        }
+
+        $data = array(
+            'user_access_level' => $user_access_level,
+            'day_from' => $day_from,
+            'day_to' => $day_to,
+            'hide_1' => $hide_1,
+            'hide_2' => $hide_2,
+            'hide_3' => $hide_3,
+            'date_1' => $date_1,
+            'date_2' => $date_2,
+            'date_3' => $date_3,
+            'time_1' => $time_1,
+            'time_2' => $time_2,
+            'time_3' => $time_3,
+            'time_view_1' => $time_view_1,
+            'time_view_2' => $time_view_2,
+            'time_view_3' => $time_view_3,
+            'x' => $request->x,
+            'id' => $query->id
+        );
+        return view('hrims/payroll/view/bank',$data);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function bankSubmit(Request $request)
     {
-        //
+        $query = HRPayroll::with('emp_stat','bank')
+            ->where('id',$request->id)->first();
+
+        if (!$query) {
+            return  response()->json(['result' => 'error']);
+        }
+
+        $id = $request->id;
+        $date_1 = $request->date_1;
+        $time_1 = $request->time_1;
+        $date_2 = $request->date_2;
+        $time_2 = $request->time_2;
+        $date_3 = $request->date_3;
+        $time_3 = $request->time_3;
+
+        $update_1 = $this->bankDateTime($id,$date_1,$time_1,1);
+        $update_2 = $this->bankDateTime($id,$date_2,$time_2,2);
+        $update_2 = $this->bankDateTime($id,$date_3,$time_3,3);
+
+        $btn = 'Period:';
+        $day_from = $query->day_from;
+        $day_to = $query->day_to;
+        $bank = HRPayrollBank::where('payroll_id',$id)
+            ->orderBy('type','ASC')
+            ->get();
+        if($bank->count()>0){
+            foreach($bank as $row){
+                if($row->type==1){
+                    $btn .= 'Period: '.$day_from.'-15 Date: '.date('m/d/Y h:ia',strtotime($row->dateTime)).'<br>';
+                }elseif($row->type==2){
+                    $btn .= 'Period: 16-'.$day_to.' Date: '.date('m/d/Y h:ia',strtotime($row->dateTime)).'<br>';
+                }elseif($row->type==3){
+                    $btn .= 'Period: '.$day_from.'-'.$day_to.' Date: '.date('m/d/Y h:ia',strtotime($row->dateTime));
+                }
+            }
+        }
+
+        return response()->json(['result' => 'success',
+                                'btn' => $btn]);
+    }
+
+    private function bankDateTime($id,$date,$time,$type)
+    {
+        if($time){
+            $user = Auth::user();
+            $updated_by = $user->id;
+            $check = HRPayrollBank::where('payroll_id', $id)->where('type',$type)->first();
+            if($check){
+                $update = HRPayrollBank::find($check->id);
+            }else{
+                $update = new HRPayrollBank();
+                $update->payroll_id = $id;
+            }
+            $update->type = $type;
+            $update->dateTime = date('Y-m-d H:i:s',strtotime($date.' '.$time));
+            $update->updated_by = $updated_by;
+            $update->save();
+        }else{
+            HRPayrollBank::where('payroll_id', $id)->where('type',$type)->delete();
+            DB::update("ALTER TABLE `hr_payroll_bank` AUTO_INCREMENT = 1;");
+        }
+        return 'success';
     }
 
     /**
@@ -220,27 +364,27 @@ class PayrollListController extends Controller
         try{
 
             $delete = HRPayrollAllowance::where('payroll_id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_allowance` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_allowance` AUTO_INCREMENT = 1;");
             $delete = HRPayrollDeduction::where('payroll_id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_deduction` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_deduction` AUTO_INCREMENT = 1;");
             $delete = HRPayrollMonths::where('payroll_id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_months` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_months` AUTO_INCREMENT = 1;");
             $delete = HRPayrollList::where('payroll_id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_list` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_list` AUTO_INCREMENT = 1;");
 
             $delete = HRPayrollEmpStat::where('payroll_id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_emp_stat` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_emp_stat` AUTO_INCREMENT = 1;");
             $delete = HRPayrollFundSource::where('payroll_id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_source` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_source` AUTO_INCREMENT = 1;");
             $delete = HRPayrollFundService::where('payroll_id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_service` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll_fund_service` AUTO_INCREMENT = 1;");
             $delete = HRPayroll::where('id', $id)->delete();
-            $auto_increment = DB::update("ALTER TABLE `hr_payroll` AUTO_INCREMENT = 0;");
+            $auto_increment = DB::update("ALTER TABLE `hr_payroll` AUTO_INCREMENT = 1;");
             if($tracking_id){
                 $delete = DTSDocsHistory::where('doc_id', $tracking_id)->delete();
-                $auto_increment = DB::update("ALTER TABLE `dts_docs_history` AUTO_INCREMENT = 0;");
+                $auto_increment = DB::update("ALTER TABLE `dts_docs_history` AUTO_INCREMENT = 1;");
                 $delete = DTSDocs::where('id', $tracking_id)->delete();
-                $auto_increment = DB::update("ALTER TABLE `dts_docs` AUTO_INCREMENT = 0;");
+                $auto_increment = DB::update("ALTER TABLE `dts_docs` AUTO_INCREMENT = 1;");
             }
 
             return response()->json(['result' => 'success']);

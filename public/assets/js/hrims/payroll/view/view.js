@@ -15,6 +15,12 @@ $(document).off('click', '#payrollView .delete').on('click', '#payrollView .dele
 $(document).off('click', '#deletePayrollSubmit').on('click', '#deletePayrollSubmit', function (e) {
     deletePayrollSubmit($(this));
 });
+$(document).off('click', '#payrollView .bank').on('click', '#payrollView .bank', function (e) {
+    bankPayroll($(this));
+});
+$(document).off('click', '#bank #submit').on('click', '#bank #submit', function (e) {
+    bankSubmit($(this));
+});
 function listTable(){
     var thisBtn = $('#payrollView button[name="submit"]');
     var payroll_type = $('#payrollView select[name="payroll_type"] option:selected').val();
@@ -49,6 +55,23 @@ function deletePayroll(thisBtn){
     };
     loadModal(form_data,thisBtn);
 }
+function bankPayroll(thisBtn){
+    var id = thisBtn.data('id');
+    var x = thisBtn.data('x');
+    var url = base_url+'/hrims/payroll/view/bank';
+    var modal = 'default';
+    var modal_size = 'modal-md';
+    var form_data = {
+        url:url,
+        modal:modal,
+        modal_size:modal_size,
+        static:'',
+        w_table:'wo',
+        id:id,
+        x:x
+    };
+    loadModal(form_data,thisBtn);
+}
 function deletePayrollSubmit(thisBtn){
     var id = thisBtn.data('id');
     var form_data = {
@@ -74,6 +97,64 @@ function deletePayrollSubmit(thisBtn){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
                 $('#deletePayroll'+id).closest('tr').remove();
+                $('#modal-default').modal('hide');
+            }else{
+                toastr.error(data.result);
+                thisBtn.addClass('input-error');
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+}
+function bankSubmit(thisBtn){
+    var id = thisBtn.data('id');
+    var x = thisBtn.data('x');
+    var date_1 = $('#bank #date_1').val();
+    var time_1 = $('#bank #time_1').val();
+    var date_2 = $('#bank #date_2').val();
+    var time_2 = $('#bank #time_2').val();
+    var date_3 = $('#bank #date_3').val();
+    var time_3 = $('#bank #time_3').val();
+
+    var form_data = {
+        id:id,
+        x:x,
+        date_1:date_1,
+        time_1:time_1,
+        date_2:date_2,
+        time_2:time_2,
+        date_3:date_3,
+        time_3:time_3
+    };
+    $.ajax({
+        url: base_url+'/hrims/payroll/view/bankSubmit',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled');
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading');
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisBtn.addClass('input-success');
+                $('#bank'+x).html(data.btn)
                 $('#modal-default').modal('hide');
             }else{
                 toastr.error(data.result);

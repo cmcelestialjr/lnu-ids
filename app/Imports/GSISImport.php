@@ -6,6 +6,7 @@ use App\Models\_PersonalInfo;
 use App\Models\HRBillingList;
 use App\Models\HRDeduction;
 use App\Models\HRDeductionEmployee;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Support\Facades\DB;
 
@@ -179,7 +180,6 @@ class GSISImport implements ToModel
                 // Process the deduction if necessary and the amount is greater than 0
                 if ($this->shouldProcessDeduction($i) && $deductionId !== null && $row[$i] > 0) {
                     $getDeduction = HRDeduction::where('id', $deductionId)->first();
-
                     HRDeductionEmployee::updateOrCreate(
                         [
                             'user_id' => $personalInfo->user_id,
@@ -199,12 +199,16 @@ class GSISImport implements ToModel
                     $status = 1;
                 }
             }
-
+            if($i==6 || $i==9){
+                $amount = Carbon::create(1899, 12, 30)->addDays($row[$i])->format('Y-m-d');
+            }else{
+                $amount = $row[$i];
+            }
             $insert = new HRBillingList();
             $insert->staff_no = $row[0];
             $insert->billing_id = $this->billing_id;
             $insert->deduction_id = $deductionId;
-            $insert->amount = $row[$i];
+            $insert->amount = $amount;
             $insert->option = null;
             $insert->status = $status;
             $insert->updated_by = $this->updated_by;

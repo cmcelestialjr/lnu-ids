@@ -20,6 +20,10 @@ class HRPayroll extends Model
     {
         return $this->hasMany(HRPayrollList::class, 'payroll_id', 'id');
     }
+    public function bank()
+    {
+        return $this->hasMany(HRPayrollBank::class, 'payroll_id', 'id');
+    }
     public function deduction()
     {
         return $this->hasMany(HRPayrollDeduction::class, 'payroll_id', 'id');

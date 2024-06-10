@@ -43,16 +43,19 @@ class PayslipController extends Controller
             $payroll_period = $payroll_type_query->time_period_id;
             $payroll = HRPayroll::whereHas('list', function ($subQuery) use ($user_id) {
                     $subQuery->where('user_id',$user_id);
-                })->where('payroll_type_id',$payroll_type)
+                })->whereHas('bank', function ($subQuery) {
+
+                })
+                ->where('payroll_type_id',$payroll_type)
                 ->where('year',$year);
-            if($payroll_period!=4){
-                $payroll = $payroll->where('month',$month);
-            }
+            // if($payroll_period!=4){
+            //     $payroll = $payroll->where('month',$month);
+            // }
             $payroll = $payroll->get();
 
             if($payroll->count()<=0){
-                return response()->json(['result' => 'error',
-                        'src' => asset('assets\pdf\pdf_error.pdf')]);
+                return response()->json(['result' => 'No available payslip.',
+                        'src' => asset('assets\pdf\no-data-found.pdf')]);
             }
 
             if($payroll->count()>1){
