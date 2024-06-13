@@ -10,6 +10,10 @@ $(document).off('change', '#schedNewModal input[name="duration"]').on('change', 
     var thisBtn = $(this);
     schedNewDaysList(thisBtn);
 });
+$(document).off('change', '#schedNewModal select[name="is_rotation_duty"]').on('change', '#schedNewModal select[name="is_rotation_duty"]', function (e) {
+    var thisBtn = $(this);
+    schedNewDaysList(thisBtn);
+});
 $(document).off('click', '#schedNewModal button[name="submit"]').on('click', '#schedNewModal button[name="submit"]', function (e) {
     var thisBtn = $(this);
     schedNewSubmit(thisBtn);
@@ -23,6 +27,10 @@ $(document).off('blur', '#schedEditModal .time_input').on('blur', '#schedEditMod
     schedEditDaysList(thisBtn);
 });
 $(document).off('change', '#schedEditModal input[name="duration"]').on('change', '#schedEditModal input[name="duration"]', function (e) {
+    var thisBtn = $(this);
+    schedEditDaysList(thisBtn);
+});
+$(document).off('change', '#schedEditModal select[name="is_rotation_duty"]').on('change', '#schedEditModal select[name="is_rotation_duty"]', function (e) {
     var thisBtn = $(this);
     schedEditDaysList(thisBtn);
 });
@@ -42,7 +50,7 @@ $(document).off('change', '#table select').on('change', '#table select', functio
     var thisBtn = $(this);
     _information1('schedule',thisBtn,'table_active');
 });
-function _information1(url,thisBtn,active){    
+function _information1(url,thisBtn,active){
     var id = thisBtn.data('id');
     var from_sys = thisBtn.data('sys');
     var year = $('#table select[name="year"] option:selected').val();
@@ -131,7 +139,7 @@ function schedNewSubmit(thisBtn){
     var x = 0;
     $('#schedNewModal input[name="days[]"]:checked').each(function(){
         days.push($(this).val());
-    }); 
+    });
     if(days==''){
         toastr.error('Please select Day!');
         x++;
@@ -148,11 +156,13 @@ function schedNewSubmit(thisBtn){
         toastr.error('Please input correct time format!');
         x++;
     }
-    if(time_from>=time_to){
-        $('#schedNewModal input[name="time_from"]').addClass('border-require');
-        $('#schedNewModal input[name="time_to"]').addClass('border-require');
-        toastr.error('Time from must less than time to');
-        x++;
+    if(is_rotation_duty=='No'){
+        if(time_from>time_to){
+            $('#schedNewModal input[name="time_from"]').addClass('border-require');
+            $('#schedNewModal input[name="time_to"]').addClass('border-require');
+            toastr.error('Time from must less than time to');
+            x++;
+        }
     }
     if(x==0){
         var form_data = {
@@ -163,7 +173,7 @@ function schedNewSubmit(thisBtn){
             time_from:time_from,
             time_to:time_to,
             days:days,
-            remarks:remarks            
+            remarks:remarks
         };
         $.ajax({
             url: base_url+'/hrims/employee/information/schedule/schedNewSubmit',
@@ -175,13 +185,13 @@ function schedNewSubmit(thisBtn){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
-                if(data.result=='success'){                    
+                thisBtn.removeClass('input-loading');
+                if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
                     var url = 'schedule';
@@ -277,7 +287,7 @@ function schedEditSubmit(thisBtn){
     var x = 0;
     $('#schedEditModal input[name="days[]"]:checked').each(function(){
         days.push($(this).val());
-    }); 
+    });
     if(days==''){
         toastr.error('Please select Day!');
         x++;
@@ -294,11 +304,13 @@ function schedEditSubmit(thisBtn){
         toastr.error('Please input correct time format!');
         x++;
     }
-    if(time_from>=time_to){
-        $('#schedEditModal input[name="time_from"]').addClass('border-require');
-        $('#schedEditModal input[name="time_to"]').addClass('border-require');
-        toastr.error('Time from must less than time to');
-        x++;
+    if(is_rotation_duty=='No'){
+        if(time_from>time_to){
+            $('#schedEditModal input[name="time_from"]').addClass('border-require');
+            $('#schedEditModal input[name="time_to"]').addClass('border-require');
+            toastr.error('Time from must less than time to');
+            x++;
+        }
     }
     if(x==0){
         var form_data = {
@@ -321,13 +333,13 @@ function schedEditSubmit(thisBtn){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
-                if(data.result=='success'){                    
+                thisBtn.removeClass('input-loading');
+                if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
                     var url = 'schedule';
@@ -380,15 +392,15 @@ function schedDeleteSubmit(thisBtn){
         cache: false,
         dataType: 'json',
         beforeSend: function() {
-            thisBtn.attr('disabled','disabled'); 
+            thisBtn.attr('disabled','disabled');
             thisBtn.addClass('input-loading');
         },
         success : function(data){
             thisBtn.removeAttr('disabled');
-            thisBtn.removeClass('input-loading'); 
-            if(data.result=='success'){                    
+            thisBtn.removeClass('input-loading');
+            if(data.result=='success'){
                 toastr.success('Success');
-                thisBtn.addClass('input-success');                
+                thisBtn.addClass('input-success');
                 var url = 'schedule';
                 _information(url,thisBtn,'table_active');
                 $('#modal-info').modal('hide');
@@ -411,11 +423,11 @@ function schedDeleteSubmit(thisBtn){
 }
 function checkTimeFormat(timeString) {
     var timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
-  
+
     return timeRegex.test(timeString);
 }
 function checkTimeFormat1(timeString) {
     var timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-  
+
     return timeRegex.test(timeString);
 }

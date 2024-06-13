@@ -24,7 +24,7 @@ use PDF;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class IndividualController extends Controller
-{   
+{
     public function individual(Request $request,Users $users,
         _Work $_work, UsersDTR $usersDtr, Holidays $_holidays,
         UsersSchedDays $usersSchedDays, UsersSchedTime $usersSchedTime, EducOfferedScheduleDay $educOfferedScheduleDay,
@@ -55,7 +55,7 @@ class IndividualController extends Controller
         $check = UsersDTR::where('id_no',$id_no)
             ->whereYear('date',$year)
             ->whereMonth('date',$month)->first();
-        if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req) && $check!=NULL){            
+        if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req) && $check!=NULL){
             $result = 'success';
 
             // $insert = new DTRlogs();
@@ -181,7 +181,7 @@ class IndividualController extends Controller
 
                 $time = date('H:i',strtotime($dateTime));
                 $date = date('Y-m-d',strtotime($dateTime));
-                
+
                 $check = UsersDTR::where('id_no',$user_id)
                     ->where('date',$date)->first();
                 if($time<'12:00'){
@@ -211,7 +211,7 @@ class IndividualController extends Controller
                             $state_column = 'state_out_am';
                             $ip_column = 'ipaddress_out_am';
                         }
-                        
+
                     }
                 }elseif($time>='12:00' && $time<='13:00'){
                     if($type==0 || $type==3){
@@ -294,7 +294,7 @@ class IndividualController extends Controller
                                     'ipaddress_out_pm' => NULL]);
                     }
                 }
-                $dtr_log_ids[] = $dtr_log_id;                
+                $dtr_log_ids[] = $dtr_log_id;
             }
             DTRlogs::whereIn('id',$dtr_log_ids)
                     ->update(['link' => 1,
@@ -308,7 +308,7 @@ class IndividualController extends Controller
         $id_no_req = $request->id_no;
         $year = $request->year;
         $month = $request->month;
-        $day = $request->day;        
+        $day = $request->day;
         if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req)){
             $weekDay = date('w', strtotime($year.'-'.$month.'-'.$day));
             $date = date('Y-m-d',strtotime($year.'-'.$month.'-'.$day));
@@ -321,7 +321,7 @@ class IndividualController extends Controller
                 ->first();
             $users = Users::where('id_no',$id_no_req)
                 ->first();
-            
+
             $user_id = $users->id;
 
             $time_from_to = $this->time_from_to($user_id,$year,$month,$weekDay);
@@ -333,14 +333,14 @@ class IndividualController extends Controller
             $time_type_ids = array(1,2,3,4,5,6,7);
             $time_type_ids_not = array('');
             if($query!=NULL){
-                if(($query->status==1) || 
+                if(($query->status==1) ||
                     ($query->time_in_am!=NULL && $query->time_in_am_type==NULL &&
                      $query->time_out_am!=NULL && $query->time_out_am_type==NULL &&
                      $query->time_in_pm!=NULL && $query->time_in_pm_type==NULL &&
                      $query->time_out_pm!=NULL && $query->time_out_pm_type==NULL)){
                     $time_type_ids = array('');
                 }else{
-                    $push = 0;                    
+                    $push = 0;
                     if($query->time_in_am!=NULL && $query->time_in_am_type==NULL){
                         array_push($time_type_ids_not,2);
                         $push++;
@@ -400,7 +400,7 @@ class IndividualController extends Controller
         $id_no_req = $request->id_no;
         $year = $request->year;
         $month = $request->month;
-        $day = $request->day;        
+        $day = $request->day;
         if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req)){
             $time_type = $request->time_type;
             $weekDay = date('w', strtotime($year.'-'.$month.'-'.$day));
@@ -764,7 +764,7 @@ class IndividualController extends Controller
                 $department = NULL;
             }
             $datas['department_id'] = $department;
-            $datas['updated_by'] = $updated_by;            
+            $datas['updated_by'] = $updated_by;
             UsersRoleList::where('user_id',$id)
                 ->where('role_id',3)
                 ->update($datas);
@@ -778,7 +778,7 @@ class IndividualController extends Controller
         $work = _Work::where('user_id',$user_id)
                 ->where('date_to','present')
                 ->orderBy('emp_stat_id','ASC')
-                ->orderBy('date_from','DESC')                
+                ->orderBy('date_from','DESC')
                 ->first();
         $emp_type = 'Employee';
         if($work!=NULL){
@@ -791,7 +791,7 @@ class IndividualController extends Controller
                 }
             }
         }
-        
+
         return array(
             'emp_type' => $emp_type,
             'emp_stat_id' => $emp_stat_id
@@ -803,49 +803,62 @@ class IndividualController extends Controller
             //$emp_type = 'Faculty';
             $time_from = '';
             $time_to = '';
-            if($emp_type=='Employee'){
-                $day = UsersSchedDays::where('user_id',$user_id)->where('day',$weekDay)->first();
-                if($day!=NULL){
-                    $time_from = date('H:i',strtotime($day->time->time_from));
-                    $time_to = date('H:i',strtotime($day->time->time_to));
-                }
-            }else{
-                $day = EducOfferedScheduleDay::where('no',$weekDay)
-                    ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {                        
-                        $query->whereHas('course', function ($query) use ($user_id,$year,$month) {
-                            $query->where('instructor_id',$user_id);
-                            $query->whereHas('curriculum', function ($query) use ($year,$month) {
-                                $query->whereHas('offered_program', function ($query) use ($year,$month) {                                    
-                                    $query->whereHas('school_year', function ($query) use ($year,$month) {
-                                        $query->where('year_from','>=',$year);
-                                        $query->whereHas('grade_period', function ($query) use ($month) {
-                                            $query->whereHas('month', function ($query) use ($month) {
-                                                $query->where('month',$month);
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    })
-                    ->pluck('offered_schedule_id')->toArray();
-                $time_from_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_from','ASC')
-                    ->whereHas('course', function ($query) {
-                        $query->where('load_type',1);
-                    })
-                    ->first();
-                $time_to_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_to','DESC')
-                    ->whereHas('course', function ($query) {
-                        $query->where('load_type',1);
-                    })
-                    ->first();
-                if($time_from_query!=NULL){
-                    $time_from = date('H:i',strtotime($time_from_query->time_from));
-                }
-                if($time_to_query!=NULL){
-                    $time_to =date('H:i',strtotime( $time_to_query->time_to));
-                }
+            $day = UsersSchedDays::where('user_id',$user_id)
+                ->where('day',$weekDay)
+                ->whereHas('time', function ($query) use ($year,$month) {
+                    $query->whereYear('date_from','>=',$year);
+                    $query->whereYear('date_to','<=',$year);
+                    $query->whereMonth('date_from','>=',$month);
+                    $query->whereMonth('date_to','<=',$month);
+                })
+                ->first();
+            if($day!=NULL){
+                $time_from = date('H:i',strtotime($day->time->time_from));
+                $time_to = date('H:i',strtotime($day->time->time_to));
             }
+            // if($emp_type=='Employee'){
+            //     $day = UsersSchedDays::where('user_id',$user_id)->where('day',$weekDay)->first();
+            //     if($day!=NULL){
+            //         $time_from = date('H:i',strtotime($day->time->time_from));
+            //         $time_to = date('H:i',strtotime($day->time->time_to));
+            //     }
+            // }else{
+            //     $day = EducOfferedScheduleDay::where('no',$weekDay)
+            //         ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {
+            //             $query->whereHas('course', function ($query) use ($user_id,$year,$month) {
+            //                 $query->where('instructor_id',$user_id);
+            //                 $query->whereHas('curriculum', function ($query) use ($year,$month) {
+            //                     $query->whereHas('offered_program', function ($query) use ($year,$month) {
+            //                         $query->whereHas('school_year', function ($query) use ($year,$month) {
+            //                             $query->where('year_from','>=',$year);
+            //                             $query->whereHas('grade_period', function ($query) use ($month) {
+            //                                 $query->whereHas('month', function ($query) use ($month) {
+            //                                     $query->where('month',$month);
+            //                                 });
+            //                             });
+            //                         });
+            //                     });
+            //                 });
+            //             });
+            //         })
+            //         ->pluck('offered_schedule_id')->toArray();
+            //     $time_from_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_from','ASC')
+            //         ->whereHas('course', function ($query) {
+            //             $query->where('load_type',1);
+            //         })
+            //         ->first();
+            //     $time_to_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_to','DESC')
+            //         ->whereHas('course', function ($query) {
+            //             $query->where('load_type',1);
+            //         })
+            //         ->first();
+            //     if($time_from_query!=NULL){
+            //         $time_from = date('H:i',strtotime($time_from_query->time_from));
+            //     }
+            //     if($time_to_query!=NULL){
+            //         $time_to =date('H:i',strtotime( $time_to_query->time_to));
+            //     }
+            // }
         return array(
                 'time_from' => $time_from,
                 'time_to' => $time_to

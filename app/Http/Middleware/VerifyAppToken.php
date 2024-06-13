@@ -17,6 +17,7 @@ class VerifyAppToken
     public function handle(Request $request, Closure $next)
     {
         $appToken = env('APP_TOKEN');
+        $appToken = 'LNU-!ds-m0b!l3-@pp';
         if ($request->header('App-Token') !== $appToken) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
