@@ -22,7 +22,7 @@ use PDF;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PDFController extends Controller
-{   
+{
     public function PDF(Request $request){
         $user_access_level = $request->session()->get('user_access_level');
         $user = Auth::user();
@@ -38,7 +38,7 @@ class PDFController extends Controller
             ->whereYear('date',$year)
             ->whereMonth('date',$month)->first();
         if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req) && $check!=NULL){
-            $result = 'success';            
+            $result = 'success';
             $name_services = new NameServices;
             $src = $this->generateQR($id_no_req,$year,$month,$range,$option);
             $user = Users::where('id_no',$id_no_req)->first();
@@ -111,13 +111,13 @@ class PDFController extends Controller
         $pathUser = NULL;
         $user = Users::with('employee_default.position.office_designate.current_user','instructor_info.position.office_designate.current_user')->where('id_no',$id_no)->first();
         $user_id = $user->id;
-        $emp_stat_gov = $user->employee_default->emp_stat->gov;        
+        $emp_stat_gov = $user->employee_default->emp_stat->gov;
         $name = mb_strtoupper($name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname));
-        
+
         $logo = public_path('assets\images\logo\lnu_logo.png');
         $logo_blur = public_path('assets\images\logo\lnu_logo_blur1.png');
         $scissor = public_path('assets\images\icons\png\scissor1.png');
-        
+
         $signatory = '';
 
         if($option=='o'){
@@ -169,9 +169,9 @@ class PDFController extends Controller
                 $dtr[$m]['in_am'] = '';
                 $dtr[$m]['out_am'] = '';
                 $dtr[$m]['in_pm'] = '';
-                $dtr[$m]['out_pm'] = '';  
+                $dtr[$m]['out_pm'] = '';
                 $dtr[$m]['time_from'] = '';
-                $dtr[$m]['time_to'] = '';          
+                $dtr[$m]['time_to'] = '';
                 $dtr[$m]['time_type'] = '';
                 $dtr[$m]['time_type_name'] = '';
                 $dtr[$m]['time_in_am_type'] = '';
@@ -201,7 +201,7 @@ class PDFController extends Controller
                     ->where('date_from','<=',date('Y-m-d',strtotime($year.'-'.$month.'-'.$l)))
                     ->whereHas('days', function ($query) use ($weekDay) {
                         $query->where('day',$weekDay);
-                    });                    
+                    });
                     if($option=='o'){
                         $schedTimeFrom = $schedTimeFrom->where('option_id',2);
                     }else{
@@ -231,7 +231,7 @@ class PDFController extends Controller
                 if($schedTimeTo!=NULL){
                     $time_to = date('H:i',strtotime($schedTimeTo->time_to));
                 }
-                
+
                 $dtr[$l]['time_from'] = $time_from;
                 $dtr[$l]['time_to'] = $time_to;
 
@@ -262,7 +262,7 @@ class PDFController extends Controller
                     ->whereMonth('date',$month)
                     ->first();
                 if($user_dtr!=NULL){
-                    $row = $user_dtr;                
+                    $row = $user_dtr;
 
                     $date_day = date('j',strtotime($row->date));
                     $weekDay = date('w', strtotime($row->date));
@@ -274,7 +274,7 @@ class PDFController extends Controller
                     $time_minutes_total = 0;
 
                     $dtr[$date_day]['check'] = 'dtr';
-                
+
                     if($row->time_in_am==NULL){
                         $time_in_am = '';
                         $time_in_am_for = '';
@@ -302,21 +302,21 @@ class PDFController extends Controller
                     }else{
                         $time_out_pm = date('h:ia',strtotime($row->time_out_pm));
                         $time_out_pm_for = date('H:i',strtotime($row->time_out_pm));
-                    }                
-                    if($time_from<'12:00' && $time_to>'12:00'){
-                        if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
-                            && $row->time_type==NULL){
-                            $count_days += 1;
-                        }
-                    }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
-                        if($time_in_am_for=='' || $time_out_am_for==''){
-                            $count_days += 1;
-                        }
-                    }else{
-                        if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
-                            $count_days += 1;
-                        }
                     }
+                    // if($time_from<'12:00' && $time_to>'12:00'){
+                    //     if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
+                    //         && $row->time_type==NULL){
+                    //         $count_days += 1;
+                    //     }
+                    // }elseif(($time_from<'12:00' && $time_to<'13:00') && $row->time_type==3){
+                    //     if($time_in_am_for=='' || $time_out_am_for==''){
+                    //         $count_days += 1;
+                    //     }
+                    // }else{
+                    //     if(($time_in_pm_for=='' || $time_out_pm_for=='') && $row->time_type==2){
+                    //         $count_days += 1;
+                    //     }
+                    // }
 
                     $total_minutes = 0;
                     $tardy_minutes = 0;
@@ -346,9 +346,9 @@ class PDFController extends Controller
                             $time_from = date('H:i',strtotime($rowSchedTime->time_from));
                             $time_to = date('H:i',strtotime($rowSchedTime->time_to));
                             $is_rotation_duty = $rowSchedTime->is_rotation_duty;
-                            
+
                             if($is_rotation_duty=='Yes'){
-                                if(($time_from<'12:00' && $time_in_am_for=='') || 
+                                if(($time_from<'12:00' && $time_in_am_for=='') ||
                                     ($time_from>='12:00' && $time_in_pm_for=='')){
                                     $count_days += 1;
                                 }
@@ -363,12 +363,12 @@ class PDFController extends Controller
                                         && $row->time_type==NULL){
                                         $count_days += 1;
                                     }
-                                }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
+                                }elseif(($time_from<'12:00' && $time_to<'13:00') && $row->time_type==3){
                                     if($time_in_am_for=='' || $time_out_am_for==''){
                                         $count_days += 1;
                                     }
                                 }else{
-                                    if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
+                                    if(($time_in_pm_for=='' || $time_out_pm_for=='') && $row->time_type==2){
                                         $count_days += 1;
                                     }
                                 }
@@ -427,7 +427,7 @@ class PDFController extends Controller
                                     }
                                 }
                             }
-                            
+
                             if($row->time_type==1 || $row->time_type==2 || $row->time_type==3){
                                 $time_from_ = Carbon::parse($time_from)->seconds(0);
                                 $time_to_ = Carbon::parse($time_to)->seconds(0);
@@ -487,7 +487,7 @@ class PDFController extends Controller
                         $time_type_name = $row->time_type_->name;
                     }
 
-                    $dtr[$date_day]['in_am'] = $time_in_am;            
+                    $dtr[$date_day]['in_am'] = $time_in_am;
                     $dtr[$date_day]['out_am'] = $time_out_am;
                     $dtr[$date_day]['in_pm'] = $time_in_pm;
                     $dtr[$date_day]['out_pm'] = $time_out_pm;
@@ -501,7 +501,7 @@ class PDFController extends Controller
                     $dtr[$date_day]['time_out_pm_type'] = $row->time_out_pm_type;
                     $dtr[$date_day]['hours'] = $hours;
                     $dtr[$date_day]['minutes'] = $minutes;
-                    
+
                 }else{
                     if($dtr[$m]['time_from']!=''){
                         $count_days += 1;
@@ -519,9 +519,9 @@ class PDFController extends Controller
                     $dtr[$date_day]['val'] = $row->name;
                     $count_days = $count_days-1;
                 }
-            }        
+            }
         if($count_days<=0){
-        
+
         //$pdf = new PDF('A4', 'mm', '', true, 'UTF-8', false);
         $page_size = array(215.9, 330.2);
         $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
@@ -543,7 +543,7 @@ class PDFController extends Controller
             }else{
                 $x_add = 105;
             }
-            
+
             $y = 6;
             $y_add = 14;
             // $pdf::SetXY(24+$x_add, $y+$y_add+5);
@@ -577,14 +577,14 @@ class PDFController extends Controller
             $pdf::SetFont('typewritingsmall','',9);
             $pdf::SetXY(7+$x_add, $y-2);
             $pdf::Image($logo, '', '', 23, 23, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
-            
+
             $pdf::SetXY(5+$x_add, $y+2);
             $pdf::Cell(95, '', 'Civil Service Form 48', 0, 1, 'C', 0, '', 1);
 
             $pdf::SetXY(5+$x_add, $y+9);
             $pdf::SetFont('typewriteb','',9);
             $pdf::Cell(95, '', 'DAILY TIME RECORD', 0, 1, 'C', 0, '', 1);
-            
+
             $y = $y+4;
 
             $pdf::SetXY(5+$x_add, $y+18);
@@ -607,12 +607,12 @@ class PDFController extends Controller
                 $pdf::SetXY(35+$x_add, $y+34.8);
                 $pdf::SetFont('typewriteb','',9);
                 $pdf::Cell(95, '', date('F 1-15, Y', strtotime($year.'-'.$month.'-01')), 0, 1, 'L', 0, '', 1);
-            }else{                
+            }else{
                 $pdf::SetXY(35+$x_add, $y+34.8);
                 $pdf::SetFont('typewriteb','',9);
                 $pdf::Cell(95, '', date('F Y', strtotime($year.'-'.$month.'-01')), 0, 1, 'L', 0, '', 1);
-            }   
-            
+            }
+
             $pdf::setCellPaddings(0, 1, 0, 1);
             $pdf::SetXY(5+$x_add, $y+40);
             $pdf::SetFont('typewritingsmall','',9);
@@ -717,7 +717,7 @@ class PDFController extends Controller
                                 $dtr[$j]['time_out_am_type']!=NULL && $dtr[$j]['time_out_am_type']!='1' &&
                                 $dtr[$j]['time_in_pm_type']!=NULL && $dtr[$j]['time_in_pm_type']!='1' &&
                                 $dtr[$j]['time_out_pm_type']!=NULL && $dtr[$j]['time_out_pm_type']!='1')){
-                                
+
                                 $pdf::SetTextColor(0,0,0);
                                 $pdf::SetXY(5+$x_tr_add+$x_add, $y+40);
                                 if($dtr[$j]['time_type']==7){
@@ -748,16 +748,16 @@ class PDFController extends Controller
                                     $x_tr_add = $x_tr_add+30;
                                 }else{
                                     if($dtr[$j]['time_in_am_type']!=NULL && $dtr[$j]['time_in_am_type']!='1'){
-                                        $pdf::SetDrawColor(0,0,0); 
+                                        $pdf::SetDrawColor(0,0,0);
                                         $pdf::SetTextColor(0,0,0);
                                         $pdf::SetXY(5+$x_tr_add+$x_add, $y+40);
-                                        
+
                                         if($dtr[$j]['time_type']==7){
                                             $pdf::Cell(15, '', '-------', 1, 1, 'C', 0, '', 1);
                                         }else{
                                             $pdf::Cell(15, '', $dtr[$j]['time_type_name'], 1, 1, 'C', 0, '', 1);
                                         }
-                                        
+
                                     }else{
                                         if($dtr[$j]['time_in_am_type']=='1'){
                                             $pdf::SetDrawColor(220,20,60);
@@ -765,7 +765,7 @@ class PDFController extends Controller
                                             $pdf::SetXY(6+$x_tr_add+$x_add, $y+39);
                                             $pdf::Cell(13, '', '', 'B', 1, 'C', 0, '', 1);
                                         }else{
-                                            $pdf::SetDrawColor(0,0,0); 
+                                            $pdf::SetDrawColor(0,0,0);
                                             $pdf::SetTextColor(0,0,0);
                                         }
                                         if($dtr[$j]['time_from']!='' && $dtr[$j]['time_from']>'12:00' && $dtr[$j]['in_am']==''){
@@ -780,16 +780,16 @@ class PDFController extends Controller
                                     $x_tr_add = $x_tr_add+15;
 
                                     if($dtr[$j]['time_out_am_type']!=NULL && $dtr[$j]['time_out_am_type']!='1'){
-                                        $pdf::SetDrawColor(0,0,0); 
+                                        $pdf::SetDrawColor(0,0,0);
                                         $pdf::SetTextColor(0,0,0);
                                         $pdf::SetXY(5+$x_tr_add+$x_add, $y+40);
-                                        
+
                                         if($dtr[$j]['time_type']==7){
                                             $pdf::Cell(15, '', '-------', 1, 1, 'C', 0, '', 1);
                                         }else{
                                             $pdf::Cell(15, '', $dtr[$j]['time_type_name'], 1, 1, 'C', 0, '', 1);
                                         }
-                                        
+
                                     }else{
                                         if($dtr[$j]['time_out_am_type']=='1'){
                                             $pdf::SetDrawColor(220,20,60);
@@ -797,7 +797,7 @@ class PDFController extends Controller
                                             $pdf::SetXY(6+$x_tr_add+$x_add, $y+39);
                                             $pdf::Cell(13, '', '', 'B', 1, 'C', 0, '', 1);
                                         }else{
-                                            $pdf::SetDrawColor(0,0,0); 
+                                            $pdf::SetDrawColor(0,0,0);
                                             $pdf::SetTextColor(0,0,0);
                                         }
                                         if($dtr[$j]['time_from']!='' && $dtr[$j]['time_from']>'12:00' && $dtr[$j]['out_am']==''){
@@ -829,11 +829,11 @@ class PDFController extends Controller
                                     }else{
                                         $pdf::Cell(30, '', $dtr[$j]['time_type_name'], 1, 1, 'C', 0, '', 1);
                                     }
-                                    
+
                                     $x_tr_add = $x_tr_add+30;
                                 }else{
                                     if($dtr[$j]['time_in_pm_type']!=NULL && $dtr[$j]['time_in_pm_type']!='1'){
-                                        $pdf::SetDrawColor(0,0,0); 
+                                        $pdf::SetDrawColor(0,0,0);
                                         $pdf::SetTextColor(0,0,0);
                                         $pdf::SetXY(5+$x_tr_add+$x_add, $y+40);
 
@@ -850,7 +850,7 @@ class PDFController extends Controller
                                             $pdf::SetXY(6+$x_tr_add+$x_add, $y+39);
                                             $pdf::Cell(13, '', '', 'B', 1, 'C', 0, '', 1);
                                         }else{
-                                            $pdf::SetDrawColor(0,0,0); 
+                                            $pdf::SetDrawColor(0,0,0);
                                             $pdf::SetTextColor(0,0,0);
                                         }
                                         if($dtr[$j]['time_to']!='' && $dtr[$j]['time_to']<'13:00' && $dtr[$j]['in_pm']==''){
@@ -868,7 +868,7 @@ class PDFController extends Controller
                                     $x_tr_add = $x_tr_add+15;
 
                                     if($dtr[$j]['time_out_pm_type']!=NULL && $dtr[$j]['time_out_pm_type']!='1'){
-                                        $pdf::SetDrawColor(0,0,0); 
+                                        $pdf::SetDrawColor(0,0,0);
                                         $pdf::SetTextColor(0,0,0);
                                         $pdf::SetXY(5+$x_tr_add+$x_add, $y+40);
 
@@ -885,7 +885,7 @@ class PDFController extends Controller
                                             $pdf::SetXY(6+$x_tr_add+$x_add, $y+39);
                                             $pdf::Cell(13, '', '', 'B', 1, 'C', 0, '', 1);
                                         }else{
-                                            $pdf::SetDrawColor(0,0,0); 
+                                            $pdf::SetDrawColor(0,0,0);
                                             $pdf::SetTextColor(0,0,0);
                                         }
                                         if($dtr[$j]['time_to']!='' && $dtr[$j]['time_to']<'13:00' && $dtr[$j]['out_pm']==''){
@@ -898,11 +898,11 @@ class PDFController extends Controller
                                     }
 
                                     $x_tr_add = $x_tr_add+15;
-                                } 
-                            }  
-                        }                     
+                                }
+                            }
+                        }
                     }
-                }                
+                }
                 $pdf::SetDrawColor(0, 0, 0);
                 $pdf::SetFillColor(0, 0, 0);
                 $pdf::SetTextColor(0, 0, 0);
@@ -964,7 +964,7 @@ class PDFController extends Controller
             $y = $y+6.25;
 
             $pdf::SetXY(10+$x_add, $y+40);
-            $pdf::SetFont('typewritingsmall','',9); 
+            $pdf::SetFont('typewritingsmall','',9);
             $pdf::Cell(85, '', 'I CERTIFY on my honor that the above is a true and correct', 0, 0, 'C', 0, '', 1);
 
             $y = $y+4;
@@ -1000,12 +1000,12 @@ class PDFController extends Controller
             $pdf::SetFont('typewriteb','',8);
             $pdf::Cell(95, '', '', 'B', 1, 'C', 0, '', 1);
 
-            $y = $y+4.5;            
+            $y = $y+4.5;
 
             $pdf::SetXY(5+$x_add, $y+40);
             $pdf::SetFont('typewriteb','',8);
             $pdf::Cell(95, '', 'Authorized signature', '', 1, 'C', 0, '', 1);
-            
+
             $schedTimeGet = UsersSchedTime::with('days')
                 ->where('user_id',$user_id)
                 ->where('date_to','>=',date('Y-m-01',strtotime($year.'-'.$month.'-01')))
@@ -1047,7 +1047,7 @@ class PDFController extends Controller
         $pdf::SetXY(100, 5);
         $pdf::SetFont('typewriteb','',6);
         $pdf::MultiCell(10, 270, "|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n", 0, 'C', 0, 0, '', '', true);
-       
+
         $pathUser = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'.pdf';
         $pdf::Output(public_path($pathUser),'F');
         }

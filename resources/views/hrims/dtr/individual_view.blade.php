@@ -292,20 +292,23 @@ $user = $users::with('employee_default.emp_stat')
                     $time_out_pm = date('h:ia',strtotime($row->time_out_pm));
                     $time_out_pm_for = date('H:i',strtotime($row->time_out_pm));
                 }
-                if($time_from<'12:00' && $time_to>'12:00'){
-                    if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
-                        && $row->time_type==NULL){
-                        $count_days += 1;
-                    }
-                }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
-                    if($time_in_am_for=='' || $time_out_am_for==''){
-                        $count_days += 1;
-                    }
-                }else{
-                    if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
-                        $count_days += 1;
-                    }
-                }
+                // if($time_from<'12:00' && $time_to>'12:00'){
+                //     if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
+                //         && $row->time_type==NULL){
+                //         $count_days += 1;
+                //         echo $m.'a';
+                //     }
+                // }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
+                //     if($time_in_am_for=='' || $time_out_am_for==''){
+                //         $count_days += 1;
+                //         echo $m.'b';
+                //     }
+                // }else{
+                //     if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
+                //         $count_days += 1;
+                //         echo $m.'C';
+                //     }
+                // }
 
                 $total_minutes = 0;
                 $tardy_minutes = 0;
@@ -348,12 +351,12 @@ $user = $users::with('employee_default.emp_stat')
                                     && $row->time_type==NULL){
                                     $count_days += 1;
                                 }
-                            }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
+                            }elseif(($time_from<'12:00' && $time_to<'13:00') && $row->time_type==3){
                                 if($time_in_am_for=='' || $time_out_am_for==''){
                                     $count_days += 1;
                                 }
                             }else{
-                                if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
+                                if(($time_in_pm_for=='' || $time_out_pm_for=='') && $row->time_type==2){
                                     $count_days += 1;
                                 }
                             }
