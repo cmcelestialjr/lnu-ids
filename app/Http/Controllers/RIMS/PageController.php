@@ -59,7 +59,7 @@ class PageController extends Controller
 
             // $poes_ids = DB::connection($connectionCpanel)->table('tbl_profile')
             //             ->pluck('student_number')->toArray();
-            // $query1 = DB::connection($connectionName)->table('info')
+            // $query = DB::connection($connectionName)->table('info')
             //     ->where('source','sias')
             //     ->where('stud_id','>=','2300001')
             //     ->whereRaw('LENGTH(stud_id) = ?', [7])
@@ -116,10 +116,9 @@ class PageController extends Controller
             //     // DB::table('students_program')->insert($data_program);
             // }
             // $users = Users::where('stud_id','!=',NULL)->pluck('stud_id')->toArray();
-            // $users_student = DB::connection($connectionName)->table('info')
-            //             ->whereNotIn('stud_id',$users)
-            //             ->get();
-            // $students_data = $users_student;
+            $users_student = DB::connection($connectionName)->table('info')
+                        ->get();
+            $students_data = $users_student;
             //$query = "Connection to $connectionName is established.";
             //$query = $query1->count();
 

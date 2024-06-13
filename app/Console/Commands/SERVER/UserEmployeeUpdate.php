@@ -32,65 +32,65 @@ class UserEmployeeUpdate extends Command
         $connectionName = 'server';
         DB::connection($connectionName)->getPdo();
 
-        $del_user = Users::where('id_no', 200317)->first();
-        UsersRoleList::where('user_id',$del_user->id)->delete();
-        _PersonalInfo::where('user_id',$del_user->id)->delete();
-        _Work::where('user_id',$del_user->id)->delete();
-        Users::where('id',$del_user->id)->delete();
+        // $del_user = Users::where('id_no', 200317)->first();
+        // UsersRoleList::where('user_id',$del_user->id)->delete();
+        // _PersonalInfo::where('user_id',$del_user->id)->delete();
+        // _Work::where('user_id',$del_user->id)->delete();
+        // Users::where('id',$del_user->id)->delete();
 
-        $del_user = DB::connection($connectionName)->table('users')->where('id_no', 200317)->first();
-        DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
+        // $del_user = DB::connection($connectionName)->table('users')->where('id_no', 200317)->first();
+        // DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
 
-        $del_user = Users::where('id_no', 181219)->first();
-        UsersRoleList::where('user_id',$del_user->id)->delete();
-        _PersonalInfo::where('user_id',$del_user->id)->delete();
-        _Work::where('user_id',$del_user->id)->delete();
-        Users::where('id',$del_user->id)->delete();
+        // $del_user = Users::where('id_no', 181219)->first();
+        // UsersRoleList::where('user_id',$del_user->id)->delete();
+        // _PersonalInfo::where('user_id',$del_user->id)->delete();
+        // _Work::where('user_id',$del_user->id)->delete();
+        // Users::where('id',$del_user->id)->delete();
 
-        $del_user = DB::connection($connectionName)->table('users')->where('id_no', 181219)->first();
-        DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
+        // $del_user = DB::connection($connectionName)->table('users')->where('id_no', 181219)->first();
+        // DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
 
-        $del_user = Users::where('id_no', 30601)->first();
-        UsersRoleList::where('user_id',$del_user->id)->delete();
-        _PersonalInfo::where('user_id',$del_user->id)->delete();
-        _Work::where('user_id',$del_user->id)->delete();
-        Users::where('id',$del_user->id)->delete();
+        // $del_user = Users::where('id_no', 30601)->first();
+        // UsersRoleList::where('user_id',$del_user->id)->delete();
+        // _PersonalInfo::where('user_id',$del_user->id)->delete();
+        // _Work::where('user_id',$del_user->id)->delete();
+        // Users::where('id',$del_user->id)->delete();
 
-        $del_user = DB::connection($connectionName)->table('users')->where('id_no', 30601)->first();
-        DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
+        // $del_user = DB::connection($connectionName)->table('users')->where('id_no', 30601)->first();
+        // DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
 
-        $del_user = Users::where('id_no', 180919)->first();
-        UsersRoleList::where('user_id',$del_user->id)->delete();
-        _PersonalInfo::where('user_id',$del_user->id)->delete();
-        _Work::where('user_id',$del_user->id)->delete();
-        Users::where('id',$del_user->id)->delete();
+        // $del_user = Users::where('id_no', 180919)->first();
+        // UsersRoleList::where('user_id',$del_user->id)->delete();
+        // _PersonalInfo::where('user_id',$del_user->id)->delete();
+        // _Work::where('user_id',$del_user->id)->delete();
+        // Users::where('id',$del_user->id)->delete();
 
-        $del_user = DB::connection($connectionName)->table('users')->where('id_no', 180919)->first();
-        DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
+        // $del_user = DB::connection($connectionName)->table('users')->where('id_no', 180919)->first();
+        // DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
 
-        $del_user = Users::where('id_no', 191816)->first();
-        UsersRoleList::where('user_id',$del_user->id)->delete();
-        _PersonalInfo::where('user_id',$del_user->id)->delete();
-        _Work::where('user_id',$del_user->id)->delete();
-        Users::where('id',$del_user->id)->delete();
+        // $del_user = Users::where('id_no', 191816)->first();
+        // UsersRoleList::where('user_id',$del_user->id)->delete();
+        // _PersonalInfo::where('user_id',$del_user->id)->delete();
+        // _Work::where('user_id',$del_user->id)->delete();
+        // Users::where('id',$del_user->id)->delete();
 
-        $del_user = DB::connection($connectionName)->table('users')->where('id_no', 191816)->first();
-        DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
-        DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
+        // $del_user = DB::connection($connectionName)->table('users')->where('id_no', 191816)->first();
+        // DB::connection($connectionName)->table('users_role_list')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_personal_info')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('_work')->where('user_id',$del_user->id)->delete();
+        // DB::connection($connectionName)->table('users')->where('id',$del_user->id)->delete();
 
         $query = Users::where('id_no','>',1)->get();
         foreach($query as $row){

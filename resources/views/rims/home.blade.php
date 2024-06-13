@@ -20,11 +20,11 @@
               <td>{{$row->student_number}}</td>
             </tr>
           @endforeach --}}
-          
+
           </table>
         </div>
         <div class="card-footer">
-            
+
         </div>
     </div>
   </div>

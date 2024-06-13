@@ -19,7 +19,7 @@
                         @endphp
                         <div class="row">
                             <div class="col-lg-4">
-                                <label>Time Type</label>
+                                <label>Time Type</label> {{$time_from}}
                                 <select class="form-control select2-primary" name="time_type">
                                     <option value="">Default</option>
                                     @foreach($time_type_ as $row)
@@ -27,12 +27,12 @@
                                             <option value="{{$row->id}}" selected>{{$row->name}}</option>
                                         @else
                                             <option value="{{$row->id}}">{{$row->name}}</option>
-                                        @endif                                        
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-lg-12" id="dtrInputTable">
-                                
+
                             </div>
                         </div>
                     </div>
