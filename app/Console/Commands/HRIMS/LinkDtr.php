@@ -125,7 +125,7 @@ class LinkDtr extends Command
                             $state_column = 'state_out_pm';
                             $check_where = 10;
                         }
-                        $this->info($column.'-'.$check_where.'-'.$time.'-'.date('H:i',strtotime($check->$column)).'-'.$check->$column);
+                        //$this->info($column.'-'.$check_where.'-'.$time.'-'.date('H:i',strtotime($check->$column)).'-'.$check->$column);
                         if($check->$column==NULL){
                             UsersDTR::where('id_no',$id_no)
                                     ->where('date',$date)
