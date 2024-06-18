@@ -3,25 +3,45 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Auth;
-use Session;
-class Login
+
+class Authenticate extends Middleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string[]  ...$guards
+     * @return mixed
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle($request, Closure $next, ...$guards)
     {
-        if (!Auth::check()) {
-            return redirect('/');
+        $this->authenticate($request, $guards);
+
+        // Check if user is authenticated
+        if ($request->user()) {
+            // Check if the user needs to update their password
+            if ($request->user()->update_password === null || $request->user()->update_password === 0) {
+                // Redirect the user to the password change page
+                return redirect()->route('change.password');
+            }
         }
+
         return $next($request);
-        
-        //return $next($request);
+    }
+
+    /**
+     * Get the path the user should be redirected to when they are not authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string|null
+     */
+    protected function redirectTo($request)
+    {
+        return $request->expectsJson() ? null : route('login');
     }
 }
+
 

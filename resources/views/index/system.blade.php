@@ -6,7 +6,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>LNU IDS V1.0</title>
+  <title>LNU - Integrated Data System</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -14,6 +14,8 @@
   <link rel="icon" href="{{ asset('assets/images/logo/lnu_logo.png') }}" type="image/gif" nonce="{{ csp_nonce() }}">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/fontawesome-free/css/all.min.css') }}" nonce="{{ csp_nonce() }}">
+   <!-- Toastr -->
+  <link rel="stylesheet" href="{{ asset('_adminLTE/plugins/toastr/toastr.min.css') }}" nonce="{{ csp_nonce() }}">
   <!-- adminLTE style -->
   <link rel="stylesheet" href="{{ asset('_adminLTE/dist/css/adminlte.min.css') }}" nonce="{{ csp_nonce() }}">
   <!-- master style -->
@@ -27,7 +29,7 @@
             <a href="" class="navbar-brand">
                 <img src="{{ asset('assets/images/logo/ids_logo_dark.png') }}" alt="LNU IDS Logo" class="brand-image elevation-3">
                 <span class="brand-text font-weight-light">LNU IDS</span>
-            </a> 
+            </a>
             <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="{{url('logout')}}">
@@ -42,7 +44,7 @@
                     <span class="default-header">My Modules</span><br>
                     <span class="default-desc">Choose the module that you want to use.</span>
                     <!-- Small boxes (Stat box) -->
-                    <div class="row" id="row-size">                        
+                    <div class="row" id="row-size">
                         @if($count_systems<=2)
                             <div class="col-lg-3 col-2">
                             </div>
@@ -66,7 +68,7 @@
                                     </div>
                                     <a href="{{$url}}" class="{{$row['button']}} small-box-btn">Proceed</a>
                                 </div>
-                            </div> 
+                            </div>
                             @php
                             $x++;
                             @endphp
@@ -77,10 +79,32 @@
         </div>
     </div>
     @extends('layouts.footer')
-    
+
 </body>
-    
+
     <!-- jQuery -->
     <script src="{{ asset('_adminLTE/plugins/jquery/jquery.min.js') }}" nonce="{{ csp_nonce() }}"></script>
     <script src="{{ asset('_adminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js') }}" nonce="{{ csp_nonce() }}"></script>
+    <script src="{{ asset('_adminLTE/plugins/toastr/toastr.min.js') }}"></script>
+    <script>
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "preventOpenDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "300",
+            "timeOut": "2000",
+            "extendedTimeOut": "800",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+        toastr.success('Welcome');
+    </script>
 </html>

@@ -15,7 +15,7 @@
                         <br><br>Attendance Tracking: The system maintains daily time records by allowing employees to time in and out using a biometric machine, which automatically records the data. Email notifications are sent automatically for each time entry. By monitoring attendance, the system generates reports to evaluate employee punctuality and absences.
                         </h4>
                 </div>
-                {{-- <div class="col-lg-6">
+                <div class="col-lg-6">
                     <table class="table table-bordered">
                         @foreach($getUser as $row)
                           <tr>
@@ -23,7 +23,7 @@
                           </tr>
                         @endforeach
                     </table>
-                </div> --}}
+                </div>
                 {{-- <div class="col-lg-6">
                     <table class="table table-bordered">
                         @foreach($getUser1 as $row)

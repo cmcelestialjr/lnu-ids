@@ -99,14 +99,14 @@ class PageController extends Controller
         //$query = DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')->where('IdNo','230209')->get();
 
         // try{
-            //  $zk = new ZKTeco('10.5.205.97',4370);
+        //     $zk = new ZKTeco('10.5.205.96',4370);
             //  $zk1 = new ZKTeco('10.5.205.55',4370);
         //     // $zk_guard = new ZKTeco('10.5.205.8',4370);
         //     // $zk = new ZKTeco('10.5.201.137',4370); //mis
         //     // $zk = new ZKTeco('10.5.205.11',4370); //kabilang guard
         //     // $zk = new ZKTeco('10.5.205.23',4370); //youngfield
         //     // $zk = new ZKTeco('10.5.205.137',4370); // admin
-            // if ($zk->connect() && $zk1->connect()){
+            //if ($zk->connect() ){
             //     $getUser = $zk->getUser();
             //     $getUser1 = $zk1->getUser();
             // }
@@ -131,7 +131,7 @@ class PageController extends Controller
         //     //         return $recordDate >= $startDate && $recordDate <= $endDate;
         //     //     });
 
-        //     $getUser = $zk->getUser();
+               // $getUser = $zk->getUser();
         //     //     foreach($attendace as $row){
         //     //         $insert = new DTRlogsCopy();
 
@@ -159,8 +159,7 @@ class PageController extends Controller
         //         //     //     $resultFinger = 'error';
         //         //     // }
         //         // }
-
-        //    }
+        //     }
         // }catch(Exception $e){
 
         // }
