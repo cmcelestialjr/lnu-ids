@@ -50,7 +50,7 @@ class LinkDtr extends Command
                         ->where('date',$date)->first();
                     if($time<'12:00'){
                         if($check){
-                            if($check->time_out_am!='' && $dateTime>=$check->time_out_am){
+                            if($check->time_out_am!=NULL && $dateTime>=$check->time_out_am){
                                 $column = 'time_in_pm';
                                 $state_column = 'state_in_pm';
                                 $ip_column = 'ipaddress_in_pm';
