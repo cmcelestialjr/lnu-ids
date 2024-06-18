@@ -648,6 +648,30 @@ datalist{
     background-position:right center;
     background-repeat: no-repeat;
 }
+.input-loading:hover {
+    background-image: url("/assets/images/loader/loader-dots2.gif");
+    background-size: 25px 25px;
+    background-position:right center;
+    background-repeat: no-repeat;
+}
+.input-success:hover {
+    background-image: url("/assets/images/icons/gif/success3nobg.gif");
+    background-size: 25px 25px;
+    background-position:right center;
+    background-repeat: no-repeat;
+}
+.input-error:hover {
+    background-image: url("/assets/images/icons/gif/error.gif");
+    background-size: 25px 25px;
+    background-position:right center;
+    background-repeat: no-repeat;
+}
+.input-require:hover {
+    background-image: url("/assets/images/icons/png/exclamation.png");
+    background-size: 25px 25px;
+    background-position:right center;
+    background-repeat: no-repeat;
+}
 .bg-lightgreen1{
   background-color: #3CB371;
   color:white;

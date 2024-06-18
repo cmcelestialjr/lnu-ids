@@ -29,7 +29,8 @@ class IndexController extends Controller
         $data = array(
             'role' => $role
             );
-        return view('index/index',$data);
+        //return view('index/index',$data);
+        return view('index/login',$data);
     }
     public function systempage()
     {

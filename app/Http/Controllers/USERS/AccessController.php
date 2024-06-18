@@ -36,16 +36,16 @@ class AccessController extends Controller
             $systems = Systems::with(['user_system' => function($query) use ($decrypt_id){
                                     $query->where('user_id',$decrypt_id);
                                 }])->get();
-            $systems_name = Systems::where('id',1)->first(); 
+            $systems_name = Systems::where('id',1)->first();
             $systems_id = $systems_name->id;
             $system_selected = $systems_name->shorten;
         }else{
             $page = 'modal_access_system';
-            $systems = Systems::where('shorten',$system_selected)->first();   
-            $systems_id = $systems->id;   
-            $system_selected = $systems->shorten;     
-        }       
-        $systems_nav_selected = SystemsNav::where('system_id',$systems_id)->first(); 
+            $systems = Systems::where('shorten',$system_selected)->first();
+            $systems_id = $systems->id;
+            $system_selected = $systems->shorten;
+        }
+        $systems_nav_selected = SystemsNav::where('system_id',$systems_id)->first();
         $systems_nav = SystemsNav::with(['user_nav' => function($query) use ($decrypt_id){
                             $query->where('user_id',$decrypt_id);
                         }])->where('system_id',$systems_id)->orderBy('order')->get();
@@ -54,7 +54,7 @@ class AccessController extends Controller
                         }])->whereHas('system_nav', function($query) use ($systems_id){
                             $query->where('system_id', '=', $systems_id);
                         })->where('system_nav_id',$systems_nav_selected->id)->orderBy('order')->get();
-        
+
         if($systems_nav_selected!=NULL){
             $systems_nav_selected = '('.$systems_nav_selected->name.')';
         }else{
@@ -69,25 +69,25 @@ class AccessController extends Controller
             'systems_nav_selected' => $systems_nav_selected,
             'levels' => $levels
         );
-        return view('users/'.$page,$data);        
+        return view('users/'.$page,$data);
     }
     public function update(Request $request){
-        $result = 'error';       
-        $val = $request->val; 
+        $result = 'error';
+        $val = $request->val;
         $system_selected = $request->session()->get('system_selected');
         $system_id = $request->system_id;
         if($val=='system'){
             $from = 'system';
             if($system_selected=='USERS'){
                 $result = $this->update_system($request);
-            }else{            
+            }else{
                 $system = Systems::where('shorten',$system_selected)->first();
                 if($system_id==$system->id){
                     $result = $this->update_system($request);
                 }
             }
-        }elseif($val=='nav'){   
-            $from = 'nav';  
+        }elseif($val=='nav'){
+            $from = 'nav';
             $result = $this->update_nav($request,'nav');
         }elseif($val=='nav_sub'){
             $system_nav_sub = SystemsNavSub::where('id',$system_id)->first();
@@ -128,7 +128,7 @@ class AccessController extends Controller
             'systems_nav' => $systems_nav,
             'levels' => $levels
         );
-        return view('users/modal_list_nav',$data);  
+        return view('users/modal_list_nav',$data);
     }
     public function listNavSub(Request $request){
         $encrypt = new EncryptServices;
@@ -143,7 +143,7 @@ class AccessController extends Controller
         if($request->from=='system'){
             $system_selected = SystemsNav::where('system_id',$system_id)->first();
         }else{
-            $system_selected = SystemsNav::where('id',$system_id)->first(); 
+            $system_selected = SystemsNav::where('id',$system_id)->first();
         }
         $system_id = $system_selected->id;
         $systems_nav_sub = SystemsNavSub::with(['user_nav_sub' => function($query) use ($user_id){
@@ -154,7 +154,7 @@ class AccessController extends Controller
             'systems_nav_sub' => $systems_nav_sub,
             'levels' => $levels
         );
-        return view('users/modal_list_nav_sub',$data);  
+        return view('users/modal_list_nav_sub',$data);
     }
     private function update_system($request){
         $user = Auth::user();
@@ -202,12 +202,12 @@ class AccessController extends Controller
                                     ->where('user_id', $id)
                                     ->where('role_id', $role_id)->first();
                         if($check==NULL){
-                            $insert = new UsersSystems; 
+                            $insert = new UsersSystems;
                             $insert->user_id = $id;
                             $insert->system_id = $system_id;
                             $insert->role_id = $role_id;
                             $insert->level_id = $level_id;
-                            $insert->updated_by = $user->id;                        
+                            $insert->updated_by = $user->id;
                             $insert->save();
                         }else{
                             UsersSystems::where('system_id', $system_id)
@@ -220,7 +220,7 @@ class AccessController extends Controller
                 $this->update_nav($request,'system');
                 $result = 'success';
             }catch(Exception $e) {
-                
+
             }
         }
         return $result;
@@ -245,7 +245,7 @@ class AccessController extends Controller
                 $role_id = $user_selected->employee_default->role_id;
                 if($from=='system'){
                     $system_nav_ids = SystemsNav::where('system_id',$system_id)->pluck('id')->toArray();
-                    if($level_id=='' || $level_id==1 || $level_id==2){                        
+                    if($level_id=='' || $level_id==1 || $level_id==2){
                         $delete = UsersSystemsNav::whereIn('system_nav_id', $system_nav_ids)
                                     ->where('user_id', $id)
                                     ->where('role_id', $role_id)->delete();
@@ -265,7 +265,7 @@ class AccessController extends Controller
                                         ];
                                     })->toArray();
                             UsersSystemsNav::insert($query);
-                        }elseif($level_id==1){                                                        
+                        }elseif($level_id==1){
                             $delete = UsersSystemsNav::where('user_id', $id)
                                         ->where('role_id', $role_id)->delete();
                             $auto_increment = DB::update("ALTER TABLE users_systems_nav AUTO_INCREMENT = 0;");
@@ -346,7 +346,7 @@ class AccessController extends Controller
                 }
                 $result = 'success';
             }catch(Exception $e){
-                
+
             }
         }
         return $result;
@@ -374,7 +374,7 @@ class AccessController extends Controller
                         $system_nav_ids = SystemsNav::where('id',$system_id)->pluck('id')->toArray();
                     }else{
                         $system_nav_ids = SystemsNav::where('system_id',$system_id)->pluck('id')->toArray();
-                    }                    
+                    }
                     $system_nav_sub_ids = SystemsNavSub::whereIn('system_nav_id',$system_nav_ids)->pluck('id')->toArray();
                     if($level_id=='' || $level_id==1){
                         $delete = UsersSystemsNavSub::whereIn('system_nav_sub_id', $system_nav_sub_ids)
@@ -433,7 +433,7 @@ class AccessController extends Controller
                 }
                 $result = 'success';
             }catch(Exception $e){
-                
+
             }
         }
         return $result;

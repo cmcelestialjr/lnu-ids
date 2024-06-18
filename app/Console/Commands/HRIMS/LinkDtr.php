@@ -125,7 +125,7 @@ class LinkDtr extends Command
                             $state_column = 'state_out_pm';
                             $check_where = 10;
                         }
-                        //$this->info($column.'-'.$check_where.'-'.$time.'-'.date('H:i',strtotime($check->$column)).'-'.$check->$column);
+                        $this->info($column.'-'.$check_where.'-'.$time.'-'.date('H:i',strtotime($check->$column)).'-'.$check->$column);
                         if($check->$column==NULL){
                             UsersDTR::where('id_no',$id_no)
                                     ->where('date',$date)
@@ -144,7 +144,7 @@ class LinkDtr extends Command
                                             'time_type' => NULL,
                                             'updated_at' => date('Y-m-d H:i:s')]);
                     }
-                    $this->info($column);
+                    //$this->info($column);
                     $check = UsersDTR::where('id_no',$id_no)
                         ->where('date',$date)->first();
                     if($check){
@@ -173,9 +173,11 @@ class LinkDtr extends Command
                     $dtr_log_ids[] = $dtr_log_id;
                 }
             }
-            DTRlogs::whereIn('id',$dtr_log_ids)
-                    ->update(['link' => $link,
-                              'updated_at' => date('Y-m-d H:i:s')]);
+            if($dtr_log_ids){
+                DTRlogs::whereIn('id',$dtr_log_ids)
+                        ->update(['link' => $link,
+                                'updated_at' => date('Y-m-d H:i:s')]);
+            }
         }
         $this->info('Command executed successfully!');
     }

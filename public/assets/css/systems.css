@@ -25,7 +25,7 @@
     padding-right:40px !important;
 }
 .button-nav-h3{
-    background: none !important; 
+    background: none !important;
     font-size: 55px !important;
 }
 #title{
@@ -34,7 +34,7 @@
     color: #6c757d;
     text-align: center;
     letter-spacing: 2px;
-    text-shadow: -1px -1px 3px #f8f9fa, 
+    text-shadow: -1px -1px 3px #f8f9fa,
         2px 2px 4px #f8f9fa;
 }
 .button-nav{
@@ -88,11 +88,11 @@
     position: relative;
 }
 .small-box-btn{
-    display: block; 
-    width: 93% !important; 
-    color: #f5f5f5; 
-    text-align: center; 
-    padding: 10px 5px; 
+    display: block;
+    width: 93% !important;
+    color: #f5f5f5;
+    text-align: center;
+    padding: 10px 5px;
     border-radius: 5px;
     position: absolute;
     bottom: 0;

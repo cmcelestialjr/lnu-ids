@@ -21,15 +21,21 @@ class LoginController extends Controller
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
-        $role = $request->role;
+        //$role = $request->role;
         $username = $request->username;
         $password = $request->password;
+        $page = '';
         $user = User::where('username',$username)->first();
         if ($user) {
             if(Hash::check($password, $user->password)){
                 //$encrypt = Crypt::encryptString($token(4).hash('123').$token(4));
                 if($user->status_id=='1'){
                     Auth::login($user);
+                    if($user->update_password==NULL){
+                        $page = 'change_password';
+                    }else{
+                        $page = 'system';
+                    }
                     $result = 'success';
                 }elseif($user->status_id=='3'){
                     $result = 'On-hold';
@@ -39,7 +45,7 @@ class LoginController extends Controller
             }
 
         }
-        $response = array('result' => $result);
+        $response = array('result' => $result, 'page' => $page);
         return response()->json($response);
     }
     private function checkPassword($user,$password){

@@ -24,6 +24,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
         //});
     });
 
+    Route::post('/forgotPassword', 'PasswordController@forgot');
+
     Route::get('/monitor1', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@monitor1');
     Route::post('/monitor1/display', 'HRIMS\DTR\BIOMACHINE\Monitor1Controller@display');
 
@@ -31,20 +33,24 @@ Route::group(['middleware' => ['HTTPS']], function(){
     Route::get('/student/enrollmentform/{stud_id}/{school_year}/{school_year_period}/{enrollment_form_no}/{pdf_code}', 'RIMS\Student\EnrollmentFormController@pdf');
 
     Route::group(['middleware' => ['auth']], function(){
-    //Route::group(['middleware' => ['auth','Login','PreventBackHistory']], function(){
         Route::middleware(['throttle:10,1'])->group(function () {
             Route::group(['prefix'=>'import'], function(){
                 Route::post('/import', 'ImportController@import');
 
             });
         });
-        // Route::middleware(['throttle:60,1'])->group(function () {
+        Route::get('/change_password', 'PasswordController@change')->name('change.password');
+        Route::post('/update_password', 'PasswordController@update');
+        Route::get('/logout', 'LoginController@logout');
+
+        Route::group(['middleware' => ['check.updated_password']], function(){
             Route::get('/ludongExport','EXPORTS\LudongController@export');
             Route::get('/poesExport','EXPORTS\PoesController@export');
 
-            Route::get('/logout', 'LoginController@logout');
+
             Route::get('/system', 'IndexController@systempage')->name('systempage');
             Route::get('/systems', 'IndexController@systems');
+
 
             Route::get('/ids/{system_selected}/{nav_selected}/{type}', 'IndexController@ids');
             Route::get('/ids/{system_selected}/{nav_selected}/{type}/{search}', 'IndexController@ids');
@@ -826,7 +832,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
 
                 Route::post('/newSubmit', 'DTS\NewController@create');
             });
-        // });
+        });
     });
 });
 
