@@ -120,7 +120,7 @@ class LinkDtr extends Command
                         $insert->save();
                         $link = 1;
                     }else{
-                        if($time>='12:00' && $check->time_in_pm>$dateTime && $check->time_out_pm==NULL && $check->time_out_am==NULL && $check->time_in_pm!=NULL && $type==1){
+                        if($time>='12:00' && $dateTime>$check->time_in_pm && $check->time_out_pm==NULL && $check->time_out_am==NULL && $check->time_in_pm!=NULL && $type==1){
                             $column = 'time_out_pm';
                             $state_column = 'state_out_pm';
                             $check_where = 10;
