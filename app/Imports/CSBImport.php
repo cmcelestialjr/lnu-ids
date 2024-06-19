@@ -166,7 +166,7 @@ class CSBImport implements ToModel
                             'updated_at' => date('Y-m-d H:i:s'),
                         ]
                     );
-                    $total_deduction = HRDeductionDocs::where('date_to','>=',date('Y-m-d'))
+                    $total_deduction = HRDeductionDocs::where('date_to','>=',date('Y-m-01'))
                         ->where('deduction_employee_id',$employee->deduction_employee_id)
                         ->sum('amount');
                     $update = HRDeductionEmployee::find($employee->deduction_employee_id);

@@ -5,7 +5,9 @@ namespace App\Imports;
 use App\Models\_PersonalInfo;
 use App\Models\HRBillingList;
 use App\Models\HRDeduction;
+use App\Models\HRDeductionDocs;
 use App\Models\HRDeductionEmployee;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Support\Facades\DB;
 
@@ -134,16 +136,19 @@ class PAGIBIGImport implements ToModel
     {
         $deductionId = NULL;
         $status = NULL;
+        $user_id = NULL;
+        $loan_type = $row[8];
+
          // Check if the second column has a value
-        if ($row[1]) {
+        if ($loan_type) {
             // Determine the appropriate column name based on the value in the second column
-            if ($row[1] == 'MPL') {
+            if ($loan_type == 'MPL') {
                 $pagibig_no = 'pagibig_mpl_app_no';
-            } elseif ($row[1] == 'MP2') {
+            } elseif ($loan_type == 'MP2') {
                 $pagibig_no = 'pagibig2_no';
-            } elseif ($row[1] == 'CAL') {
+            } elseif ($loan_type == 'CAL') {
                 $pagibig_no = 'pagibig_cal_app_no';
-            } elseif ($row[1] == 'HOUSING') {
+            } elseif ($loan_type == 'HOUSING') {
                 $pagibig_no = 'pagibig_housing_app_no';
             }else{
                 $pagibig_no = NULL;
@@ -151,17 +156,17 @@ class PAGIBIGImport implements ToModel
 
             if($pagibig_no){
                 // Get the deduction ID based on the column name and value in the second column
-                $deductionId = $this->shouldCreateDeduction($row[1]);
+                $deductionId = $this->shouldCreateDeduction($loan_type);
 
                 // Find the personal information using the appropriate column name and value in the first column
-                $personalInfo = _PersonalInfo::where($pagibig_no, $row[0])->first();
+                $personalInfo = _PersonalInfo::where($pagibig_no, $row[1])->first();
 
                 // If personal information is found
                 if ($personalInfo !== null) {
                     // Check if the amount in the third column is greater than 0
                     if ($row[2]) {
                         // Update or create an HRDeductionEmployee record based on the user, payroll type, and deduction ID
-                        HRDeductionEmployee::updateOrCreate(
+                        $deduction_employee = HRDeductionEmployee::updateOrCreate(
                             [
                                 'user_id' => $personalInfo->user_id,
                                 'payroll_type_id' => $this->payroll_type,
@@ -169,11 +174,31 @@ class PAGIBIGImport implements ToModel
                             ],
                             [
                                 'emp_stat_id' => $personalInfo->user->employee_default->emp_stat_id,
-                                'amount' => $row[2],
+                                'total_amount' => $row[7],
+                                'amount' => $row[9],
+                                'date_from' => date('Y-m-d',strtotime($row[10])),
+                                'date_to' => date('Y-m-d',strtotime($row[11])),
                                 'updated_by' => $this->updated_by,
                                 'updated_at' => date('Y-m-d H:i:s'),
                             ]
                         );
+                        $deduction_employee_id = $deduction_employee->id;
+
+                        HRDeductionDocs::updateOrCreate(
+                            [
+                                'deduction_employee_id' => $deduction_employee_id,
+                                'account_no' => $row[1],
+                            ],
+                            [
+                                'date_from' => date('Y-m-d',strtotime($row[10])),
+                                'date_to' => date('Y-m-d',strtotime($row[11])),
+                                'amount' => $row[9],
+                                'total_amount' => $row[7],
+                                'updated_by' => $this->updated_by,
+                                'updated_at' => date('Y-m-d H:i:s'),
+                            ]
+                        );
+
                         $status = 1;
                     }
                 }
@@ -182,12 +207,24 @@ class PAGIBIGImport implements ToModel
 
         if($deductionId){
             // Create a new HRBillingList record with the data from the row
+            $middlename = ' ';
+            if($row[4]!=''){
+                $middlename = $row[4];
+            }
+            $extname = ' ';
+            if($row[5]!=''){
+                $extname = $row[5];
+            }
             $insert = new HRBillingList();
-            $insert->staff_no = $row[0];
             $insert->billing_id = $this->billing_id;
+            $insert->user_id = $user_id;
+            $insert->staff_no = $row[1];
             $insert->deduction_id = $deductionId;
-            $insert->name = $row[1];
-            $insert->amount = $row[2];
+            $insert->name = $row[0].'_'.$row[2].'_'.$row[3].'_'.$middlename.'_'.$extname.'_'.date('Y-m-d',strtotime($row[6])).'_'.$loan_type;
+            $insert->amount = $row[9];
+            $insert->total_amount = $row[7];
+            $insert->date_from = date('Y-m-d',strtotime($row[10]));
+            $insert->date_to = date('Y-m-d',strtotime($row[11]));
             $insert->option = null;
             $insert->status = $status;
             $insert->updated_by = $this->updated_by;

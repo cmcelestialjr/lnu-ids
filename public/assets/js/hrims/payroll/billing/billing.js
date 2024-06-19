@@ -11,6 +11,11 @@ $(document).off('click', '.assign').on('click', '.assign', function (e) {
 $(document).off('click', '#assignSubmit').on('click', '#assignSubmit', function (e) {
     assignSubmit($(this));
 });
+// $(document).off('click', '#importSubmit').on('click', '#importSubmit', function (e) {
+//     var thisBtn = $(this);
+//     thisBtn.attr('disabled','disabled');
+//     thisBtn.addClass('input-loading');
+// });
 function listTable(){
     var thisBtn = $('#list select[name="year"]');
     var year = $('#list select[name="year"] option:selected').val();
@@ -92,7 +97,7 @@ function assignSubmit(thisBtn){
             if(data.result=='success'){
                 toastr.success('Success');
                 thisBtn.addClass('input-success');
-                showTable(data.id,thisBtn);
+                //showTable(data.id,thisBtn);
                 $('#modal-primary').modal('hide');
 
             }else{

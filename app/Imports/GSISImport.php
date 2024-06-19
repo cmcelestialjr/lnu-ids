@@ -159,16 +159,16 @@ class GSISImport implements ToModel
     {
         // Get personal information based on GSIS BP number
         $personalInfo = _PersonalInfo::with('user.employee_default')->where('gsis_bp_no', $row[0])->first();
-
         for ($i = 0; $i < count($row); $i++) {
             $deductionId = $this->deductionID[$i];
             $status = NULL;
-            if ($personalInfo !== null) {
+            if ($this->shouldProcessDeduction($i) && $deductionId != NUll && $personalInfo !== null) {
                 // Delete the deduction if the amount is less than or equal to 0
                 if ($row[$i] <= 0) {
                     $delete = HRDeductionEmployee::where('user_id', $personalInfo->user_id)
                         ->where('payroll_type_id', $this->payroll_type)
                         ->where('deduction_id', $deductionId)
+                        ->where('emp_stat_id', $personalInfo->user->employee_default->emp_stat_id)
                         ->delete();
 
                     // Reset the auto-increment value of the table if a deletion occurs
@@ -176,9 +176,8 @@ class GSISImport implements ToModel
                         DB::statement("ALTER TABLE `hr_deduction_employee` AUTO_INCREMENT = 0;");
                     }
                 }
-
                 // Process the deduction if necessary and the amount is greater than 0
-                if ($this->shouldProcessDeduction($i) && $deductionId !== null && $row[$i] > 0) {
+                if($row[$i]>0){
                     $getDeduction = HRDeduction::where('id', $deductionId)->first();
                     HRDeductionEmployee::updateOrCreate(
                         [

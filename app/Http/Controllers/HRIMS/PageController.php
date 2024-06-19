@@ -106,7 +106,7 @@ class PageController extends Controller
         //     // $zk = new ZKTeco('10.5.205.11',4370); //kabilang guard
         //     // $zk = new ZKTeco('10.5.205.23',4370); //youngfield
         //     // $zk = new ZKTeco('10.5.205.137',4370); // admin
-            //if ($zk->connect() ){
+        //    if ($zk->connect() ){
             //     $getUser = $zk->getUser();
             //     $getUser1 = $zk1->getUser();
             // }
@@ -131,7 +131,7 @@ class PageController extends Controller
         //     //         return $recordDate >= $startDate && $recordDate <= $endDate;
         //     //     });
 
-               // $getUser = $zk->getUser();
+        //     $getUser = $zk->getUser();
         //     //     foreach($attendace as $row){
         //     //         $insert = new DTRlogsCopy();
 
@@ -159,6 +159,7 @@ class PageController extends Controller
         //         //     //     $resultFinger = 'error';
         //         //     // }
         //         // }
+
         //     }
         // }catch(Exception $e){
 

@@ -72,6 +72,9 @@ function list_new_submit(){
         toastr.error('Please select Payroll Type');
         x++;
     }
+    if(group=='None'){
+        var group = null;
+    }
     if(x==0){
         var form_data = {
             name:name,
@@ -89,19 +92,19 @@ function list_new_submit(){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
-                if(data.result=='success'){                    
+                thisBtn.removeClass('input-loading');
+                if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
                     list_table();
                     $('#modal-default').modal('hide');
                 }else{
-                    toastr.error('Error.');
+                    toastr.error(data.result);
                     thisBtn.addClass('input-error');
                 }
                 setTimeout(function() {
@@ -131,7 +134,7 @@ function list_update(thisBtn){
         w_table:'wo',
         id:id
     };
-    loadModal(form_data,thisBtn);    
+    loadModal(form_data,thisBtn);
 }
 function list_update_submit(){
     var thisBtn = $('#listUpdateModal button[name="submit"]');
@@ -168,6 +171,9 @@ function list_update_submit(){
         toastr.error('Please select Payroll Type');
         x++;
     }
+    if(group=='None'){
+        var group = null;
+    }
     if(x==0){
         var form_data = {
             name:name,
@@ -189,13 +195,13 @@ function list_update_submit(){
             cache: false,
             dataType: 'json',
             beforeSend: function() {
-                thisBtn.attr('disabled','disabled'); 
+                thisBtn.attr('disabled','disabled');
                 thisBtn.addClass('input-loading');
             },
             success : function(data){
                 thisBtn.removeAttr('disabled');
-                thisBtn.removeClass('input-loading'); 
-                if(data.result=='success'){                    
+                thisBtn.removeClass('input-loading');
+                if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
                     list_table();
@@ -232,12 +238,12 @@ function select_computation(thisBtn){
     }
 }
 function add_computation(thisBtn){
-    thisBtn.attr('disabled','disabled'); 
+    thisBtn.attr('disabled','disabled');
     thisBtn.addClass('input-loading');
     var val = $('#listNewModal select[name="computation"] option:selected').val();
     setTimeout(function(){
         thisBtn.removeAttr('disabled');
-        thisBtn.removeClass('input-loading'); 
+        thisBtn.removeClass('input-loading');
         thisBtn.addClass('input-success');
 
         if(val=='None'){
@@ -245,12 +251,12 @@ function add_computation(thisBtn){
         }else if(val=='Percent'){
             percent_computation();
         }
-        
+
         setTimeout(function() {
             thisBtn.removeClass('input-success');
             thisBtn.removeClass('input-error');
         }, 3000);
-    },700); 
+    },700);
 }
 function percent_computation(){
     var percent = $('#listNewModal input[name="percent"]').val();

@@ -103,7 +103,7 @@
                                                       &nbsp; <span class="file-message">or drag and drop file here</span>
                                                       <input class="file-input" type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
                                                   </div><br>
-                                                  <button class="btn btn-primary btn-primary-scan" style="width: 100%;">Submit Import</button>
+                                                  <button class="btn btn-primary btn-primary-scan" id="importSubmit" style="width: 100%;">Submit Import</button>
                                               </div>
                                           </div>
                                       </form>

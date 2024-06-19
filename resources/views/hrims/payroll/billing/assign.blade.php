@@ -8,7 +8,20 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-12">
-                        <label>{{$query->staff_no}} <br> {{$query->name}}</label>
+                        @php
+                        $exp = explode('_',$query->name);
+                        $name = $query->name;
+                        if(isset($exp[1])){
+                            $lastname = $exp[1];
+                            $firstname = $exp[2];
+                            $middlename = $exp[3];
+                            $extname = $exp[4];
+                            $loan_type = $exp[6];
+                            $name = $lastname.', '.$firstname.' '.$extname.' '.$middlename.' ('.$loan_type.')';
+                        }
+                        @endphp
+                        <label>{{$query->staff_no}} <br> {{$name}}</label>
+
                     </div>
                     <div class="col-lg-12">
                         <label for="employee">Employee</label>
