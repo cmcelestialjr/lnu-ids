@@ -83,23 +83,33 @@ class EmployeePaginateController extends Controller
                 $position = '';
                 $salary = '';
                 $emp_stat = '';
+                $fund_service = '';
                 if($option==2){
                     if(isset($row->employee_info)){
                         $position = $row->employee_info->position_title;
                         $salary = $row->employee_info->salary;
                         $emp_stat = $row->employee_info->emp_stat->name;
+                        if($row->employee_info->fund_services_id){
+                            $fund_service = $row->employee_info->fund_service->shorten;
+                        }
                     }
                 }elseif($option==3){
                     if(isset($row->instructor_info)){
                         $position = $row->instructor_info->position_title;
                         $salary = $row->instructor_info->salary;
                         $emp_stat = $row->instructor_info->emp_stat->name;
+                        if($row->instructor_info->fund_services_id){
+                            $fund_service = $row->instructor_info->fund_service->shorten;
+                        }
                     }
                 }else{
                     if(isset($row->employee_default)){
                         $position = $row->employee_default->position_title;
                         $salary = $row->employee_default->salary;
                         $emp_stat = $row->employee_default->emp_stat->name;
+                        if($row->employee_default->fund_services_id){
+                            $fund_service = $row->employee_default->fund_service->shorten;
+                        }
                     }
                 }
                 if(!$salary){
@@ -113,7 +123,8 @@ class EmployeePaginateController extends Controller
                     'id_no' => $row->id_no,
                     'position' => $position,
                     'salary' => $salary,
-                    'emp_stat' => $emp_stat
+                    'emp_stat' => $emp_stat,
+                    'fund_service' => $fund_service
                 );
             }
         }

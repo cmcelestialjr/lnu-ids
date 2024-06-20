@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\ApiAuthController;
+use App\Http\Controllers\API\ApiDtrController;
 use App\Http\Middleware\VerifyAppToken;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group(['middleware' => [VerifyAppToken::class]], function(){
     Route::post('/login', [ApiAuthController::class, 'login']);
+    Route::post('/fetchDtr', [ApiDtrController::class, 'fetchDtr']);
 });
 
 // Route::group(['middleware' => ['auth:api']], function(){

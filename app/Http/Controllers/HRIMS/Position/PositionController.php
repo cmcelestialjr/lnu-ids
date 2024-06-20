@@ -48,7 +48,7 @@ class PositionController extends Controller
                                   'emp_stat',
                                   'fund_source',
                                   'role',
-                                  'type')
+                                  'type_info')
             ->where('status_id',$status);
         if($type!='All'){
             $query = $query->where('type_id',$type);
@@ -59,6 +59,22 @@ class PositionController extends Controller
                 if($query->designation_id!=NULL){
                     $designation = $query->designation->shorten;
                 }
+                $emp_stat = '';
+                if($query->emp_stat){
+                    $emp_stat = $query->emp_stat->name;
+                }
+                $fund_source = '';
+                if($query->fund_source){
+                    $fund_source = $query->fund_source->shorten;
+                }
+                $role = '';
+                if($query->role){
+                    $role = $query->role->name;
+                }
+                $type = '';
+                if($query->type_id!=NULL){
+                    $type = $query->type_info->name;
+                }
                 return [
                     'id' => $query->id,
                     'item_no' => $query->item_no,
@@ -68,10 +84,10 @@ class PositionController extends Controller
                     'sg' => $query->sg,
                     'level' => $query->level,
                     'date_created' => date('M d, Y', strtotime($query->date_created)),
-                    'emp_stat' => $query->emp_stat->name,
-                    'fund_source' => $query->fund_source->shorten,
-                    'role' => $query->role->name,
-                    'type' => $query->type->name,
+                    'emp_stat' => $emp_stat,
+                    'fund_source' => $fund_source,
+                    'role' => $role,
+                    'type' => $type,
                     'designation' => $designation
                 ];
             })->toArray();
@@ -79,7 +95,7 @@ class PositionController extends Controller
             $x = 1;
             foreach($query as $r){
                 $data_list['f1'] = $x;
-                $data_list['f2'] = $r['item_no'];
+                $data_list['f2'] = $r['item_no'].$status;
                 $data_list['f3'] = $r['name'];
                 $data_list['f4'] = $r['shorten'];
                 $data_list['f5'] = $r['sg'];
@@ -124,7 +140,7 @@ class PositionController extends Controller
                     'date_from' => date('M d, Y',strtotime($date_from->date_from)),
                     'date_to' => $date_to->date_to,
                     'id' => $query->user->id_no,
-                    'name' => $name,                    
+                    'name' => $name,
                     'salary' => $date_to->salary,
                     'sg' => $date_to->sg,
                     'step' => $date_to->step,
@@ -240,7 +256,7 @@ class PositionController extends Controller
                 if($fund_services==''){
                     $fund_services = NULL;
                 }
-                $insert = new HRPosition(); 
+                $insert = new HRPosition();
                 $insert->item_no = $item_no;
                 $insert->name = $name;
                 $insert->shorten = $shorten;

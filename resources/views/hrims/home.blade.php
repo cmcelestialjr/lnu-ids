@@ -24,15 +24,18 @@
                         @endforeach
                     </table>
                 </div>
-                {{-- <div class="col-lg-6">
+                <div class="col-lg-6">
                     <table class="table table-bordered">
                         @foreach($getUser1 as $row)
                           <tr>
-                            <td>{{$row}}</td>
+                            <td>{{$row['id']}}</td>
+                            <td>{{$row['state']}}</td>
+                            <td>{{$row['timestamp']}}</td>
+                            <td>{{$row['type']}}</td>
                           </tr>
                         @endforeach
                     </table>
-                </div> --}}
+                </div>
             </div>
           </div>
           <div class="card-footer">

@@ -28,6 +28,10 @@ class _Work extends Model
     {
         return $this->belongsTo(FundSource::class, 'fund_source_id', 'id');
     }
+    public function fund_service()
+    {
+        return $this->belongsTo(FundServices::class, 'fund_services_id', 'id');
+    }
     public function designation()
     {
         return $this->belongsTo(HRDesignation::class, 'designation_id', 'id');

@@ -180,7 +180,7 @@ function updateDisplayedContent(data) {
             row += '<td class="center">' + item.position + '</td>';
             row += '<td class="center">' + item.salary + '</td>';
             row += '<td class="center">' + item.emp_stat + '</td>';
-            row += '<td class="center">' + item.emp_stat + '</td>';
+            row += '<td class="center">' + item.fund_service + '</td>';
             row += '<td class="center"><button class="btn btn-primary btn-primary-scan btn-sm employeeView" data-id="'+item.id+'">'+
                     '<span class="fa fa-eye"></span> View</button></td>';
             row += '<td class="center"><button class="btn btn-info btn-info-scan btn-sm deduction" data-id="'+item.id+'">'+

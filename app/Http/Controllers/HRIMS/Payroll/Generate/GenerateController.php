@@ -758,6 +758,7 @@ class GenerateController extends Controller
         return date('ym',strtotime($year.'-'.$month.'-01')).$no;
     }
     private function updatePagibig($user_id,$gov,$payroll_type,$emp_stat){
+
         $check = HRDeduction::where('id',29)
             ->whereHas('emp_stat', function ($query) use ($emp_stat) {
                 $query->where('emp_stat_id',$emp_stat);
@@ -766,13 +767,23 @@ class GenerateController extends Controller
             $user = Auth::user();
             $updated_by = $user->id;
             if($gov=='N'){
-                $amount = 200;
+                $amount = 400;
                 $amount_employer = 0;
             }else{
-                $amount = 100;
+                $amount = 200;
                 $amount_employer = $check->amount;
             }
-            $query = HRDeductionEmployee::firstOrCreate(
+            $query = HRDeductionEmployee::where('user_id',$user_id)
+                ->where('payroll_type_id',$payroll_type)
+                ->where('emp_stat_id',$emp_stat)
+                ->where('deduction_id',29)
+                ->first();
+            if($query){
+                if($query->amount>$amount){
+                    $amount = $query->amount;
+                }
+            }
+            HRDeductionEmployee::updateOrCreate(
                 [
                     'user_id' => $user_id,
                     'payroll_type_id' => $payroll_type,

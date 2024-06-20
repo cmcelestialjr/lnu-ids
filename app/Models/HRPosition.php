@@ -24,7 +24,7 @@ class HRPosition extends Model
     {
         return $this->belongsTo(UsersRole::class, 'role_id', 'id');
     }
-    public function type()
+    public function type_info()
     {
         return $this->belongsTo(HRPositionType::class, 'type_id', 'id');
     }

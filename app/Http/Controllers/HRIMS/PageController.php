@@ -99,14 +99,14 @@ class PageController extends Controller
         //$query = DB::connection('skyhr')->table('skyhr.db_owner.tblDeviceLogs')->where('IdNo','230209')->get();
 
         // try{
-        //     $zk = new ZKTeco('10.5.205.96',4370);
+        //     $zk = new ZKTeco('10.5.205.55',4370);
             //  $zk1 = new ZKTeco('10.5.205.55',4370);
         //     // $zk_guard = new ZKTeco('10.5.205.8',4370);
         //     // $zk = new ZKTeco('10.5.201.137',4370); //mis
         //     // $zk = new ZKTeco('10.5.205.11',4370); //kabilang guard
         //     // $zk = new ZKTeco('10.5.205.23',4370); //youngfield
         //     // $zk = new ZKTeco('10.5.205.137',4370); // admin
-        //    if ($zk->connect() ){
+        //   if ($zk->connect() ){
             //     $getUser = $zk->getUser();
             //     $getUser1 = $zk1->getUser();
             // }
@@ -124,14 +124,14 @@ class PageController extends Controller
         //     //     $getUser = $zk_guard->userSpecific(900911);
         //     //     $startDate = '2023-06-01';
         //     //     $endDate = '2023-06-31';
-        //     $attendace = $zk->getAttendance();
+         //    $attendace = $zk->getAttendance();
         //     //     $attendace = collect($attendace1)->filter(function ($record) use ($startDate, $endDate) {
         //     //         $recordDate = $record['timestamp'];
         //     //         $recordDate = date('Y-m-d', strtotime($recordDate));
         //     //         return $recordDate >= $startDate && $recordDate <= $endDate;
         //     //     });
 
-        //     $getUser = $zk->getUser();
+                //$getUser = $zk->getUser();
         //     //     foreach($attendace as $row){
         //     //         $insert = new DTRlogsCopy();
 
@@ -160,7 +160,7 @@ class PageController extends Controller
         //         //     // }
         //         // }
 
-        //     }
+        //      }
         // }catch(Exception $e){
 
         // }
@@ -180,7 +180,7 @@ class PageController extends Controller
         // }
         $data['deviceName'] = $deviceName;
         $data['getUser'] = $getUser;
-        // $data['getUser1'] = $ids;
+        $data['getUser1'] = $attendace;
         $data['getFingerprint'] = $getFingerprint;
         $data['getTime'] = $query;
         return view($this->page.'/home',$data);
@@ -314,4 +314,3 @@ class PageController extends Controller
         return view($this->page.'/my/payslip',$data);
     }
 }
-?>
