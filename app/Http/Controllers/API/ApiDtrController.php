@@ -38,8 +38,8 @@ class ApiDtrController extends Controller
             $option = $request->option;
 
             if ($option == 'Today') {
-                $dtrData = UsersDTR::where('user_id', $user->id)
-                    ->whereDate('date', today())
+                $dtrData = UsersDTR::where('id_no', $user->id_no)
+                    ->where('date', date('Y-m-d'))
                     ->get();
             } else {
                 $year = $request->year;
