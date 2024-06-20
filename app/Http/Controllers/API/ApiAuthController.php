@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\UsersSystems;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -26,25 +27,23 @@ class ApiAuthController extends Controller
         $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
-            $user1 = User::with('systems.system')->where('username',$request->username)->first();
+            $user = User::where('username',$request->username)->first();
             $token = Str::random(80);
 
-            $user = User::find($user1->id);
-            $user->api_token = Hash::make($token);
-            $user->save();
+            $user1 = User::find($user->id);
+            $user1->api_token = Hash::make($token);
+            $user1->save();
 
             $role = 0;
 
+            $user_systems = UsersSystems::with('system')
+                ->where('user_id',$user->id)
+                ->whereIn('system_id',[1,6,7,9])
+                ->get();
             $systems = [];
-
-            if($user1->systems){
-                foreach($user1->systems as $row){
-                    if($row->system->shorten=='HRIMS' ||
-                        $row->system->shorten=='RIMS' ||
-                        $row->system->shorten=='FIS'
-                    ){
-                        $systems[] = $row->system->shorten;
-                    }
+            if($user_systems->count()>0){
+                foreach($user_systems as $row){
+                    $systems[] = $row->system->shorten;
                 }
             }
 

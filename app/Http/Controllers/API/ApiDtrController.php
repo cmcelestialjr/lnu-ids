@@ -4,13 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Users;
 use App\Models\UsersDTR;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class ApiDtrController extends Controller
 {
@@ -36,7 +33,7 @@ class ApiDtrController extends Controller
 
         $api_token = $user->api_token;
 
-        if (Hash::check($request->token, $api_token)) {
+       // if (Hash::check($request->token, $api_token)) {
 
             $option = $request->option;
 
@@ -47,7 +44,7 @@ class ApiDtrController extends Controller
             } else {
                 $year = $request->year;
                 $month = date('m',strtotime($year.'-'.$request->month.'-01'));
-                $dtrData = UsersDTR::where('user_id', $user->id)
+                $dtrData = UsersDTR::where('id_no', $user->id_no)
                     ->whereYear('date', $year)
                     ->whereMonth('date', $month)
                     ->get();
@@ -56,17 +53,17 @@ class ApiDtrController extends Controller
             $responseData = $dtrData->map(function ($dtr) {
                 return [
                     'date' => $dtr->date,
-                    'time_in_am' => $dtr->time_in_am,
-                    'time_out_am' => $dtr->time_out_am,
-                    'time_in_pm' => $dtr->time_in_pm,
-                    'time_out_pm' => $dtr->time_out_pm,
+                    'time_in_am' => strtotime($dtr->time_in_am) ? date('H:i:s', strtotime($dtr->time_in_am)) : '',
+                    'time_out_am' => strtotime($dtr->time_out_am) ? date('H:i:s', strtotime($dtr->time_out_am)) : '',
+                    'time_in_pm' => strtotime($dtr->time_in_pm) ? date('H:i:s', strtotime($dtr->time_in_pm)) : '',
+                    'time_out_pm' => strtotime($dtr->time_out_pm) ? date('H:i:s', strtotime($dtr->time_out_pm)) : '',
                 ];
             });
 
             return response()->json($responseData, 200);
 
-        }else{
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+        // }else{
+        //     return response()->json(['error' => 'Unauthorized'], 401);
+        // }
     }
 }
