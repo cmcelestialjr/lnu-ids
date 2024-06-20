@@ -45,8 +45,8 @@ class ApiDtrController extends Controller
                 $year = $request->year;
                 $month = date('m',strtotime($year.'-'.$request->month.'-01'));
                 $dtrData = UsersDTR::where('id_no', $user->id_no)
-                    ->whereYear('date', $year)
-                    ->whereMonth('date', $month)
+                    ->whereYear('date', date('Y'))
+                    ->whereMonth('date', date('m'))
                     ->get();
             }
 
