@@ -77,10 +77,10 @@
                                             </p>
                                             <p class="button-desc" id="password-policies" style="font-size: 14px !important;">
                                                 <i id="policy-1"><span id="policy-span-1">*</span> must atleast 8 characters</i><br>
-                                                <i id="policy-2"><span id="policy-span-2">*</span> must contain at least 1 small letter</i><br>
-                                                <i id="policy-3"><span id="policy-span-3">*</span> must contain at least 1 capital letter</i><br>
-                                                <i id="policy-4"><span id="policy-span-4">*</span> must contain at least 1 number</i><br>
-                                                <i id="policy-5"><span id="policy-span-5">*</span> must contain at least 1 special character</i>
+                                                <i id="policy-2"><span id="policy-span-2">*</span> must contain a small letter</i><br>
+                                                <i id="policy-3"><span id="policy-span-3">*</span> must contain a capital letter</i><br>
+                                                <i id="policy-4"><span id="policy-span-4">*</span> must contain a number</i><br>
+                                                <i id="policy-5"><span id="policy-span-5">*</span> must contain a special character</i>
                                             </p>
                                         </div>
                                     </div>
