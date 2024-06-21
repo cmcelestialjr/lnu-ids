@@ -43,7 +43,9 @@ class ApiAuthController extends Controller
             $systems = [];
             if($user_systems->count()>0){
                 foreach($user_systems as $row){
-                    $systems[] = $row->system->shorten;
+                    if (!in_array($row->system->shorten, $systems)) {
+                        $systems[] = $row->system->shorten;
+                    }
                 }
             }
 
