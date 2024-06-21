@@ -42,7 +42,7 @@
     <div class="container d-flex justify-content-between align-items-center">
 
       <div id="logo">
-        <a href="#hero"><img src="{{ asset('assets/images/logo/lnu_logo_header_blue.png') }}" alt=""></a>
+        <a href="#"><img src="{{ asset('assets/images/logo/lnu_logo_header_blue.png') }}" alt=""></a>
       </div>
     </div>
   </header><!-- End Header -->
@@ -102,10 +102,10 @@
 
     <div class="container">
       <div class="copyright">
-        &copy; Copyright <strong>MIS</strong>. All Rights Reserved
+        &copy; Copyright <strong>ITSO</strong>. All Rights Reserved
       </div>
       <div class="credits">
-        Managed by <a href="#">MIS</a>
+        Managed by <a href="#">ITSO</a>
       </div>
     </div>
   </footer><!-- End Footer -->

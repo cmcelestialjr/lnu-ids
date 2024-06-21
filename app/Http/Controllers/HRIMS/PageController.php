@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Rats\Zkteco\Lib\ZKTeco;
+use Intervention\Image\Facades\Image;
 
 class PageController extends Controller
 {
@@ -58,6 +59,25 @@ class PageController extends Controller
         $dateTime = '2024-05-09 08:05:56';
         $type = '0';
         $ipaddress = '10.5.201.137';
+
+        // // Define the path to your existing image
+        // $imagePath = public_path('assets/images/logo/lnu_logo.png');
+
+        // // Check if the image exists
+        // if (!file_exists($imagePath)) {
+        //     return response()->json(['error' => 'Image not found.'], 404);
+        // }
+
+        // // Create an instance of the image
+        // $img = Image::make($imagePath);
+
+        // // Resize the image to 48x48 pixels
+        // $img->resize(250, 250);
+
+        // // Save the resized image to a desired location (for example, in the public folder)
+        // $resizedImagePath = public_path('assets/resized_image_250.png');
+        // $img->save($resizedImagePath);
+
         // $details = [
         //     'id_no' => $idNo,
         //     'dateTime' => $dateTime,
