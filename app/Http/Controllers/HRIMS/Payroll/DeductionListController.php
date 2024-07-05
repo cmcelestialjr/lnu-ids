@@ -109,7 +109,7 @@ class DeductionListController extends Controller
 
         // Check user access level
         if (!in_array($user_access_level, $user_access_levels)) {
-            return  response()->json(['result' => 'error1']);
+            return  response()->json(['result' => 'error']);
         }
 
         $user = Auth::user();
@@ -126,7 +126,7 @@ class DeductionListController extends Controller
         $check = HRDeduction::where('name',$name)
             ->where('group_id',$group)->first();
         if($check){
-            return  response()->json(['result' => 'error2']);
+            return  response()->json(['result' => 'error']);
         }
 
         try{

@@ -120,14 +120,12 @@ class DtrMachineCheck extends Command
             }
             $now = now();
             if ($now->isBetween('07:05', '07:06') ||
-                $now->isBetween('08:35', '08:36') ||
-                $now->isBetween('09:01', '09:02') ||
-                $now->isBetween('12:35', '12:36') ||
-                $now->isBetween('13:01', '13:02') ||
-                $now->isBetween('17:35', '17:36') ||
-                $now->isBetween('18:01', '18:02') ||
-                $now->isBetween('20:35', '20:36') ||
-                $now->isBetween('23:35', '23:40')) {
+                $now->isBetween('09:25', '09:26') ||
+                $now->isBetween('11:55', '11:56') ||
+                $now->isBetween('13:25', '13:26') ||
+                $now->isBetween('14:55', '14:56') ||
+                $now->isBetween('20:25', '20:26')
+                ) {
                 if($recordsCheck==0){
                     $zk->clearAttendance();
                 }

@@ -267,11 +267,12 @@ class PayrollPrintController extends Controller
             }
         }
 
-        if($fund_services->count()>0){
-            $y_limit = 139;
-        }else{
-            $y_limit = 161.5;
-        }
+        // if($fund_services->count()>0){
+        //     $y_limit = 139;
+        // }else{
+        //     $y_limit = 200;
+        // }
+        $y_limit = 200;
 
         $x = 3;
         $y = 5;
@@ -420,7 +421,7 @@ class PayrollPrintController extends Controller
                 foreach($deduction_group as $deduction){
                     $pdf::SetXY($x+$x_add+$x_add_group, $y+$y_add);
                     $pdf::Cell($allocated_per_column*$deduction_group_count[$deduction->id], 3.3, $deduction->name, 1, 1, 'C', 0, '', 1);
-                    $x_add_group = $allocated_per_column*$deduction_group_count[$deduction->id];
+                    $x_add_group += $allocated_per_column*$deduction_group_count[$deduction->id];
                     $deduction_x++;
                 }
             }
@@ -900,6 +901,13 @@ class PayrollPrintController extends Controller
                         }
                         $list_x++;
                     }
+                   if(count($payroll_list)==$list_x){
+                        if($fund_services->count()>0){
+                            $y_limit = 139;
+                        }else{
+                            $y_limit = 160;
+                        }
+                   }
 
                     if(($y+$y_add)>$y_limit){
                         $pdf::AddPage('L',$page_size);
@@ -1527,7 +1535,7 @@ class PayrollPrintController extends Controller
                                 $x_add = $x_add+40;
                                 $pdf::SetXY($x+$x_add, $y+$y_add);
                                 $pdf::Cell(20, '', $this->check_zero($deduction_services_group), 0, 1, 'R', 0, '', 1);
-                                $total_deduction_services_group1[$fund_service->fund_services_id] = $deduction_services_group;
+                                $total_deduction_services_group1[$fund_service->fund_services_id] += $deduction_services_group;
                                 $total_deduction_services_group += $deduction_services_group;
                             }
                             $group_services = $fund_service->fund_services->group;
@@ -1551,13 +1559,24 @@ class PayrollPrintController extends Controller
                 for ($i = 0; $i < $fund_services->count(); $i++) {
                     $fund_service = $fund_services[$i];
                     $fund_service_next = $fund_services[$i + 1];
-                    $deduction_services_group = 0;
+                    $allowance_services_group = 0;
+
+                    if($group_services==$fund_service->fund_services->group){
+                        $services_group_name[] = $fund_service->fund_services->shorten;
+                    }else{
+                        $services_group_name = [];
+                        $services_group_name[] = $fund_service->fund_services->shorten;
+                    }
+
+                    $group_services_next = NULL;
+                    if($fund_service_next){
+                        $group_services_next = $fund_service_next->fund_services->group;
+                    }
 
                     if($group_services_next!=$fund_service->fund_services->group){
                         $x_add = $x_add+40;
                         $pdf::SetXY($x+$x_add, $y+$y_add);
-                        $pdf::Cell(20, '', $this->check_zero($total_netpay_services_group1[$fund_service->fund_services_id]
-                                                        -$total_deduction_services_group1[$fund_service->fund_services_id]), 0, 1, 'R', 0, '', 1);
+                        $pdf::Cell(20, '', $this->check_zero($total_netpay_services_group1[$fund_service->fund_services_id]), 0, 1, 'R', 0, '', 1);
 
                         $pdf::SetXY($x+$x_add-17, $y+$y_add+3);
                         $pdf::Cell(37, '', '', 'TB', 1, 'L', 0, '', 1);

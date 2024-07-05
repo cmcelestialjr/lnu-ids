@@ -37,6 +37,10 @@ $(document).off('click', '#departmentModal button[name="submit"]').on('click', '
     var thisBtn = $(this);
     department_submit(thisBtn);
 });
+$(document).off('click', '.dtrPrint').on('click', '.dtrPrint', function (e) {
+    var thisBtn = $(this);
+    dtrPrint(thisBtn);
+});
 $(document).off('click', '#dtrInputModal #dtrInputTable .change_travel').on('click', '#dtrInputModal #dtrInputTable .change_travel', function (e) {
     var thisBtn = $(this);
     var val = thisBtn.data('val');
@@ -431,6 +435,68 @@ function department_submit(thisBtn){
                 thisBtn.removeClass('input-success');
                 thisBtn.removeClass('input-error');
             }, 3000);
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+}
+function dtrPrint(thisBtn){
+    var id_no = $('input[name="id_no"]').val();
+    var option = thisBtn.data('id');
+    var year = thisBtn.data('y');
+    var month = thisBtn.data('m');
+    var range = thisBtn.data('r');
+    var form_data = {
+        id_no:id_no,
+        option:option,
+        year:year,
+        month:month,
+        range:range
+    };
+    $.ajax({
+        url: base_url+'/hrims/employee/dtrSubmit',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled');
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading');
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisBtn.addClass('input-success');
+                // var url = base_url+'/rims/student/certificationDisplay';
+                // var modal = 'info';
+                // var modal_size = 'modal-lg';
+                // var form_data = {
+                //     url:url,
+                //     modal:modal,
+                //     modal_size:modal_size,
+                //     static:'',
+                //     w_table:'wo',
+                //     src:data.url
+                // };
+                // loadModal(form_data,thisBtn);
+                window.open(base_url+'/'+data.url, '_blank');
+            }else{
+                toastr.error(data.result);
+                thisBtn.addClass('input-error');
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+
         },
         error: function (){
             toastr.error('Error!');

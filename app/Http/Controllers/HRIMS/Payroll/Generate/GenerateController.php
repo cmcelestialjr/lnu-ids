@@ -511,6 +511,7 @@ class GenerateController extends Controller
                         ->orderBy('date_from','DESC')->first();
 
                     $salary = $getWork->salary;
+                    $emp_stat = $getWork->emp_stat_id;
                     $include = 'Y';
                     $w_salary_amount = 0;
                     $column_amount = 0;
@@ -574,6 +575,7 @@ class GenerateController extends Controller
                     if($include=='Y'){
                         $allowance = $this->getAllowance($emp_stat,$payroll_type,$include_pera);
                         $deduction = $this->getDeduction($emp_stat,$payroll_type,$employee);
+
                         $gross = $earned+$allowance;
                         $netpay = $gross-$deduction;
 

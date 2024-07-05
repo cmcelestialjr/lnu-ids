@@ -665,18 +665,28 @@ table td{
 <div class="row">
     <div class="col-lg-12">
         @if($count_days<=0)
-            <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/o')}}" method="GET" target="_blank">
-                <button class="btn btn-info btn-info-scan" style="float:right">
+            {{-- <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/o')}}" method="GET" target="_blank"> --}}
+                <button class="btn btn-info btn-info-scan dtrPrint"
+                    data-id="o"
+                    data-y="{{$year}}"
+                    data-m="{{$month}}"
+                    data-r="{{$range}}"
+                    style="float:right">
                 <span class="fa fa-file-pdf"></span>
                 Overload Print
                 </button>
-            </form>
-            <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/p')}}" method="GET" target="_blank">
-                <button class="btn btn-primary btn-primary-scan" style="float:right">
+            {{-- </form> --}}
+            {{-- <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/p')}}" method="GET" target="_blank"> --}}
+                <button class="btn btn-primary btn-primary-scan dtrPrint"
+                    data-id="p"
+                    data-y="{{$year}}"
+                    data-m="{{$month}}"
+                    data-r="{{$range}}"
+                    style="float:right">
                 <span class="fa fa-file-pdf"></span>
                 Print
                 </button>
-            </form>
+            {{-- </form> --}}
         @else
             <button class="btn btn-info btn-info-scan" style="float:right" disabled>
                 <span class="fa fa-file-pdf"></span>

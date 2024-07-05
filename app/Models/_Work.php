@@ -44,4 +44,8 @@ class _Work extends Model
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id');
     }
+    public function pt_option()
+    {
+        return $this->belongsTo(HRPTOption::class, 'pt_option_id', 'id');
+    }
 }

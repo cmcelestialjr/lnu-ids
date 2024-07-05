@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class HRPayrollList extends Model
 {
-    protected $table = 'hr_payroll_list';    
+    protected $table = 'hr_payroll_list';
 
     public function payroll()
     {
         return $this->belongsTo(HRPayroll::class, 'payroll_id', 'id');
-    }    
+    }
     public function employee()
     {
         return $this->belongsTo(Users::class, 'user_id', 'id');

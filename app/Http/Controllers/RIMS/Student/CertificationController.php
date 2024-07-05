@@ -449,7 +449,7 @@ class CertificationController extends Controller
         $x = 10;
         $y_add = 5;
         $x_add = 0;
-
+        $page_size = array(215.9, 330.2);
         $pdf::AddPage('P',$page_size);
         $pdf::SetAutoPageBreak(TRUE, 3);
 

@@ -13,46 +13,16 @@ use App\Models\UsersRoleList;
 use App\Models\UsersSchedDays;
 use App\Models\UsersSchedTime;
 use App\Services\NameServices;
-use App\Services\PasswordServices;
-use App\Services\TokenServices;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use PDF;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PDFController extends Controller
 {
-    /**
-     * Show the form for viewing a resource.
-     */
-    public function index(Request $request){
-        $id_no = $request->id_no;
-        $year = $request->year;
-        $month = $request->month;
-        $range = $request->range;
-        $option = $request->option;
-        $pdf_code = $request->pdf_code;
-        $date = date('Y-m-d',strtotime($year.'-'.$month.'-01'));
-
-        $first_remove = substr($pdf_code, 4);
-        $second_remove = substr($first_remove, 0, -4);
-        $check_pdf_code = $second_remove;
-
-        $employee = Users::where('id_no',$id_no)->first();
-        if($employee==NULL || $check_pdf_code!=mb_substr($date, -1)){
-            return view('layouts/error/404');
-        }
-        $src = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'.pdf';
-
-        $data = array(
-                'src' => $src
-            );
-        return view('pdf/main_view',$data);
-    }
     public function PDF(Request $request){
         $user_access_level = $request->session()->get('user_access_level');
         $user = Auth::user();
@@ -116,45 +86,8 @@ class PDFController extends Controller
             return view('layouts/error/404');
         }
     }
-    public function show(Request $request)
-    {
-        // Validate the request
-        $validator = $this->showValidateRequest($request);
-
-        // Check if validation fails
-        if ($validator->fails()) {
-            // If validation fails, return a JSON response with validation errors and a 400 status code
-            return response()->json(['result' => $validator->errors()], 400);
-        }
-
-        $id_no = $request->id_no;
-        $employee = Users::where('id_no',$id_no)
-            ->first();
-
-        // Check if the employee exists
-        if($employee==NULL){
-            return response()->json(['result' => 'error']);
-        }
-
-        $option = $request->option;
-        $year = $request->year;
-        $month = $request->month;
-        $range = $request->range;
-
-        $url = $this->generateQR($id_no,$year,$month,$range,$option);
-
-        return response()->json(['result' => 'success',
-                                'url' => $url
-                                ]);
-    }
     private function generateQR($id_no,$year,$month,$range,$option){
         error_reporting(E_ERROR);
-        $token = new TokenServices;
-        $date = date('Y-m-d',strtotime($year.'-'.$month.'-01'));
-        $token1 = $token->token_w_upper(4);
-        $token2 = $token->token_w_upper(4);
-        $pdf_code = $token1.mb_substr($date, -1).$token2;
-        $password = $token1.mb_substr($date, -1).$token2;
         $image = QrCode::format('png')
                     ->merge(public_path('assets\images\logo\lnu_logo.png'), .28, true)
                     ->style('round', 0.2)
@@ -163,43 +96,17 @@ class PDFController extends Controller
                     ->eyeColor(2, /*outer*/ 212,175,55, /*inner*/ 0, 0, 128, 0, 0)
                     ->size(300)
                     ->errorCorrection('H')
-                    ->generate('hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/'.$option.'/'.$pdf_code);
-        $imageName = $id_no.'_'.$year.'_'.$month.'_'.$range.'_'.$option.'_'.$pdf_code.'.png';
+                    ->generate('hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/'.$option);
+        $imageName = $id_no.'_'.$year.'_'.$month.'_'.$range.'_'.$option.'.png';
         $path = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/';
         File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
         $file = public_path($path . $imageName);
         file_put_contents($file, $image);
         $qrcode = $path.$imageName;
-        $src = $this->generatePDF($id_no,$year,$month,$range,$qrcode,$option,$password);
+        $src = $this->generatePDF($id_no,$year,$month,$range,$qrcode,$option);
         return $src;
     }
-
-    private function generatePDF($id_no,$year,$month,$range,$qrcode,$option,$password){
-        $password_services = new PasswordServices;
-
-        $master_password = $password_services->master();
-
-        //$pdf = new PDF('A4', 'mm', '', true, 'UTF-8', false);
-        $page_size = array(215.9, 330.2);
-        $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
-        $height = 185;
-        $width = 260;
-        $pdf::reset();
-        $pdf = $this->generatePDFDetails($pdf,$id_no,$year,$month,$range,$qrcode,$option,$password);
-        $pdf::setProtection();
-        $pathUserUnprotected = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'.pdf';
-        $pdf::Output(public_path($pathUserUnprotected),'F');
-
-        // $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
-        // $pdf::reset();
-        // $pdf = $this->generatePDFDetails($id_no,$year,$month,$range,$qrcode,$option,$password);
-        // $pdf::setProtection(array('print'), $password, $master_password, 0, null);
-        // $pathUserUnprotected = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'_protected.pdf';
-        // $pdf::Output(public_path($pathUserProtected),'F');
-
-        return 'hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/'.$option.'/'.$password;
-    }
-    private function generatePDFDetails($pdf,$id_no,$year,$month,$range,$qrcode,$option,$password){
+    private function generatePDF($id_no,$year,$month,$range,$qrcode,$option){
         $name_services = new NameServices;
         $pathUser = NULL;
         $user = Users::with('employee_default.position.office_designate.current_user','instructor_info.position.office_designate.current_user')->where('id_no',$id_no)->first();
@@ -617,10 +524,10 @@ class PDFController extends Controller
 
         //$pdf = new PDF('A4', 'mm', '', true, 'UTF-8', false);
         $page_size = array(215.9, 330.2);
-        // $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
-        // $height = 185;
-        // $width = 260;
-        // $pdf::reset();
+        $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
+        $height = 185;
+        $width = 260;
+        $pdf::reset();
         $pdf::AddPage('P',$page_size);
         $pdf::SetAutoPageBreak(TRUE, 3);
        //landscape scale A4
@@ -1141,35 +1048,9 @@ class PDFController extends Controller
         $pdf::SetFont('typewriteb','',6);
         $pdf::MultiCell(10, 270, "|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n", 0, 'C', 0, 0, '', '', true);
 
-        // $pathUser = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'.pdf';
-        // $pdf::Output(public_path($pathUser),'F');
+        $pathUser = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'.pdf';
+        $pdf::Output(public_path($pathUser),'F');
         }
-        return $pdf;
-    }
-
-    /**
-     * Validate the request data.
-     *
-     * @param Request $request The HTTP request instance.
-     * @return \Illuminate\Contracts\Validation\Validator The validation validator instance.
-     */
-    private function showValidateRequest(Request $request)
-    {
-        $rules = [
-            'id_no' => 'required|string',
-            'option' => 'required|string',
-            'year' => 'required|string',
-            'month' => 'required|string',
-            'range' => 'required|string'
-        ];
-
-        $customMessages = [
-            'id_no.required' => 'ID is required.',
-            'id_no.string' => 'ID must be a string.',
-            'option.required' => 'Option is required.',
-            'option.string' => 'Option must be a string.'
-        ];
-
-        return Validator::make($request->all(), $rules, $customMessages);
+        return $pathUser;
     }
 }

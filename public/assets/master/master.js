@@ -382,7 +382,7 @@ function loadDivwLoader(form_data,thisBtn){
     cache: false,
     beforeSend: function() {
       thisBtn.attr('disabled','disabled');
-      thisBtn.addClass('input-loading');
+      //thisBtn.addClass('input-loading');
     },
     success : function(data){
       $('#'+form_data.tid).html('');
@@ -407,17 +407,17 @@ function loadDivwLoader(form_data,thisBtn){
         dropdownParent: $("#"+form_data.tid)
       });
       thisBtn.removeAttr('disabled');
-      thisBtn.removeClass('input-loading');
-      thisBtn.addClass('input-success');
-      setTimeout(function() {
-        thisBtn.removeClass('input-success');
-        thisBtn.removeClass('input-error');
-      }, 3000);
+      //thisBtn.removeClass('input-loading');
+      //thisBtn.addClass('input-success');
+    //   setTimeout(function() {
+    //     thisBtn.removeClass('input-success');
+    //     thisBtn.removeClass('input-error');
+    //   }, 3000);
     },
     error: function (){
       thisBtn.removeAttr('disabled');
-      thisBtn.removeClass('input-success');
-      thisBtn.removeClass('input-error');
+    //   thisBtn.removeClass('input-success');
+    //   thisBtn.removeClass('input-error');
       toastr.error('Error!');
     }
   });
@@ -434,7 +434,7 @@ function loadDivwDisabled(form_data,thisBtn){
     beforeSend: function() {
       $('#'+form_data.tid).addClass('disabled');
       thisBtn.attr('disabled','disabled');
-      thisBtn.addClass('input-loading');
+    //   thisBtn.addClass('input-loading');
     },
     success : function(data){
       $('#'+form_data.tid).removeClass('disabled');
@@ -458,12 +458,12 @@ function loadDivwDisabled(form_data,thisBtn){
         dropdownParent: $("#"+form_data.tid)
       });
       thisBtn.removeAttr('disabled');
-      thisBtn.removeClass('input-loading');
-      thisBtn.addClass('input-success');
-      setTimeout(function() {
-        thisBtn.removeClass('input-success');
-        thisBtn.removeClass('input-error');
-      }, 3000);
+    //   thisBtn.removeClass('input-loading');
+    //   thisBtn.addClass('input-success');
+    //   setTimeout(function() {
+    //     thisBtn.removeClass('input-success');
+    //     thisBtn.removeClass('input-error');
+    //   }, 3000);
     },
     error: function (){
       thisBtn.removeAttr('disabled');

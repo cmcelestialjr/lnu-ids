@@ -276,6 +276,9 @@ class PageController extends Controller
         $data['payroll_type'] = $payroll_type;
         return view($this->page.'/payroll/billing/billing',$data);
     }
+    public function monitoring($data){
+        return view($this->page.'/payroll/monitoring/monitoring',$data);
+    }
     public function summary($data){
         return view($this->page.'/payroll/summary/summary',$data);
     }

@@ -32,6 +32,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
     Route::get('/student/certification/{stud_id}/{certification}/{program_level}/{school_year}/{period}/{date}/{pdf_code}', 'RIMS\Student\CertificationController@pdf');
     Route::get('/student/enrollmentform/{stud_id}/{school_year}/{school_year_period}/{enrollment_form_no}/{pdf_code}', 'RIMS\Student\EnrollmentFormController@pdf');
 
+    Route::get('/hrims/dtr/pdf/{year}/{month}/{id_no}/{range}/{option}/{pdf_code}', 'HRIMS\DTR\PDFController@index');
+
     Route::group(['middleware' => ['auth']], function(){
         Route::middleware(['throttle:10,1'])->group(function () {
             Route::group(['prefix'=>'import'], function(){
@@ -544,8 +546,11 @@ Route::group(['middleware' => ['HTTPS']], function(){
 
                     Route::post('/docInfo', 'HRIMS\Employee\Information\DocInfoController@index');
 
+                    Route::post('/dtrSubmit', 'HRIMS\DTR\PDFController@show');
+
                     Route::post('/paginate', 'HRIMS\Employee\EmployeePaginateController@paginate');
                     Route::post('/counts', 'HRIMS\Employee\EmployeePaginateController@counts');
+
 
                     Route::group(['prefix'=>'information'], function(){
                         Route::post('/infoSubmit', 'HRIMS\Employee\Information\PersonalInfoController@infoSubmit');
@@ -664,6 +669,19 @@ Route::group(['middleware' => ['HTTPS']], function(){
                         Route::post('/assign', 'HRIMS\Payroll\BillingController@assign');
                         Route::post('/assignSubmit', 'HRIMS\Payroll\BillingController@assignSubmit');
                         Route::post('/import', 'HRIMS\Payroll\BillingController@import');
+                    });
+                    Route::group(['prefix'=>'monitoring'], function(){
+                        Route::post('/monitoring', 'HRIMS\Payroll\MonitoringController@index');
+
+                        Route::group(['prefix'=>'partTime'], function(){
+                            Route::post('/index', 'HRIMS\Payroll\PartTimeController@index');
+                            Route::post('/syNew', 'HRIMS\Payroll\PartTimeController@syNew');
+                            Route::post('/syNewSubmit', 'HRIMS\Payroll\PartTimeController@syNewSubmit');
+                            Route::post('/update', 'HRIMS\Payroll\PartTimeController@update');
+                            Route::post('/updateSubmit', 'HRIMS\Payroll\PartTimeController@updateSubmit');
+                            Route::post('/add', 'HRIMS\Payroll\PartTimeController@add');
+                            Route::post('/addSubmit', 'HRIMS\Payroll\PartTimeController@addSubmit');
+                        });
                     });
                 });
                 Route::group(['prefix'=>'position'], function(){

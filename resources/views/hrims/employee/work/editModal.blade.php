@@ -45,7 +45,7 @@
                                             <option value="{{$query->position_id}}">{{$query->position_title}}</option>
                                         </select>
                                     </div>
-                                    <input type="hidden" name="position_title" value="{{$query->position_title}}">
+                                    <input type="text" class="form-control hide" name="position_title" placeholder="Position Title" value="{{$query->position_title}}">
                                 @endif
                             </div>
                             <div class="col-lg-6">

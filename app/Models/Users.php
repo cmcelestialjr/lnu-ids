@@ -85,6 +85,10 @@ class Users extends Model
     {
         return $this->hasMany(_Work::class, 'user_id', 'id');
     }
+    public function part_time()
+    {
+        return $this->hasMany(HRPT::class, 'user_id', 'id');
+    }
     public function courses()
     {
         return $this->hasMany(EducOfferedCourses::class, 'instructor_id', 'id');
