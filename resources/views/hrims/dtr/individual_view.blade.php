@@ -518,7 +518,7 @@ table td{
             <th style="width: 3%">Min</th>
             <th style="width: 3%">No</th>
         </tr>
-    <thead>
+    </thead>
     <body>
 @php
     $total_minutes = 0;

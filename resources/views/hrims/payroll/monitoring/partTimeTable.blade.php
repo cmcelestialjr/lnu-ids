@@ -106,13 +106,24 @@
                         </span>
                         @php
                             $payroll_found = false;
+                            $pt_total_amount = 0;
                             $total_amount = 0;
                             $total_earned = 0;
                         @endphp
+                        @foreach ($r->pt_months as $pt_month)
+                            @if($pt_month->pt_option_id==$option_id &&
+                                $pt_month->year == $current_date->format('Y') &&
+                                $pt_month->month == $current_date->format('m'))
+                                @php
+                                    $pt_total_amount = $pt_month->hour;
+                                @endphp
+                            @endif
+                        @endforeach
                         @foreach ($r->payrolls as $payroll)
                             @if ($payroll->months)
                                 @foreach($payroll->months as $rowMonth)
-                                    @if ($rowMonth->year == $current_date->format('Y') && $rowMonth->month == $current_date->format('m'))
+                                    @if ($rowMonth->year == $current_date->format('Y') &&
+                                        $rowMonth->month == $current_date->format('m'))
                                         @if($payroll->pt_option_id == $option_id)
                                             @php
                                                 $total_amount += $rowMonth->amount;
@@ -127,10 +138,21 @@
                                 @endforeach
                             @endif
                         @endforeach
-                        @if ($total_amount > 0 || $total_earned > 0)
-                            <br> hr: {{ number_format($total_amount, 2) }} <br>
-                            P{{ number_format($total_earned, 2) }}
+                        @php
+                        if($total_amount > 0){
+                            $pt_total_amount = $total_amount;
+                        }
+                        @endphp
+                        <span id="option{{$current_date->format('Y')}}{{$current_date->format('m')}}">
+                            <br>
+                            hrs:
+                            {{ number_format($pt_total_amount, 2) }}
+                        </span>
+
+                        @if ($total_earned > 0)
+                            <br> P{{ number_format($total_earned, 2) }}
                         @endif
+
                         @php
                             $current_date->modify('+1 month');
                         @endphp

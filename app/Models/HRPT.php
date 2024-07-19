@@ -20,6 +20,10 @@ class HRPT extends Model
     {
         return $this->belongsTo(HRPTOption::class, 'pt_option_id', 'id');
     }
+    public function pt_months()
+    {
+        return $this->hasMany(HRPTMonths::class, 'pt_id', 'id');
+    }
     public function updated_by_info()
     {
         return $this->belongsTo(Users::class, 'updated_by', 'id');

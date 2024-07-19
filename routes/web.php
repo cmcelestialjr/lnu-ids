@@ -684,6 +684,8 @@ Route::group(['middleware' => ['HTTPS']], function(){
                             Route::post('/remove', 'HRIMS\Payroll\PartTimeController@remove');
                             Route::post('/removeSubmit', 'HRIMS\Payroll\PartTimeController@removeSubmit');
                             Route::post('/viewOptions', 'HRIMS\Payroll\PartTimeController@viewOptions');
+                            Route::post('/hoursAccumulated', 'HRIMS\Payroll\PartTimeController@hoursAccumulated');
+                            Route::post('/viewDtr', 'HRIMS\Payroll\PartTimeController@viewDtr');
                         });
 
                         Route::group(['prefix'=>'overLoad'], function(){

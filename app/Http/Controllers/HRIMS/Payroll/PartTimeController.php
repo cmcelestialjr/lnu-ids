@@ -16,6 +16,7 @@ use App\Models\HRPTMonths;
 use App\Models\HRPTOption;
 use App\Models\HRPTSY;
 use App\Models\Users;
+use App\Models\UsersDTR;
 use App\Services\NameServices;
 use DateTime;
 use Exception;
@@ -85,6 +86,15 @@ class PartTimeController extends Controller
             }])->with(['work' => function ($query) use ($option) {
                 $query->where('emp_stat_id',5);
                 $query->where('date_to','present');
+                if($option){
+                    $query->where(function ($query) use ($option) {
+                        $query->whereIn('pt_option_id', $option)
+                            ->orWhereNull('pt_option_id');
+                    });
+                }
+            }])->with(['pt_months' => function ($query) use ($sy,$option) {
+                $query->where('pt_sy_id',$sy);
+                $query->where('emp_stat_id',5);
                 if($option){
                     $query->where(function ($query) use ($option) {
                         $query->whereIn('pt_option_id', $option)
@@ -383,12 +393,41 @@ class PartTimeController extends Controller
         $hour = $payroll_month ? $payroll_month->amount : $hour;
 
         $data = [
+            'id' => $id,
             'payroll_month' => $payroll_month,
             'year' => $year,
             'month' => $month,
             'hour' => $hour,
+            'option_id' => $option_id
         ];
         return view('hrims/payroll/monitoring/partTimeViewOptions',$data);
+    }
+    public function viewDtr(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|numeric',
+            'year' => 'required|numeric',
+            'month' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return view('layouts/error/404');
+        }
+
+        $id = $request->id;
+        $year = $request->year;
+        $month = $request->month;
+
+        $getDtr = UsersDTR::whereHas('user', function ($query) use ($id) {
+                $query->where('id', $id);
+            })->whereYear('date',$year)
+            ->whereMonth('date',$month)
+            ->get();
+
+        $data = [
+            'getDtr' => $getDtr
+        ];
+        return view('hrims/payroll/monitoring/partTimeViewDtr',$data);
     }
     public function syNewSubmit(Request $request)
     {
@@ -699,7 +738,87 @@ class PartTimeController extends Controller
             return $this->handleOtherError($e);
         }
     }
-    public function removeSubmit(Request $request){
+    public function hoursAccumulated(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'sy' => 'required|numeric',
+            'id' => 'required|numeric',
+            'year' => 'required|numeric',
+            'month' => 'required|string',
+            'option_id' => 'required|numeric',
+            'hour' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['result' => 'error']);
+        }
+
+        $sy = $request->sy;
+        $id = $request->id;
+        $option_id = $request->option_id;
+        $year = $request->year;
+        $month = $request->month;
+        $hour = $request->hour;
+
+        $check_sy = HRPTSY::find($sy);
+        $check_user = Users::find($id);
+        $check_pt_option = HRPTOption::find($option_id);
+        $check_pt_user = HRPT::where('user_id',$id)
+            ->where('pt_sy_id',$sy)
+            ->where('pt_option_id',$option_id)
+            ->where('emp_stat_id',5)
+            ->first();
+
+        if (!$check_sy || !$check_user || !$check_pt_option || !$check_pt_user) {
+            return response()->json(['result' => 'error']);
+        }
+
+        try{
+            $user = Auth::user();
+            $updated_by = $user->id;
+
+            $check_pt_month = HRPTMonths::where('user_id',$id)
+                ->where('pt_sy_id',$sy)
+                ->where('pt_option_id',$option_id)
+                ->where('emp_stat_id', 5)
+                ->where('year',$year)
+                ->where('month',$month)
+                ->first();
+
+            if($check_pt_month){
+                $update = HRPTMonths::find($check_pt_month->id);
+            }else{
+                $update = new HRPTMonths();
+                $update->user_id = $id;
+                $update->pt_id = $check_pt_user->id;
+                $update->pt_sy_id = $sy;
+                $update->pt_option_id = $option_id;
+                $update->emp_stat_id = 5;
+                $update->year = $year;
+                $update->month = $month;
+            }
+            $update->updated_by = $updated_by;
+            $update->hour = $hour;
+            $update->save();
+
+            return response()->json(['result' => 'success',
+                                    'year' => $year,
+                                    'month' => $month,
+                                    'hour' => 'hrs: '.number_format($hour,2)]);
+        } catch (QueryException $e) {
+            // Handle database query exceptions
+            return $this->handleDatabaseError($e);
+        } catch (PDOException $e) {
+            // Handle PDO exceptions
+            return $this->handleDatabaseError($e);
+        } catch (Exception $e) {
+            // Handle other exceptions
+            return $this->handleOtherError($e);
+        }
+
+    }
+    public function removeSubmit(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'sy' => 'required|numeric',
             'id' => 'required|numeric',
@@ -761,7 +880,8 @@ class PartTimeController extends Controller
         }
 
     }
-    private function get_position($name,$shorten,$salary,$fund_source_id,$fund_services_id,$office_id,$pt_option_id,$current_user_id,$updated_by){
+    private function get_position($name,$shorten,$salary,$fund_source_id,$fund_services_id,$office_id,$pt_option_id,$current_user_id,$updated_by)
+    {
         HRPosition::where('emp_stat_id', 5)
             ->where('pt_option_id',$pt_option_id)
             ->where('current_user_id',$current_user_id)

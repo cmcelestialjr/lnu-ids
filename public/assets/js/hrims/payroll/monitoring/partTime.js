@@ -64,6 +64,12 @@ $(document).off('input', '#ptUpdate input[name="units"]').on('input', '#ptUpdate
 $(document).off('click', '.viewOptions').on('click', '.viewOptions', function (e) {
     viewOptions($(this));
 });
+$(document).off('click', '#ptOptions #hoursAccumulated button[name="submit"]').on('click', '#ptOptions #hoursAccumulated button[name="submit"]', function (e) {
+    submitHoursAccumulated($(this));
+});
+$(document).off('click', '#ptOptions #dtr button[name="submit"]').on('click', '#ptOptions #dtr button[name="submit"]', function (e) {
+    submitDtr($(this));
+});
 function total_hours(formID){
     var units = $('#'+formID+' input[name="units"]').val();
     var option_id = $('#'+formID+' select[name="type"] option:selected').val();
@@ -424,6 +430,54 @@ function ptRemoveSubmit(thisBtn){
                 thisBtn.addClass('input-success');
                 $('#modal-default').modal('hide');
                 partTimeTable();
+            }else{
+                toastr.error(data.result);
+                thisBtn.addClass('input-error');
+            }
+            setTimeout(function() {
+                thisBtn.removeClass('input-success');
+                thisBtn.removeClass('input-error');
+            }, 3000);
+
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-success');
+            thisBtn.removeClass('input-error');
+        }
+    });
+}
+function submitHoursAccumulated(thisBtn){
+    var sy = $('#partTimeSY option:selected').val();
+
+    var form_data = $('#ptOptions').serializeArray();
+
+    form_data.push({ name: 'sy', value: sy });
+
+    var serialized_data = $.param(form_data);
+
+    $.ajax({
+        url: base_url+'/hrims/payroll/monitoring/partTime/hoursAccumulated',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:serialized_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled');
+            thisBtn.addClass('input-loading');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            thisBtn.removeClass('input-loading');
+            if(data.result=='success'){
+                toastr.success('Success');
+                thisBtn.addClass('input-success');
+                $('#modal-default').modal('hide');
+                $('#option'+data.year+data.month).html(data.hour);
             }else{
                 toastr.error(data.result);
                 thisBtn.addClass('input-error');

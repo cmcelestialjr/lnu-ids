@@ -125,4 +125,8 @@ class Users extends Model
     {
         return $this->hasMany(HRDeductionEmployee::class, 'user_id', 'id');
     }
+    public function pt_months()
+    {
+        return $this->hasMany(HRPTMonths::class, 'user_id', 'id');
+    }
 }
