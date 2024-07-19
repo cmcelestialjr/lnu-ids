@@ -53,9 +53,12 @@ class ImportStudentCourseLudong extends Command
         DB::connection($connectionTools)->getPdo();
 
         $courses = DB::connection($connectionName)->table('mark')
-            // ->where('sy','2024')
             // ->where('stud_id','2202681')
-            ->where('submitted_on','>=','2024-07-19 06:01:19')
+            //->where('submitted_on','>=','2024-07-19 06:05:20')
+            ->where('sy','2024')
+            ->where('term','2')
+            ->where('terms','2')
+            ->where('submitted_on','<=','2024-04-30 08:22:09')
             ->orderBy('sy','ASC')
             ->orderBy('term','ASC')
             ->orderBy('terms','ASC')
