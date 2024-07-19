@@ -195,6 +195,13 @@ class PayrollListController extends Controller
 
         foreach($query->emp_stat as $emp_stat){
             $emp_stats[] = $emp_stat->gov;
+            $emp_stat_ids[] = $emp_stat->emp_stat_id;
+        }
+
+        if(in_array('5', $emp_stat_ids) || in_array('7', $emp_stat_ids)){
+            $hide_1 = 'hide';
+            $hide_2 = 'hide';
+            $hide_3 = '';
         }
 
         if($query->bank){

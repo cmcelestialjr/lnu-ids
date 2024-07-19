@@ -5,7 +5,7 @@
     </div>
     <form method="POST" id="ptAdd">
         <div class="modal-body table-responsive">
-            <div class="card card-info card-outline">
+            <div class="card card-primary card-outline">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
@@ -47,6 +47,17 @@
                                 <select class="form-control select2-default" name="fund_source">
                                     <option value="">Please select...</option>
                                     @foreach($fund_sources as $row)
+                                        <option value="{{$row->id}}">{{$row->shorten}} - {{$row->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label>Fund Service</label>
+                            <div id="fundserviceDiv">
+                                <select class="form-control select2-default" name="fund_service">
+                                    <option value="">None.</option>
+                                    @foreach($fund_services as $row)
                                         <option value="{{$row->id}}">{{$row->shorten}} - {{$row->name}}</option>
                                     @endforeach
                                 </select>

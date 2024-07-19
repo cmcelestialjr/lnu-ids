@@ -57,7 +57,7 @@ class PayrollUpdateServices
         $column_amount2 = 0;
         $include = 'Y';
         if($payroll_type==1){
-            if($query->emp_stat_id==5){
+            if($query->emp_stat_id==5 || $query->emp_stat_id==7){
                 $hours = HRPayrollMonths::where('payroll_list_id',$id)->sum('amount');
                 $earned = round(($query->salary*$hours),2);
             }else{

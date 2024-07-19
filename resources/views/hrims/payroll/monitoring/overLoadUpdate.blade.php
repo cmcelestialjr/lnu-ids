@@ -3,7 +3,7 @@
     <div class="modal-header">
         <h4><span class="fa fa-edit"></span> Update</h4>
     </div>
-    <form method="POST" id="ptUpdate">
+    <form method="POST" id="olUpdate">
         <div class="modal-body table-responsive">
             <div class="card card-info card-outline">
                 <div class="card-body">

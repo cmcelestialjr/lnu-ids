@@ -9,6 +9,7 @@
                     <label>Option</label>
                     <select class="form-control select2" id="monitoringOption">
                         <option value="partTime">Part-time</option>
+                        <option value="overLoad">Overload</option>
                     </select>
                 </div>
               </div>

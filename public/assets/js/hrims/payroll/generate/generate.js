@@ -36,9 +36,11 @@ function show_hide_div(){
         $('#generateDiv #monthMultipleDiv').addClass('hide');
         $('#generateDiv #unclaimedDiv').addClass('hide');
         $('#generateDiv #include_peraDiv').removeClass('hide');
-        if(jQuery.inArray('5', emp_stats) != -1){
+        $('#generateDiv #ptOptionDiv').addClass('hide');
+        if(jQuery.inArray('5', emp_stats) != -1 || jQuery.inArray('7', emp_stats) != -1){
             $('#generateDiv #monthMultipleDiv').removeClass('hide');
             $('#generateDiv #unclaimedDiv').removeClass('hide');
+            $('#generateDiv #ptOptionDiv').removeClass('hide');
             $('#generateDiv #monthSingleDiv').addClass('hide');
             $('#generateDiv #optionSelectDiv').addClass('hide');
             $('#generateDiv #durationDiv').addClass('hide');
@@ -83,6 +85,7 @@ function generate_list(){
     var year = $('#generateDiv select[name="year"] option:selected').val();
     var month = $('#generateDiv select[name="month"] option:selected').val();
     var payroll_type = $('#generateDiv select[name="payroll_type"] option:selected').val();
+    var pt_option = $('#generateDiv select[name="pt_option"] option:selected').val();
     var duration = $('#generateDiv select[name="duration"] option:selected').val();
     var option = $('#generateDiv select[name="option"] option:selected').val();
     var day_from = $('#generateDiv input[name="day_from"]').val();
@@ -182,6 +185,7 @@ function generate_list(){
                         fund_sources:fund_sources,
                         fund_services:fund_services,
                         duration:duration,
+                        pt_option:pt_option,
                         option:option,
                         day_from:day_from,
                         day_to:day_to,
@@ -217,6 +221,7 @@ function generate(thisBtn){
     var day_from = $('#generateDiv input[name="day_from"]').val();
     var day_to = $('#generateDiv input[name="day_to"]').val();
     var status = $('#generateDiv select[name="status"] option:selected').val();
+    var pt_option = $('#generateDiv select[name="pt_option"] option:selected').val();
     var include_pera = $('#generateDiv select[name="include_pera"] option:selected').val();
     var account_title = $('#generateDiv select[name="account_title"] option:selected').val();
 
@@ -253,6 +258,7 @@ function generate(thisBtn){
             fund_sources:fund_sources,
             fund_services:fund_services,
             duration:duration,
+            pt_option:pt_option,
             option:option,
             day_from:day_from,
             day_to:day_to,
@@ -282,6 +288,7 @@ function generate(thisBtn){
                 if(data.result=='success'){
                     toastr.success('Success');
                     thisBtn.addClass('input-success');
+                    window.location.href = base_url+'/ids/hrims/payroll_view/s';
                     generate_list();
                 }else{
                     toastr.error('Error.');

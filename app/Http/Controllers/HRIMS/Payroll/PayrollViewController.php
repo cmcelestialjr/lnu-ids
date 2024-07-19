@@ -192,7 +192,7 @@ class PayrollViewController extends Controller
         $column_amount2 = 0;
         $earned = 0;
         if($payroll_type==1){
-            if($emp_stat!=5){
+            if($emp_stat!=5 && $emp_stat!=7){
                 $payroll_update_services->updatePhilHealth($salary,$employee,$gov,$year,$month,$payroll_type,$emp_stat,$duration,$option,$day_from,$day_to);
                 $payroll_update_services->updatePagibig($employee,$gov,$payroll_type,$emp_stat);
                 if($gov=='Y'){
@@ -294,7 +294,7 @@ class PayrollViewController extends Controller
             $payroll_update_services->insertEmployeeAllowance($emp_stat,$payroll_type,$include_pera,$gov,$payroll_list_id,$payroll_id,$employee,$updated_by);
             $payroll_update_services->insertEmployeeDeduction($emp_stat,$payroll_type,$payroll_list_id,$payroll_id,$employee,$updated_by);
 
-            if($emp_stat==5 && $payroll_type==1){
+            if(($emp_stat==5 || $emp_stat==7) && $payroll_type==1){
                 if(isset($payroll->months)){
                     foreach($payroll->months as $month){
                         $check = HRPayrollMonths::where('user_id',$employee)

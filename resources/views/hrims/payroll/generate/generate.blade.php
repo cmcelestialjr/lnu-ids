@@ -108,6 +108,14 @@
                                           @endfor
                                       </select>
                                   </div>
+                                  <div class="col-lg-3 hide" id="ptOptionDiv">
+                                    <label>Type</label>
+                                    <select class="form-control select2" name="pt_option">
+                                        @foreach($pt_option as $row)
+                                            <option value="{{$row->id}}">{{$row->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                   <div class="col-lg-3" id="optionDiv">
                                       <label>Option</label>
                                       <select class="form-control select2" name="option">

@@ -21,7 +21,7 @@
                             @endforeach
                         </select>
                     </div>
-                    @if($query->payroll->payroll_type_id<=2 && $query->emp_stat_id!=5)
+                    @if($query->payroll->payroll_type_id<=2 && $query->emp_stat_id!=5 && $query->emp_stat_id!=7)
                         <div class="col-lg-2">
                             <label>Days Accu</label>
                             <input type="number" class="form-control lwopInput" data-n="day_accu" name="day_accu" value="{{$query->day_accu}}">
@@ -73,7 +73,7 @@
                 <li class="nav-item" id="allowanceLi">
                   <a class="nav-link" data-toggle="pill" href="#allowance" role="tab" aria-selected="true">Allowance</a>
                 </li>
-                @if($query->payroll->payroll_type_id==1 && $query->emp_stat_id!=5)
+                @if($query->payroll->payroll_type_id==1 && $query->emp_stat_id!=5 && $query->emp_stat_id!=7)
                 <li class="nav-item" id="lwopLi">
                     <a class="nav-link" data-toggle="pill" href="#lwop" role="tab" aria-selected="true">LWOP</a>
                 </li>

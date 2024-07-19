@@ -3,11 +3,6 @@ $user = $users::with('employee_default.emp_stat')
             ->where('id_no',$id_no)->first();
         $user_id = $user->id;
 
-        // $work = $_work::with('emp_stat')
-        //     ->where('user_id',$user_id)
-        //     ->orderBy('date_from','DESC')
-        //     ->orderBy('emp_stat_id','ASC')
-        //     ->first();
 
         $emp_stat_gov = $user->employee_default->emp_stat->gov;
         if($user->employee_default->role_id==3){
@@ -89,60 +84,7 @@ $user = $users::with('employee_default.emp_stat')
                 $weekDay = 7;
             }
             $time_minutes_total = 0;
-            // if($emp_type=='Personnel'){
-            //     $day = $usersSchedDays::with('time')->where('user_id',$user_id)->where('day',$weekDay)->first();
-            //     if($day!=NULL){
-            //         $time_from = date('H:i',strtotime($day->time->time_from));
-            //         $time_to = date('H:i',strtotime($day->time->time_to));
-            //     }
-            // }else{
-            //     $day = $educOfferedScheduleDay::where('no',$weekDay)
-            //         ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {
-            //             $query->whereHas('course', function ($query) use ($user_id,$year,$month) {
-            //                 $query->where('instructor_id',$user_id);
-            //                 $query->whereHas('curriculum', function ($query) use ($year,$month) {
-            //                     $query->whereHas('offered_program', function ($query) use ($year,$month) {
-            //                         $query->whereHas('school_year', function ($query) use ($year,$month) {
-            //                             $query->where('year_from','>=',$year);
-            //                             $query->whereHas('grade_period', function ($query) use ($month) {
-            //                                 $query->whereHas('month', function ($query) use ($month) {
-            //                                     $query->where('month',$month);
-            //                                 });
-            //                             });
-            //                         });
-            //                     });
-            //                 });
-            //             });
-            //         })
-            //         ->pluck('offered_schedule_id')->toArray();
-            //     $time_from_query = $educOfferedSchedule::whereIn('id',$day)->orderBy('time_from','ASC')
-            //         ->whereHas('course', function ($query) {
-            //             $query->where('load_type',1);
-            //         })
-            //         ->first();
-            //     $time_to_query = $educOfferedSchedule::whereIn('id',$day)->orderBy('time_to','DESC')
-            //         ->whereHas('course', function ($query) {
-            //             $query->where('load_type',1);
-            //         })
-            //         ->first();
-            //     $time_minutes = $educOfferedSchedule::whereIn('id',$day)
-            //         ->whereHas('course', function ($query) {
-            //             $query->where('load_type',1);
-            //         })->get();
-            //     if($time_minutes->count()>0){
-            //         foreach($time_minutes as $row){
-            //             $time_from_ = Carbon::parse($row->time_from);
-            //             $time_to_ = Carbon::parse($row->time_to);
-            //             $time_minutes_total += $time_to_->diffInMinutes($time_from_);
-            //         }
-            //     }
-            //     if($time_from_query!=NULL){
-            //         $time_from = date('H:i',strtotime($time_from_query->time_from));
-            //     }
-            //     if($time_to_query!=NULL){
-            //         $time_to =date('H:i',strtotime( $time_to_query->time_to));
-            //     }
-            // }
+
 
             $schedTimeFrom = $usersSchedTime::where('user_id',$user_id)
                 ->where('option_id',1)
@@ -208,60 +150,7 @@ $user = $users::with('employee_default.emp_stat')
                 $time_from = '';
                 $time_to = '';
                 $time_minutes_total = 0;
-                // if($emp_type=='Personnel'){
-                //     $day = $usersSchedDays::with('time')->where('user_id',$user_id)->where('day',$weekDay)->first();
-                //     if($day!=NULL){
-                //         $time_from = date('H:i',strtotime($day->time->time_from));
-                //         $time_to = date('H:i',strtotime($day->time->time_to));
-                //     }
-                // }else{
-                //     $day = $educOfferedScheduleDay::where('no',$weekDay)
-                //         ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {
-                //             $query->whereHas('course', function ($query) use ($user_id,$year,$month) {
-                //                 $query->where('instructor_id',$user_id);
-                //                 $query->whereHas('curriculum', function ($query) use ($year,$month) {
-                //                     $query->whereHas('offered_program', function ($query) use ($year,$month) {
-                //                         $query->whereHas('school_year', function ($query) use ($year,$month) {
-                //                             $query->where('year_from','>=',$year);
-                //                             $query->whereHas('grade_period', function ($query) use ($month) {
-                //                                 $query->whereHas('month', function ($query) use ($month) {
-                //                                     $query->where('month',$month);
-                //                                 });
-                //                             });
-                //                         });
-                //                     });
-                //                 });
-                //             });
-                //         })
-                //         ->pluck('offered_schedule_id')->toArray();
-                //     $time_from_query = $educOfferedSchedule::whereIn('id',$day)->orderBy('time_from','ASC')
-                //         ->whereHas('course', function ($query) {
-                //             $query->where('load_type',1);
-                //         })
-                //         ->first();
-                //     $time_to_query = $educOfferedSchedule::whereIn('id',$day)->orderBy('time_to','DESC')
-                //         ->whereHas('course', function ($query) {
-                //             $query->where('load_type',1);
-                //         })
-                //         ->first();
-                //     $time_minutes = $educOfferedSchedule::whereIn('id',$day)
-                //         ->whereHas('course', function ($query) {
-                //             $query->where('load_type',1);
-                //         })->get();
-                //     if($time_minutes->count()>0){
-                //         foreach($time_minutes as $r){
-                //             $time_from_ = Carbon::parse($r->time_from);
-                //             $time_to_ = Carbon::parse($r->time_to);
-                //             $time_minutes_total += $time_to_->diffInMinutes($time_from_);
-                //         }
-                //     }
-                //     if($time_from_query!=NULL){
-                //         $time_from = date('H:i',strtotime($time_from_query->time_from));
-                //     }
-                //     if($time_to_query!=NULL){
-                //         $time_to =date('H:i',strtotime( $time_to_query->time_to));
-                //     }
-                // }
+
                 $dtr[$date_day]['check'] = 'dtr';
 
                 if($row->time_in_am==NULL){
@@ -292,23 +181,7 @@ $user = $users::with('employee_default.emp_stat')
                     $time_out_pm = date('h:ia',strtotime($row->time_out_pm));
                     $time_out_pm_for = date('H:i',strtotime($row->time_out_pm));
                 }
-                // if($time_from<'12:00' && $time_to>'12:00'){
-                //     if(($time_in_am_for=='' || $time_out_am_for=='' || $time_out_pm_for=='' || $time_out_pm_for=='')
-                //         && $row->time_type==NULL){
-                //         $count_days += 1;
-                //         echo $m.'a';
-                //     }
-                // }elseif(($time_from<'12:00' && $time_to<'13:00') || $row->time_type==3){
-                //     if($time_in_am_for=='' || $time_out_am_for==''){
-                //         $count_days += 1;
-                //         echo $m.'b';
-                //     }
-                // }else{
-                //     if(($time_in_pm_for=='' || $time_out_pm_for=='') || $row->time_type==2){
-                //         $count_days += 1;
-                //         echo $m.'C';
-                //     }
-                // }
+
 
                 $total_minutes = 0;
                 $tardy_minutes = 0;
@@ -361,108 +234,7 @@ $user = $users::with('employee_default.emp_stat')
                                 }
                             }
                         }
-                        // if($emp_type=='Personnel'){
-                        //     if($time_from<'12:00'){
-                        //         if($time_in_am_for!='' && $time_in_am_for>$time_from){
-                        //             $time_from_ = Carbon::parse($time_from)->seconds(0);
-                        //             $time_to_ = Carbon::parse($time_in_am_for)->seconds(0);
-                        //             $total_minutes = $time_to_->diffInMinutes($time_from_);
-                        //             $tardy_minutes = $total_minutes;
-                        //             $tardy_no = 1;
-                        //         }
-                        //         if($time_to>'13:00'){
-                        //             if($time_out_am_for!='' && $time_out_am_for<'12:00'){
-                        //                 $time_from_ = Carbon::parse($time_out_am_for)->seconds(0);
-                        //                 $time_to_ = Carbon::parse('12:00');
-                        //                 $total_minutes = $total_minutes+$time_to_->diffInMinutes($time_from_);
-                        //                 $ud_minutes = $total_minutes;
-                        //                 $ud_no = 1;
-                        //             }
-                        //             if($time_in_pm_for!='' && $time_in_pm_for>'13:00'){
-                        //                 $time_from_ = Carbon::parse('13:00');
-                        //                 $time_to_ = Carbon::parse($time_in_pm_for)->seconds(0);
-                        //                 $total_minutes = $total_minutes+$time_to_->diffInMinutes($time_from_);
-                        //                 $tardy_minutes = $total_minutes;
-                        //                 $tardy_no = 1+$tardy_no;
-                        //             }
-                        //             if($time_out_pm_for!='' && $time_out_pm_for<$time_to){
-                        //                 $time_from_ = Carbon::parse($time_out_pm_for)->seconds(0);
-                        //                 $time_to_ = Carbon::parse($time_to);
-                        //                 $total_minutes = $total_minutes+$time_to_->diffInMinutes($time_from_);
-                        //                 $ud_minutes = $total_minutes;
-                        //                 $ud_no = 1+$ud_no;
-                        //             }
-                        //             if($rowSchedTime->time_type==2){
-                        //                 $time_from_ = Carbon::parse($time_from)->seconds(0);
-                        //                 $time_to_ = Carbon::parse('12:00');
-                        //                 $get_hd_minutes = $time_to_->diffInMinutes($time_from_);
-                        //                 $hd_minutes = $get_hd_minutes;
-                        //                 $hd_no = 1;
-                        //                 if($emp_stat_gov=='N'){
-                        //                     $total_minutes = $total_minutes+$get_hd_minutes;
-                        //                 }
-                        //             }elseif($rowSchedTime->time_type==3){
-                        //                 $time_from_ = Carbon::parse('13:00');
-                        //                 $time_to_ = Carbon::parse($time_to)->seconds(0);
-                        //                 $get_hd_minutes = $time_to_->diffInMinutes($time_from_);
-                        //                 $hd_minutes = $get_hd_minutes;
-                        //                 $hd_no = 1;
-                        //                 if($emp_stat_gov=='N'){
-                        //                     $total_minutes = $total_minutes+$get_hd_minutes;
-                        //                 }
-                        //             }elseif($rowSchedTime->time_type==1){
-                        //                 $time_from_ = Carbon::parse($time_from)->seconds(0);
-                        //                 $time_to_ = Carbon::parse($time_to)->seconds(0);
-                        //                 $get_abs_minutes = $time_to_->diffInMinutes($time_from_);
-                        //                 $abs_minutes = $get_abs_minutes;
-                        //                 $abs_no = 1;
-                        //                 if($emp_stat_gov=='N'){
-                        //                     $total_minutes = $get_abs_minutes;
-                        //                     if($total_minutes>=540){
-                        //                         $total_minutes = 480;
-                        //                     }
-                        //                 }
-                        //             }
-                        //         }else{
-                        //             if($time_out_am_for!='' && $time_out_am_for<$time_to){
-                        //                 $time_from_ = Carbon::parse($time_out_am_for)->seconds(0);
-                        //                 $time_to_ = Carbon::parse($time_to)->seconds(0);
-                        //                 $total_minutes = $time_to_->diffInMinutes($time_from_);
-                        //                 $ud_minutes = $total_minutes;
-                        //                 $ud_no = 1;
-                        //             }
-                        //             if($rowSchedTime->time_type==1){
-                        //                 $abs_minutes = 480;
-                        //                 $abs_no = 1;
-                        //                 if($emp_stat_gov=='N'){
-                        //                     $total_minutes = 480;
-                        //                 }
-                        //             }
-                        //         }
-                        //     }else{
-                        //         if($time_in_pm_for!='' && $time_in_pm_for>$time_from){
-                        //             $time_from_ = Carbon::parse($time_from)->seconds(0);
-                        //             $time_to_ = Carbon::parse($time_in_pm_for)->seconds(0);
-                        //             $total_minutes = $time_to_->diffInMinutes($time_from_);
-                        //             $tardy_minutes = $total_minutes;
-                        //             $tardy_no = 1;
-                        //         }
-                        //         if($time_out_pm_for!='' && $time_out_pm_for<$time_to){
-                        //             $time_from_ = Carbon::parse($time_out_pm_for)->seconds(0);
-                        //             $time_to_ = Carbon::parse($time_to)->seconds(0);
-                        //             $total_minutes = $total_minutes+$time_to_->diffInMinutes($time_from_);
-                        //             $ud_minutes = $total_minutes;
-                        //             $ud_no = 1;
-                        //         }
-                        //         if($rowSchedTime->time_type==1){
-                        //             $abs_minutes = 480;
-                        //             $abs_no = 1;
-                        //             if($emp_stat_gov=='N'){
-                        //                 $total_minutes = 480;
-                        //             }
-                        //         }
-                        //     }
-                        // }else{
+
                             if($time_from<'12:00'){
                                 if($time_in_am_for!='' && $time_in_am_for>$time_from){
                                     $time_from_ = Carbon::parse($time_from)->seconds(0);
@@ -537,7 +309,6 @@ $user = $users::with('employee_default.emp_stat')
                                 }
 
                             }
-                        //}
                     }
                 }
 
@@ -623,9 +394,7 @@ $user = $users::with('employee_default.emp_stat')
                 $count_days = $count_days-1;
             }
         }
-        // foreach($user_dtr as $row){
 
-        // }
 @endphp
 <style>
 .dtrInput{

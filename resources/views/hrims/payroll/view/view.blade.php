@@ -48,8 +48,13 @@
                   <div class="col-lg-3">
                       <label>Type</label>
                       <select class="form-control select2" name="type">
-                          <option value="generate">Generated Payroll</option>
-                          <option value="partial">Partial Payroll</option>
+                            @if($check_partial)
+                                <option value="generate">Generated Payroll</option>
+                                <option value="partial" selected>Partial Payroll</option>
+                            @else
+                                <option value="generate">Generated Payroll</option>
+                                <option value="partial">Partial Payroll</option>
+                            @endif
                       </select>
                   </div>
                   <div class="col-lg-1"><br>

@@ -9,10 +9,8 @@ use App\Models\EducDepartments;
 use App\Models\EducGradePeriod;
 use App\Models\FundServices;
 use App\Models\FundSource;
-use App\Models\HRPayrollMonths;
 use App\Models\HRPosition;
 use App\Models\HRPT;
-use App\Models\HRPTMonths;
 use App\Models\HRPTOption;
 use App\Models\HRPTSY;
 use App\Models\Users;
@@ -26,11 +24,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PDOException;
 
-class PartTimeController extends Controller
+class OverLoadController extends Controller
 {
     public function index(Request $request)
     {
-        $data = [];
+        $data = array();
 
         $validator = Validator::make($request->all(), [
             'sy' => 'required|numeric',
@@ -60,7 +58,7 @@ class PartTimeController extends Controller
 
         $query = Users::with(['part_time' => function ($query) use ($sy,$option) {
                 $query->where('pt_sy_id', $sy);
-                $query->where('emp_stat_id',5);
+                $query->where('emp_stat_id', 7);
                 if($option){
                     $query->where(function ($query) use ($option) {
                         $query->whereIn('pt_option_id', $option)
@@ -69,21 +67,19 @@ class PartTimeController extends Controller
                 }
             }])
             ->with(['payrolls' => function ($query) use ($date_from,$date_to,$option){
-                $query->where('emp_stat_id', 5);
+                $query->where('emp_stat_id', 7);
                 if($option){
                     $query->whereIn('pt_option_id', $option);
                 }
-                $query->whereHas('months', function ($query) use ($date_from, $date_to) {
-                    $query->where('year', '>=', $date_from->format('Y'))
+                $query->whereHas('payroll', function ($query) use ($date_from, $date_to) {
+                    $query->where('payroll_type_id', 1)
+                          ->where('year', '>=', $date_from->format('Y'))
                           ->where('year', '<=', $date_to->format('Y'))
                           ->where('month', '>=', $date_from->format('m'))
                           ->where('month', '<=', $date_to->format('m'));
                 });
-                $query->whereHas('payroll', function ($query) {
-                    $query->where('payroll_type_id', 1);
-                });
             }])->with(['work' => function ($query) use ($option) {
-                $query->where('emp_stat_id',5);
+                $query->where('emp_stat_id',7);
                 $query->where('date_to','present');
                 if($option){
                     $query->where(function ($query) use ($option) {
@@ -93,7 +89,7 @@ class PartTimeController extends Controller
                 }
             }])
             ->whereHas('work', function ($query) use ($option) {
-                $query->where('emp_stat_id',5);
+                $query->where('emp_stat_id',7);
                 $query->where('date_to','present');
                 if($option){
                     $query->where(function ($query) use ($option) {
@@ -106,24 +102,24 @@ class PartTimeController extends Controller
 
         $current_date = clone $date_from;
 
-        $data = [
+        $data = array(
             'query' => $query,
             'pt_sy' => $pt_sy,
             'date_from' => $date_from,
             'date_to' => $date_to,
             'current_date' => $current_date,
             'name_services' => $name_services
-        ];
-        return view('hrims/payroll/monitoring/partTimeTable',$data);
+        );
+        return view('hrims/payroll/monitoring/overLoadTable',$data);
     }
     public function syNew(Request $request)
     {
         $grade_periods = EducGradePeriod::get();
 
-        $data = [
+        $data = array(
             'grade_periods' => $grade_periods,
-        ];
-        return view('hrims/payroll/monitoring/partTimeSyNew',$data);
+        );
+        return view('hrims/payroll/monitoring/overLoadSyNew',$data);
     }
     public function add(Request $request)
     {
@@ -136,7 +132,7 @@ class PartTimeController extends Controller
         $fund_services = FundServices::get();
         $employees = Users::where('emp_status_id',1)
             ->whereDoesntHave('work', function ($query) use ($option) {
-                $query->where('emp_stat_id',5);
+                $query->where('emp_stat_id',7);
                 $query->where('date_to','present');
                 if($option){
                     $query->where(function ($query) use ($option) {
@@ -154,7 +150,7 @@ class PartTimeController extends Controller
             'fund_services' => $fund_services,
             'employees' => $employees
         );
-        return view('hrims/payroll/monitoring/partTimeAddEmployee',$data);
+        return view('hrims/payroll/monitoring/overLoadAddEmployee',$data);
     }
     public function remove(Request $request)
     {
@@ -199,7 +195,7 @@ class PartTimeController extends Controller
         $pt_default = HRPT::with('pt_option')
             ->where('user_id',$id)
             ->where('pt_option_id',$option_id)
-            ->where('emp_stat_id',5)
+            ->where('emp_stat_id',7)
             ->orderBy('id','DESC')
             ->first();
 
@@ -207,7 +203,7 @@ class PartTimeController extends Controller
             ->where('pt_sy_id',$sy)
             ->where('user_id',$id)
             ->where('pt_option_id',$option_id)
-            ->where('emp_stat_id',5)
+            ->where('emp_stat_id',7)
             ->first();
 
         if($pt_default){
@@ -234,7 +230,7 @@ class PartTimeController extends Controller
             'total_hours' => $total_hours,
             'pt_option' => $pt_option
         );
-        return view('hrims/payroll/monitoring/partTimeRemove',$data);
+        return view('hrims/payroll/monitoring/overLoadRemove',$data);
     }
     public function update(Request $request)
     {
@@ -277,14 +273,14 @@ class PartTimeController extends Controller
 
         $pt_default = HRPT::where('user_id',$id)
             ->where('pt_option_id',$option_id)
-            ->where('emp_stat_id',5)
+            ->where('emp_stat_id',7)
             ->orderBy('id','DESC')
             ->first();
 
         $pt = HRPT::where('pt_sy_id',$sy)
             ->where('user_id',$id)
             ->where('pt_option_id',$option_id)
-            ->where('emp_stat_id',5)
+            ->where('emp_stat_id',7)
             ->first();
 
         $pt_options = HRPTOption::get();
@@ -305,7 +301,7 @@ class PartTimeController extends Controller
             $total_hours = $pt->total_hours;
         }
 
-        $data = [
+        $data = array(
             'id' => $id,
             'option_id' => $check_work->pt_option_id,
             'work_id' => $work_id,
@@ -322,73 +318,8 @@ class PartTimeController extends Controller
             'fund_sources' => $fund_sources,
             'fund_services' => $fund_services,
             'departments' => $departments
-        ];
-        return view('hrims/payroll/monitoring/partTimeUpdate',$data);
-    }
-    public function viewOptions(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|numeric',
-            'option_id' => 'nullable|numeric',
-            'work_id' => 'required|numeric',
-            'sy' => 'required|numeric',
-            'year' => 'required|numeric',
-            'month' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return view('layouts/error/404');
-        }
-
-        $sy = $request->sy;
-        $id = $request->id;
-        $option_id = $request->option_id;
-        $work_id = $request->work_id;
-        $year = $request->year;
-        $month = $request->month;
-
-        $check_sy = HRPTSY::find($sy);
-        $check_user = Users::find($id);
-        $check_work = _Work::where('id',$work_id)
-            ->where('user_id',$id)
-            ->first();
-        if($option_id){
-            $check_option = HRPTOption::where('id',$option_id)->get();
-        }
-
-        if (!$check_sy || !$check_user || !$check_option || !$check_work) {
-            return view('layouts/error/404');
-        }
-
-        $hour = 0;
-
-        $pt_month = HRPTMonths::where('user_id',$id)
-            ->where('pt_sy_id',$sy)
-            ->where('pt_option_id',$option_id)
-            ->where('emp_stat_id',5)
-            ->where('year',$year)
-            ->where('month',$month)
-            ->first();
-
-        $payroll_month = HRPayrollMonths::where('user_id',$id)
-            ->where('pt_option_id',$option_id)
-            ->where('year',$year)
-            ->where('month',$month)
-            ->whereHas('list', function ($query) {
-                $query->where('emp_stat_id', 5);
-            })
-            ->first();
-
-        $hour = $pt_month ? $pt_month->hour : 0;
-        $hour = $payroll_month ? $payroll_month->amount : $hour;
-
-        $data = [
-            'payroll_month' => $payroll_month,
-            'year' => $year,
-            'month' => $month,
-            'hour' => $hour,
-        ];
-        return view('hrims/payroll/monitoring/partTimeViewOptions',$data);
+        );
+        return view('hrims/payroll/monitoring/overLoadUpdate',$data);
     }
     public function syNewSubmit(Request $request)
     {
@@ -525,7 +456,7 @@ class PartTimeController extends Controller
             $update->user_id = $id;
             $update->position_id = $position_id;
             $update->role_id = 3;
-            $update->emp_stat_id = 5;
+            $update->emp_stat_id = 7;
             $update->fund_source_id = $fund_source;
             $update->fund_services_id = $fund_service;
             $update->pt_option_id = $option_id;
@@ -546,14 +477,14 @@ class PartTimeController extends Controller
                 HRPT::where('pt_sy_id', $sy)
                     ->where('user_id', $id)
                     ->where('pt_option_id', $option_id)
-                    ->where('emp_stat_id',5)
+                    ->where('emp_stat_id',7)
                     ->delete();
                 DB::update("ALTER TABLE `hr_pt` AUTO_INCREMENT = 1;");
             }else{
                 $pt = HRPT::where('pt_sy_id',$sy)
                     ->where('user_id',$id)
                     ->where('pt_option_id', $option_id)
-                    ->where('emp_stat_id',5)
+                    ->where('emp_stat_id',7)
                     ->first();
                 if($pt){
                     $insert = HRPT::find($pt->id);
@@ -562,7 +493,7 @@ class PartTimeController extends Controller
                     $insert->pt_sy_id = $sy;
                     $insert->user_id = $id;
                     $insert->pt_option_id = $option_id;
-                    $insert->emp_stat_id = 5;
+                    $insert->emp_stat_id = 7;
                 }
                 $insert->rate = $rate;
                 $insert->units = $units;
@@ -660,13 +591,13 @@ class PartTimeController extends Controller
                 HRPT::where('pt_sy_id', $sy)
                     ->where('pt_option_id', $option_id)
                     ->where('user_id', $id)
-                    ->where('emp_stat_id',5)->delete();
+                    ->where('emp_stat_id',7)->delete();
                 DB::update("ALTER TABLE `hr_pt` AUTO_INCREMENT = 1;");
             }else{
                 $pt = HRPT::where('pt_sy_id',$sy)
                     ->where('pt_option_id',$option_id)
                     ->where('user_id',$id)
-                    ->where('emp_stat_id',5)
+                    ->where('emp_stat_id',7)
                     ->first();
                 if($pt){
                     $insert = HRPT::find($pt->id);
@@ -675,7 +606,7 @@ class PartTimeController extends Controller
                     $insert->pt_option_id = $option_id;
                     $insert->pt_sy_id = $sy;
                     $insert->user_id = $id;
-                    $insert->emp_stat_id = 5;
+                    $insert->emp_stat_id = 7;
                 }
                 $insert->rate = $rate;
                 $insert->units = $units;
@@ -740,7 +671,7 @@ class PartTimeController extends Controller
             HRPT::where('pt_sy_id', $sy)
                 ->where('pt_option_id', $pt_option_id)
                 ->where('user_id', $id)
-                ->where('emp_stat_id', 5)
+                ->where('emp_stat_id', 7)
                 ->delete();
             DB::update("ALTER TABLE `hr_pt` AUTO_INCREMENT = 1;");
 
@@ -762,7 +693,7 @@ class PartTimeController extends Controller
 
     }
     private function get_position($name,$shorten,$salary,$fund_source_id,$fund_services_id,$office_id,$pt_option_id,$current_user_id,$updated_by){
-        HRPosition::where('emp_stat_id', 5)
+        HRPosition::where('emp_stat_id', 7)
             ->where('pt_option_id',$pt_option_id)
             ->where('current_user_id',$current_user_id)
             ->update(['type_id' => 2,
@@ -771,7 +702,7 @@ class PartTimeController extends Controller
         $get_position = HRPosition::whereNull('current_user_id')
             ->where('pt_option_id',$pt_option_id)
             ->whereYear('created_at',date('Y'))
-            ->where('emp_stat_id',5)
+            ->where('emp_stat_id',7)
             ->first();
 
         if($get_position){
@@ -789,12 +720,12 @@ class PartTimeController extends Controller
         }else{
             $check_user_position = HRPosition::where('current_user_id',$current_user_id)
                 ->where('pt_option_id',$pt_option_id)
-                ->where('emp_stat_id',5)
+                ->where('emp_stat_id',7)
                 ->first();
             if($check_user_position){
                 return $check_user_position->id;
             }else{
-                $position = HRPosition::where('emp_stat_id',5)
+                $position = HRPosition::where('emp_stat_id',7)
                     ->where('pt_option_id',$pt_option_id)
                     ->whereYear('created_at',date('Y'))
                     ->orderBy('item_no','DESC')
@@ -814,7 +745,7 @@ class PartTimeController extends Controller
                 $insert->sg = 0;
                 $insert->step = 0;
                 $insert->gov_service = 'N';
-                $insert->emp_stat_id = 5;
+                $insert->emp_stat_id = 7;
                 $insert->fund_source_id = $fund_source_id;
                 $insert->fund_services_id = $fund_services_id;
                 $insert->role_id = 3;

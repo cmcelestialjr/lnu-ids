@@ -11,13 +11,13 @@ class MonitoringController extends Controller
 {
     public function index(Request $request)
     {
-        $options = array('partTime');
+        $options = array('partTime','overLoad');
         $option = $request->option;
 
-        // // Check if exists in array
-        // if (in_array($option, $options)){
-        //     return view('layouts/error/404');
-        // }
+        // Check if exists in array
+        if (!in_array($option, $options)){
+            return view('layouts/error/404');
+        }
 
         return $this->$option($option);
     }
@@ -29,5 +29,14 @@ class MonitoringController extends Controller
             'options' => $options
         );
         return view('hrims/payroll/monitoring/partTime',$data);
+    }
+    private function overLoad($option){
+        $school_years = HRPTSY::with('grade_period')->get();
+        $options = HRPTOption::get();
+        $data = array(
+            'school_years' => $school_years,
+            'options' => $options
+        );
+        return view('hrims/payroll/monitoring/overLoad',$data);
     }
 }

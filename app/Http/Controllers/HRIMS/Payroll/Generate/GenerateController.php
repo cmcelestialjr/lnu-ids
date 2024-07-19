@@ -20,6 +20,7 @@ use App\Models\HRPayrollList;
 use App\Models\HRPayrollMonths;
 use App\Models\HRPayrollType;
 use App\Models\HRPayrollTypeGuideline;
+use App\Models\HRPTMonths;
 use App\Models\Users;
 use App\Services\DTSServices;
 use App\Services\NameServices;
@@ -73,6 +74,7 @@ class GenerateController extends Controller
             'fund_sources' => 'required|array',
             'fund_services' => 'nullable|array',
             'duration' => 'required|integer',
+            'pt_option' => 'required|integer',
             'option' => 'required|integer',
             'day_from' => 'required|integer',
             'day_to' => 'required|integer',
@@ -88,6 +90,7 @@ class GenerateController extends Controller
         $fund_sources = $request->fund_sources;
         $fund_services = $request->fund_services;
         $duration = $request->duration;
+        $pt_option = $request->pt_option;
         $option = $request->option;
         $day_from = $request->day_from;
         $day_to = $request->day_to;
@@ -102,11 +105,11 @@ class GenerateController extends Controller
         $countGov = count(array_unique($checkGov));
         if($countGov==1){
             $date_check = date('Y-m-d',strtotime($year.'-'.$month.'-01'));
-            if(in_array(5,$emp_stats)){
+            if(in_array(5,$emp_stats) || in_array(7,$emp_stats)){
                 $date_check = date('Y-m-d',strtotime($year.'-'.$months[0].'-01'));
             }
             $query = Users::
-                whereHas('work', function ($query) use ($emp_stats,$fund_sources,$fund_services,$status,$date_check,$gov_service,$grant_separated) {
+                whereHas('work', function ($query) use ($emp_stats,$fund_sources,$fund_services,$status,$date_check,$gov_service,$grant_separated,$pt_option) {
                     $query->whereIn('emp_stat_id',$emp_stats);
                     $query->whereIn('fund_source_id',$fund_sources);
                     if($gov_service=='Y' || $gov_service=='N'){
@@ -121,6 +124,9 @@ class GenerateController extends Controller
                             $query->where('date_to', 'present');
                             $query->orWhere('date_to','>=',$date_check);
                         });
+                    }
+                    if(in_array(5,$emp_stats) || in_array(7,$emp_stats)){
+                        $query->where('pt_option_id',$pt_option);
                     }
                 });
 
@@ -171,15 +177,21 @@ class GenerateController extends Controller
                 }
             }
 
-            if(in_array(5,$emp_stats)){
+            if(in_array(5,$emp_stats) || in_array(7,$emp_stats)){
                 $user_ids = $query->pluck('id')->toArray();
                 $getMonths = HRPayrollMonths::whereIn('user_id',$user_ids)
-                    ->where('year',$year)->pluck('user_id')->toArray();
+                    ->where('year',$year)
+                    ->where('pt_option_id',$pt_option)
+                    ->pluck('user_id')
+                    ->toArray();
                 if(count($getMonths)>0){
                     $listUser = [];
                     foreach($getMonths as $row){
                         $getMonths1 = HRPayrollMonths::where('year',$year)
-                            ->where('user_id',$row)->pluck('month')->toArray();
+                            ->where('user_id',$row)
+                            ->where('pt_option_id',$pt_option)
+                            ->pluck('month')
+                            ->toArray();
                         $nonExistingValues = array_diff($months, $getMonths1);
                         if (!empty($nonExistingValues)) {
                             $listUser[] = $row;
@@ -187,9 +199,7 @@ class GenerateController extends Controller
                     }
                     $query = $query->whereIn('id',$listUser);
                 }
-
             }else{
-
                 $query =  $query->whereDoesntHave('payrolls', function ($query) use ($year,$month,$months,$payroll_type,$emp_stats,$fund_sources,$fund_services,$option,$day_from,$day_to) {
                         $query->whereHas('payroll', function ($query) use ($year,$month,$payroll_type,$emp_stats,$fund_sources,$fund_services,$option,$day_from,$day_to) {
                             $query->where('year',$year);
@@ -224,7 +234,8 @@ class GenerateController extends Controller
                                             $fund_sources,$fund_services,
                                             $payroll_type,$duration,
                                             $option,$day_from,
-                                            $day_to,$include_pera) {
+                                            $day_to,$include_pera,
+                                            $pt_option) {
 
                     if($query->middlename_in_last=='Y'){
                         $name = $name_services->lastname_middlename_last($query->lastname,$query->firstname,$query->middlename,$query->extname);
@@ -235,7 +246,10 @@ class GenerateController extends Controller
                         ->whereIn('emp_stat_id',$emp_stats)
                         ->whereIn('fund_source_id',$fund_sources);
                     if($fund_services!=''){
-                        $query->whereIn('fund_services_id',$fund_services);
+                        $getWork->whereIn('fund_services_id',$fund_services);
+                    }
+                    if(in_array(5,$emp_stats) || in_array(7,$emp_stats)){
+                        $getWork->where('pt_option_id',$pt_option);
                     }
                     $getWork = $getWork->orderBy('date_from','DESC')->first();
 
@@ -250,7 +264,7 @@ class GenerateController extends Controller
                         $include = 'Y';
 
                         if($payroll_type==1){
-                            if($emp_stat!=5){
+                            if($emp_stat!=5 && $emp_stat!=7){
                                 $this->updatePhilHealth($salary,$user_id,$gov,$year,$month,$payroll_type,$emp_stat,$duration,$option,$day_from,$day_to);
                                 $this->updatePagibig($user_id,$gov,$payroll_type,$emp_stat);
                                 if($gov=='Y'){
@@ -361,6 +375,7 @@ class GenerateController extends Controller
             'fund_sources' => 'required|array',
             'fund_services' => 'nullable|array',
             'duration' => 'required|integer',
+            'pt_option' => 'required|integer',
             'option' => 'required|integer',
             'day_from' => 'required|integer',
             'day_to' => 'required|integer',
@@ -391,6 +406,7 @@ class GenerateController extends Controller
             $fund_sources = $request->fund_sources;
             $fund_services = $request->fund_services;
             $duration = $request->duration;
+            $pt_option = $request->pt_option;
             $option = $request->option;
             $day_from = $request->day_from;
             $day_to = $request->day_to;
@@ -421,10 +437,10 @@ class GenerateController extends Controller
                 $gov_service = $payroll->gov_service;
                 $grant_separated = $payroll->grant_separated;
 
-                if(in_array('5',$emp_stats)){
-                    $month = $months[0];
+                if(in_array('5',$emp_stats) || in_array('7',$emp_stats)){
+                    $month = end($months);
                 }
-                if($payroll_type==1 && !in_array('5',$emp_stats)){
+                if($payroll_type==1 && !in_array('5',$emp_stats) && !in_array('7',$emp_stats)){
                     if($option==1){
                         $day_from = 1;
                         $day_to = $last_day;
@@ -585,6 +601,7 @@ class GenerateController extends Controller
                         $insert->emp_stat_id = $getWork->emp_stat_id;
                         $insert->fund_source_id = $getWork->fund_source_id;
                         $insert->fund_services_id = $getWork->fund_services_id;
+                        $insert->pt_option_id = $pt_option;
                         $insert->lastname = $info->lastname;
                         $insert->firstname = $info->firstname;
                         $insert->middlename = $info->middlename;
@@ -616,23 +633,34 @@ class GenerateController extends Controller
                         $this->insertEmployeeAllowance($emp_stat,$payroll_type,$include_pera,$gov,$payroll_list_id,$payroll_id,$employee,$updated_by);
                         $this->insertEmployeeDeduction($emp_stat,$payroll_type,$payroll_list_id,$payroll_id,$employee,$updated_by);
 
-                        if(in_array(5,$emp_stats) && $payroll_type==1){
+                        if((in_array(5,$emp_stats) || in_array(7,$emp_stats)) && $payroll_type==1){
                             foreach($months as $month){
                                 $check = HRPayrollMonths::where('user_id',$employee)
                                     ->where('year',$year)
                                     ->where('month',$month)
+                                    ->where('pt_option_id',$pt_option)
+                                    ->first();
+                                $hr_month = HRPTMonths::where('user_id',$employee)
+                                    ->where('year',$year)
+                                    ->where('month',$month)
+                                    ->where('pt_option_id',$pt_option)
+                                    ->where('emp_stat_id',$emp_stat)
                                     ->first();
                                 $status = 'unclaimed';
                                 if($check!=NULL){
                                     $status = 'claimed';
                                 }
+                                $hours = $hr_month ? $hr_month->hour : 0;
+                                $earned = $getWork->salary*$hours;
                                 $insert = new HRPayrollMonths();
                                 $insert->payroll_list_id = $payroll_list_id;
                                 $insert->payroll_id = $payroll_id;
                                 $insert->user_id = $employee;
+                                $insert->pt_option_id = $pt_option;
                                 $insert->year = $year;
                                 $insert->month = $month;
-                                $insert->amount = 0;
+                                $insert->amount = $hours;
+                                $insert->earned = $earned;
                                 $insert->option = 'default';
                                 $insert->status = $status;
                                 $insert->updated_by = $updated_by;
@@ -644,18 +672,29 @@ class GenerateController extends Controller
                                         $check = HRPayrollMonths::where('user_id',$employee)
                                             ->where('year',($year-1))
                                             ->where('month',$month)
+                                            ->where('pt_option_id',$pt_option)
+                                            ->first();
+                                        $hr_month = HRPTMonths::where('user_id',$employee)
+                                            ->where('year',$year)
+                                            ->where('month',$month)
+                                            ->where('pt_option_id',$pt_option)
+                                            ->where('emp_stat_id',$emp_stat)
                                             ->first();
                                         $status = 'unclaimed';
                                         if($check!=NULL){
                                             $status = 'claimed';
                                         }
+                                        $hours = $hr_month ? $hr_month->hour : 0;
+                                        $earned = $getWork->salary*$hours;
                                         $insert = new HRPayrollMonths();
                                         $insert->payroll_list_id = $payroll_list_id;
                                         $insert->payroll_id = $payroll_id;
                                         $insert->user_id = $employee;
+                                        $insert->pt_option_id = $pt_option;
                                         $insert->year = ($year-1);
                                         $insert->month = $month1;
-                                        $insert->amount = 0;
+                                        $insert->amount = $hours;
+                                        $insert->earned = $earned;
                                         $insert->option = 'unclaimed';
                                         $insert->status = $status;
                                         $insert->updated_by = $updated_by;
@@ -676,8 +715,8 @@ class GenerateController extends Controller
                     ->orderBy('lastname','ASC')
                     ->orderBy('firstname','ASC')
                     ->first();
-                $ob = ($gross) == null ? '' : number_format($gross,2);
-                $dv = ($netpay) == null ? '' : number_format($netpay,2);
+                $ob = $gross == null ? '' : number_format($gross,2);
+                $dv = $netpay == null ? '' : number_format($netpay,2);
                 $etal = '';
                 if($get_et_al){
                     $et_al = $count > 1 ? ' etal' : '';
@@ -688,7 +727,7 @@ class GenerateController extends Controller
                     }
                     $etal = $etal.$et_al;
                 }
-                if(in_array(5,$emp_stats) && $payroll_type==1 && count($months)>0){
+                if((in_array(5,$emp_stats) || in_array(7,$emp_stats)) && $payroll_type==1 && count($months)>0){
                     $payroll_name = $payroll->name.' (Part-Time)';
                 }else{
                     $payroll_name = $payroll->name;

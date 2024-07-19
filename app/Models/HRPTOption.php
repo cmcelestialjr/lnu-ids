@@ -12,6 +12,10 @@ class HRPTOption extends Model
     {
         return $this->hasMany(_Work::class, 'pt_option_id', 'id');
     }
+    public function pt()
+    {
+        return $this->hasMany(HRPT::class, 'pt_option_id', 'id');
+    }
     public function employee()
     {
         return $this->belongsTo(Users::class, 'user_id', 'id');

@@ -51,89 +51,11 @@ class IndividualController extends Controller
                 $this->updateDtrIndividual($row->id_no,$year,$month);
             }
         }
-        $this->updateDtrIndividual($id_no_req,$year,$month);
         $check = UsersDTR::where('id_no',$id_no)
             ->whereYear('date',$year)
             ->whereMonth('date',$month)->first();
         if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req) && $check!=NULL){
             $result = 'success';
-
-            // $insert = new DTRlogs();
-            // $insert->device_id = 0;
-            // $insert->id_no = $id_no;
-            // $insert->state = 1;
-            // $insert->dateTime = '2024-02-01 17:15:27';
-            // $insert->type = 1;
-            // $insert->link = 0;
-            // $insert->skyhrImport = 0;
-            // $insert->ipaddress = '10.5.201.137';
-            // $insert->save();
-
-            // $insert = new DTRlogs();
-            // $insert->device_id = 0;
-            // $insert->id_no = $id_no;
-            // $insert->state = 1;
-            // $insert->dateTime = '2024-01-15 07:59:56';
-            // $insert->type = 0;
-            // $insert->link = 0;
-            // $insert->skyhrImport = 1;
-            // $insert->ipaddress = '10.5.201.137';
-            // $insert->save();
-
-            // $insert = new DTRlogs();
-            // $insert->device_id = 0;
-            // $insert->id_no = $id_no;
-            // $insert->state = 1;
-            // $insert->dateTime = '2024-01-16 08:00:56';
-            // $insert->type = 0;
-            // $insert->link = 0;
-            // $insert->skyhrImport = 1;
-            // $insert->ipaddress = '10.5.201.137';
-            // $insert->save();
-
-            // $insert = new DTRlogs();
-            // $insert->device_id = 0;
-            // $insert->id_no = $id_no;
-            // $insert->state = 1;
-            // $insert->dateTime = '2024-01-18 07:50:39';
-            // $insert->type = 0;
-            // $insert->link = 0;
-            // $insert->skyhrImport = 1;
-            // $insert->ipaddress = '10.5.201.137';
-            // $insert->save();
-
-            // $insert = new DTRlogs();
-            // $insert->device_id = 0;
-            // $insert->id_no = $id_no;
-            // $insert->state = 1;
-            // $insert->dateTime = '2024-01-22 07:56:29';
-            // $insert->type = 0;
-            // $insert->link = 0;
-            // $insert->skyhrImport = 1;
-            // $insert->ipaddress = '10.5.201.137';
-            // $insert->save();
-
-            // $insert = new DTRlogs();
-            // $insert->device_id = 0;
-            // $insert->id_no = $id_no;
-            // $insert->state = 1;
-            // $insert->dateTime = '2024-01-23 08:00:24';
-            // $insert->type = 0;
-            // $insert->link = 0;
-            // $insert->skyhrImport = 1;
-            // $insert->ipaddress = '10.5.201.137';
-            // $insert->save();
-
-            // $insert = new DTRlogs();
-            // $insert->device_id = 0;
-            // $insert->id_no = $id_no;
-            // $insert->state = 1;
-            // $insert->dateTime = '2024-01-24 08:05:47';
-            // $insert->type = 0;
-            // $insert->link = 0;
-            // $insert->skyhrImport = 1;
-            // $insert->ipaddress = '10.5.201.137';
-            // $insert->save();
 
             $name_services = new NameServices;
             $user = Users::where('id_no',$id_no)->first();
@@ -816,49 +738,6 @@ class IndividualController extends Controller
                 $time_from = date('H:i',strtotime($day->time->time_from));
                 $time_to = date('H:i',strtotime($day->time->time_to));
             }
-            // if($emp_type=='Employee'){
-            //     $day = UsersSchedDays::where('user_id',$user_id)->where('day',$weekDay)->first();
-            //     if($day!=NULL){
-            //         $time_from = date('H:i',strtotime($day->time->time_from));
-            //         $time_to = date('H:i',strtotime($day->time->time_to));
-            //     }
-            // }else{
-            //     $day = EducOfferedScheduleDay::where('no',$weekDay)
-            //         ->whereHas('schedule', function ($query) use ($user_id,$year,$month) {
-            //             $query->whereHas('course', function ($query) use ($user_id,$year,$month) {
-            //                 $query->where('instructor_id',$user_id);
-            //                 $query->whereHas('curriculum', function ($query) use ($year,$month) {
-            //                     $query->whereHas('offered_program', function ($query) use ($year,$month) {
-            //                         $query->whereHas('school_year', function ($query) use ($year,$month) {
-            //                             $query->where('year_from','>=',$year);
-            //                             $query->whereHas('grade_period', function ($query) use ($month) {
-            //                                 $query->whereHas('month', function ($query) use ($month) {
-            //                                     $query->where('month',$month);
-            //                                 });
-            //                             });
-            //                         });
-            //                     });
-            //                 });
-            //             });
-            //         })
-            //         ->pluck('offered_schedule_id')->toArray();
-            //     $time_from_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_from','ASC')
-            //         ->whereHas('course', function ($query) {
-            //             $query->where('load_type',1);
-            //         })
-            //         ->first();
-            //     $time_to_query = EducOfferedSchedule::whereIn('id',$day)->orderBy('time_to','DESC')
-            //         ->whereHas('course', function ($query) {
-            //             $query->where('load_type',1);
-            //         })
-            //         ->first();
-            //     if($time_from_query!=NULL){
-            //         $time_from = date('H:i',strtotime($time_from_query->time_from));
-            //     }
-            //     if($time_to_query!=NULL){
-            //         $time_to =date('H:i',strtotime( $time_to_query->time_to));
-            //     }
-            // }
         return array(
                 'time_from' => $time_from,
                 'time_to' => $time_to

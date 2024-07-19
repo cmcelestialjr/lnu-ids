@@ -32,13 +32,13 @@ class DtrImportServer extends Command
             'device_id' => 0,
             'id_no' => 230209,
             'state' => 0,
-            'dateTime' => '2024-07-04 08:00:09',
+            'dateTime' => '2024-07-18 07:59:09',
             'type' => 0,
             'link' => 0,
             'skyhrImport' => 0,
             'ipaddress' => '10.5.201.137',
-            'created_at' => '2024-07-04 08:00:09',
-            'updated_at' => '2024-07-04 08:00:09',
+            'created_at' => '2024-07-18 07:59:09',
+            'updated_at' => '2024-07-18 07:59:09',
         ]);
 
         $this->info('Command executed successfully!');

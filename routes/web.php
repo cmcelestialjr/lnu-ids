@@ -677,10 +677,25 @@ Route::group(['middleware' => ['HTTPS']], function(){
                             Route::post('/index', 'HRIMS\Payroll\PartTimeController@index');
                             Route::post('/syNew', 'HRIMS\Payroll\PartTimeController@syNew');
                             Route::post('/syNewSubmit', 'HRIMS\Payroll\PartTimeController@syNewSubmit');
-                            Route::post('/update', 'HRIMS\Payroll\PartTimeController@update');
-                            Route::post('/updateSubmit', 'HRIMS\Payroll\PartTimeController@updateSubmit');
                             Route::post('/add', 'HRIMS\Payroll\PartTimeController@add');
                             Route::post('/addSubmit', 'HRIMS\Payroll\PartTimeController@addSubmit');
+                            Route::post('/update', 'HRIMS\Payroll\PartTimeController@update');
+                            Route::post('/updateSubmit', 'HRIMS\Payroll\PartTimeController@updateSubmit');
+                            Route::post('/remove', 'HRIMS\Payroll\PartTimeController@remove');
+                            Route::post('/removeSubmit', 'HRIMS\Payroll\PartTimeController@removeSubmit');
+                            Route::post('/viewOptions', 'HRIMS\Payroll\PartTimeController@viewOptions');
+                        });
+
+                        Route::group(['prefix'=>'overLoad'], function(){
+                            Route::post('/index', 'HRIMS\Payroll\OverLoadController@index');
+                            Route::post('/syNew', 'HRIMS\Payroll\OverLoadController@syNew');
+                            Route::post('/syNewSubmit', 'HRIMS\Payroll\OverLoadController@syNewSubmit');
+                            Route::post('/add', 'HRIMS\Payroll\OverLoadController@add');
+                            Route::post('/addSubmit', 'HRIMS\Payroll\OverLoadController@addSubmit');
+                            Route::post('/update', 'HRIMS\Payroll\OverLoadController@update');
+                            Route::post('/updateSubmit', 'HRIMS\Payroll\OverLoadController@updateSubmit');
+                            Route::post('/remove', 'HRIMS\Payroll\OverLoadController@remove');
+                            Route::post('/removeSubmit', 'HRIMS\Payroll\OverLoadController@removeSubmit');
                         });
                     });
                 });

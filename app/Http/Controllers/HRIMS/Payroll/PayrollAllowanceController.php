@@ -137,21 +137,21 @@ class PayrollAllowanceController extends Controller
         }
 
         $payroll_update_services = new PayrollUpdateServices;
-        $values = NULL;        
+        $values = NULL;
         $id = $request->id;
         $aid = $request->aid;
         $check = $request->check;
 
         $query = HRPayrollList::find($id);
-            
+
         if($query==NULL){
             return  response()->json($data);
         }
 
         $user = Auth::user();
         $updated_by = $user->id;
-        
-        try{ 
+
+        try{
             if($check=='yes' && $query!=NULL){
                 $allowance = HRAllowance::find($aid);
 
@@ -171,13 +171,13 @@ class PayrollAllowanceController extends Controller
                 );
             }else{
                 $delete = HRPayrollAllowance::where('payroll_list_id', $id)
-                    ->where('allowance_id',$aid)->delete();                    
+                    ->where('allowance_id',$aid)->delete();
                 $auto_increment = DB::update("ALTER TABLE `hr_payroll_allowance` AUTO_INCREMENT = 0;");
             }
-            
+
             $values = $payroll_update_services->updatePayrollList($id,$updated_by);
-         
-            return response()->json(['result' => 'success', 
+
+            return response()->json(['result' => 'success',
                                      'values' => $values]);
         } catch (QueryException $e) {
             // Handle database query exceptions
@@ -210,7 +210,7 @@ class PayrollAllowanceController extends Controller
         $rules = [
             'id' => 'required|numeric'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',
@@ -232,7 +232,7 @@ class PayrollAllowanceController extends Controller
             'aid' => 'required|numeric',
             'check' => 'required|string'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',

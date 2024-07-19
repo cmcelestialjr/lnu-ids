@@ -9,7 +9,7 @@
                 <div class="row">
                     @if($user_access_level==1 || $user_access_level==2 || $user_access_level==3)
                         <div class="col-lg-12">
-                            <i>Remove time for selected period to delete the period info</i>
+                            <i>Remove time to delete the period info</i>
                         </div>
                         <div class="col-lg-12 {{$hide_1}}">
                             <label>Period: {{$day_from}}-15</label>

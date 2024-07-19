@@ -15,10 +15,12 @@ use App\Models\FundServices;
 use App\Models\FundSource;
 use App\Models\HRCreditType;
 use App\Models\HRDeductionGroup;
+use App\Models\HRPayroll;
 use App\Models\HRPayrollDuration;
 use App\Models\HRPayrollOption;
 use App\Models\HRPayrollType;
 use App\Models\HRPositionType;
+use App\Models\HRPTOption;
 use App\Models\Ludong\Student\LudongStudentInfo;
 use App\Models\Sexs;
 use App\Models\Signatory;
@@ -246,6 +248,8 @@ class PageController extends Controller
         $payroll_duration = HRPayrollDuration::get();
         $payroll_option = HRPayrollOption::get();
         $account_titles = AccAccountTitle::where('payment','yes')->get();
+        $pt_option = HRPTOption::get();
+
         $data['emp_stat'] = $emp_stat;
         $data['payroll_type'] = $payroll_type;
         $data['fund_source'] = $fund_source;
@@ -253,11 +257,20 @@ class PageController extends Controller
         $data['payroll_duration'] = $payroll_duration;
         $data['payroll_option'] = $payroll_option;
         $data['account_titles'] = $account_titles;
+        $data['pt_option'] = $pt_option;
+
         return view($this->page.'/payroll/generate/generate',$data);
     }
     public function payroll_view($data){
         $payroll_type = HRPayrollType::get();
+        $check_partial = HRPayroll::where('year',date('Y'))
+            ->where('month',date('m'))
+            ->where('generate_option','partial')
+            ->where('generated_by',$data['user']->id)->first(['id']);
+
         $data['payroll_type'] = $payroll_type;
+        $data['check_partial'] = $check_partial;
+
         return view($this->page.'/payroll/view/view',$data);
     }
     public function payroll_type($data){

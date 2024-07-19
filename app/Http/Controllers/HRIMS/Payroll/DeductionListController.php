@@ -287,7 +287,7 @@ class DeductionListController extends Controller
             $auto_increment = DB::update("ALTER TABLE `hr_adg_emp_stat` AUTO_INCREMENT = 0;");
 
             foreach($emp_stat as $emp_stat_id){
-                $check = HRadgEmpStat::where('emp_stat_id',$emp_stat)
+                $check = HRadgEmpStat::where('emp_stat_id',$emp_stat_id)
                     ->where('deduction_id',$id)->first();
                 if($check==NULL){
                     $insert = new HRadgEmpStat();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\HRIMS\Payroll;
 
 use App\Http\Controllers\Controller;
+use App\Models\HRPayrollList;
 use App\Models\HRPayrollMonths;
 use App\Services\PayrollUpdateServices;
 use Exception;
@@ -39,7 +40,7 @@ class PayrollMonthController extends Controller
         }
 
         $payroll_update_services = new PayrollUpdateServices;
-        
+
         $values = NULL;
         $payroll_list_id = '';
 
@@ -58,12 +59,16 @@ class PayrollMonthController extends Controller
 
         $user = Auth::user();
         $updated_by = $user->id;
-            
+
+        $payroll = HRPayrollList::find($query->payroll_list_id);
+        $earned = round(($payroll->salary*$val),2);
+
         try{
             HRPayrollMonths::where('id', $id)
                 ->where('status','unclaimed')
                 ->update([
                     'amount' => $val,
+                    'earned' => $earned,
                     'updated_by' => $updated_by,
                     'updated_at' => date('Y-m-d H:i:s'),
                 ]);
@@ -145,7 +150,7 @@ class PayrollMonthController extends Controller
             'id' => 'required|numeric',
             'val' => 'nullable|numeric'
         ];
-        
+
         $customMessages = [
             'id.required' => 'ID is required',
             'id.numeric' => 'ID must be a number',
@@ -176,5 +181,5 @@ class PayrollMonthController extends Controller
     {
         return response()->json(['result' => $e->getMessage()], 500);
     }
-    
+
 }

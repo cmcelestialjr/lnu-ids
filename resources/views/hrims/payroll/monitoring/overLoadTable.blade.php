@@ -1,13 +1,13 @@
-<table id="partTimeTable" class="table table-bordered table-fixed"
-       data-toggle="table"
-       data-search="true"
-       data-buttons-class="primary"
-       data-show-export="true"
-       data-show-columns-toggle-all="true"
-       data-mobile-responsive="true"
-       data-pagination="false"
-       data-loading-template="loadingTemplate"
-       data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
+<table id="overLoadTable" class="table table-bordered table-fixed"
+        data-toggle="table"
+        data-search="true"
+        data-buttons-class="primary"
+        data-show-export="true"
+        data-show-columns-toggle-all="true"
+        data-mobile-responsive="true"
+        data-pagination="false"
+        data-loading-template="loadingTemplate"
+        data-export-types="['csv', 'txt', 'doc', 'excel', 'json', 'sql']">
     <thead>
         <tr>
             <th data-sortable="true" data-align="center" rowspan="2">#</th>
@@ -99,25 +99,19 @@
                         <span class="btn btn-secondary btn-secondary-scan btn-sm viewOptions"
                             data-id="{{ $r->id }}"
                             data-o="{{ $option_id }}"
-                            data-w="{{ $work_id }}"
-                            data-y="{{ $current_date->format('Y') }}"
-                            data-m="{{ $current_date->format('m') }}">
+                            data-w="{{ $work_id }}">
                             <span class="fa fa-calendar-times-o"></span>
                         </span>
                         @php
                             $payroll_found = false;
-                            $total_amount = 0;
-                            $total_earned = 0;
                         @endphp
                         @foreach ($r->payrolls as $payroll)
                             @if ($payroll->months)
                                 @foreach($payroll->months as $rowMonth)
                                     @if ($rowMonth->year == $current_date->format('Y') && $rowMonth->month == $current_date->format('m'))
-                                        @if($payroll->pt_option_id == $option_id)
-                                            @php
-                                                $total_amount += $rowMonth->amount;
-                                                $total_earned += $rowMonth->earned;
-                                            @endphp
+                                        @if($payroll->pt_option_id == $option_id) <br>
+                                            hr:{{ number_format($rowMonth->amount, 2) }} <br>
+                                            P{{ number_format($rowMonth->earned, 2) }}
                                         @endif
                                         @php
                                             $payroll_found = true;
@@ -127,36 +121,29 @@
                                 @endforeach
                             @endif
                         @endforeach
-                        @if ($total_amount > 0 || $total_earned > 0)
-                            <br> hr: {{ number_format($total_amount, 2) }} <br>
-                            P{{ number_format($total_earned, 2) }}
-                        @endif
                         @php
                             $current_date->modify('+1 month');
                         @endphp
                     </td>
                 @endwhile
                 <td>
-                    <button class="btn btn-info btn-info-scan btn-sm ptUpdate"
-                        data-id="{{ $r->id }}"
-                        data-o="{{ $option_id }}"
-                        data-w="{{ $work_id }}">
+                    <button class="btn btn-info btn-info-scan btn-sm olUpdate"
+                        data-id="{{$r->id}}"
+                        data-o="{{$option_id}}"
+                        data-w="{{$work_id}}">
                         <span class="fa fa-edit"></span>
                     </button>
-                    <button class="btn btn-danger btn-danger-scan btn-sm ptRemove"
-                        data-id="{{ $r->id }}"
-                        data-o="{{ $option_id }}"
-                        data-w="{{ $work_id }}">
+                    <button class="btn btn-danger btn-danger-scan btn-sm olRemove"
+                        data-id="{{$r->id}}"
+                        data-o="{{$option_id}}"
+                        data-w="{{$work_id}}">
                         <span class="fa fa-trash"></span>
                     </button>
                 </td>
-            </tr>
+            <tr>
         @endforeach
     </tbody>
 </table>
-
 <script>
-$(document).ready(function() {
-    $('#partTimeTable').bootstrapTable();
-});
+$('#overLoadTable').bootstrapTable();
 </script>
