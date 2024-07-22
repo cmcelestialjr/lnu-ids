@@ -43,7 +43,9 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="dtr" role="tabpanel">
+                                    <div class="table-responsive" id="viewDtr">
 
+                                    </div>
                                 </div>
                                 <div class="tab-pane fade" id="payroll" role="tabpanel">
                                     <div class="row">

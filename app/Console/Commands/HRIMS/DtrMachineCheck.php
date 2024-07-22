@@ -119,11 +119,10 @@ class DtrMachineCheck extends Command
                 }
             }
             $now = now();
-            if ($now->isBetween('07:05', '07:06') ||
+            if ($now->isBetween('05:25', '05:26') ||
                 $now->isBetween('09:25', '09:26') ||
-                $now->isBetween('11:55', '11:56') ||
-                $now->isBetween('13:25', '13:26') ||
-                $now->isBetween('14:55', '14:56') ||
+                $now->isBetween('11:45', '11:46') ||
+                $now->isBetween('14:45', '14:46') ||
                 $now->isBetween('20:25', '20:26')
                 ) {
                 if($recordsCheck==0){
@@ -146,7 +145,7 @@ class DtrMachineCheck extends Command
             $status = 'Off';
             $dateTime = NULL;
             $this->updateStatus($id,$status,$dateTime,0);
-            exit(1);
+            exit;
         }
     }
     private function updateStatus($id,$status,$dateTime,$no){

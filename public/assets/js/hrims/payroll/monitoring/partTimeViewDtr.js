@@ -1,20 +1,17 @@
 
-viewDtr($('#ptOptions #dtr'));
+viewDtr($('#ptOptions #viewDtr'));
 function viewDtr(thisBtn){
-    var sy = $('#overLoadSY option:selected').val();
-    var url = base_url+'/hrims/payroll/monitoring/overLoad/update';
-    var modal = 'default';
-    var modal_size = 'modal-sm';
+    var id = $('#ptOptions input[name="id"]').val();
+    var year = $('#ptOptions input[name="year"]').val();
+    var month = $('#ptOptions input[name="month"]').val();
+    var url_table = base_url+'/hrims/payroll/monitoring/partTime/viewDtr';
+    var tid = 'viewDtr';
     var form_data = {
-        url:url,
-        modal:modal,
-        modal_size:modal_size,
-        static:'',
-        w_table:'wo',
+        url_table:url_table,
+        tid:tid,
         id:id,
-        option_id:option_id,
-        work_id:work_id,
-        sy:sy
+        year:year,
+        month:month
     };
     loadDivwLoader(form_data,thisBtn);
 }

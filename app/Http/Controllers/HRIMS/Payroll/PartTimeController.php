@@ -9,6 +9,7 @@ use App\Models\EducDepartments;
 use App\Models\EducGradePeriod;
 use App\Models\FundServices;
 use App\Models\FundSource;
+use App\Models\Holidays;
 use App\Models\HRPayrollMonths;
 use App\Models\HRPosition;
 use App\Models\HRPT;
@@ -418,14 +419,27 @@ class PartTimeController extends Controller
         $year = $request->year;
         $month = $request->month;
 
-        $getDtr = UsersDTR::whereHas('user', function ($query) use ($id) {
+        $getDtr = UsersDTR::with('time_type_')
+            ->whereHas('user', function ($query) use ($id) {
                 $query->where('id', $id);
             })->whereYear('date',$year)
             ->whereMonth('date',$month)
+            ->orderBy('date','ASC')
             ->get();
+        $getHolidays = Holidays::where(function ($query) use ($month) {
+                $query->whereMonth('date', $month)
+                      ->where('option', 'Yes');
+            })->orWhere(function ($query) use ($year,$month) {
+                $query->whereYear('date', $year)
+                      ->whereMonth('date', $month);
+            })->get();
 
         $data = [
-            'getDtr' => $getDtr
+            'getDtr' => $getDtr,
+            'getHolidays' => $getHolidays,
+            'year' => $year,
+            'month' => $month,
+            'lastDay' => date('t',strtotime($year.'-'.$month.'-01'))
         ];
         return view('hrims/payroll/monitoring/partTimeViewDtr',$data);
     }

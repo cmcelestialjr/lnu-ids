@@ -252,7 +252,7 @@ class IndividualController extends Controller
             $emp_type = $emp_type['emp_type'];
             $time_from = $time_from_to['time_from'];
             $time_to = $time_from_to['time_to'];
-            $time_type_ids = array(1,2,3,4,5,6,7);
+            $time_type_ids = array(1,2,3,4,5,6,7,8);
             $time_type_ids_not = array('');
             if($query!=NULL){
                 if(($query->status==1) ||
@@ -280,12 +280,12 @@ class IndividualController extends Controller
                         $push++;
                     }
                     if($push>0){
-                        array_push($time_type_ids_not,1,4,5);
+                        array_push($time_type_ids_not,1,4);
                     }
                 }
             }
             if($emp_stat_id==4 || $emp_stat_id==5){
-                array_push($time_type_ids_not,4,7);
+                array_push($time_type_ids_not,4);
             }else{
                 array_push($time_type_ids_not,1);
             }
@@ -351,7 +351,7 @@ class IndividualController extends Controller
         $query = Users::where('id_no',$id_no)
             ->first();
         $date_name = date('M Y',strtotime($year.'-'.$month.'-01'));
-        $time_type_ids = array(1,4,5,6,7);
+        $time_type_ids = array(1,4,5,6,7,8);
         $time_type_ = DTRtimeType::whereIn('id',$time_type_ids)->get();
         $data = array(
             'query' => $query,
@@ -419,22 +419,22 @@ class IndividualController extends Controller
                         if($query->time_in_am!=NULL && $query->time_in_am_type==NULL){
                         }else{
                             $datas['time_in_am'] = $time_in_am;
-                            $datas['time_in_am_type'] = 1;
+                            $datas['time_in_am_type'] = 0;
                         }
                         if($query->time_out_am!=NULL && $query->time_out_am_type==NULL){
                         }else{
                             $datas['time_out_am'] = $time_out_am;
-                            $datas['time_out_am_type'] = 1;
+                            $datas['time_out_am_type'] = 0;
                         }
                         if($query->time_in_pm!=NULL && $query->time_in_pm_type==NULL){
                         }else{
                             $datas['time_in_pm'] = $time_in_pm;
-                            $datas['time_in_pm_type'] = 1;
+                            $datas['time_in_pm_type'] = 0;
                         }
                         if($query->time_out_pm!=NULL && $query->time_out_pm_type==NULL){
                         }else{
                             $datas['time_out_pm'] = $time_out_pm;
-                            $datas['time_out_pm_type'] = 1;
+                            $datas['time_out_pm_type'] = 0;
                         }
                         UsersDTR::where('id', $query->id)
                             ->update($datas);
@@ -444,13 +444,13 @@ class IndividualController extends Controller
                         $insert->id_no = $id_no_req;
                         $insert->date = $date;
                         $insert->time_in_am = $time_in_am;
-                        $insert->time_in_am_type = 1;
+                        $insert->time_in_am_type = 0;
                         $insert->time_out_am = $time_out_am;
-                        $insert->time_out_am_type = 1;
+                        $insert->time_out_am_type = 0;
                         $insert->time_in_pm = $time_in_pm;
-                        $insert->time_in_pm_type = 1;
+                        $insert->time_in_pm_type = 0;
                         $insert->time_out_pm = $time_out_pm;
-                        $insert->time_out_pm_type = 1;
+                        $insert->time_out_pm_type = 0;
                         $insert->updated_by = $updated_by;
                         $insert->save();
                         $result = 'success';
@@ -460,12 +460,12 @@ class IndividualController extends Controller
                         if($query->time_in_pm!=NULL && $query->time_in_pm_type==NULL){
                         }else{
                             $datas['time_in_pm'] = $time_in_pm;
-                            $datas['time_in_pm_type'] = 1;
+                            $datas['time_in_pm_type'] = 0;
                         }
                         if($query->time_out_pm!=NULL && $query->time_out_pm_type==NULL){
                         }else{
                             $datas['time_out_pm'] = $time_out_pm;
-                            $datas['time_out_pm_type'] = 1;
+                            $datas['time_out_pm_type'] = 0;
                         }
                         $datas['updated_by'] = $updated_by;
                         $datas['time_type'] = $time_type;
@@ -477,9 +477,9 @@ class IndividualController extends Controller
                         $insert->id_no = $id_no_req;
                         $insert->date = $date;
                         $insert->time_in_pm = $time_in_pm;
-                        $insert->time_in_pm_type = 1;
+                        $insert->time_in_pm_type = 0;
                         $insert->time_out_pm = $time_out_pm;
-                        $insert->time_out_pm_type = 1;
+                        $insert->time_out_pm_type = 0;
                         $insert->time_type = $time_type;
                         $insert->updated_by = $updated_by;
                         $insert->save();
@@ -490,12 +490,12 @@ class IndividualController extends Controller
                         if($query->time_in_am!=NULL && $query->time_in_am_type==NULL){
                         }else{
                             $datas['time_in_am'] = $time_in_am;
-                            $datas['time_in_am_type'] = 1;
+                            $datas['time_in_am_type'] = 0;
                         }
                         if($query->time_out_am!=NULL && $query->time_out_am_type==NULL){
                         }else{
                             $datas['time_out_am'] = $time_out_am;
-                            $datas['time_out_am_type'] = 1;
+                            $datas['time_out_am_type'] = 0;
                         }
                         $datas['updated_by'] = $updated_by;
                         $datas['time_type'] = $time_type;
@@ -507,21 +507,21 @@ class IndividualController extends Controller
                         $insert->id_no = $id_no_req;
                         $insert->date = $date;
                         $insert->time_in_am = $time_in_am;
-                        $insert->time_in_am_type = 1;
+                        $insert->time_in_am_type = 0;
                         $insert->time_out_am = $time_out_am;
-                        $insert->time_out_am_type = 1;
+                        $insert->time_out_am_type = 0;
                         $insert->time_type = $time_type;
                         $insert->updated_by = $updated_by;
                         $insert->save();
                         $result = 'success';
                     }
-                }elseif($time_type=='6' || $time_type=='7'){
+                }elseif($time_type=='5' || $time_type=='6' || $time_type=='7' || $time_type=='8'){
                     if($query!=NULL){
                         if($query->time_in_am!=NULL && $query->time_in_am_type==NULL){
                         }else{
                             if($query->time_in_am!=NULL && $request->time_in_am!='Travel' && $request->time_in_am!='Vacant'){
                                 $datas['time_in_am'] = $time_in_am;
-                                $datas['time_in_am_type'] = 1;
+                                $datas['time_in_am_type'] = 0;
                             }else{
                                 $datas['time_in_am_type'] = $time_type;
                             }
@@ -530,7 +530,7 @@ class IndividualController extends Controller
                         }else{
                             if($query->time_out_am!=NULL && $request->time_out_am!='Travel' && $request->time_out_am!='Vacant'){
                                 $datas['time_out_am'] = $time_out_am;
-                                $datas['time_out_am_type'] = 1;
+                                $datas['time_out_am_type'] = 0;
                             }else{
                                 $datas['time_out_am_type'] = $time_type;
                             }
@@ -539,7 +539,7 @@ class IndividualController extends Controller
                         }else{
                             if($query->time_in_pm!=NULL && $request->time_in_pm!='Travel' && $request->time_in_pm!='Vacant'){
                                 $datas['time_in_pm'] = $time_in_pm;
-                                $datas['time_in_pm_type'] = 1;
+                                $datas['time_in_pm_type'] = 0;
                             }else{
                                 $datas['time_in_pm_type'] = $time_type;
                             }
@@ -548,7 +548,7 @@ class IndividualController extends Controller
                         }else{
                             if($query->time_out_pm!=NULL && $request->time_out_pm!='Travel' && $request->time_out_pm!='Vacant'){
                                 $datas['time_out_pm'] = $time_out_pm;
-                                $datas['time_out_pm_type'] = 1;
+                                $datas['time_out_pm_type'] = 0;
                             }else{
                                 $datas['time_out_pm_type'] = $time_type;
                             }
@@ -567,35 +567,35 @@ class IndividualController extends Controller
                             $insert->time_in_am_type = $time_type;
                         }else{
                             $insert->time_in_am = date('Y-m-d H:i:s',strtotime($year.'-'.$month.'-'.$day.' '.$request->time_in_am));
-                            $insert->time_in_am_type = 1;
+                            $insert->time_in_am_type = 0;
                         }
                         if($request->time_out_am=='Travel' || $request->time_out_am=='Vacant'){
                             $insert->time_out_am = NULL;
                             $insert->time_out_am_type = $time_type;
                         }else{
                             $insert->time_out_am = date('Y-m-d H:i:s',strtotime($year.'-'.$month.'-'.$day.' '.$request->time_out_am));
-                            $insert->time_out_am_type = 1;
+                            $insert->time_out_am_type = 0;
                         }
                         if($request->time_in_pm=='Travel' || $request->time_in_pm=='Vacant'){
                             $insert->time_in_pm = NULL;
                             $insert->time_in_pm_type = $time_type;
                         }else{
                             $insert->time_in_pm = date('Y-m-d H:i:s',strtotime($year.'-'.$month.'-'.$day.' '.$request->time_in_pm));
-                            $insert->time_in_pm_type = 1;
+                            $insert->time_in_pm_type = 0;
                         }
                         if($request->time_out_pm=='Travel' || $request->time_out_pm=='Vacant'){
                             $insert->time_out_pm = NULL;
                             $insert->time_out_pm_type = $time_type;
                         }else{
                             $insert->time_out_pm = date('Y-m-d H:i:s',strtotime($year.'-'.$month.'-'.$day.' '.$request->time_out_pm));
-                            $insert->time_out_pm_type = 1;
+                            $insert->time_out_pm_type = 0;
                         }
                         $insert->time_type = $time_type;
                         $insert->updated_by = $updated_by;
                         $insert->save();
                         $result = 'success';
                     }
-                }elseif($time_type=='1' || $time_type=='4' || $time_type=='5'){
+                }elseif($time_type=='1' || $time_type=='4'){
                     if($query==NULL){
                         $insert = new UsersDTR();
                         $insert->id_no = $id_no_req;
@@ -629,7 +629,7 @@ class IndividualController extends Controller
         $day_to = $request->day_to;
         $time_type = $request->time_type;
         if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req)){
-            $time_type_ids = array(1,4,5,6,7);
+            $time_type_ids = array(1,4,5,6,7,8);
             if(in_array($time_type,$time_type_ids)){
                 for($i=$day_from;$i<=$day_to;$i++){
                     $date = date('Y-m-d',strtotime($year.'-'.$month.'-'.$i));
