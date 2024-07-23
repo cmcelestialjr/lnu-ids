@@ -468,6 +468,8 @@ class IndividualController extends Controller
                             $datas['time_out_pm_type'] = 0;
                         }
                         $datas['updated_by'] = $updated_by;
+                        $datas['time_in_am_type'] = $time_type;
+                        $datas['time_out_am_type'] = $time_type;
                         $datas['time_type'] = $time_type;
                         UsersDTR::where('id', $query->id)
                             ->update($datas);
@@ -476,6 +478,8 @@ class IndividualController extends Controller
                         $insert = new UsersDTR();
                         $insert->id_no = $id_no_req;
                         $insert->date = $date;
+                        $insert->time_in_am_type = $time_type;
+                        $insert->time_out_am_type = $time_type;
                         $insert->time_in_pm = $time_in_pm;
                         $insert->time_in_pm_type = 0;
                         $insert->time_out_pm = $time_out_pm;
@@ -498,6 +502,8 @@ class IndividualController extends Controller
                             $datas['time_out_am_type'] = 0;
                         }
                         $datas['updated_by'] = $updated_by;
+                        $datas['time_in_pm_type'] = $time_type;
+                        $datas['time_out_pm_type'] = $time_type;
                         $datas['time_type'] = $time_type;
                         UsersDTR::where('id', $query->id)
                             ->update($datas);
@@ -510,6 +516,8 @@ class IndividualController extends Controller
                         $insert->time_in_am_type = 0;
                         $insert->time_out_am = $time_out_am;
                         $insert->time_out_am_type = 0;
+                        $insert->time_in_pm_type = $time_type;
+                        $insert->time_out_pm_type = $time_type;
                         $insert->time_type = $time_type;
                         $insert->updated_by = $updated_by;
                         $insert->save();

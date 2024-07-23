@@ -56,7 +56,7 @@ class ImportStudentCourseLudong extends Command
             // ->where('stud_id','2202681')
             //->where('submitted_on','>=','2024-07-19 06:05:20')
             ->where('sy','2024')
-            ->where('term','2')
+            ->where('term','3')
             ->where('terms','2')
             ->where('submitted_on','>=','2024-04-30 08:22:09')
             ->where('submitted_on','<=','2024-05-31 10:10:47')

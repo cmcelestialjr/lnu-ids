@@ -18,6 +18,8 @@ use App\Models\HRPTOption;
 use App\Models\HRPTSY;
 use App\Models\Users;
 use App\Models\UsersDTR;
+use App\Models\UsersDTRInfo;
+use App\Models\UsersSchedDays;
 use App\Services\NameServices;
 use DateTime;
 use Exception;
@@ -157,14 +159,14 @@ class PartTimeController extends Controller
             })->orderBy('lastname','ASC')
             ->orderBy('firstname','ASC')->get();
 
-        $data = array(
+        $data = [
             'pt_options' => $pt_options,
             'nstp_options' => $nstp_options,
             'fund_sources' => $fund_sources,
             'departments' => $departments,
             'fund_services' => $fund_services,
             'employees' => $employees
-        );
+        ];
         return view('hrims/payroll/monitoring/partTimeAddEmployee',$data);
     }
     public function remove(Request $request)
@@ -235,7 +237,7 @@ class PartTimeController extends Controller
             $pt_option = '('.$pt->pt_option->name.')';
         }
 
-        $data = array(
+        $data = [
             'id' => $id,
             'option_id' => $check_work->pt_option_id,
             'work_id' => $work_id,
@@ -244,7 +246,7 @@ class PartTimeController extends Controller
             'units' => $units,
             'total_hours' => $total_hours,
             'pt_option' => $pt_option
-        );
+        ];
         return view('hrims/payroll/monitoring/partTimeRemove',$data);
     }
     public function update(Request $request)
@@ -426,6 +428,25 @@ class PartTimeController extends Controller
             ->whereMonth('date',$month)
             ->orderBy('date','ASC')
             ->get();
+        $getDtrInfo = UsersDTRInfo::where('user_id',$id)
+            ->whereYear('date',$year)
+            ->whereMonth('date',$month)
+            ->where('option_id',2)
+            ->orderBy('date','ASC')
+            ->get();
+        $getDtrSched = UsersSchedDays::with(['time' => function ($query) use ($id,$year,$month) {
+                $query->where('user_id',$id)
+                ->where('option_id',1)
+                ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
+                ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')))
+                ->orderBy('time_from', 'DESC');
+            }])
+            ->whereHas('time', function ($query) use ($id,$year,$month) {
+                $query->where('user_id',$id)
+                ->where('option_id',1)
+                ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
+                ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')));
+            })->get();
         $getHolidays = Holidays::where(function ($query) use ($month) {
                 $query->whereMonth('date', $month)
                       ->where('option', 'Yes');
@@ -436,6 +457,8 @@ class PartTimeController extends Controller
 
         $data = [
             'getDtr' => $getDtr,
+            'getDtrInfo' => $getDtrInfo,
+            'getDtrSched' => $getDtrSched,
             'getHolidays' => $getHolidays,
             'year' => $year,
             'month' => $month,

@@ -35,7 +35,7 @@ class NavigationUserAdd extends Command
                 foreach($nav_sub_ids as $nav_sub){
                     $query->where('system_nav_sub_id', $nav_sub);
                 }
-                
+
             })
             ->whereHas('user_role', function ($query) {
                 $query->whereIn('role_id', [2,3]);

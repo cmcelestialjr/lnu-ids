@@ -39,6 +39,10 @@
                 @endphp
                 @for ($i = 1; $i <= $lastDay; $i++)
                     @php
+                        $weekDay = date('w', strtotime($year.'-'.$month.'-'.$i));
+                        if($weekDay==0){
+                            $weekDay = 7;
+                        }
                         $dtr[$i]['day'] = $i;
                         $dtr[$i]['check'] = '';
                         $dtr[$i]['holiday'] = '';
@@ -52,22 +56,33 @@
                         $dtr[$i]['time_out_am_type'] = '';
                         $dtr[$i]['time_in_pm_type'] = '';
                         $dtr[$i]['time_out_pm_type'] = '';
-                        $dtr[$i]['hours'] = '';
-                        $dtr[$i]['minutes'] = '';
-                        $dtr[$i]['tardy_hr'] = '';
-                        $dtr[$i]['tardy_min'] = '';
-                        $dtr[$i]['tardy_no'] = '';
-                        $dtr[$i]['ud_hr'] = '';
-                        $dtr[$i]['ud_min'] = '';
-                        $dtr[$i]['ud_no'] = '';
-                        $dtr[$i]['hd_hr'] = '';
-                        $dtr[$i]['hd_min'] = '';
-                        $dtr[$i]['hd_no'] = '';
-                        $dtr[$i]['abs_hr'] = '';
-                        $dtr[$i]['abs_min'] = '';
-                        $dtr[$i]['abs_no'] = '';
+                        $dtr[$i]['hours'] = 0;
+                        $dtr[$i]['minutes'] = 0;
+                        $dtr[$i]['tardy_hr'] = 0;
+                        $dtr[$i]['tardy_min'] = 0;
+                        $dtr[$i]['tardy_no'] = 0;
+                        $dtr[$i]['ud_hr'] = 0;
+                        $dtr[$i]['ud_min'] = 0;
+                        $dtr[$i]['ud_no'] = 0;
+                        $dtr[$i]['hd_hr'] = 0;
+                        $dtr[$i]['hd_min'] = 0;
+                        $dtr[$i]['hd_no'] = 0;
+                        $dtr[$i]['abs_hr'] = 0;
+                        $dtr[$i]['abs_min'] = 0;
+                        $dtr[$i]['abs_no'] = 0;
+                        $dtr[$i]['sched_time'] = [];
                     @endphp
-
+                    @foreach ($getDtrSched as $row)
+                        @php
+                            if($weekDay==$row->day){
+                                $dtr[$i]['check'] = 'included';
+                                $dtr[$i]['sched_time'][] = [
+                                    'in' => $row->time->time_from,
+                                    'out' => $row->time->time_to
+                                ];
+                            }
+                        @endphp
+                    @endforeach
                 @endfor
                 @foreach($getHolidays as $row)
                     @php
@@ -76,9 +91,10 @@
                         $dtr[$day]['holiday'] = $row->name;
                     @endphp
                 @endforeach
-                @foreach($getDtr as $row)
+                @for ($k = 0; $k < $getDtr->count(); $k++)
                     @php
-                        $day = date('j',strtotime($row->date));
+                        $row = $getDtr[$k];
+                        $day = date('j', strtotime($row->date));
                         $dtr[$day]['check'] = 'time';
                         $dtr[$day]['in_am'] = date('h:ia',strtotime($row->time_in_am));
                         $dtr[$day]['out_am'] = date('h:ia',strtotime($row->time_out_am));
@@ -92,7 +108,28 @@
                             $dtr[$day]['time_in_pm_type'] = $row->time_in_pm_type;
                             $dtr[$day]['time_out_pm_type'] = $row->time_out_pm_type;
                         }
-
+                        foreach($dtr[$day]['sched_time'] as $sched){
+                            echo '-- '.$day.'---'.$sched['in'].' '.$sched['out'].'<br>';
+                        }
+                    @endphp
+                @endfor
+                @foreach ($getDtrInfo as $row)
+                    @php
+                        $day = date('j',strtotime($row->date));
+                        $dtr[$day]['hours'] = $row->hours;
+                        $dtr[$day]['minutes'] = $row->minutes;
+                        $dtr[$day]['tardy_hr'] = $row->tardy_hr;
+                        $dtr[$day]['tardy_min'] = $row->tardy_min;
+                        $dtr[$day]['tardy_no'] = $row->tardy_no;
+                        $dtr[$day]['ud_hr'] = $row->ud_hr;
+                        $dtr[$day]['ud_min'] = $row->ud_min;
+                        $dtr[$day]['ud_no'] = $row->ud_no;
+                        $dtr[$day]['hd_hr'] = $row->hd_hr;
+                        $dtr[$day]['hd_min'] = $row->hd_min;
+                        $dtr[$day]['hd_no'] = $row->hd_no;
+                        $dtr[$day]['abs_hr'] = $row->abs_hr;
+                        $dtr[$day]['abs_min'] = $row->abs_min;
+                        $dtr[$day]['abs_no'] = $row->abs_no;
                     @endphp
                 @endforeach
                 @for ($j = 1; $j <= $lastDay; $j++)
@@ -112,37 +149,100 @@
                                 @endif
                             @elseif($dtr[$j]['holiday']!='')
                                 <td colspan="4"><span class="text-primary">{{$dtr[$j]['holiday']}}</span></td>
+                            @else
+                                <td>{{$dtr[$j]['in_am']}}</td>
+                                <td>{{$dtr[$j]['out_am']}}</td>
+                                <td>{{$dtr[$j]['in_pm']}}</td>
+                                <td>{{$dtr[$j]['out_pm']}}</td>
                             @endif
                         @else
-                            @if($dtr[$j]['time_type']==1 ||
-                                    $dtr[$j]['time_type']==4)
-                                <td colspan="4"><span class="text-primary">{{$dtr[$j]['time_type_name']}}</span></td>
-                            @else
-                                @if($dtr[$j]['time_in_am_type'] && $dtr[$j]['time_out_pm_type'])
-                                    <td colspan="4"><span class="text-primary">{{$dtr[$j]['time_type_name']}}</span></td>
+                            @php
+                                $colspan1 = 1;
+                                $colspan2 = 1;
+                                $colspan3 = 1;
+                                $include = [1,2,3,4];
+                                if($dtr[$j]['time_in_am_type']==$dtr[$j]['time_out_am_type'] &&
+                                    $dtr[$j]['time_in_am_type']==$dtr[$j]['time_in_pm_type'] &&
+                                    $dtr[$j]['time_in_am_type']==$dtr[$j]['time_out_pm_type'] &&
+                                    $dtr[$j]['time_type']>0){
+                                    $colspan1 = 4;
+                                    $include = [1];
+                                }elseif($dtr[$j]['time_in_am_type']==$dtr[$j]['time_out_am_type'] &&
+                                    $dtr[$j]['time_in_am_type']==$dtr[$j]['time_in_pm_type'] &&
+                                    ($dtr[$j]['time_out_pm_type']==NULL || $dtr[$j]['time_out_pm_type']==0) &&
+                                    $dtr[$j]['time_type']>0){
+                                    $colspan1 = 3;
+                                    $include = [1,4];
+                                }elseif($dtr[$j]['time_in_am_type']==$dtr[$j]['time_out_am_type'] &&
+                                    ($dtr[$j]['time_in_pm_type']==NULL || $dtr[$j]['time_in_pm_type']==0) &&
+                                    ($dtr[$j]['time_out_pm_type']==NULL || $dtr[$j]['time_out_pm_type']==0) &&
+                                    $dtr[$j]['time_type']>0){
+                                    $colspan1 = 2;
+                                    $include = [1,3,4];
+                                }elseif($dtr[$j]['time_out_am_type']==$dtr[$j]['time_in_pm_type'] &&
+                                    $dtr[$j]['time_out_am_type']==$dtr[$j]['time_out_pm_type'] &&
+                                    ($dtr[$j]['time_in_am_type']==NULL || $dtr[$j]['time_in_am_type']==0) &&
+                                    $dtr[$j]['time_type']>0){
+                                    $colspan2 = 3;
+                                    $include = [1,2];
+                                }elseif($dtr[$j]['time_out_am_type']==$dtr[$j]['time_in_pm_type'] &&
+                                    ($dtr[$j]['time_in_am_type']==NULL || $dtr[$j]['time_in_am_type']==0)&&
+                                    ($dtr[$j]['time_out_pm_type']==NULL || $dtr[$j]['time_out_pm_type']==0) &&
+                                    $dtr[$j]['time_type']>0){
+                                    $colspan2 = 3;
+                                    $include = [1,2,4];
+                                }elseif($dtr[$j]['time_in_pm_type']==$dtr[$j]['time_out_pm_type'] &&
+                                    ($dtr[$j]['time_in_am_type']==NULL || $dtr[$j]['time_in_am_type']==0)&&
+                                    ($dtr[$j]['time_out_am_type']==NULL || $dtr[$j]['time_out_am_type']==0) &&
+                                    $dtr[$j]['time_type']>0){
+                                    $colspan3 = 2;
+                                    $include = [1,2,3];
+                                }
+                            @endphp
+                            @if (in_array(1, $include))
+                                @if($dtr[$j]['time_in_am_type']>0)
+                                    <td colspan="{{$colspan1}}"><span class="text-primary">{{$dtr[$j]['time_type_name']}}</span></td>
                                 @else
                                     <td>{{$dtr[$j]['in_am']}}</td>
+                                @endif
+                            @endif
+                            @if (in_array(2, $include))
+                                @if($dtr[$j]['time_out_am_type']>0)
+                                    <td colspan="{{$colspan2}}"><span class="text-primary">{{$dtr[$j]['time_type_name']}}</span></td>
+                                @else
                                     <td>{{$dtr[$j]['out_am']}}</td>
+                                @endif
+                            @endif
+                            @if (in_array(3, $include))
+                                @if($dtr[$j]['time_in_pm_type']>0)
+                                    <td colspan="{{$colspan3}}"><span class="text-primary">{{$dtr[$j]['time_type_name']}}</span></td>
+                                @else
                                     <td>{{$dtr[$j]['in_pm']}}</td>
+                                @endif
+                            @endif
+                            @if (in_array(4, $include))
+                                @if($dtr[$j]['time_out_pm_type']>0)
+                                    <td><span class="text-primary">{{$dtr[$j]['time_type_name']}}</span></td>
+                                @else
                                     <td>{{$dtr[$j]['out_pm']}}</td>
                                 @endif
                             @endif
                         @endif
 
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
-                        <td>{{$dtr[$j]['hours']}}</td>
+                        <td>{{ $dtr[$j]['hours'] <= 0 ? '' : $dtr[$j]['hours'] }}</td>
+                        <td>{{ $dtr[$j]['minutes'] <= 0 ? '' : $dtr[$j]['minutes'] }}</td>
+                        <td>{{ $dtr[$j]['tardy_hr'] <= 0 ? '' : $dtr[$j]['tardy_hr'] }}</td>
+                        <td>{{ $dtr[$j]['tardy_min'] <= 0 ? '' : $dtr[$j]['tardy_min'] }}</td>
+                        <td>{{ $dtr[$j]['tardy_no'] <= 0 ? '' : $dtr[$j]['tardy_no'] }}</td>
+                        <td>{{ $dtr[$j]['ud_hr'] <= 0 ? '' : $dtr[$j]['ud_hr'] }}</td>
+                        <td>{{ $dtr[$j]['ud_min'] <= 0 ? '' : $dtr[$j]['ud_min'] }}</td>
+                        <td>{{ $dtr[$j]['ud_no'] <= 0 ? '' : $dtr[$j]['ud_no'] }}</td>
+                        <td>{{ $dtr[$j]['hd_hr'] <= 0 ? '' : $dtr[$j]['hd_hr'] }}</td>
+                        <td>{{ $dtr[$j]['hd_min'] <= 0 ? '' : $dtr[$j]['hd_min'] }}</td>
+                        <td>{{ $dtr[$j]['hd_no'] <= 0 ? '' : $dtr[$j]['hd_no'] }}</td>
+                        <td>{{ $dtr[$j]['abs_hr'] <= 0 ? '' : $dtr[$j]['abs_hr'] }}</td>
+                        <td>{{ $dtr[$j]['abs_min'] <= 0 ? '' : $dtr[$j]['abs_min'] }}</td>
+                        <td>{{ $dtr[$j]['abs_no'] <= 0 ? '' : $dtr[$j]['abs_no'] }}</td>
                     </tr>
                 @endfor
             </body>
