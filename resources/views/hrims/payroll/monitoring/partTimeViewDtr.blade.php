@@ -129,7 +129,8 @@
                         $abs_no = 0;
 
                         $sched_count = count($dtr[$day]['sched_time']);
-                        echo $sched_count;
+                        $total_time_diff = 0;
+
                         foreach($dtr[$day]['sched_time'] as $sched){
                             if(strtotime($sched['in']) && strtotime($sched['out'])){
                                 if($sched['is_rotation_duty']=='No'){
@@ -139,18 +140,21 @@
                                     $in_from_ = Carbon::parse($in_from)->seconds(0);
                                     $out_to_ = Carbon::parse($out_to)->seconds(0);
 
+                                    $total_time_diff += $out_to_->diffInMinutes($in_from_);
+
                                     if($row->time_in_am_type==2 && $row->time_out_am_type==2){
 
                                     }elseif($row->time_type==1 || $row->time_type==4){
-                                        $time_diff = $out_to_->diffInMinutes($in_from_);
-                                        $total_minutes += $time_diff;
-                                        $abs_minutes += $time_diff;
-                                        $abs_no = 1;
+
+
                                     }
-
-
                                 }
                             }
+                        }
+
+                        if($row->time_type==1 || $row->time_type==4){
+                            $abs_minutes = $total_time_diff;
+                            $abs_no = 1;
                         }
 
                         $hours = 0;
