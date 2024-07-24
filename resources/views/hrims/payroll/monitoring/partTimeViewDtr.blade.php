@@ -78,7 +78,8 @@
                                 $dtr[$i]['check'] = 'included';
                                 $dtr[$i]['sched_time'][] = [
                                     'in' => $row->time->time_from,
-                                    'out' => $row->time->time_to
+                                    'out' => $row->time->time_to,
+                                    'is_rotation_duty' => $row->time->is_rotation_duty
                                 ];
                             }
                         @endphp
@@ -95,11 +96,23 @@
                     @php
                         $row = $getDtr[$k];
                         $day = date('j', strtotime($row->date));
+
+                        $time_in_am = $row->time_in_am;
+                        $time_out_am = $row->time_out_am;
+                        $time_in_pm = $row->time_in_pm;
+                        $time_out_pm = $row->time_out_pm;
+
+                        $in_am = (strtotime($row->time_in_am)) ? date('h:ia',strtotime($time_in_am)) : '';
+                        $out_am = (strtotime($row->time_out_am)) ? date('h:ia',strtotime($time_out_am)) : '';
+                        $in_pm = (strtotime($row->time_in_pm)) ? date('h:ia',strtotime($time_in_pm)) : '';
+                        $out_pm = (strtotime($row->time_out_pm)) ? date('h:ia',strtotime($time_out_pm)) : '';
+
                         $dtr[$day]['check'] = 'time';
-                        $dtr[$day]['in_am'] = date('h:ia',strtotime($row->time_in_am));
-                        $dtr[$day]['out_am'] = date('h:ia',strtotime($row->time_out_am));
-                        $dtr[$day]['in_pm'] = date('h:ia',strtotime($row->time_in_pm));
-                        $dtr[$day]['out_pm'] = date('h:ia',strtotime($row->time_out_pm));
+                        $dtr[$day]['in_am'] = $in_am;
+                        $dtr[$day]['out_am'] = $out_am;
+                        $dtr[$day]['in_pm'] = $in_pm;
+                        $dtr[$day]['out_pm'] = $out_pm;
+
                         if($row->time_type_){
                             $dtr[$day]['time_type'] = $row->time_type;
                             $dtr[$day]['time_type_name'] = $row->time_type_->name;
@@ -108,9 +121,56 @@
                             $dtr[$day]['time_in_pm_type'] = $row->time_in_pm_type;
                             $dtr[$day]['time_out_pm_type'] = $row->time_out_pm_type;
                         }
+
+                        $total_minutes = 0;
+
+                        $abs_hr = 0;
+                        $abs_minutes = 0;
+                        $abs_no = 0;
+
+                        $sched_count = count($dtr[$day]['sched_time']);
+                        echo $sched_count;
                         foreach($dtr[$day]['sched_time'] as $sched){
-                            echo '-- '.$day.'---'.$sched['in'].' '.$sched['out'].'<br>';
+                            if(strtotime($sched['in']) && strtotime($sched['out'])){
+                                if($sched['is_rotation_duty']=='No'){
+                                    $in_from = date('H:i',strtotime($sched['in']));
+                                    $out_to = date('H:i',strtotime($sched['out']));
+
+                                    $in_from_ = Carbon::parse($in_from)->seconds(0);
+                                    $out_to_ = Carbon::parse($out_to)->seconds(0);
+
+                                    if($row->time_in_am_type==2 && $row->time_out_am_type==2){
+
+                                    }elseif($row->time_type==1 || $row->time_type==4){
+                                        $time_diff = $out_to_->diffInMinutes($in_from_);
+                                        $total_minutes += $time_diff;
+                                        $abs_minutes += $time_diff;
+                                        $abs_no = 1;
+                                    }
+
+
+                                }
+                            }
                         }
+
+                        $hours = 0;
+                        $minutes = $total_minutes;
+                        if($total_minutes>=60){
+                            $hours = floor($total_minutes / 60);
+                            $minutes = $total_minutes % 60;
+                        }
+
+                        $abs_min = $abs_minutes;
+                        if($abs_minutes>=60){
+                            $abs_hr = floor($abs_minutes / 60);
+                            $abs_min = $abs_minutes % 60;
+                        }
+
+                        $dtr[$i]['hours'] = $hours;
+                        $dtr[$i]['minutes'] = $minutes;
+                        $dtr[$i]['abs_hr'] = $abs_hr;
+                        $dtr[$i]['abs_min'] = $abs_min;
+                        $dtr[$i]['abs_no'] = $abs_no;
                     @endphp
                 @endfor
                 @foreach ($getDtrInfo as $row)
