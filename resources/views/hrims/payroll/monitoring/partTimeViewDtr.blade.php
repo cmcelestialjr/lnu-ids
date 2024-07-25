@@ -36,6 +36,7 @@
             <body>
                 @php
                     $dtr = [];
+                    $included_days = [];
                 @endphp
                 @for ($i = 1; $i <= $lastDay; $i++)
                     @php
@@ -84,18 +85,33 @@
                             }
                         @endphp
                     @endforeach
+                    @if($dtr[$i]['check'] == 'included')
+                        @php
+                            $included_days[] = $i;
+                        @endphp
+                    @endif
                 @endfor
                 @foreach($getHolidays as $row)
                     @php
                         $day = date('j',strtotime($row->date));
                         $dtr[$day]['check'] = '';
                         $dtr[$day]['holiday'] = $row->name;
+
+                        $index = array_search($day, $included_days);
+                        if ($index !== false) {
+                            unset($included_days[$index]);
+                        }
                     @endphp
                 @endforeach
                 @for ($k = 0; $k < $getDtr->count(); $k++)
                     @php
                         $row = $getDtr[$k];
                         $day = date('j', strtotime($row->date));
+
+                        $index = array_search($day, $included_days);
+                        if ($index !== false) {
+                            unset($included_days[$index]);
+                        }
 
                         $time_in_am = (strtotime($row->time_in_am)) ? date('H:i',strtotime($row->time_in_am)) : NULL;
                         $time_out_am = (strtotime($row->time_out_am)) ? date('H:i',strtotime($row->time_out_am)) : NULL;
@@ -132,10 +148,8 @@
                         $tardy_no = 0;
                         $ud_minutes = 0;
                         $ud_no = 0;
-                        $hd_hr = 0;
                         $hd_minutes = 0;
                         $hd_no = 0;
-                        $abs_hr = 0;
                         $abs_minutes = 0;
                         $abs_no = 0;
 
@@ -173,9 +187,15 @@
                                         if($time_in_am==NULL && $time_out_am==NULL &&
                                             $time_in_am_type==NULL && $time_out_am_type==NULL
                                         ){
-                                            $hd_minutes = $out_to_->diffInMinutes($in_from_);
-                                            $total_minutes += $hd_minutes;
-                                            $hd_no = 1;
+                                            if($sched_count>1){
+                                                $hd_minutes = $out_to_->diffInMinutes($in_from_);
+                                                $total_minutes += $hd_minutes;
+                                                $hd_no = 1;
+                                            }else{
+                                                $abs_minutes = $out_to_->diffInMinutes($in_from_);
+                                                $total_minutes += $abs_minutes;
+                                                $abs_no = 1;
+                                            }
                                         }
                                     }elseif($in_from>='10:00' && $out_to<='24:00'){
                                         if($time_in_pm && $time_in_pm>$in_from){
@@ -197,11 +217,47 @@
                                         if($time_in_pm==NULL && $time_out_pm==NULL &&
                                             $time_in_pm_type==NULL && $time_out_pm_type==NULL
                                         ){
-                                            $hd_minutes = $out_to_->diffInMinutes($in_from_);
-                                            $total_minutes += $hd_minutes;
-                                            $hd_no = 1;
+                                            if($sched_count>1){
+                                                $hd_minutes = $out_to_->diffInMinutes($in_from_);
+                                                $total_minutes += $hd_minutes;
+                                                $hd_no = 1;
+                                            }else{
+                                                $abs_minutes = $out_to_->diffInMinutes($in_from_);
+                                                $total_minutes += $abs_minutes;
+                                                $abs_no = 1;
+                                            }
+                                        }
+                                    }else{
+                                        if($time_in_am && $time_in_am>$in_from){
+                                            $time_from_ = Carbon::parse($in_from)->seconds(0);
+                                            $time_to_ = Carbon::parse($time_in_am)->seconds(0);
+                                            $tardy_minutes += $time_to_->diffInMinutes($time_from_);
+                                            $total_minutes += $tardy_minutes;
+                                            $tardy_no++;
+                                        }
+                                        if($time_out_pm && $time_out_pm<$out_to){
+                                            $time_from_ = Carbon::parse($time_out_pm)->seconds(0);
+                                            $time_to_ = Carbon::parse($out_to)->seconds(0);
+                                            $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                                            $total_minutes += $ud_minutes;
+                                            $ud_no++;
+                                        }
+                                        if($time_in_am==NULL && $time_out_pm==NULL &&
+                                            $time_in_am_type==NULL && $time_out_pm_type==NULL
+                                        ){
+                                            if($sched_count>1){
+                                                $hd_minutes = $out_to_->diffInMinutes($in_from_);
+                                                $total_minutes += $hd_minutes;
+                                                $hd_no = 1;
+                                            }else{
+                                                $abs_minutes = $out_to_->diffInMinutes($in_from_);
+                                                $total_minutes += $abs_minutes;
+                                                $abs_no = 1;
+                                            }
                                         }
                                     }
+                                }else{
+
                                 }
                             }
                         }
@@ -240,11 +296,13 @@
                             $hd_hr = floor($hd_minutes / 60);
                             $hd_min = $hd_minutes % 60;
                         }
+                        $abs_hr = 0;
                         $abs_min = $abs_minutes;
                         if($abs_minutes>=60){
                             $abs_hr = floor($abs_minutes / 60);
                             $abs_min = $abs_minutes % 60;
                         }
+
 
                         $dtr[$day]['hours'] = $hours;
                         $dtr[$day]['minutes'] = $minutes;
@@ -262,6 +320,43 @@
                         $dtr[$day]['abs_no'] = $abs_no;
                     @endphp
                 @endfor
+                @foreach($included_days as $row)
+                    @php
+                        $total_minutes = 0;
+                        $total_time_diff = 0;
+                        foreach($dtr[$row]['sched_time'] as $sched){
+                            if(strtotime($sched['in']) && strtotime($sched['out'])){
+                                $in_from = date('H:i',strtotime($sched['in']));
+                                $out_to = date('H:i',strtotime($sched['out']));
+
+                                $in_from_ = Carbon::parse($in_from)->seconds(0);
+                                $out_to_ = Carbon::parse($out_to)->seconds(0);
+
+                                $total_time_diff += $out_to_->diffInMinutes($in_from_);
+                            }
+                        }
+                        $abs_minutes = $total_time_diff;
+                        $total_minutes += $abs_minutes;
+                        $abs_no = 1;
+                        $hours = 0;
+                        $minutes = $total_minutes;
+                        if($total_minutes>=60){
+                            $hours = floor($total_minutes / 60);
+                            $minutes = $total_minutes % 60;
+                        }
+                        $abs_hr = 0;
+                        $abs_min = $abs_minutes;
+                        if($abs_minutes>=60){
+                            $abs_hr = floor($abs_minutes / 60);
+                            $abs_min = $abs_minutes % 60;
+                        }
+                        $dtr[$row]['hours'] = $hours;
+                        $dtr[$row]['minutes'] = $minutes;
+                        $dtr[$row]['abs_hr'] = $abs_hr;
+                        $dtr[$row]['abs_min'] = $abs_min;
+                        $dtr[$row]['abs_no'] = $abs_no;
+                    @endphp
+                @endforeach
                 @foreach ($getDtrInfo as $row)
                     @php
                         $day = date('j',strtotime($row->date));
