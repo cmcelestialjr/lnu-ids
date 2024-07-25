@@ -1,3 +1,11 @@
+<style>
+    .dtrInput{
+        font-size: 12px;
+        background-color: #fee7e7;
+        border-color: black;
+        padding: 0px;
+    }
+</style>
 <div class="row">
     <div class="col-md-12">
         <table class="table table-bordered center" style="font-size: 10px;">
@@ -53,10 +61,10 @@
                             @elseif($dtr[$j]['holiday']!='')
                                 <td colspan="4"><span class="text-primary">{{$dtr[$j]['holiday']}}</span></td>
                             @else
-                                <td>{{$dtr[$j]['in_am']}}</td>
-                                <td>{{$dtr[$j]['out_am']}}</td>
-                                <td>{{$dtr[$j]['in_pm']}}</td>
-                                <td>{{$dtr[$j]['out_pm']}}</td>
+                                <td><button class="btn btn-default dtrInput">gsagas</button></td>
+                                <td><button class="btn btn-default dtrInput"></button></td>
+                                <td><button class="btn btn-default dtrInput"></button></td>
+                                <td><button class="btn btn-default dtrInput"></button></td>
                             @endif
                         @else
                             @php
@@ -106,7 +114,14 @@
                                 @if($dtr[$j]['time_in_am_type']>0)
                                     <td colspan="{{$colspan1}}"><span class="text-primary">{{$dtr[$j]['time_type_name']}}</span></td>
                                 @else
-                                    <td>{{$dtr[$j]['in_am']}}</td>
+                                    <td>
+                                        @if($dtr[$j]['in_am']=='')
+                                            <button class="btn btn-default dtrInput">gsagas</button>
+                                        @else
+                                            {{$dtr[$j]['in_am']}}
+                                        @endif
+
+                                    </td>
                                 @endif
                             @endif
                             @if (in_array(2, $include))
