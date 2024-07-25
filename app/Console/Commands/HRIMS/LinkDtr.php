@@ -80,9 +80,8 @@ class LinkDtr extends Command
                                 $ip_column = 'ipaddress_out_am';
                                 $check_where = 5;
                             }
-
                         }
-                    }elseif($time>='12:00' && $time<='13:00'){
+                    }elseif($time>='12:00' && $time<'14:00'){
                         if($type==0 || $type==3){
                             $column = 'time_in_pm';
                             $state_column = 'state_in_pm';
