@@ -471,34 +471,34 @@ class PartTimeController extends Controller
             if($weekDay==0){
                 $weekDay = 7;
             }
-                $dtr[$i]['day'] = $i;
-                $dtr[$i]['check'] = '';
-                $dtr[$i]['holiday'] = '';
-                $dtr[$i]['in_am'] = '';
-                $dtr[$i]['out_am'] = '';
-                $dtr[$i]['in_pm'] = '';
-                $dtr[$i]['out_pm'] = '';
-                $dtr[$i]['time_type'] = '';
-                $dtr[$i]['time_type_name'] = '';
-                $dtr[$i]['time_in_am_type'] = '';
-                $dtr[$i]['time_out_am_type'] = '';
-                $dtr[$i]['time_in_pm_type'] = '';
-                $dtr[$i]['time_out_pm_type'] = '';
-                $dtr[$i]['hours'] = 0;
-                $dtr[$i]['minutes'] = 0;
-                $dtr[$i]['tardy_hr'] = 0;
-                $dtr[$i]['tardy_min'] = 0;
-                $dtr[$i]['tardy_no'] = 0;
-                $dtr[$i]['ud_hr'] = 0;
-                $dtr[$i]['ud_min'] = 0;
-                $dtr[$i]['ud_no'] = 0;
-                $dtr[$i]['hd_hr'] = 0;
-                $dtr[$i]['hd_min'] = 0;
-                $dtr[$i]['hd_no'] = 0;
-                $dtr[$i]['abs_hr'] = 0;
-                $dtr[$i]['abs_min'] = 0;
-                $dtr[$i]['abs_no'] = 0;
-                $dtr[$i]['sched_time'] = [];
+            $dtr[$i]['day'] = $i;
+            $dtr[$i]['check'] = '';
+            $dtr[$i]['holiday'] = '';
+            $dtr[$i]['in_am'] = '';
+            $dtr[$i]['out_am'] = '';
+            $dtr[$i]['in_pm'] = '';
+            $dtr[$i]['out_pm'] = '';
+            $dtr[$i]['time_type'] = '';
+            $dtr[$i]['time_type_name'] = '';
+            $dtr[$i]['time_in_am_type'] = '';
+            $dtr[$i]['time_out_am_type'] = '';
+            $dtr[$i]['time_in_pm_type'] = '';
+            $dtr[$i]['time_out_pm_type'] = '';
+            $dtr[$i]['hours'] = 0;
+            $dtr[$i]['minutes'] = 0;
+            $dtr[$i]['tardy_hr'] = 0;
+            $dtr[$i]['tardy_min'] = 0;
+            $dtr[$i]['tardy_no'] = 0;
+            $dtr[$i]['ud_hr'] = 0;
+            $dtr[$i]['ud_min'] = 0;
+            $dtr[$i]['ud_no'] = 0;
+            $dtr[$i]['hd_hr'] = 0;
+            $dtr[$i]['hd_min'] = 0;
+            $dtr[$i]['hd_no'] = 0;
+            $dtr[$i]['abs_hr'] = 0;
+            $dtr[$i]['abs_min'] = 0;
+            $dtr[$i]['abs_no'] = 0;
+            $dtr[$i]['sched_time'] = [];
 
             foreach ($getDtrSched as $row){
                 if($weekDay==$row->day){
