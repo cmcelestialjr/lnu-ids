@@ -97,10 +97,10 @@
                         $row = $getDtr[$k];
                         $day = date('j', strtotime($row->date));
 
-                        $time_in_am = $row->time_in_am;
-                        $time_out_am = $row->time_out_am;
-                        $time_in_pm = $row->time_in_pm;
-                        $time_out_pm = $row->time_out_pm;
+                        $time_in_am = date('H:i:s',strtotime($row->time_in_am));
+                        $time_out_am = date('H:i:s',strtotime($row->time_out_am));
+                        $time_in_pm = date('H:i:s',strtotime($row->time_in_pm));
+                        $time_out_pm = date('H:i:s',strtotime($row->time_out_pm));
 
                         $in_am = (strtotime($row->time_in_am)) ? date('h:ia',strtotime($time_in_am)) : '';
                         $out_am = (strtotime($row->time_out_am)) ? date('h:ia',strtotime($time_out_am)) : '';
@@ -124,6 +124,9 @@
 
                         $total_minutes = 0;
 
+                        $hd_hr = 0;
+                        $hd_minutes = 0;
+                        $hd_no = 0;
                         $abs_hr = 0;
                         $abs_minutes = 0;
                         $abs_no = 0;
@@ -133,28 +136,28 @@
 
                         foreach($dtr[$day]['sched_time'] as $sched){
                             if(strtotime($sched['in']) && strtotime($sched['out'])){
-                                if($sched['is_rotation_duty']=='No'){
-                                    $in_from = date('H:i',strtotime($sched['in']));
-                                    $out_to = date('H:i',strtotime($sched['out']));
+                                $in_from = date('H:i',strtotime($sched['in']));
+                                $out_to = date('H:i',strtotime($sched['out']));
 
-                                    $in_from_ = Carbon::parse($in_from)->seconds(0);
-                                    $out_to_ = Carbon::parse($out_to)->seconds(0);
+                                $in_from_ = Carbon::parse($in_from)->seconds(0);
+                                $out_to_ = Carbon::parse($out_to)->seconds(0);
 
-                                    $total_time_diff += $out_to_->diffInMinutes($in_from_);
+                                $total_time_diff += $out_to_->diffInMinutes($in_from_);
 
-                                    if($row->time_in_am_type==2 && $row->time_out_am_type==2){
-
-                                    }elseif($row->time_type==1 || $row->time_type==4){
-
+                                if($out_to>$in_from){
+                                    if($in_from>='00:01' && $out_to<='12:59'){
 
                                     }
                                 }
                             }
                         }
 
-                        if($row->time_type==1 || $row->time_type==4){
+                        if($row->time_type==1){
                             $abs_minutes = $total_time_diff;
                             $abs_no = 1;
+                        }elseif($row->time_type==2 || $row->time_type==3){
+                            $hd_minutes = $total_time_diff/2;
+                            $hd_no = 1;
                         }
 
                         $hours = 0;
@@ -163,13 +166,21 @@
                             $hours = floor($total_minutes / 60);
                             $minutes = $total_minutes % 60;
                         }
-
+                        $hd_hr = 0;
+                        $hd_min = $hd_minutes;
+                        if($hd_minutes>=60){
+                            $hd_hr = floor($hd_minutes / 60);
+                            $hd_min = $hd_minutes % 60;
+                        }
                         $abs_min = $abs_minutes;
                         if($abs_minutes>=60){
                             $abs_hr = floor($abs_minutes / 60);
                             $abs_min = $abs_minutes % 60;
                         }
 
+                        $dtr[$i]['hd_hr'] = $hd_hr;
+                        $dtr[$i]['hd_min'] = $hd_min;
+                        $dtr[$i]['hd_no'] = $hd_no;
                         $dtr[$i]['hours'] = $hours;
                         $dtr[$i]['minutes'] = $minutes;
                         $dtr[$i]['abs_hr'] = $abs_hr;
