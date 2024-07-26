@@ -66,51 +66,80 @@
                             @endif
                         @else
                             @php
-                                $colspan1 = 1;
-                                $colspan2 = 1;
-                                $colspan3 = 1;
+                                $colspans = ['in_am' => 1, 'out_am' => 1, 'in_pm' => 1, 'out_pm', 1];
                                 $include = [1,2,3,4];
                                 if($dtrEntry['time_in_am_type']==$dtrEntry['time_out_am_type'] &&
                                     $dtrEntry['time_out_am_type']==$dtrEntry['time_in_pm_type'] &&
                                     $dtrEntry['time_in_pm_type']==$dtrEntry['time_out_pm_type'] &&
                                     $dtrEntry['time_type']>0){
-                                    $colspan1 = 4;
+                                    $colspans['in_am'] = 4;
                                     $include = [1];
                                 }elseif($dtrEntry['time_in_am_type']==$dtrEntry['time_out_am_type'] &&
                                     $dtrEntry['time_out_am_type']==$dtrEntry['time_in_pm_type'] &&
-                                    ($dtrEntry['time_out_pm_type']==NULL || $dtrEntry['time_out_pm_type']==0) &&
+                                    (!$dtrEntry['time_out_pm_type'] || $dtrEntry['time_out_pm_type']==0) &&
                                     $dtrEntry['time_type']>0){
-                                    $colspan1 = 3;
+                                    $colspans['in_am'] = 3;
                                     $include = [1,4];
                                 }elseif($dtrEntry['time_in_am_type']==$dtrEntry['time_out_am_type'] &&
-                                    ($dtrEntry['time_in_pm_type']==NULL || $dtrEntry['time_in_pm_type']==0) &&
-                                    ($dtrEntry['time_out_pm_type']==NULL || $dtrEntry['time_out_pm_type']==0) &&
+                                    (!$dtrEntry['time_in_pm_type'] || $dtrEntry['time_in_pm_type']==0) &&
+                                    (!$dtrEntry['time_out_pm_type'] || $dtrEntry['time_out_pm_type']==0) &&
                                     $dtrEntry['time_type']>0){
-                                    $colspan1 = 2;
+                                    $colspans['in_am'] = 2;
                                     $include = [1,3,4];
                                 }elseif($dtrEntry['time_out_am_type']==$dtrEntry['time_in_pm_type'] &&
                                     $dtrEntry['time_out_am_type']==$dtrEntry['time_out_pm_type'] &&
-                                    ($dtrEntry['time_in_am_type']==NULL || $dtrEntry['time_in_am_type']==0) &&
+                                    (!$dtrEntry['time_in_am_type'] || $dtrEntry['time_in_am_type']==0) &&
                                     $dtrEntry['time_type']>0){
-                                    $colspan2 = 3;
+                                    $colspans['out_am'] = 3;
                                     $include = [1,2];
                                 }elseif($dtrEntry['time_out_am_type']==$dtrEntry['time_in_pm_type'] &&
-                                    ($dtrEntry['time_in_am_type']==NULL || $dtrEntry['time_in_am_type']==0)&&
-                                    ($dtrEntry['time_out_pm_type']==NULL || $dtrEntry['time_out_pm_type']==0) &&
+                                    (!$dtrEntry['time_in_am_type'] || $dtrEntry['time_in_am_type']==0)&&
+                                    (!$dtrEntry['time_out_pm_type'] || $dtrEntry['time_out_pm_type']==0) &&
                                     $dtrEntry['time_type']>0){
-                                    $colspan2 = 3;
+                                    $colspans['out_am'] = 2;
                                     $include = [1,2,4];
                                 }elseif($dtrEntry['time_in_pm_type']==$dtrEntry['time_out_pm_type'] &&
-                                    ($dtrEntry['time_in_am_type']==NULL || $dtrEntry['time_in_am_type']==0)&&
-                                    ($dtrEntry['time_out_am_type']==NULL || $dtrEntry['time_out_am_type']==0) &&
+                                    (!$dtrEntry['time_in_am_type'] || $dtrEntry['time_in_am_type']==0)&&
+                                    (!$dtrEntry['time_out_am_type'] || $dtrEntry['time_out_am_type']==0) &&
                                     $dtrEntry['time_type']>0){
-                                    $colspan3 = 2;
+                                    $colspans['in_pm'] = 2;
                                     $include = [1,2,3];
                                 }
                             @endphp
-                            @if (in_array(1, $include))
+                            @foreach([1 => 'in_am', 2 => 'out_am', 3 => 'in_pm', 4 => 'out_pm'] as $key => $field)
+                                @if (in_array($key, $include))
+                                    @if($dtrEntry["time_{$field}_type"]>0)
+                                        <td colspan="{{$colspans[$field]}}">
+                                            @if($current_url=='mydtr')
+                                                {{$dtrEntry['time_type_name']}}
+                                            @else
+                                                <button type="button" class="btn btn-default dtrInput text-primary border-primary"
+                                                        data-d="{{$j}}"
+                                                        data-time_type="{{$dtrEntry['time_type']}}">
+                                                    <span class="fa fa-edit"></span>
+                                                    {{$dtrEntry['time_type_name']}}
+                                                </button>
+                                            @endif
+                                        </td>
+                                    @else
+                                        <td>
+                                            @if($dtrEntry["time_{$field}_type"]==0 && $dtrEntry["time_{$field}_type"]!='' && $current_url!='mydtr')
+                                                <button type="button" class="btn btn-default dtrInput text-require border-require"
+                                                    data-d="{{$j}}"
+                                                    data-time_type="{{$dtrEntry['time_type']}}">
+                                                    <span class="fa fa-edit">
+                                                    {{$dtrEntry[$field]}}</span>
+                                                </button>
+                                            @else
+                                                {{$dtrEntry[$field]}}
+                                            @endif
+                                        </td>
+                                    @endif
+                                @endif
+                            @endforeach
+                            {{-- @if (in_array(1, $include))
                                 @if($dtrEntry['time_in_am_type']>0)
-                                    <td colspan="{{$colspan1}}">
+                                    <td colspan="{{$colspans['in_am']}}">
                                         @if($current_url=='mydtr')
                                             {{$dtrEntry['time_type_name']}}
                                         @else
@@ -139,7 +168,7 @@
                             @endif
                             @if (in_array(2, $include))
                                 @if($dtrEntry['time_out_am_type']>0)
-                                    <td colspan="{{$colspan2}}">
+                                    <td colspan="{{$colspans['out_am']}}">
                                         @if($current_url=='mydtr')
                                             {{$dtrEntry['time_type_name']}}
                                         @else
@@ -168,7 +197,7 @@
                             @endif
                             @if (in_array(3, $include))
                                 @if($dtrEntry['time_in_pm_type']>0)
-                                    <td colspan="{{$colspan3}}">
+                                    <td colspan="{{$colspans['in_pm']}}">
                                         @if($current_url=='mydtr')
                                             {{$dtrEntry['time_type_name']}}
                                         @else
@@ -197,7 +226,7 @@
                             @endif
                             @if (in_array(4, $include))
                                 @if($dtrEntry['time_out_pm_type']>0)
-                                    <td>
+                                    <td colspan="{{$colspans['out_pm']}}">
                                         @if($current_url=='mydtr')
                                             {{$dtrEntry['time_type_name']}}
                                         @else
@@ -223,7 +252,7 @@
                                         @endif
                                     </td>
                                 @endif
-                            @endif
+                            @endif --}}
                         @endif
 
                         @foreach (['hours',
