@@ -480,10 +480,10 @@ class PartTimeController extends Controller
             $dtr[$i]['out_pm'] = '';
             $dtr[$i]['time_type'] = '';
             $dtr[$i]['time_type_name'] = '';
-            $dtr[$i]['time_in_am_type'] = '';
-            $dtr[$i]['time_out_am_type'] = '';
-            $dtr[$i]['time_in_pm_type'] = '';
-            $dtr[$i]['time_out_pm_type'] = '';
+            $dtr[$i]['time_in_am_type'] = 0;
+            $dtr[$i]['time_out_am_type'] = 0;
+            $dtr[$i]['time_in_pm_type'] = 0;
+            $dtr[$i]['time_out_pm_type'] = 0;
             $dtr[$i]['hours'] = 0;
             $dtr[$i]['minutes'] = 0;
             $dtr[$i]['tardy_hr'] = 0;
@@ -554,14 +554,13 @@ class PartTimeController extends Controller
             $dtr[$day]['out_am'] = $out_am;
             $dtr[$day]['in_pm'] = $in_pm;
             $dtr[$day]['out_pm'] = $out_pm;
-
+            $dtr[$day]['time_type'] = $row->time_type;
+            $dtr[$day]['time_in_am_type'] = $time_in_am_type;
+            $dtr[$day]['time_out_am_type'] = $time_out_am_type;
+            $dtr[$day]['time_in_pm_type'] = $time_in_pm_type;
+            $dtr[$day]['time_out_pm_type'] = $time_out_pm_type;
             if($row->time_type_){
-                $dtr[$day]['time_type'] = $row->time_type;
                 $dtr[$day]['time_type_name'] = $row->time_type_->name;
-                $dtr[$day]['time_in_am_type'] = $time_in_am_type;
-                $dtr[$day]['time_out_am_type'] = $time_out_am_type;
-                $dtr[$day]['time_in_pm_type'] = $time_in_pm_type;
-                $dtr[$day]['time_out_pm_type'] = $time_out_pm_type;
             }
 
             $total_minutes = 0;

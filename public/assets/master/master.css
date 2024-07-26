@@ -541,6 +541,10 @@ datalist{
 .bg-yellow-light{
   background-color: #ffffeb;
 }
+.border-primary{
+    border: 1px solid;
+    border-color: #007bff !important;
+  }
 .border-require{
   border: 1px solid;
   border-color: red !important;
