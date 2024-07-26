@@ -114,16 +114,20 @@
                             @if (in_array(1, $include))
                                 @if($dtr[$j]['time_in_am_type']>0)
                                     <td colspan="{{$colspan1}}">
-                                        <button type="button" class="btn btn-default dtrInput text-primary border-primary"
-                                                data-d="{{$j}}"
-                                                data-time_type="{{$dtr[$j]['time_type']}}">
-                                            <span class="fa fa-edit"></span>
+                                        @if($current_url=='mydtr')
                                             {{$dtr[$j]['time_type_name']}}
-                                        </button>
+                                        @else
+                                            <button type="button" class="btn btn-default dtrInput text-primary border-primary"
+                                                    data-d="{{$j}}"
+                                                    data-time_type="{{$dtr[$j]['time_type']}}">
+                                                <span class="fa fa-edit"></span>
+                                                {{$dtr[$j]['time_type_name']}}
+                                            </button>
+                                        @endif
                                     </td>
                                 @else
                                     <td>
-                                        @if($dtr[$j]['time_in_am_type']==0 && $dtr[$j]['time_in_am_type']!='')
+                                        @if($dtr[$j]['time_in_am_type']==0 && $dtr[$j]['time_in_am_type']!='' && $current_url!='mydtr')
                                             <button type="button" class="btn btn-default dtrInput text-require border-require"
                                                 data-d="{{$j}}"
                                                 data-time_type="{{$dtr[$j]['time_type']}}">
@@ -139,16 +143,20 @@
                             @if (in_array(2, $include))
                                 @if($dtr[$j]['time_out_am_type']>0)
                                     <td colspan="{{$colspan2}}">
-                                        <button type="button" class="btn btn-default dtrInput text-primary border-primary"
-                                                data-d="{{$j}}"
-                                                data-time_type="{{$dtr[$j]['time_type']}}">
-                                            <span class="fa fa-edit"></span>
+                                        @if($current_url=='mydtr')
                                             {{$dtr[$j]['time_type_name']}}
-                                        </button>
+                                        @else
+                                            <button type="button" class="btn btn-default dtrInput text-primary border-primary"
+                                                    data-d="{{$j}}"
+                                                    data-time_type="{{$dtr[$j]['time_type']}}">
+                                                <span class="fa fa-edit"></span>
+                                                {{$dtr[$j]['time_type_name']}}
+                                            </button>
+                                        @endif
                                     </td>
                                 @else
                                     <td>
-                                        @if($dtr[$j]['time_out_am_type']==0 && $dtr[$j]['time_out_am_type']!='')
+                                        @if($dtr[$j]['time_out_am_type']==0 && $dtr[$j]['time_out_am_type']!='' && $current_url!='mydtr')
                                             <button type="button" class="btn btn-default dtrInput text-require border-require"
                                                 data-d="{{$j}}"
                                                 data-time_type="{{$dtr[$j]['time_type']}}">
@@ -164,16 +172,20 @@
                             @if (in_array(3, $include))
                                 @if($dtr[$j]['time_in_pm_type']>0)
                                     <td colspan="{{$colspan3}}">
-                                        <button type="button" class="btn btn-default dtrInput text-primary border-primary"
-                                                data-d="{{$j}}"
-                                                data-time_type="{{$dtr[$j]['time_type']}}">
-                                            <span class="fa fa-edit"></span>
+                                        @if($current_url=='mydtr')
                                             {{$dtr[$j]['time_type_name']}}
-                                        </button>
+                                        @else
+                                            <button type="button" class="btn btn-default dtrInput text-primary border-primary"
+                                                    data-d="{{$j}}"
+                                                    data-time_type="{{$dtr[$j]['time_type']}}">
+                                                <span class="fa fa-edit"></span>
+                                                {{$dtr[$j]['time_type_name']}}
+                                            </button>
+                                        @endif
                                     </td>
                                 @else
                                     <td>
-                                        @if($dtr[$j]['time_in_pm_type']==0 && $dtr[$j]['time_in_pm_type']!='')
+                                        @if($dtr[$j]['time_in_pm_type']==0 && $dtr[$j]['time_in_pm_type']!='' && $current_url!='mydtr')
                                             <button type="button" class="btn btn-default dtrInput text-require border-require"
                                                 data-d="{{$j}}"
                                                 data-time_type="{{$dtr[$j]['time_type']}}">
@@ -189,16 +201,20 @@
                             @if (in_array(4, $include))
                                 @if($dtr[$j]['time_out_pm_type']>0)
                                     <td>
-                                        <button type="button" class="btn btn-default dtrInput text-primary border-primary"
-                                                data-d="{{$j}}"
-                                                data-time_type="{{$dtr[$j]['time_type']}}">
-                                            <span class="fa fa-edit"></span>
+                                        @if($current_url=='mydtr')
                                             {{$dtr[$j]['time_type_name']}}
-                                        </button>
+                                        @else
+                                            <button type="button" class="btn btn-default dtrInput text-primary border-primary"
+                                                    data-d="{{$j}}"
+                                                    data-time_type="{{$dtr[$j]['time_type']}}">
+                                                <span class="fa fa-edit"></span>
+                                                {{$dtr[$j]['time_type_name']}}
+                                            </button>
+                                        @endif
                                     </td>
                                 @else
                                     <td>
-                                        @if($dtr[$j]['time_out_pm_type']==0 && $dtr[$j]['time_out_pm_type']!='')
+                                        @if($dtr[$j]['time_out_pm_type']==0 && $dtr[$j]['time_out_pm_type']!='' && $current_url!='mydtr')
                                             <button type="button" class="btn btn-default dtrInput text-require border-require"
                                                 data-d="{{$j}}"
                                                 data-time_type="{{$dtr[$j]['time_type']}}">

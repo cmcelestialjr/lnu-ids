@@ -823,6 +823,7 @@ class PartTimeController extends Controller
             'year' => $year,
             'month' => $month,
             'lastDay' => $lastDay,
+            'current_url' => 'monitoring'
 
         ];
         return view('hrims/payroll/monitoring/partTimeViewDtr',$data);
