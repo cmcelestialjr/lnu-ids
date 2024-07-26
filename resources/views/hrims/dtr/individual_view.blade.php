@@ -398,19 +398,21 @@ $user = $users::with('employee_default.emp_stat')
 @endphp
 <style>
 .dtrInput{
-    font-size: 12px;
+    font-size: 10px;
     background-color: #fee7e7;
-    border-color: black;
+    border-color: rgb(89, 87, 87);
+    padding: 0px;
 }
 table{
     border-collapse: collapse;
     border: 1px solid;
     width:100%;
     font-size:10px;
+
 }
 table th{
     border: 1px solid;
-    border-color: black;
+    border-color: rgb(89, 87, 87);
     padding-top:2px;
     padding-bottom:2px;
     padding-left:2px;
@@ -419,16 +421,12 @@ table th{
 }
 table td{
     border: 1px solid;
-    border-color: black;
+    border-color: rgb(89, 87, 87);
     padding-top:2px;
     padding-bottom:2px;
     padding-left:2px;
     padding-right:2px;
     background-color: #fcfcfc;
-}
-.dtrInput{
-    font-size: 10px;
-    padding: 0px;
 }
 </style>
 <div class="row">

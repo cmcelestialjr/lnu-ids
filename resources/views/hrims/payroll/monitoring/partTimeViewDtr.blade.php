@@ -1,6 +1,6 @@
 <style>
     .dtrInput{
-        font-size: 12px;
+        font-size: 10px;
         background-color: #fee7e7;
         border-color: black;
         padding: 0px;
@@ -116,10 +116,10 @@
                                     <td colspan="{{$colspan1}}"><span class="text-primary">{{$dtr[$j]['time_type_name']}}</span></td>
                                 @else
                                     <td>
-                                        @if($dtr[$j]['in_am']==NULL || ($dtr[$j]['time_in_am_type']==0 && $dtr[$j]['time_in_am_type']!=''))
+                                        @if($dtr[$j]['time_in_am_type']==0 && $dtr[$j]['time_in_am_type']!='')
                                             <button class="btn btn-default dtrInput">
-                                                <span class="fa fa-edit"></span>
-                                                {{$dtr[$j]['in_am']}}
+                                                <span class="fa fa-edit">
+                                                {{$dtr[$j]['in_am']}}</span>
                                             </button>
                                         @else
                                             {{$dtr[$j]['in_am']}}
