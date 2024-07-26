@@ -62,10 +62,10 @@
                             @elseif($dtr[$j]['holiday']!='')
                                 <td colspan="4"><span class="text-primary">{{$dtr[$j]['holiday']}}</span></td>
                             @else
-                                <td><button class="btn btn-default dtrInput">gsagas</button></td>
-                                <td><button class="btn btn-default dtrInput"></button></td>
-                                <td><button class="btn btn-default dtrInput"></button></td>
-                                <td><button class="btn btn-default dtrInput"></button></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                             @endif
                         @else
                             @php
