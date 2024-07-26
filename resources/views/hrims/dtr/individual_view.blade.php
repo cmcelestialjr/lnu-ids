@@ -557,10 +557,10 @@ table td{
                     //     echo '<td colspan="4">-------------------</td>';
                     // }else{
                         if($dtr[$j]['time_type']=='1' || $dtr[$j]['time_type']=='4' || $dtr[$j]['time_type']=='5'
-                            || ($dtr[$j]['time_in_am_type']!=NULL && $dtr[$j]['time_in_am_type']!='1' &&
-                                $dtr[$j]['time_out_am_type']!=NULL && $dtr[$j]['time_out_am_type']!='1' &&
-                                $dtr[$j]['time_in_pm_type']!=NULL && $dtr[$j]['time_in_pm_type']!='1' &&
-                                $dtr[$j]['time_out_pm_type']!=NULL && $dtr[$j]['time_out_pm_type']!='1')){
+                            || ($dtr[$j]['time_in_am_type']!=NULL && $dtr[$j]['time_in_am_type']!='0' &&
+                                $dtr[$j]['time_out_am_type']!=NULL && $dtr[$j]['time_out_am_type']!='0' &&
+                                $dtr[$j]['time_in_pm_type']!=NULL && $dtr[$j]['time_in_pm_type']!='0' &&
+                                $dtr[$j]['time_out_pm_type']!=NULL && $dtr[$j]['time_out_pm_type']!='0')){
                             if($dtr[$j]['time_type']==7){
                                 $td_name = '-------------------';
                             }else{
@@ -581,22 +581,22 @@ table td{
                         }else{
                             if($dtr[$j]['time_type']=='2'){
                                 echo '<td colspan="2">Half Day</td>';
-                            }elseif($dtr[$j]['time_in_am_type']!=NULL && $dtr[$j]['time_in_am_type']!='1' &&
-                                    $dtr[$j]['time_out_am_type']!=NULL && $dtr[$j]['time_out_am_type']!='1'){
+                            }elseif($dtr[$j]['time_in_am_type']!=NULL && $dtr[$j]['time_in_am_type']!='0' &&
+                                    $dtr[$j]['time_out_am_type']!=NULL && $dtr[$j]['time_out_am_type']!='0'){
                                 if($dtr[$j]['time_type']==7){
                                     echo '<td colspan="2">-------------------</td>';
                                 }else{
                                     echo '<td colspan="2">'.$dtr[$j]['time_type_name'].'</td>';
                                 }
                             }else{
-                                if($dtr[$j]['time_in_am_type']!=NULL && $dtr[$j]['time_in_am_type']!='1'){
+                                if($dtr[$j]['time_in_am_type']!=NULL && $dtr[$j]['time_in_am_type']!='0'){
                                     if($dtr[$j]['time_type']==7){
                                         echo '<td>------</td>';
                                     }else{
                                         echo '<td>'.$dtr[$j]['time_type_name'].'</td>';
                                     }
                                 }else{
-                                    if($dtr[$j]['time_in_am_type']=='1'){
+                                    if($dtr[$j]['time_in_am_type']=='0'){
                                         $color = 'rgba(220,20,60)';
                                         $border_color = 'border-color:'.$color;
                                     }else{
@@ -642,14 +642,14 @@ table td{
                                         }
                                     }
                                 }
-                                if($dtr[$j]['time_out_am_type']!=NULL && $dtr[$j]['time_out_am_type']!='1'){
+                                if($dtr[$j]['time_out_am_type']!=NULL && $dtr[$j]['time_out_am_type']!='0'){
                                     if($dtr[$j]['time_type']==7){
                                         echo '<td>------</td>';
                                     }else{
                                         echo '<td>'.$dtr[$j]['time_type_name'].'</td>';
                                     }
                                 }else{
-                                    if($dtr[$j]['time_out_am_type']=='1'){
+                                    if($dtr[$j]['time_out_am_type']=='0'){
                                         $color = 'rgba(220,20,60)';
                                         $border_color = 'border-color:'.$color;
                                     }else{
@@ -699,22 +699,22 @@ table td{
                             }
                             if($dtr[$j]['time_type']=='3'){
                                 echo '<td colspan="2">Half Day</td>';
-                            }elseif($dtr[$j]['time_in_pm_type']!=NULL && $dtr[$j]['time_in_pm_type']!='1' &&
-                                    $dtr[$j]['time_out_pm_type']!=NULL && $dtr[$j]['time_out_pm_type']!='1'){
+                            }elseif($dtr[$j]['time_in_pm_type']!=NULL && $dtr[$j]['time_in_pm_type']!='0' &&
+                                    $dtr[$j]['time_out_pm_type']!=NULL && $dtr[$j]['time_out_pm_type']!='0'){
                                 if($dtr[$j]['time_type']==7){
                                     echo '<td colspan="2">-------------------</td>';
                                 }else{
                                     echo '<td colspan="2">'.$dtr[$j]['time_type_name'].'</td>';
                                 }
                             }else{
-                                if($dtr[$j]['time_in_pm_type']!=NULL && $dtr[$j]['time_in_pm_type']!='1'){
+                                if($dtr[$j]['time_in_pm_type']!=NULL && $dtr[$j]['time_in_pm_type']!='0'){
                                     if($dtr[$j]['time_type']==7){
                                         echo '<td>------</td>';
                                     }else{
                                         echo '<td>'.$dtr[$j]['time_type_name'].'</td>';
                                     }
                                 }else{
-                                    if($dtr[$j]['time_in_pm_type']=='1'){
+                                    if($dtr[$j]['time_in_pm_type']=='0'){
                                         $color = 'rgba(220,20,60)';
                                         $border_color = 'border-color:'.$color;
                                     }else{
@@ -760,14 +760,14 @@ table td{
                                         }
                                     }
                                 }
-                                if($dtr[$j]['time_out_pm_type']!=NULL && $dtr[$j]['time_out_pm_type']!='1'){
+                                if($dtr[$j]['time_out_pm_type']!=NULL && $dtr[$j]['time_out_pm_type']!='0'){
                                     if($dtr[$j]['time_type']==7){
                                         echo '<td>------</td>';
                                     }else{
                                         echo '<td>'.$dtr[$j]['time_type_name'].'</td>';
                                     }
                                 }else{
-                                    if($dtr[$j]['time_out_pm_type']=='1'){
+                                    if($dtr[$j]['time_out_pm_type']=='0'){
                                         $color = 'rgba(220,20,60)';
                                         $border_color = 'border-color:'.$color;
                                     }else{
