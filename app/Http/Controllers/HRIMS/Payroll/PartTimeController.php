@@ -466,39 +466,43 @@ class PartTimeController extends Controller
         $lastDay = date('t',strtotime($year.'-'.$month.'-01'));
         $dtr = [];
         $included_days = [];
+        $defaultValues = [
+            'day' => null,
+            'check' => '',
+            'holiday' => '',
+            'in_am' => '',
+            'out_am' => '',
+            'in_pm' => '',
+            'out_pm' => '',
+            'time_type' => '',
+            'time_type_name' => '',
+            'time_in_am_type' => 0,
+            'time_out_am_type' => 0,
+            'time_in_pm_type' => 0,
+            'time_out_pm_type' => 0,
+            'hours' => 0,
+            'minutes' => 0,
+            'tardy_hr' => 0,
+            'tardy_min' => 0,
+            'tardy_no' => 0,
+            'ud_hr' => 0,
+            'ud_min' => 0,
+            'ud_no' => 0,
+            'hd_hr' => 0,
+            'hd_min' => 0,
+            'hd_no' => 0,
+            'abs_hr' => 0,
+            'abs_min' => 0,
+            'abs_no' => 0,
+            'sched_time' => []
+        ];
         for ($i = 1; $i <= $lastDay; $i++){
             $weekDay = date('w', strtotime($year.'-'.$month.'-'.$i));
             if($weekDay==0){
                 $weekDay = 7;
             }
+            $dtr[$i] = $defaultValues;
             $dtr[$i]['day'] = $i;
-            $dtr[$i]['check'] = '';
-            $dtr[$i]['holiday'] = '';
-            $dtr[$i]['in_am'] = '';
-            $dtr[$i]['out_am'] = '';
-            $dtr[$i]['in_pm'] = '';
-            $dtr[$i]['out_pm'] = '';
-            $dtr[$i]['time_type'] = '';
-            $dtr[$i]['time_type_name'] = '';
-            $dtr[$i]['time_in_am_type'] = 0;
-            $dtr[$i]['time_out_am_type'] = 0;
-            $dtr[$i]['time_in_pm_type'] = 0;
-            $dtr[$i]['time_out_pm_type'] = 0;
-            $dtr[$i]['hours'] = 0;
-            $dtr[$i]['minutes'] = 0;
-            $dtr[$i]['tardy_hr'] = 0;
-            $dtr[$i]['tardy_min'] = 0;
-            $dtr[$i]['tardy_no'] = 0;
-            $dtr[$i]['ud_hr'] = 0;
-            $dtr[$i]['ud_min'] = 0;
-            $dtr[$i]['ud_no'] = 0;
-            $dtr[$i]['hd_hr'] = 0;
-            $dtr[$i]['hd_min'] = 0;
-            $dtr[$i]['hd_no'] = 0;
-            $dtr[$i]['abs_hr'] = 0;
-            $dtr[$i]['abs_min'] = 0;
-            $dtr[$i]['abs_no'] = 0;
-            $dtr[$i]['sched_time'] = [];
 
             foreach ($getDtrSched as $row){
                 if($weekDay==$row->day){
@@ -549,16 +553,19 @@ class PartTimeController extends Controller
             $time_in_pm_type = $row->time_in_pm_type;
             $time_out_pm_type = $row->time_out_pm_type;
 
-            $dtr[$day]['check'] = 'time';
-            $dtr[$day]['in_am'] = $in_am;
-            $dtr[$day]['out_am'] = $out_am;
-            $dtr[$day]['in_pm'] = $in_pm;
-            $dtr[$day]['out_pm'] = $out_pm;
-            $dtr[$day]['time_type'] = $row->time_type;
-            $dtr[$day]['time_in_am_type'] = $time_in_am_type;
-            $dtr[$day]['time_out_am_type'] = $time_out_am_type;
-            $dtr[$day]['time_in_pm_type'] = $time_in_pm_type;
-            $dtr[$day]['time_out_pm_type'] = $time_out_pm_type;
+            $dtrEntry = &$dtr[$day];
+
+            $dtrEntry['check'] = 'time';
+            $dtrEntry['in_am'] = $in_am;
+            $dtrEntry['out_am'] = $out_am;
+            $dtrEntry['in_pm'] = $in_pm;
+            $dtrEntry['out_pm'] = $out_pm;
+            $dtrEntry['time_type'] = $row->time_type;
+            $dtrEntry['time_in_am_type'] = $time_in_am_type;
+            $dtrEntry['time_out_am_type'] = $time_out_am_type;
+            $dtrEntry['time_in_pm_type'] = $time_in_pm_type;
+            $dtrEntry['time_out_pm_type'] = $time_out_pm_type;
+
             if($row->time_type_){
                 $dtr[$day]['time_type_name'] = $row->time_type_->name;
             }
