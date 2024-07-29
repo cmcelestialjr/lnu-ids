@@ -508,16 +508,16 @@ class PartTimeController extends Controller
 
             foreach ($getDtrSched as $row){
                 if($weekDay==$row->day){
-                    // if($row->date_from>=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i)) &&
-                    //     $row->date_to<=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i))
-                    // ){
+                    if($row->time->date_from<=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i)) &&
+                        $row->time->date_to>=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i))
+                    ){
                         $dtr[$i]['check'] = 'included';
                         $dtr[$i]['sched_time'][] = [
                             'in' => $row->time->time_from,
                             'out' => $row->time->time_to,
                             'is_rotation_duty' => $row->time->is_rotation_duty
                         ];
-                    //}
+                    }
                 }
             }
             if($dtr[$i]['check'] == 'included'){
