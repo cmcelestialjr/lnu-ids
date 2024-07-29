@@ -85,7 +85,7 @@ class ScheduleController extends Controller
             $active_view = '';
             $active_table = 'show active';
         }
-        $data = array(
+        $data = [
             'query' => $query,
             'time' => $time,
             'active_view' => $active_view,
@@ -95,16 +95,16 @@ class ScheduleController extends Controller
             'from_sys' => $request->from_sys,
             'user_access_level' => $user_access_level,
             'date' => $date
-        );
+        ];
         return view('hrims/employee/information/schedule',$data);
     }
     private function _schedNewModal($request){
         $id = $this->_getID($request);
         $sched_option = $this->sched_option($id);
-        $data = array(
+        $data = [
             'id' => $id,
             'sched_option' => $sched_option
-        );
+        ];
         return view('hrims/employee/information/schedNewModal',$data);
     }
 
@@ -115,8 +115,8 @@ class ScheduleController extends Controller
             $date_to = date('Y-m-t');
         }else{
             $exp = explode('-',$request->duration);
-            $date_from = date('Y-m-01',strtotime($exp[0]));
-            $date_to = date('Y-m-t',strtotime($exp[1]));
+            $date_from = date('Y-m-d',strtotime($exp[0]));
+            $date_to = date('Y-m-d',strtotime($exp[1]));
         }
         $time_other = UsersSchedTime::where('user_id',$id)
             ->where('date_to','>=',$date_to)
@@ -129,11 +129,11 @@ class ScheduleController extends Controller
             $time_from = date('H:i:s',strtotime($request->time_from));
             $time_to = date('H:i:s',strtotime($request->time_to));
         }
-        $data = array(
+        $data = [
             'time_from' => $time_from,
             'time_to' => $time_to,
             'time_other' => $time_other
-        );
+        ];
         return view('hrims/employee/information/schedNewDaysList',$data);
     }
     private function _schedNewSubmit($request){
@@ -147,8 +147,8 @@ class ScheduleController extends Controller
         $time_from = date('H:i:s',strtotime($request->time_from));
         $time_to = date('H:i:s',strtotime($request->time_to));
         $exp = explode('-',$request->duration);
-        $date_from = date('Y-m-01',strtotime($exp[0]));
-        $date_to = date('Y-m-t',strtotime($exp[1]));
+        $date_from = date('Y-m-d',strtotime($exp[0]));
+        $date_to = date('Y-m-d',strtotime($exp[1]));
         $remarks = $request->remarks;
         $days = $request->days;
         if($days!=''){
@@ -174,8 +174,7 @@ class ScheduleController extends Controller
             }
             $result = 'success';
         }
-        $response = array('result' => $result
-                        );
+        $response = ['result' => $result];
         return response()->json($response);
     }
     private function _schedEditModal($request){
@@ -187,11 +186,11 @@ class ScheduleController extends Controller
             $time_other = UsersSchedTime::where('user_id',$time->user_id)
                 ->where('id','<>',$id)->get();
             $sched_option = $this->sched_option($id);
-            $data = array(
+            $data = [
                 'query' => $time,
                 'time_other' => $time_other,
                 'sched_option' => $sched_option
-            );
+            ];
             return view('hrims/employee/information/schedEditModal',$data);
         }else{
             return view('layouts/error/404');
@@ -208,8 +207,8 @@ class ScheduleController extends Controller
                 $date_to = date('Y-m-t');
             }else{
                 $exp = explode('-',$request->duration);
-                $date_from = date('Y-m-01',strtotime($exp[0]));
-                $date_to = date('Y-m-t',strtotime($exp[1]));
+                $date_from = date('Y-m-d',strtotime($exp[0]));
+                $date_to = date('Y-m-d',strtotime($exp[1]));
             }
             $time_other = UsersSchedTime::where('user_id',$time->user_id)
                 ->where('date_to','>=',$date_to)
@@ -222,12 +221,12 @@ class ScheduleController extends Controller
                 $time_from = date('H:i:s',strtotime($request->time_from));
                 $time_to = date('H:i:s',strtotime($request->time_to));
             }
-            $data = array(
+            $data = [
                 'query' => $time,
                 'time_from' => $time_from,
                 'time_to' => $time_to,
                 'time_other' => $time_other
-            );
+            ];
             return view('hrims/employee/information/schedEditDaysList',$data);
         }else{
             return view('layouts/error/404');
@@ -244,8 +243,8 @@ class ScheduleController extends Controller
             $option = $request->option;
             $is_rotation_duty = $request->is_rotation_duty;
             $exp = explode('-',$request->duration);
-            $date_from = date('Y-m-01',strtotime($exp[0]));
-            $date_to = date('Y-m-t',strtotime($exp[1]));
+            $date_from = date('Y-m-d',strtotime($exp[0]));
+            $date_to = date('Y-m-d',strtotime($exp[1]));
             $time_from = date('H:i:s',strtotime($request->time_from));
             $time_to = date('H:i:s',strtotime($request->time_to));
             $remarks = $request->remarks;
@@ -275,8 +274,7 @@ class ScheduleController extends Controller
             }
             $result = 'success';
         }
-        $response = array('result' => $result
-                        );
+        $response = ['result' => $result];
         return response()->json($response);
     }
     private function _schedDeleteModal($request){
@@ -284,9 +282,9 @@ class ScheduleController extends Controller
         $query = UsersSchedTime::where('id',$id)->first();
         $x = $this->_getX($request);
         if($x==0){
-            $data = array(
+            $data = [
                 'query' => $query
-            );
+            ];
             return view('hrims/employee/information/schedDeleteModal',$data);
         }else{
             return view('layouts/error/404');
@@ -305,8 +303,7 @@ class ScheduleController extends Controller
             $auto_increment = DB::update("ALTER TABLE users_sched_time AUTO_INCREMENT = 0;");
             $result = 'success';
         }
-        $response = array('result' => $result
-                        );
+        $response = ['result' => $result];
         return response()->json($response);
     }
     private function _getID($request){

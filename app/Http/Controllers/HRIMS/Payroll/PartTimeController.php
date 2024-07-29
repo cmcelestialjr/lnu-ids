@@ -498,6 +498,7 @@ class PartTimeController extends Controller
             'abs_no' => 0,
             'sched_time' => []
         ];
+
         for ($i = 1; $i <= $lastDay; $i++){
             $weekDay = date('w', strtotime($year.'-'.$month.'-'.$i));
             if($weekDay==0){
@@ -524,6 +525,7 @@ class PartTimeController extends Controller
                 $included_days[] = $i;
             }
         }
+
         foreach($getHolidays as $row){
             $day = date('j',strtotime($row->date));
             $dtr[$day]['check'] = '';
@@ -609,9 +611,10 @@ class PartTimeController extends Controller
             $dtr[$day]['abs_hr'] = $row->abs_hr;
             $dtr[$day]['abs_min'] = $row->abs_min;
             $dtr[$day]['abs_no'] = $row->abs_no;
-
+            $dtr[$day]['days'] = $row->days;
+            $dtr[$day]['total_hours'] = $row->total_hours;
+            $dtr[$day]['total_minutes'] = $row->total_minutes;
         }
-
 
         $data = [
             'dtr' => $dtr,

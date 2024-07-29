@@ -102,7 +102,7 @@
                                     }
                                 }
                             @endphp
-                            {{-- @foreach([1 => 'in_am', 2 => 'out_am', 3 => 'in_pm', 4 => 'out_pm'] as $key => $field)
+                            @foreach([1 => 'in_am', 2 => 'out_am', 3 => 'in_pm', 4 => 'out_pm'] as $key => $field)
                                 @if (in_array($key, $include))
                                     @if($dtrEntry["time_{$field}_type"]>0)
                                         <td colspan="{{$colspans[$field]}}">
@@ -132,8 +132,8 @@
                                         </td>
                                     @endif
                                 @endif
-                            @endforeach --}}
-                            @if (in_array(1, $include))
+                            @endforeach
+                            {{-- @if (in_array(1, $include))
                                 @if($dtrEntry['time_in_am_type']>0)
                                     <td colspan="{{$colspans['in_am']}}">
                                         @if($current_url=='mydtr')
@@ -248,7 +248,7 @@
                                         @endif
                                     </td>
                                 @endif
-                            @endif
+                            @endif --}}
                         @endif
 
                         @foreach (['hours',
