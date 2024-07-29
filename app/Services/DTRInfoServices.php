@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Models\UsersDTRInfo;
+use App\Models\UsersDTRInfoTotal;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,6 +19,8 @@ class DTRInfoServices
         $year = $data['year'];
         $month = $data['month'];
         $option_id = $data['option_id'];
+        $holidays = $data['holidays'];
+        $days = 0;
 
         $user = Auth::user();
         $updated_by = $user->id;
@@ -52,19 +55,29 @@ class DTRInfoServices
             $abs_minutes = 0;
             $abs_no = 0;
             $time_out_am_next = NULL;
-
+            $check_day = 0;
             $sched_count = count($dtr[$day]['sched_time']);
             $total_time_diff = 0;
-            //dd($dtr[$day]['sched_time']);
+
             foreach($dtr[$day]['sched_time'] as $sched){
                 if(strtotime($sched['in']) && strtotime($sched['out'])){
                     $in_from = date('H:i',strtotime($sched['in']));
                     $out_to = date('H:i',strtotime($sched['out']));
+                    $check_day = 1;
 
-                    $in_from_ = Carbon::parse($in_from)->seconds(0);
-                    $out_to_ = Carbon::parse($out_to)->seconds(0);
+                    if($out_to>$in_from){
+                        $in_from_ = Carbon::parse($in_from)->seconds(0);
+                        $out_to_ = Carbon::parse($out_to)->seconds(0);
+                        $total_time_diff += $out_to_->diffInMinutes($in_from_);
+                    }else{
+                        $in_from_ = Carbon::parse($in_from)->seconds(0);
+                        $out_to_ = Carbon::parse('23:59')->seconds(0);
+                        $in_from_add_ = Carbon::parse('00:00')->seconds(0);
+                        $out_to_add_ = Carbon::parse($out_to)->seconds(0);
 
-                    $total_time_diff += $out_to_->diffInMinutes($in_from_);
+                        $total_time_diff += $out_to_->diffInMinutes($in_from_);
+                        $total_time_diff += $out_to_add_->diffInMinutes($in_from_add_);
+                    }
 
                     if($out_to>$in_from){
                         if($in_from>='00:00' && $out_to<='13:59'){
@@ -189,16 +202,23 @@ class DTRInfoServices
                 }
             }
 
+
+
             if($row->time_type==1){
                 $abs_minutes = $total_time_diff;
                 $total_minutes += $abs_minutes;
                 $abs_no = 1;
+                $check_day = 0;
             }elseif($row->time_type==2 || $row->time_type==3){
                 $hd_minutes = $total_time_diff/2;
                 $total_minutes += $hd_minutes;
                 if($total_minutes>0){
                     $hd_no = 1;
                 }
+            }
+
+            if($check_day==1){
+                $days++;
             }
 
             $hours = 0;
@@ -262,20 +282,6 @@ class DTRInfoServices
                 'option_id' => $option_id
             ];
             $this->update($dtr_info);
-            // $dtr[$day]['hours'] = $hours;
-            // $dtr[$day]['minutes'] = $minutes;
-            // $dtr[$day]['tardy_hr'] = $tardy_hr;
-            // $dtr[$day]['tardy_min'] = $tardy_min;
-            // $dtr[$day]['tardy_no'] = $tardy_no;
-            // $dtr[$day]['ud_hr'] = $ud_hr;
-            // $dtr[$day]['ud_min'] = $ud_min;
-            // $dtr[$day]['ud_no'] = $ud_no;
-            // $dtr[$day]['hd_hr'] = $hd_hr;
-            // $dtr[$day]['hd_min'] = $hd_min;
-            // $dtr[$day]['hd_no'] = $hd_no;
-            // $dtr[$day]['abs_hr'] = $abs_hr;
-            // $dtr[$day]['abs_min'] = $abs_min;
-            // $dtr[$day]['abs_no'] = $abs_no;
         }
         foreach($included_days as $row){
             $total_minutes = 0;
@@ -285,10 +291,18 @@ class DTRInfoServices
                     $in_from = date('H:i',strtotime($sched['in']));
                     $out_to = date('H:i',strtotime($sched['out']));
 
-                    $in_from_ = Carbon::parse($in_from)->seconds(0);
-                    $out_to_ = Carbon::parse($out_to)->seconds(0);
-
-                    $total_time_diff += $out_to_->diffInMinutes($in_from_);
+                    if($out_to>$in_from){
+                        $in_from_ = Carbon::parse($in_from)->seconds(0);
+                        $out_to_ = Carbon::parse($out_to)->seconds(0);
+                        $total_time_diff += $out_to_->diffInMinutes($in_from_);
+                    }else{
+                        $in_from_ = Carbon::parse($in_from)->seconds(0);
+                        $out_to_ = Carbon::parse('23:59')->seconds(0);
+                        $in_from_add_ = Carbon::parse('00:00')->seconds(0);
+                        $out_to_add_ = Carbon::parse($out_to)->seconds(0);
+                        $total_time_diff += $out_to_->diffInMinutes($in_from_);
+                        $total_time_diff += $out_to_add_->diffInMinutes($in_from_add_);
+                    }
                 }
             }
             $abs_minutes = $total_time_diff;
@@ -343,17 +357,25 @@ class DTRInfoServices
             ];
             $this->update($dtr_info);
         }
+        $dtr_info = [
+            'user_id' => $user_id,
+            'id_no' => $id_no,
+            'date' => date('Y-m-d',strtotime($year.'-'.$month.'-01')),
+            'updated_by' => $updated_by,
+            'option_id' => $option_id,
+            'days' => $days,
+            'holidays' => $holidays
+        ];
+        $this->total($dtr_info);
     }
 
     private function update($data){
-
         $check = UsersDTRInfo::where('user_id',$data['user_id'])
             ->where('date',$data['date'])
             ->where('option_id',$data['option_id'])
             ->first();
         if($check){
             $update = UsersDTRInfo::find($check->id);
-
         }else{
             $update = new UsersDTRInfo;
             $update->user_id = $data['user_id'];
@@ -380,5 +402,114 @@ class DTRInfoServices
         $update->earned_minutes = $data['earned_minutes'];
         $update->updated_by = $data['updated_by'];
         $update->save();
+    }
+
+    private function total($data){
+        $updated_by = $data['updated_by'];
+        $days = $data['days'];
+        $holidays = $data['holidays'];
+        $hours = 0;
+        $minutes = 0;
+        $tardy_hr = 0;
+        $tardy_min = 0;
+        $tardy_no = 0;
+        $ud_hr = 0;
+        $ud_min = 0;
+        $ud_no = 0;
+        $hd_hr = 0;
+        $hd_min = 0;
+        $hd_no = 0;
+        $abs_hr = 0;
+        $abs_min = 0;
+        $abs_no = 0;
+        $earned_hours = 0;
+        $earned_minutes = 0;
+
+        $query = UsersDTRInfo::where('user_id',$data['user_id'])
+            ->whereYear('date',date('Y',strtotime($data['date'])))
+            ->whereMonth('date',date('m',strtotime($data['date'])))
+            ->where('option_id',$data['option_id'])
+            ->get();
+        if($query->count()>0){
+            foreach($query as $row){
+                $hours += $row->hours;
+                $minutes += $row->minutes;
+                $tardy_hr += $row->tardy_hr;
+                $tardy_min += $row->tardy_min;
+                $tardy_no += $row->tardy_no;
+                $ud_hr += $row->ud_hr;
+                $ud_min += $row->ud_min;
+                $ud_no += $row->ud_no;
+                $hd_hr += $row->hd_hr;
+                $hd_min += $row->hd_min;
+                $hd_no += $row->hd_no;
+                $abs_hr += $row->abs_hr;
+                $abs_min += $row->abs_min;
+                $abs_no += $row->abs_no;
+                $earned_hours += $row->earned_hours;
+                $earned_minutes += $row->earned_minutes;
+            }
+            if($minutes>=60){
+                $hours = $hours+floor($minutes / 60);
+                $minutes = $minutes % 60;
+            }
+            if($tardy_min>=60){
+                $tardy_hr = $tardy_hr+floor($tardy_min / 60);
+                $tardy_min = $tardy_min % 60;
+            }
+            if($ud_min>=60){
+                $ud_hr = $ud_hr+floor($ud_min / 60);
+                $ud_min = $ud_min % 60;
+            }
+            if($hd_min>=60){
+                $hd_hr = $hd_hr+floor($hd_min / 60);
+                $hd_min = $hd_min % 60;
+            }
+            if($abs_min>=60){
+                $abs_hr = $abs_hr+floor($abs_min / 60);
+                $abs_min = $abs_min % 60;
+            }
+            if($earned_minutes>=60){
+                $earned_hours = $earned_hours+floor($earned_minutes / 60);
+                $earned_minutes = $earned_minutes % 60;
+            }
+        }
+
+        $check = UsersDTRInfoTotal::where('user_id',$data['user_id'])
+            ->where('date',$data['date'])
+            ->where('option_id',$data['option_id'])
+            ->first();
+        if($check){
+            $update = UsersDTRInfoTotal::find($check->id);
+        }else{
+            $update = new UsersDTRInfoTotal;
+            $update->user_id = $data['user_id'];
+            $update->id_no = $data['id_no'];
+            $update->date = $data['date'];
+            $update->option_id = $data['option_id'];
+        }
+
+        $update->hours = $hours;
+        $update->minutes = $minutes;
+        $update->tardy_hr = $tardy_hr;
+        $update->tardy_min = $tardy_min;
+        $update->tardy_no = $tardy_no;
+        $update->ud_hr = $ud_hr;
+        $update->ud_min = $ud_min;
+        $update->ud_no = $ud_no;
+        $update->hd_hr = $hd_hr;
+        $update->hd_min = $hd_min;
+        $update->hd_no = $hd_no;
+        $update->abs_hr = $abs_hr;
+        $update->abs_min = $abs_min;
+        $update->abs_no = $abs_no;
+        $update->earned_hours = $earned_hours;
+        $update->earned_minutes = $earned_minutes;
+        $update->days = $days;
+        $update->holidays = $holidays;
+        $update->updated_by = $updated_by;
+        $update->save();
+
+
     }
 }

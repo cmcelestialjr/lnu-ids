@@ -19,6 +19,7 @@ use App\Models\HRPTSY;
 use App\Models\Users;
 use App\Models\UsersDTR;
 use App\Models\UsersDTRInfo;
+use App\Models\UsersDTRInfoTotal;
 use App\Models\UsersSchedDays;
 use App\Services\DTRInfoServices;
 use App\Services\NameServices;
@@ -430,42 +431,8 @@ class PartTimeController extends Controller
         $year = $request->year;
         $month = $request->month;
         $last_date = date('Y-m-t',strtotime($year.'-'.$month.'-01'));
-        $option_id = 2;
-
-        $getDtr = UsersDTR::with('time_type_')
-            ->whereHas('user', function ($query) use ($id) {
-                $query->where('id', $id);
-            })->whereYear('date',$year)
-            ->whereMonth('date',$month)
-            ->orderBy('date','ASC')
-            ->get();
-        $getDtrNext = UsersDTR::with('time_type_')
-            ->whereHas('user', function ($query) use ($id) {
-                $query->where('id', $id);
-            })->whereDate('date',date('Y-m-d',strtotime($last_date . ' +1 day')))
-            ->orderBy('date','ASC')
-            ->first();
-        $getDtrSched = UsersSchedDays::with(['time' => function ($query) use ($id,$year,$month,$option_id) {
-                $query->where('user_id',$id)
-                ->where('option_id',$option_id)
-                ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
-                ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')))
-                ->orderBy('time_from', 'DESC');
-            }])
-            ->whereHas('time', function ($query) use ($id,$year,$month,$option_id) {
-                $query->where('user_id',$id)
-                ->where('option_id',$option_id)
-                ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
-                ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')));
-            })->get();
-        $getHolidays = Holidays::where(function ($query) use ($month) {
-                $query->whereMonth('date', $month)
-                      ->where('option', 'Yes');
-            })->orWhere(function ($query) use ($year,$month) {
-                $query->whereYear('date', $year)
-                      ->whereMonth('date', $month);
-            })->get();
-
+        $option_id = 1;
+        $holidays = 0;
         $lastDay = date('t',strtotime($year.'-'.$month.'-01'));
         $dtr = [];
         $included_days = [];
@@ -499,6 +466,46 @@ class PartTimeController extends Controller
             'abs_no' => 0,
             'sched_time' => []
         ];
+
+        $getDtr = UsersDTR::with('time_type_')
+            ->whereHas('user', function ($query) use ($id) {
+                $query->where('id', $id);
+            })->whereYear('date',$year)
+            ->whereMonth('date',$month)
+            ->orderBy('date','ASC')
+            ->get();
+        $getDtrNext = UsersDTR::with('time_type_')
+            ->whereHas('user', function ($query) use ($id) {
+                $query->where('id', $id);
+            })->whereDate('date',date('Y-m-d',strtotime($last_date . ' +1 day')))
+            ->orderBy('date','ASC')
+            ->first();
+        $getDtrInfo = UsersDTRInfo::where('user_id',$id)
+            ->whereYear('date',$year)
+            ->whereMonth('date',$month)
+            ->where('option_id',$option_id)
+            ->orderBy('date','ASC')
+            ->get();
+        $getDtrSched = UsersSchedDays::with(['time' => function ($query) use ($id,$year,$month,$option_id) {
+                $query->where('user_id',$id)
+                ->where('option_id',$option_id)
+                ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
+                ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')))
+                ->orderBy('time_from', 'DESC');
+            }])
+            ->whereHas('time', function ($query) use ($id,$year,$month,$option_id) {
+                $query->where('user_id',$id)
+                ->where('option_id',$option_id)
+                ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
+                ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')));
+            })->get();
+        $getHolidays = Holidays::where(function ($query) use ($month) {
+                $query->whereMonth('date', $month)
+                      ->where('option', 'Yes');
+            })->orWhere(function ($query) use ($year,$month) {
+                $query->whereYear('date', $year)
+                      ->whereMonth('date', $month);
+            })->get();
 
         for ($i = 1; $i <= $lastDay; $i++){
             $weekDay = date('w', strtotime($year.'-'.$month.'-'.$i));
@@ -535,6 +542,8 @@ class PartTimeController extends Controller
             $index = array_search($day, $included_days);
             if ($index !== false) {
                 unset($included_days[$index]);
+            }else{
+                $holidays++;
             }
         }
 
@@ -548,20 +557,13 @@ class PartTimeController extends Controller
             'included_days' => $included_days,
             'year' => $year,
             'month' => $month,
-            'option_id' => $option_id
+            'option_id' => $option_id,
+            'holidays' => $holidays
         ];
         $dtr_info_service->index($data_info);
 
-        $getDtrInfo = UsersDTRInfo::where('user_id',$id)
-            ->whereYear('date',$year)
-            ->whereMonth('date',$month)
-            ->where('option_id',$option_id)
-            ->orderBy('date','ASC')
-            ->get();
-
         for ($k = 0; $k < $getDtr->count(); $k++){
             $row = $getDtr[$k];
-            $row_next = ($getDtr->count()==$k+1) ? $getDtrNext : $getDtr[$k+1];
             $day = date('j', strtotime($row->date));
 
             $index = array_search($day, $included_days);
@@ -578,6 +580,7 @@ class PartTimeController extends Controller
             $time_out_am_type = $row->time_out_am_type;
             $time_in_pm_type = $row->time_in_pm_type;
             $time_out_pm_type = $row->time_out_pm_type;
+            $time_type = $row->time_type;
 
             $dtrEntry = &$dtr[$day];
 
@@ -586,7 +589,7 @@ class PartTimeController extends Controller
             $dtrEntry['out_am'] = $out_am;
             $dtrEntry['in_pm'] = $in_pm;
             $dtrEntry['out_pm'] = $out_pm;
-            $dtrEntry['time_type'] = $row->time_type;
+            $dtrEntry['time_type'] = $time_type;
             $dtrEntry['time_in_am_type'] = $time_in_am_type;
             $dtrEntry['time_out_am_type'] = $time_out_am_type;
             $dtrEntry['time_in_pm_type'] = $time_in_pm_type;
@@ -595,25 +598,51 @@ class PartTimeController extends Controller
             if($row->time_type_){
                 $dtr[$day]['time_type_name'] = $row->time_type_->name;
             }
-        }
 
-        $total_hours = 0;
-        $total_minutes = 0;
-        $total_tardy_hr = 0;
-        $total_tardy_min = 0;
-        $total_tardy_no = 0;
-        $total_ud_hr = 0;
-        $total_ud_min = 0;
-        $total_ud_no = 0;
-        $total_hd_hr = 0;
-        $total_hd_min = 0;
-        $total_hd_no = 0;
-        $total_abs_hr = 0;
-        $total_abs_min = 0;
-        $total_abs_no = 0;
-        $total_days = 0;
-        $earned_hours = 0;
-        $earned_minutes = 0;
+            foreach($dtr[$day]['sched_time'] as $sched){
+                if(strtotime($sched['in']) && strtotime($sched['out'])){
+                    $in_from = date('H:i',strtotime($sched['in']));
+                    $out_to = date('H:i',strtotime($sched['out']));
+                    if(!$time_type){
+                        if($in_from<'12:00' && $out_to>='14:01'){
+                            if(!$in_am){
+                                $dtrEntry['time_in_am_type'] = 0;
+                            }
+                            if(!$out_am){
+                                $dtrEntry['time_out_am_type'] = 0;
+                            }
+                            if(!$in_pm){
+                                $dtrEntry['time_in_pm_type'] = 0;
+                            }
+                            if(!$out_pm){
+                                $dtrEntry['time_out_pm_type'] = 0;
+                            }
+                        }elseif($in_from<'12:00' && $out_to<='14:00'){
+                            if(!$in_am){
+                                $dtrEntry['time_in_am_type'] = 0;
+                            }
+                            if(!$out_am){
+                                $dtrEntry['time_out_am_type'] = 0;
+                            }
+                        }elseif($in_from>='12:00' && $out_to>'12:00'){
+                            if(!$in_pm){
+                                $dtrEntry['time_in_pm_type'] = 0;
+                            }
+                            if(!$out_pm){
+                                $dtrEntry['time_out_pm_type'] = 0;
+                            }
+                        }elseif($in_from>='12:00' && $out_to<'12:00'){
+                            if(!$out_am){
+                                $dtrEntry['time_out_am_type'] = 0;
+                            }
+                            if(!$out_pm){
+                                $dtrEntry['time_out_pm_type'] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         foreach ($getDtrInfo as $row){
             $day = date('j',strtotime($row->date));
@@ -631,56 +660,23 @@ class PartTimeController extends Controller
             $dtr[$day]['abs_hr'] = $row->abs_hr;
             $dtr[$day]['abs_min'] = $row->abs_min;
             $dtr[$day]['abs_no'] = $row->abs_no;
-            $dtr[$day]['days'] = $row->days;
             $dtr[$day]['earned_hours'] = $row->earned_hours;
             $dtr[$day]['earned_minutes'] = $row->earned_minutes;
-
-            $total_hours += $row->hours;
-            $total_minutes += $row->minutes;
-            $total_tardy_hr += $row->tardy_hr;
-            $total_tardy_min += $row->tardy_min;
-            $total_tardy_no += $row->tardy_no;
-            $total_ud_hr += $row->ud_hr;
-            $total_ud_min += $row->ud_min;
-            $total_ud_no += $row->ud_no;
-            $total_hd_hr += $row->hd_hr;
-            $total_hd_min += $row->hd_min;
-            $total_hd_no += $row->hd_no;
-            $total_abs_hr += $row->abs_hr;
-            $total_abs_min += $row->abs_min;
-            $total_abs_no += $row->abs_no;
-            $total_days += $row->days;
-            $earned_hours += $row->earned_hours;
-            $earned_minutes += $row->earned_minutes;
         }
 
-        $dtrTotal = [
-            'total_hours' => $total_hours,
-            'total_minutes' => $total_minutes,
-            'total_tardy_hr' => $total_tardy_hr,
-            'total_tardy_min' => $total_tardy_min,
-            'total_tardy_no' => $total_tardy_no,
-            'total_ud_hr' => $total_ud_hr,
-            'total_ud_min' => $total_ud_min,
-            'total_ud_no' => $total_ud_no,
-            'total_hd_hr' => $total_hd_hr,
-            'total_hd_min' => $total_hd_min,
-            'total_hd_no' => $total_hd_no,
-            'total_abs_hr' => $total_abs_hr,
-            'total_abs_min' => $total_abs_min,
-            'total_abs_no' => $total_abs_no,
-            'total_days' => $total_days,
-            'earned_hours' => $earned_hours,
-            'earned_minutes' => $earned_minutes
-        ];
+        $getDtrInfoTotal = UsersDTRInfoTotal::where('user_id',$id)
+            ->whereYear('date',$year)
+            ->whereMonth('date',$month)
+            ->where('option_id',$option_id)
+            ->first();
 
         $data = [
             'dtr' => $dtr,
+            'dtrTotal' => $getDtrInfoTotal,
             'year' => $year,
             'month' => $month,
             'lastDay' => $lastDay,
-            'current_url' => 'monitoring',
-            'dtrTotal' => $dtrTotal
+            'current_url' => 'monitoring'
 
         ];
         return view('hrims/payroll/monitoring/partTimeViewDtr',$data);

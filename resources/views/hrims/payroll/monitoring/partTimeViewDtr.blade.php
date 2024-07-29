@@ -272,12 +272,36 @@
                 @endfor
             </body>
             <tfoot>
-                <tr>
-                    <td colspan="5">TOTAL</td>
-                    @foreach($dtrTotal as $row)
-                        <td>{{$row}}</td>
-                    @endforeach
-                </tr>
+                @if($dtrTotal)
+                    <tr>
+                        <th colspan="5">TOTAL</th>
+                        @foreach (['hours',
+                                    'minutes',
+                                    'tardy_hr',
+                                    'tardy_min',
+                                    'tardy_no',
+                                    'ud_hr',
+                                    'ud_min',
+                                    'ud_no',
+                                    'hd_hr',
+                                    'hd_min',
+                                    'hd_no',
+                                    'abs_hr',
+                                    'abs_min',
+                                    'abs_no']
+                                    as $field)
+                            <th>{{ $dtrTotal->$field <= 0 ? '' : $dtrTotal->$field }}</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <th colspan="5">
+                            No. of Days Present: {{$dtrTotal->days}}
+                        </th>
+                        <th colspan="14">
+                            Earned Hours.Minutes: {{$dtrTotal->earned_hours}}.{{$dtrTotal->earned_minutes}}
+                        </th>
+                    </tr>
+                @endif
             </tfoot>
         </table>
     </div>
