@@ -17,6 +17,7 @@ class DTRInfoServices
         $getDtrNext = $data['getDtrNext'];
         $year = $data['year'];
         $month = $data['month'];
+        $option_id = $data['option_id'];
 
         $user = Auth::user();
         $updated_by = $user->id;
@@ -206,11 +207,11 @@ class DTRInfoServices
                 $hours = floor($total_minutes / 60);
                 $minutes = $total_minutes % 60;
             }
-            $get_total_hours = 0;
-            $get_total_minutes = $total_time_diff-$total_minutes;
-            if($get_total_minutes>=60){
-                $get_total_hours = floor($get_total_minutes / 60);
-                $get_total_minutes = $get_total_minutes % 60;
+            $earned_hours = 0;
+            $earned_minutes = $total_time_diff-$total_minutes;
+            if($earned_minutes>=60){
+                $earned_hours = floor($earned_minutes / 60);
+                $earned_minutes = $earned_minutes % 60;
             }
             $tardy_hr = 0;
             $tardy_min = $tardy_minutes;
@@ -255,9 +256,10 @@ class DTRInfoServices
                 'abs_hr' => $abs_hr,
                 'abs_min' => $abs_min,
                 'abs_no' => $abs_no,
-                'total_hours' => $get_total_hours,
-                'total_minutes' => $get_total_minutes,
-                'updated_by' => $updated_by
+                'earned_hours' => $earned_hours,
+                'earned_minutes' => $earned_minutes,
+                'updated_by' => $updated_by,
+                'option_id' => $option_id
             ];
             $this->update($dtr_info);
             // $dtr[$day]['hours'] = $hours;
@@ -298,11 +300,11 @@ class DTRInfoServices
                 $hours = floor($total_minutes / 60);
                 $minutes = $total_minutes % 60;
             }
-            $get_total_hours = 0;
-            $get_total_minutes = $total_time_diff-$total_minutes;
-            if($get_total_minutes>=60){
-                $get_total_hours = floor($get_total_minutes / 60);
-                $get_total_minutes = $get_total_minutes % 60;
+            $earned_hours = 0;
+            $earned_minutes = $total_time_diff-$total_minutes;
+            if($earned_minutes>=60){
+                $earned_hours = floor($earned_minutes / 60);
+                $earned_minutes = $earned_minutes % 60;
             }
             $abs_hr = 0;
             $abs_min = $abs_minutes;
@@ -334,9 +336,10 @@ class DTRInfoServices
                 'abs_hr' => $abs_hr,
                 'abs_min' => $abs_min,
                 'abs_no' => $abs_no,
-                'total_hours' => $get_total_hours,
-                'total_minutes' => $get_total_minutes,
-                'updated_by' => $updated_by
+                'earned_hours' => $earned_hours,
+                'earned_minutes' => $earned_minutes,
+                'updated_by' => $updated_by,
+                'option_id' => $option_id
             ];
             $this->update($dtr_info);
         }
@@ -346,7 +349,7 @@ class DTRInfoServices
 
         $check = UsersDTRInfo::where('user_id',$data['user_id'])
             ->where('date',$data['date'])
-            ->where('option_id',2)
+            ->where('option_id',$data['option_id'])
             ->first();
         if($check){
             $update = UsersDTRInfo::find($check->id);
@@ -356,8 +359,9 @@ class DTRInfoServices
             $update->user_id = $data['user_id'];
             $update->id_no = $data['id_no'];
             $update->date = $data['date'];
-            $update->option_id = 2;
+            $update->option_id = $data['option_id'];
         }
+
         $update->hours = $data['hours'];
         $update->minutes = $data['minutes'];
         $update->tardy_hr = $data['tardy_hr'];
@@ -372,8 +376,8 @@ class DTRInfoServices
         $update->abs_hr = $data['abs_hr'];
         $update->abs_min = $data['abs_min'];
         $update->abs_no = $data['abs_no'];
-        $update->total_hours = $data['total_hours'];
-        $update->total_minutes = $data['total_minutes'];
+        $update->earned_hours = $data['earned_hours'];
+        $update->earned_minutes = $data['earned_minutes'];
         $update->updated_by = $data['updated_by'];
         $update->save();
     }

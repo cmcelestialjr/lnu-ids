@@ -271,6 +271,14 @@
                     </tr>
                 @endfor
             </body>
+            <tfoot>
+                <tr>
+                    <td colspan="5">TOTAL</td>
+                    @foreach($dtrTotal as $row)
+                        <td>{{$row}}</td>
+                    @endforeach
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>
