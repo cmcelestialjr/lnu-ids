@@ -20,6 +20,7 @@ use App\Models\Users;
 use App\Models\UsersDTR;
 use App\Models\UsersDTRInfo;
 use App\Models\UsersSchedDays;
+use App\Services\DTRInfoServices;
 use App\Services\NameServices;
 use Carbon\Carbon;
 use DateTime;
@@ -528,6 +529,14 @@ class PartTimeController extends Controller
                 unset($included_days[$index]);
             }
         }
+
+        $dtr_info_service = new DTRInfoServices;
+        $data_info = ['dtr' => $dtr,
+                    'getDtr' => $getDtr,
+                    'included_days' => $included_days
+            ];
+        $dtr_info_service->update($data_info);
+
         for ($k = 0; $k < $getDtr->count(); $k++){
             $row = $getDtr[$k];
             $row_next = ($getDtr->count()==$k+1) ? $getDtrNext : $getDtr[$k+1];
@@ -823,7 +832,10 @@ class PartTimeController extends Controller
             $dtr[$day]['abs_hr'] = $row->abs_hr;
             $dtr[$day]['abs_min'] = $row->abs_min;
             $dtr[$day]['abs_no'] = $row->abs_no;
+
         }
+
+
 
         $data = [
             'dtr' => $dtr,
