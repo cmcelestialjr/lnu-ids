@@ -66,7 +66,7 @@
                             @endif
                         @else
                             @php
-                                $colspans = ['in_am' => 1, 'out_am' => 1, 'in_pm' => 1, 'out_pm', 1];
+                                $colspans = ['in_am' => 1, 'out_am' => 1, 'in_pm' => 1, 'out_pm' => 1];
                                 $include = [1,2,3,4];
                                 if($dtrEntry['time_type']>0){
                                     if($dtrEntry['time_in_am_type']==$dtrEntry['time_out_am_type'] &&

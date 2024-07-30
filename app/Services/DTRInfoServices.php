@@ -455,9 +455,9 @@ class DTRInfoServices
         $earned_hours = 0;
         $earned_minutes = 0;
 
-        // if($data['days']>=22){
-        //     $days = 22;
-        // }
+        if($data['days']>=22){
+            $days = 22;
+        }
 
         $query = UsersDTRInfo::where('user_id',$data['user_id'])
             ->whereYear('date',date('Y',strtotime($data['date'])))

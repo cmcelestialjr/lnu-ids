@@ -484,6 +484,20 @@ class PartTimeController extends Controller
             ->whereMonth('date',$month)
             ->orderBy('date','ASC')
             ->get();
+
+        if($getDtr->count()<=0){
+            $data = [
+                'dtr' => $dtr,
+                'dtrTotal' => NULL,
+                'year' => $year,
+                'month' => $month,
+                'lastDay' => $lastDay,
+                'current_url' => 'monitoring'
+
+            ];
+            return view('hrims/payroll/monitoring/partTimeViewDtr',$data);
+        }
+        //dd($getDtr->count());
         $getDtrNext = UsersDTR::with('time_type_')
             ->whereHas('user', function ($query) use ($id) {
                 $query->where('id', $id);
