@@ -38,9 +38,17 @@
                         </select>
                       </div>
                       <div class="col-lg-1 center">
+                        <label>Option</label>
+                      </div>
+                      <div class="col-lg-2">
+                            <select class="form-control select2-default" name="option" id="select-individual-option">
+
+                            </select>
+                      </div>
+                      <div class="col-lg-1 center">
                         <label>Range</label>
                       </div>
-                      <div class="col-lg-3">
+                      <div class="col-lg-2">
                         <div class="input-group mb-3">
                             <select class="form-control" name="range">
                                 <option value="1">Whole Month</option>

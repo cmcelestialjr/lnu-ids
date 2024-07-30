@@ -141,8 +141,10 @@ table td{
                         @elseif($dtrEntry['holiday']!='')
                             <td colspan="4"><span class="text-primary">{{$dtrEntry['holiday']}}</span></td>
                         @else
-                            <td colspan="4">Vacant</td>
+                            <td colspan="4">-------------------</td>
                         @endif
+                    @elseif($dtrEntry['check']=='---')
+                        <td colspan="4">-------------------</td>
                     @else
                         @php
                             $colspans = ['in_am' => 1, 'out_am' => 1, 'in_pm' => 1, 'out_pm' => 1];

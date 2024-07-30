@@ -35,11 +35,9 @@
             <div class="col-lg-3">
                 <label>Option</label>
                 <select class="form-control select2-default" name="option" id="select-individual-option">
-                    @foreach($option_list as $row)
-                        <option value="{{$row->id}}">{{$row->name}}</option>
-                    @endforeach
+
                 </select>
-              </div>
+            </div>
             <div class="col-lg-3">
               <label>Range</label>
               <div class="input-group mb-3">

@@ -1,6 +1,9 @@
-dtr_option();
+dtr_option(0);
 $(document).off('click', '#dtrDiv button[name="submit"]').on('click', '#dtrDiv button[name="submit"]', function (e) {
     dtr_table();
+});
+$(document).off('change', '#select-individual-year, #select-individual-month').on('change', '#select-individual-year, #select-individual-month', function (e) {
+    dtr_option(1);
 });
 $(document).off('click', '.dtrInput').on('click', '.dtrInput', function (e) {
     var thisBtn = $(this);
@@ -83,7 +86,7 @@ $(document).off('click', '#dtrInputModal #dtrInputTable .change_vacant').on('cli
 
     }
 });
-function dtr_option(){
+function dtr_option(from){
     var thisBtn = $('#dtrDiv button');
     var year = $('#dtrDiv select[name="year"] option:selected').val();
     var month = $('#dtrDiv select[name="month"] option:selected').val();
@@ -113,7 +116,9 @@ function dtr_option(){
                     $('#select-individual-option').append('<option value="' + option.id + '">' + option.name + '</option>');
                 });
                 $('#select-individual-option').select2();
-                dtr_table();
+                if(from==0){
+                    dtr_table();
+                }
             }else{
                 toastr.error(data.result);
             }

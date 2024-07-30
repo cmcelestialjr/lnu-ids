@@ -726,6 +726,7 @@ Route::group(['middleware' => ['HTTPS']], function(){
 
                     Route::get('/pdf/{year}/{month}/{id_no}/{range}/{option}', 'HRIMS\DTR\PDFController@PDF');
                     Route::post('/individual', 'HRIMS\DTR\IndividualController@individual');
+                    Route::post('/individualOption', 'HRIMS\DTR\IndividualController@individualOption');
                     Route::post('/dtrInputModal', 'HRIMS\DTR\IndividualController@dtrInputModal');
                     Route::post('/dtrInputTable', 'HRIMS\DTR\IndividualController@dtrInputTable');
                     Route::post('/dtrInputSubmit', 'HRIMS\DTR\IndividualController@dtrInputSubmit');

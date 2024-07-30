@@ -65,7 +65,7 @@ class IndividualController extends Controller
                 ->where('role_id',3)
                 ->first();
             $id = $user->id;
-            $option_id = 1;
+            $option_id = $request->option;
             $last_date = date('Y-m-t',strtotime($year.'-'.$month.'-01'));
             $holidays = 0;
             $lastDay = date('t',strtotime($year.'-'.$month.'-01'));
@@ -171,85 +171,94 @@ class IndividualController extends Controller
                 'year' => $year,
                 'month' => $month,
                 'option_id' => $option_id,
-                'holidays' => $holidays
+                'holidays' => $holidays,
+                'range' => $range
             ];
             $dtr_info_service->index($data_info);
 
             for ($k = 0; $k < $getDtr->count(); $k++){
                 $row = $getDtr[$k];
                 $day = date('j', strtotime($row->date));
+                $include = 'yes';
 
-                $index = array_search($day, $included_days);
-                if ($index !== false) {
-                    unset($included_days[$index]);
+                if($range==2 && $k>15){
+                    $dtrEntry['check'] = '---';
+                    $include = 'no';
                 }
 
-                $in_am = (strtotime($row->time_in_am)) ? date('h:ia',strtotime($row->time_in_am)) : NULL;
-                $out_am = (strtotime($row->time_out_am)) ? date('h:ia',strtotime($row->time_out_am)) : NULL;
-                $in_pm = (strtotime($row->time_in_pm)) ? date('h:ia',strtotime($row->time_in_pm)) : NULL;
-                $out_pm = (strtotime($row->time_out_pm)) ? date('h:ia',strtotime($row->time_out_pm)) : NULL;
+                if($include=='yes'){
+                    $index = array_search($day, $included_days);
+                    if ($index !== false) {
+                        unset($included_days[$index]);
+                    }
 
-                $time_in_am_type = $row->time_in_am_type;
-                $time_out_am_type = $row->time_out_am_type;
-                $time_in_pm_type = $row->time_in_pm_type;
-                $time_out_pm_type = $row->time_out_pm_type;
-                $time_type = $row->time_type;
+                    $in_am = (strtotime($row->time_in_am)) ? date('h:ia',strtotime($row->time_in_am)) : NULL;
+                    $out_am = (strtotime($row->time_out_am)) ? date('h:ia',strtotime($row->time_out_am)) : NULL;
+                    $in_pm = (strtotime($row->time_in_pm)) ? date('h:ia',strtotime($row->time_in_pm)) : NULL;
+                    $out_pm = (strtotime($row->time_out_pm)) ? date('h:ia',strtotime($row->time_out_pm)) : NULL;
 
-                $dtrEntry = &$dtr[$day];
+                    $time_in_am_type = $row->time_in_am_type;
+                    $time_out_am_type = $row->time_out_am_type;
+                    $time_in_pm_type = $row->time_in_pm_type;
+                    $time_out_pm_type = $row->time_out_pm_type;
+                    $time_type = $row->time_type;
 
-                $dtrEntry['check'] = 'time';
-                $dtrEntry['in_am'] = $in_am;
-                $dtrEntry['out_am'] = $out_am;
-                $dtrEntry['in_pm'] = $in_pm;
-                $dtrEntry['out_pm'] = $out_pm;
-                $dtrEntry['time_type'] = $time_type;
-                $dtrEntry['time_in_am_type'] = $time_in_am_type;
-                $dtrEntry['time_out_am_type'] = $time_out_am_type;
-                $dtrEntry['time_in_pm_type'] = $time_in_pm_type;
-                $dtrEntry['time_out_pm_type'] = $time_out_pm_type;
+                    $dtrEntry = &$dtr[$day];
 
-                if($row->time_type_){
-                    $dtr[$day]['time_type_name'] = $row->time_type_->name;
-                }
+                    $dtrEntry['check'] = 'time';
+                    $dtrEntry['in_am'] = $in_am;
+                    $dtrEntry['out_am'] = $out_am;
+                    $dtrEntry['in_pm'] = $in_pm;
+                    $dtrEntry['out_pm'] = $out_pm;
+                    $dtrEntry['time_type'] = $time_type;
+                    $dtrEntry['time_in_am_type'] = $time_in_am_type;
+                    $dtrEntry['time_out_am_type'] = $time_out_am_type;
+                    $dtrEntry['time_in_pm_type'] = $time_in_pm_type;
+                    $dtrEntry['time_out_pm_type'] = $time_out_pm_type;
 
-                foreach($dtr[$day]['sched_time'] as $sched){
-                    if(strtotime($sched['in']) && strtotime($sched['out'])){
-                        $in_from = date('H:i',strtotime($sched['in']));
-                        $out_to = date('H:i',strtotime($sched['out']));
-                        if(!$time_type){
-                            if($in_from<'12:00' && $out_to>='14:01'){
-                                if(!$in_am){
-                                    $dtrEntry['time_in_am_type'] = 0;
-                                }
-                                if(!$out_am){
-                                    $dtrEntry['time_out_am_type'] = 0;
-                                }
-                                if(!$in_pm){
-                                    $dtrEntry['time_in_pm_type'] = 0;
-                                }
-                                if(!$out_pm){
-                                    $dtrEntry['time_out_pm_type'] = 0;
-                                }
-                            }elseif($in_from<'12:00' && $out_to<='14:00'){
-                                if(!$in_am){
-                                    $dtrEntry['time_in_am_type'] = 0;
-                                }
-                                if(!$out_am){
-                                    $dtrEntry['time_out_am_type'] = 0;
-                                }
-                            }elseif($in_from>='12:00' && $out_to>'12:00'){
-                                if(!$in_pm){
-                                    $dtrEntry['time_in_pm_type'] = 0;
-                                }
-                                if(!$out_pm){
-                                    $dtrEntry['time_out_pm_type'] = 0;
-                                }
-                            }elseif($in_from>='12:00' && $out_to<'12:00'){
-                                if(!$out_am){
-                                    $dtrEntry['time_out_am_type'] = 0;
-                                }
-                                if(!$out_pm){
-                                    $dtrEntry['time_out_pm_type'] = 0;
+                    if($row->time_type_){
+                        $dtr[$day]['time_type_name'] = $row->time_type_->name;
+                    }
+
+                    foreach($dtr[$day]['sched_time'] as $sched){
+                        if(strtotime($sched['in']) && strtotime($sched['out'])){
+                            $in_from = date('H:i',strtotime($sched['in']));
+                            $out_to = date('H:i',strtotime($sched['out']));
+                            if(!$time_type){
+                                if($in_from<'12:00' && $out_to>='14:01'){
+                                    if(!$in_am){
+                                        $dtrEntry['time_in_am_type'] = 0;
+                                    }
+                                    if(!$out_am){
+                                        $dtrEntry['time_out_am_type'] = 0;
+                                    }
+                                    if(!$in_pm){
+                                        $dtrEntry['time_in_pm_type'] = 0;
+                                    }
+                                    if(!$out_pm){
+                                        $dtrEntry['time_out_pm_type'] = 0;
+                                    }
+                                }elseif($in_from<'12:00' && $out_to<='14:00'){
+                                    if(!$in_am){
+                                        $dtrEntry['time_in_am_type'] = 0;
+                                    }
+                                    if(!$out_am){
+                                        $dtrEntry['time_out_am_type'] = 0;
+                                    }
+                                }elseif($in_from>='12:00' && $out_to>'12:00'){
+                                    if(!$in_pm){
+                                        $dtrEntry['time_in_pm_type'] = 0;
+                                    }
+                                    if(!$out_pm){
+                                        $dtrEntry['time_out_pm_type'] = 0;
+                                    }
+                                }elseif($in_from>='12:00' && $out_to<'12:00'){
+                                    if(!$out_am){
+                                        $dtrEntry['time_out_am_type'] = 0;
+                                    }
+                                    if(!$out_pm){
+                                        $dtrEntry['time_out_pm_type'] = 0;
+                                    }
                                 }
                             }
                         }
@@ -301,6 +310,37 @@ class IndividualController extends Controller
         }else{
             return $result;
         }
+    }
+    public function individualOption(Request $request)
+    {
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $id_no = $user->id_no;
+        $id_no_req = $request->id_no;
+        $year = $request->year;
+        $month = $request->month;
+        $url = explode('/',url()->previous());
+        $current_url = $url[5];
+        if($current_url=='dtr' && ($user_access_level==1 || $user_access_level==2)){
+            $id_no = $id_no_req;
+        }
+        $user = Users::where('id_no',$id_no)->first();
+        $user_id = $user->id;
+        $options = UsersSchedTimeOption::whereHas('sched_time', function ($query) use ($year,$month,$user_id) {
+                $query->where('user_id',$user_id);
+                // $query->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')));
+                // $query->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')));
+
+                $query->whereYear('date_from','<=',$year);
+                $query->whereYear('date_to','>=',$year);
+                $query->whereMonth('date_from','<=',$month);
+                $query->whereMonth('date_to','>=',$month);
+            })->get();
+        $response = [
+            'result' => 'success',
+            'options' => $options
+        ];
+        return response()->json($response);
     }
     public function individualOld(Request $request,Users $users,
         _Work $_work, UsersDTR $usersDtr, Holidays $_holidays,
@@ -897,8 +937,7 @@ class IndividualController extends Controller
                 }
             }
         }
-        $response = array('result' => $result
-                        );
+        $response = ['result' => $result];
         return response()->json($response);
     }
     public function dtrInputDurationSubmit(Request $request){
@@ -1013,10 +1052,10 @@ class IndividualController extends Controller
             $day = UsersSchedDays::where('user_id',$user_id)
                 ->where('day',$weekDay)
                 ->whereHas('time', function ($query) use ($year,$month) {
-                    $query->whereYear('date_from','>=',$year);
-                    $query->whereYear('date_to','<=',$year);
-                    $query->whereMonth('date_from','>=',$month);
-                    $query->whereMonth('date_to','<=',$month);
+                    $query->whereYear('date_from','<=',$year);
+                    $query->whereYear('date_to','>=',$year);
+                    $query->whereMonth('date_from','<=',$month);
+                    $query->whereMonth('date_to','>=',$month);
                 })
                 ->first();
             if($day!=NULL){
