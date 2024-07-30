@@ -370,30 +370,34 @@ class DTRInfoServices
     }
     public function removeDuplicate($data)
     {
-        $user_id = $data['user_id'];
+        $id_no = $data['id_no'];
         $year = $data['year'];
         $month = $data['month'];
 
-        $duplicateIds = UsersDTR::select('id')
-            ->whereHas('user', function ($query) use ($user_id) {
-                $query->where('id', $user_id);
-            })
+        $duplicateDate = UsersDTR::select('date')
+            ->where('id_no', $id_no)
             ->whereYear('date', $year)
             ->whereMonth('date', $month)
-            ->groupBy('date', 'id')
+            ->groupBy('date')
             ->havingRaw('COUNT(*) > 1')
+            ->pluck('date');
+
+        if ($duplicateDate->isNotEmpty()) {
+            $latestIds = UsersDTR::whereIn('id', function ($query) use ($duplicateDate, $id_no) {
+                $query->select(DB::raw('MAX(id) as id'))
+                    ->from('users_dtr')
+                    ->whereIn('date', $duplicateDate)
+                    ->where('id_no',$id_no)
+                    ->groupBy('date')
+                    ->havingRaw('COUNT(*) > 1');
+            })
             ->pluck('id');
-        $latestIds = UsersDTR::whereIn('id', $duplicateIds)
-            ->orderBy('date', 'desc')
-            ->groupBy('date', 'id')
-            ->pluck(DB::raw('MAX(id)'));
-        UsersDTR::whereHas('user', function ($query) use ($user_id) {
-            $query->where('id', $user_id);
-        })
-        ->whereYear('date', $year)
-        ->whereMonth('date', $month)
-        ->whereNotIn('id', $latestIds)
-        ->delete();
+            UsersDTR::where('id_no',$id_no)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->whereIn('id', $latestIds)
+            ->delete();
+        }
     }
     private function update($data){
         $check = UsersDTRInfo::where('user_id',$data['user_id'])

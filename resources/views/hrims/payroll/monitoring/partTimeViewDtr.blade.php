@@ -62,7 +62,7 @@
                             @elseif($dtrEntry['holiday']!='')
                                 <td colspan="4"><span class="text-primary">{{$dtrEntry['holiday']}}</span></td>
                             @else
-                                <td colspan="4"></td>
+                                <td colspan="4">Vacant</td>
                             @endif
                         @else
                             @php

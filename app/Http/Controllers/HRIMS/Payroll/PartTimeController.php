@@ -431,8 +431,9 @@ class PartTimeController extends Controller
         $dtr_info_service = new DTRInfoServices;
         $year = $request->year;
         $month = $request->month;
+        $id_no = $check_user->id_no;
         $last_date = date('Y-m-t',strtotime($year.'-'.$month.'-01'));
-        $option_id = 1;
+        $option_id = 2;
         $holidays = 0;
         $lastDay = date('t',strtotime($year.'-'.$month.'-01'));
         $dtr = [];
@@ -469,7 +470,7 @@ class PartTimeController extends Controller
         ];
 
         $data_info = [
-            'user_id' => $id,
+            'id_no' => $id_no,
             'year' => $year,
             'month' => $month
         ];
@@ -559,7 +560,7 @@ class PartTimeController extends Controller
 
         $data_info = [
             'user_id' => $id,
-            'id_no' => $check_user->id_no,
+            'id_no' => $id_no,
             'dtr' => $dtr,
             'getDtr' => $getDtr,
             'getDtrNext' => $getDtrNext,
