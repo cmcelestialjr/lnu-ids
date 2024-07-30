@@ -1,10 +1,12 @@
 <?php
 namespace App\Services;
 
+use App\Models\UsersDTR;
 use App\Models\UsersDTRInfo;
 use App\Models\UsersDTRInfoTotal;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DTRInfoServices
 {
@@ -202,8 +204,6 @@ class DTRInfoServices
                 }
             }
 
-
-
             if($row->time_type==1){
                 $abs_minutes = $total_time_diff;
                 $total_minutes += $abs_minutes;
@@ -368,7 +368,33 @@ class DTRInfoServices
         ];
         $this->total($dtr_info);
     }
+    public function removeDuplicate($data)
+    {
+        $user_id = $data['user_id'];
+        $year = $data['year'];
+        $month = $data['month'];
 
+        $duplicateIds = UsersDTR::select('id')
+            ->whereHas('user', function ($query) use ($user_id) {
+                $query->where('id', $user_id);
+            })
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->groupBy('date', 'id')
+            ->havingRaw('COUNT(*) > 1')
+            ->pluck('id');
+        $latestIds = UsersDTR::whereIn('id', $duplicateIds)
+            ->orderBy('date', 'desc')
+            ->groupBy('date', 'id')
+            ->pluck(DB::raw('MAX(id)'));
+        UsersDTR::whereHas('user', function ($query) use ($user_id) {
+            $query->where('id', $user_id);
+        })
+        ->whereYear('date', $year)
+        ->whereMonth('date', $month)
+        ->whereNotIn('id', $latestIds)
+        ->delete();
+    }
     private function update($data){
         $check = UsersDTRInfo::where('user_id',$data['user_id'])
             ->where('date',$data['date'])
@@ -424,6 +450,10 @@ class DTRInfoServices
         $abs_no = 0;
         $earned_hours = 0;
         $earned_minutes = 0;
+
+        // if($data['days']>=22){
+        //     $days = 22;
+        // }
 
         $query = UsersDTRInfo::where('user_id',$data['user_id'])
             ->whereYear('date',date('Y',strtotime($data['date'])))

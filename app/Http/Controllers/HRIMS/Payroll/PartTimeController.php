@@ -428,6 +428,7 @@ class PartTimeController extends Controller
             return view('layouts/error/404');
         }
 
+        $dtr_info_service = new DTRInfoServices;
         $year = $request->year;
         $month = $request->month;
         $last_date = date('Y-m-t',strtotime($year.'-'.$month.'-01'));
@@ -466,6 +467,14 @@ class PartTimeController extends Controller
             'abs_no' => 0,
             'sched_time' => []
         ];
+
+        $data_info = [
+            'user_id' => $id,
+            'year' => $year,
+            'month' => $month
+        ];
+        $dtr_info_service->removeDuplicate($data_info);
+
 
         $getDtr = UsersDTR::with('time_type_')
             ->whereHas('user', function ($query) use ($id) {
@@ -547,7 +556,7 @@ class PartTimeController extends Controller
             }
         }
 
-        $dtr_info_service = new DTRInfoServices;
+
         $data_info = [
             'user_id' => $id,
             'id_no' => $check_user->id_no,
