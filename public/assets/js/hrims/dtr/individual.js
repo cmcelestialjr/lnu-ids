@@ -1,4 +1,4 @@
-dtr_table();
+dtr_option();
 $(document).off('click', '#dtrDiv button[name="submit"]').on('click', '#dtrDiv button[name="submit"]', function (e) {
     dtr_table();
 });
@@ -83,16 +83,59 @@ $(document).off('click', '#dtrInputModal #dtrInputTable .change_vacant').on('cli
 
     }
 });
+function dtr_option(){
+    var thisBtn = $('#dtrDiv button');
+    var year = $('#dtrDiv select[name="year"] option:selected').val();
+    var month = $('#dtrDiv select[name="month"] option:selected').val();
+    var id_no = $('#dtrDiv input[name="id_no"]').val();
+    var form_data = {
+        year:year,
+        month:month,
+        id_no:id_no,
+    };
+    $.ajax({
+        url: base_url+'/hrims/dtr/individualOption',
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        data:form_data,
+        cache: false,
+        dataType: 'json',
+        beforeSend: function() {
+            thisBtn.attr('disabled','disabled');
+        },
+        success : function(data){
+            thisBtn.removeAttr('disabled');
+            if(data.result=='success'){
+                $('#select-individual-option').empty();
+                $.each(data.options, function(index, option) {
+                    $('#select-individual-option').append('<option value="' + option.id + '">' + option.name + '</option>');
+                });
+                $('#select-individual-option').select2();
+                dtr_table();
+            }else{
+                toastr.error(data.result);
+            }
+        },
+        error: function (){
+            toastr.error('Error!');
+            thisBtn.removeAttr('disabled');
+        }
+    });
+}
 function dtr_table(){
     var thisBtn = $('#dtrDiv button');
     var year = $('#dtrDiv select[name="year"] option:selected').val();
     var month = $('#dtrDiv select[name="month"] option:selected').val();
+    var option = $('#dtrDiv select[name="option"] option:selected').val();
     var range = $('#dtrDiv select[name="range"] option:selected').val();
     var id_no = $('#dtrDiv input[name="id_no"]').val();
     var dtr_type = $('#dtrDiv input[name="dtr_type"]').val();
     var form_data = {
         year:year,
         month:month,
+        option:option,
         range:range,
         id_no:id_no,
         dtr_type:dtr_type
