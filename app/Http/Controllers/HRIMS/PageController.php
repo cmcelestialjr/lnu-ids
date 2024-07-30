@@ -28,6 +28,7 @@ use App\Models\Status;
 use App\Models\Users;
 use App\Models\UsersDTR;
 use App\Models\UsersRole;
+use App\Models\UsersSchedTimeOption;
 use App\Services\NameServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -339,7 +340,9 @@ class PageController extends Controller
     //my
     public function mydtr($data){
         $user = Auth::user();
+        $option_list = UsersSchedTimeOption::get();
         $data['id_no'] = $user->id_no;
+        $data['option_list'] = $option_list;
         return view($this->page.'/dtr/individual',$data);
     }
     public function mypayslip($data){

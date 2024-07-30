@@ -40,15 +40,17 @@
                       <div class="col-lg-1 center">
                         <label>Range</label>
                       </div>
-                      <div class="col-lg-2">
-                        <select class="form-control select2" name="range">
-                          <option value="1">Whole Month</option>
-                          <option value="2">Half Month (1-15)</option>
-                        </select>
-                      </div>
-                      <div class="col-lg-1">
-                        <button type="button" class="btn btn-info btn-info-scan" name="submit">
-                          <span class="fa fa-check"></span></button>
+                      <div class="col-lg-3">
+                        <div class="input-group mb-3">
+                            <select class="form-control" name="range">
+                                <option value="1">Whole Month</option>
+                                <option value="2">Half Month (1-15)</option>
+                            </select>
+                            <div class="input-group-prepend">
+                              <button type="button" class="btn btn-info btn-info-scan" name="submit">
+                                <span class="fa fa-check"></span></button>
+                            </div>
+                          </div>
                       </div>
                       <div class="col-lg-12">
                         <div class="card card-info card-outline">

@@ -11,9 +11,13 @@ use App\Models\EducOfferedScheduleDay;
 use App\Models\Holidays;
 use App\Models\Users;
 use App\Models\UsersDTR;
+use App\Models\UsersDTRInfo;
+use App\Models\UsersDTRInfoTotal;
 use App\Models\UsersRoleList;
 use App\Models\UsersSchedDays;
 use App\Models\UsersSchedTime;
+use App\Models\UsersSchedTimeOption;
+use App\Services\DTRInfoServices;
 use App\Services\NameServices;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -25,7 +29,280 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class IndividualController extends Controller
 {
-    public function individual(Request $request,Users $users,
+    public function individual(Request $request){
+        $user_access_level = $request->session()->get('user_access_level');
+        $user = Auth::user();
+        $id_no = $user->id_no;
+        $id_no_req = $request->id_no;
+        $year = $request->year;
+        $month = $request->month;
+        $range = $request->range;
+        $dtr_type = $request->dtr_type;
+        $url = explode('/',url()->previous());
+        $current_url = $url[5];
+        $result = 'error';
+        if($current_url=='dtr' && ($user_access_level==1 || $user_access_level==2)){
+            $id_no = $id_no_req;
+        }
+        $link = DTRlogs::select('id_no')
+            ->where('link',0)
+            ->groupBy('id_no')->get();
+        if($link->count()>0){
+            foreach($link as $row){
+                $this->updateDtrIndividual($row->id_no,$year,$month);
+            }
+        }
+        $check = UsersDTR::where('id_no',$id_no)
+            ->whereYear('date',$year)
+            ->whereMonth('date',$month)->first();
+        if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req) && $check!=NULL){
+            $result = 'success';
+            $dtr_info_service = new DTRInfoServices;
+            $name_services = new NameServices;
+            $user = Users::where('id_no',$id_no)->first();
+            $name = mb_strtoupper($name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname));
+            $check_user_role = UsersRoleList::where('user_id',$user->id)
+                ->where('role_id',3)
+                ->first();
+            $id = $user->id;
+            $option_id = 1;
+            $last_date = date('Y-m-t',strtotime($year.'-'.$month.'-01'));
+            $holidays = 0;
+            $lastDay = date('t',strtotime($year.'-'.$month.'-01'));
+            $dtr = [];
+            $included_days = [];
+            $defaultValues = $this->defaultValues();
+
+            $data_info = [
+                'id_no' => $id_no,
+                'year' => $year,
+                'month' => $month
+            ];
+            $dtr_info_service->removeDuplicate($data_info);
+
+            $getDtr = UsersDTR::with('time_type_')
+                ->whereHas('user', function ($query) use ($id) {
+                    $query->where('id', $id);
+                })->whereYear('date',$year)
+                ->whereMonth('date',$month)
+                ->orderBy('date','ASC')
+                ->get();
+            $getDtrNext = UsersDTR::with('time_type_')
+                ->whereHas('user', function ($query) use ($id) {
+                    $query->where('id', $id);
+                })->whereDate('date',date('Y-m-d',strtotime($last_date . ' +1 day')))
+                ->orderBy('date','ASC')
+                ->first();
+            $getDtrInfo = UsersDTRInfo::where('user_id',$id)
+                ->whereYear('date',$year)
+                ->whereMonth('date',$month)
+                ->where('option_id',$option_id)
+                ->orderBy('date','ASC')
+                ->get();
+            $getDtrSched = UsersSchedDays::with(['time' => function ($query) use ($id,$year,$month,$option_id) {
+                    $query->where('user_id',$id)
+                    ->where('option_id',$option_id)
+                    ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
+                    ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')))
+                    ->orderBy('time_from', 'DESC');
+                }])
+                ->whereHas('time', function ($query) use ($id,$year,$month,$option_id) {
+                    $query->where('user_id',$id)
+                    ->where('option_id',$option_id)
+                    ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
+                    ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')));
+                })->get();
+            $getHolidays = Holidays::where(function ($query) use ($month) {
+                $query->whereMonth('date', $month)
+                    ->where('option', 'Yes');
+                })->orWhere(function ($query) use ($year,$month) {
+                    $query->whereYear('date', $year)
+                        ->whereMonth('date', $month);
+                })->get();
+
+            for ($i = 1; $i <= $lastDay; $i++){
+                $weekDay = date('w', strtotime($year.'-'.$month.'-'.$i));
+                if($weekDay==0){
+                    $weekDay = 7;
+                }
+                $dtr[$i] = $defaultValues;
+                $dtr[$i]['day'] = $i;
+
+                foreach ($getDtrSched as $row){
+                    if($weekDay==$row->day){
+                        if($row->time->date_from<=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i)) &&
+                            $row->time->date_to>=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i))
+                        ){
+                            $dtr[$i]['check'] = 'included';
+                            $dtr[$i]['sched_time'][] = [
+                                'in' => $row->time->time_from,
+                                'out' => $row->time->time_to,
+                                'is_rotation_duty' => $row->time->is_rotation_duty
+                            ];
+                        }
+                    }
+                }
+                if($dtr[$i]['check'] == 'included'){
+                    $included_days[] = $i;
+                }
+            }
+
+            foreach($getHolidays as $row){
+                $day = date('j',strtotime($row->date));
+                $dtr[$day]['check'] = '';
+                $dtr[$day]['holiday'] = $row->name;
+
+                $index = array_search($day, $included_days);
+                if ($index !== false) {
+                    unset($included_days[$index]);
+                }else{
+                    $holidays++;
+                }
+            }
+
+
+            $data_info = [
+                'user_id' => $id,
+                'id_no' => $id_no,
+                'dtr' => $dtr,
+                'getDtr' => $getDtr,
+                'getDtrNext' => $getDtrNext,
+                'included_days' => $included_days,
+                'year' => $year,
+                'month' => $month,
+                'option_id' => $option_id,
+                'holidays' => $holidays
+            ];
+            $dtr_info_service->index($data_info);
+
+            for ($k = 0; $k < $getDtr->count(); $k++){
+                $row = $getDtr[$k];
+                $day = date('j', strtotime($row->date));
+
+                $index = array_search($day, $included_days);
+                if ($index !== false) {
+                    unset($included_days[$index]);
+                }
+
+                $in_am = (strtotime($row->time_in_am)) ? date('h:ia',strtotime($row->time_in_am)) : NULL;
+                $out_am = (strtotime($row->time_out_am)) ? date('h:ia',strtotime($row->time_out_am)) : NULL;
+                $in_pm = (strtotime($row->time_in_pm)) ? date('h:ia',strtotime($row->time_in_pm)) : NULL;
+                $out_pm = (strtotime($row->time_out_pm)) ? date('h:ia',strtotime($row->time_out_pm)) : NULL;
+
+                $time_in_am_type = $row->time_in_am_type;
+                $time_out_am_type = $row->time_out_am_type;
+                $time_in_pm_type = $row->time_in_pm_type;
+                $time_out_pm_type = $row->time_out_pm_type;
+                $time_type = $row->time_type;
+
+                $dtrEntry = &$dtr[$day];
+
+                $dtrEntry['check'] = 'time';
+                $dtrEntry['in_am'] = $in_am;
+                $dtrEntry['out_am'] = $out_am;
+                $dtrEntry['in_pm'] = $in_pm;
+                $dtrEntry['out_pm'] = $out_pm;
+                $dtrEntry['time_type'] = $time_type;
+                $dtrEntry['time_in_am_type'] = $time_in_am_type;
+                $dtrEntry['time_out_am_type'] = $time_out_am_type;
+                $dtrEntry['time_in_pm_type'] = $time_in_pm_type;
+                $dtrEntry['time_out_pm_type'] = $time_out_pm_type;
+
+                if($row->time_type_){
+                    $dtr[$day]['time_type_name'] = $row->time_type_->name;
+                }
+
+                foreach($dtr[$day]['sched_time'] as $sched){
+                    if(strtotime($sched['in']) && strtotime($sched['out'])){
+                        $in_from = date('H:i',strtotime($sched['in']));
+                        $out_to = date('H:i',strtotime($sched['out']));
+                        if(!$time_type){
+                            if($in_from<'12:00' && $out_to>='14:01'){
+                                if(!$in_am){
+                                    $dtrEntry['time_in_am_type'] = 0;
+                                }
+                                if(!$out_am){
+                                    $dtrEntry['time_out_am_type'] = 0;
+                                }
+                                if(!$in_pm){
+                                    $dtrEntry['time_in_pm_type'] = 0;
+                                }
+                                if(!$out_pm){
+                                    $dtrEntry['time_out_pm_type'] = 0;
+                                }
+                            }elseif($in_from<'12:00' && $out_to<='14:00'){
+                                if(!$in_am){
+                                    $dtrEntry['time_in_am_type'] = 0;
+                                }
+                                if(!$out_am){
+                                    $dtrEntry['time_out_am_type'] = 0;
+                                }
+                            }elseif($in_from>='12:00' && $out_to>'12:00'){
+                                if(!$in_pm){
+                                    $dtrEntry['time_in_pm_type'] = 0;
+                                }
+                                if(!$out_pm){
+                                    $dtrEntry['time_out_pm_type'] = 0;
+                                }
+                            }elseif($in_from>='12:00' && $out_to<'12:00'){
+                                if(!$out_am){
+                                    $dtrEntry['time_out_am_type'] = 0;
+                                }
+                                if(!$out_pm){
+                                    $dtrEntry['time_out_pm_type'] = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach ($getDtrInfo as $row){
+                $day = date('j',strtotime($row->date));
+                $dtr[$day]['hours'] = $row->hours;
+                $dtr[$day]['minutes'] = $row->minutes;
+                $dtr[$day]['tardy_hr'] = $row->tardy_hr;
+                $dtr[$day]['tardy_min'] = $row->tardy_min;
+                $dtr[$day]['tardy_no'] = $row->tardy_no;
+                $dtr[$day]['ud_hr'] = $row->ud_hr;
+                $dtr[$day]['ud_min'] = $row->ud_min;
+                $dtr[$day]['ud_no'] = $row->ud_no;
+                $dtr[$day]['hd_hr'] = $row->hd_hr;
+                $dtr[$day]['hd_min'] = $row->hd_min;
+                $dtr[$day]['hd_no'] = $row->hd_no;
+                $dtr[$day]['abs_hr'] = $row->abs_hr;
+                $dtr[$day]['abs_min'] = $row->abs_min;
+                $dtr[$day]['abs_no'] = $row->abs_no;
+                $dtr[$day]['earned_hours'] = $row->earned_hours;
+                $dtr[$day]['earned_minutes'] = $row->earned_minutes;
+            }
+
+            $getDtrInfoTotal = UsersDTRInfoTotal::where('user_id',$id)
+                ->whereYear('date',$year)
+                ->whereMonth('date',$month)
+                ->where('option_id',$option_id)
+                ->first();
+
+            $data = [
+                'id_no' => $id_no,
+                'user_id' => $id,
+                'name' => $name,
+                'dtr' => $dtr,
+                'dtrTotal' => $getDtrInfoTotal,
+                'year' => $year,
+                'month' => $month,
+                'range' => $range,
+                'lastDay' => $lastDay,
+                'current_url' => $current_url,
+                'check_user_role' => $check_user_role,
+                'count_days' => 0
+            ];
+            return view('hrims/dtr/individual_view',$data);
+        }else{
+            return $result;
+        }
+    }
+    public function individualOld(Request $request,Users $users,
         _Work $_work, UsersDTR $usersDtr, Holidays $_holidays,
         UsersSchedDays $usersSchedDays, UsersSchedTime $usersSchedTime, EducOfferedScheduleDay $educOfferedScheduleDay,
         EducOfferedSchedule $educOfferedSchedule){
@@ -63,7 +340,7 @@ class IndividualController extends Controller
             $check_user_role = UsersRoleList::where('user_id',$user->id)
                 ->where('role_id',3)
                 ->first();
-            $data = array(
+            $data = [
                 'id_no' => $id_no,
                 'name' => $name,
                 'year' => $year,
@@ -78,8 +355,8 @@ class IndividualController extends Controller
                 'educOfferedScheduleDay' => $educOfferedScheduleDay,
                 'educOfferedSchedule' => $educOfferedSchedule,
                 'current_url' => $current_url,
-                'check_user_role' => $check_user_role
-            );
+                'check_user_role' => $check_user_role,
+            ];
             return view('hrims/dtr/individual_view',$data);
         }else{
             return $result;
@@ -750,5 +1027,38 @@ class IndividualController extends Controller
                 'time_from' => $time_from,
                 'time_to' => $time_to
             );
+    }
+    private function defaultValues()
+    {
+        return [
+            'day' => null,
+            'check' => '',
+            'holiday' => '',
+            'in_am' => '',
+            'out_am' => '',
+            'in_pm' => '',
+            'out_pm' => '',
+            'time_type' => '',
+            'time_type_name' => '',
+            'time_in_am_type' => 0,
+            'time_out_am_type' => 0,
+            'time_in_pm_type' => 0,
+            'time_out_pm_type' => 0,
+            'hours' => 0,
+            'minutes' => 0,
+            'tardy_hr' => 0,
+            'tardy_min' => 0,
+            'tardy_no' => 0,
+            'ud_hr' => 0,
+            'ud_min' => 0,
+            'ud_no' => 0,
+            'hd_hr' => 0,
+            'hd_min' => 0,
+            'hd_no' => 0,
+            'abs_hr' => 0,
+            'abs_min' => 0,
+            'abs_no' => 0,
+            'sched_time' => []
+        ];
     }
 }

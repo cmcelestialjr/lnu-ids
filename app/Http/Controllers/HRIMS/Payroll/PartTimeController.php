@@ -432,8 +432,8 @@ class PartTimeController extends Controller
         $year = $request->year;
         $month = $request->month;
         $id_no = $check_user->id_no;
-        $last_date = date('Y-m-t',strtotime($year.'-'.$month.'-01'));
         $option_id = 2;
+        $last_date = date('Y-m-t',strtotime($year.'-'.$month.'-01'));
         $holidays = 0;
         $lastDay = date('t',strtotime($year.'-'.$month.'-01'));
         $dtr = [];
@@ -468,7 +468,6 @@ class PartTimeController extends Controller
             'abs_no' => 0,
             'sched_time' => []
         ];
-
         $data_info = [
             'id_no' => $id_no,
             'year' => $year,
@@ -484,20 +483,6 @@ class PartTimeController extends Controller
             ->whereMonth('date',$month)
             ->orderBy('date','ASC')
             ->get();
-
-        if($getDtr->count()<=0){
-            $data = [
-                'dtr' => $dtr,
-                'dtrTotal' => NULL,
-                'year' => $year,
-                'month' => $month,
-                'lastDay' => $lastDay,
-                'current_url' => 'monitoring'
-
-            ];
-            return view('hrims/payroll/monitoring/partTimeViewDtr',$data);
-        }
-        //dd($getDtr->count());
         $getDtrNext = UsersDTR::with('time_type_')
             ->whereHas('user', function ($query) use ($id) {
                 $query->where('id', $id);

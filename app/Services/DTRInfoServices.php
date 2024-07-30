@@ -209,6 +209,11 @@ class DTRInfoServices
                 $total_minutes += $abs_minutes;
                 $abs_no = 1;
                 $check_day = 0;
+            }elseif($row->time_type==4 && $option_id==2){
+                $abs_minutes = $total_time_diff;
+                $total_minutes += $abs_minutes;
+                $abs_no = 1;
+                $check_day = 0;
             }elseif($row->time_type==2 || $row->time_type==3){
                 $hd_minutes = $total_time_diff/2;
                 $total_minutes += $hd_minutes;

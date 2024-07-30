@@ -7,6 +7,7 @@ use App\Models\DTRType;
 use App\Models\Users;
 use App\Models\UsersDTRTrack;
 use App\Models\UsersDTRType;
+use App\Models\UsersSchedTimeOption;
 use App\Services\NameServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -67,7 +68,7 @@ class AllController extends Controller
                     $salary = '';
                     $emp_stat = '';
                 }
-                
+
                 $date_submit = UsersDTRTrack::where('id_no',$query->id_no)
                     ->whereYear('date',$year)
                     ->whereMonth('date',$month)
@@ -121,7 +122,7 @@ class AllController extends Controller
                                     </button>';
                 if(count($dtrType)>0){
                     foreach($dtrType as $rowType){
-                        $checked = '<input type="checkbox" class="form-control receiveDTR" 
+                        $checked = '<input type="checkbox" class="form-control receiveDTR"
                             data-id="'.$r['id'].'"
                             data-type="'.$rowType['id'].'"> <div></div>';
                         foreach($r['received'] as $rowReceived){
@@ -131,7 +132,7 @@ class AllController extends Controller
                                 $checked = '<span class="fa fa-check"></span> '.$received_date_time.'<br>'.
                                     $rowReceived->updated_by_info->firstname[0].'. '.$rowReceived->updated_by_info->lastname;
                             }elseif($rowType['id']==$rowReceived['dtr_type_id'] && $received_date==date('Y-m-d')){
-                                $checked = '<input type="checkbox" class="form-control receiveDTR" 
+                                $checked = '<input type="checkbox" class="form-control receiveDTR"
                                             data-id="'.$r['id'].'"
                                             data-type="'.$rowType['id'].'" checked> <div>'.$received_date_time.'<br>'.
                                                 $rowReceived->updated_by_info->firstname[0].'. '.$rowReceived->updated_by_info->lastname.'</div>';
@@ -175,13 +176,15 @@ class AllController extends Controller
         $name_services = new NameServices;
         $user = Users::where('id_no',$id_no)->first();
         $name = mb_strtoupper($name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname));
-        $data = array(
+        $option_list = UsersSchedTimeOption::get();
+        $data = [
             'id_no' => $id_no,
             'name' => $name,
             'year' => $year,
             'month' => $month,
-            'range' => $range
-        );
+            'range' => $range,
+            'option_list' => $option_list
+        ];
         return view('hrims/dtr/allDtrView',$data);
     }
 
@@ -197,7 +200,7 @@ class AllController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request)
-    {        
+    {
         // Validate the incoming request data
         $validator = $this->updateValidateRequest($request);
 
@@ -229,7 +232,7 @@ class AllController extends Controller
             ->where('dtr_type_id',$type)
             ->where('date',$date)
             ->first();
-        
+
         if($dtrCheck){
             $delete = UsersDTRType::where('user_id',$id)
                 ->where('dtr_type_id',$type)
@@ -238,12 +241,12 @@ class AllController extends Controller
             if($delete){
                 $result = 'success';
             }
-        }else{            
+        }else{
             $day_to = date('t',strtotime($date));
             if($typeCheck->day_to==15){
                 $day_to = 15;
             }
-            $insert = new UsersDTRType(); 
+            $insert = new UsersDTRType();
             $insert->user_id = $id;
             $insert->dtr_type_id = $type;
             $insert->date = $date;
