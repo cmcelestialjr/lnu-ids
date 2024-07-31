@@ -44,6 +44,27 @@ $(document).off('click', '.dtrPrint').on('click', '.dtrPrint', function (e) {
     var thisBtn = $(this);
     dtrPrint(thisBtn);
 });
+$(document).off('click', '#dtrInputModal #dtrInputTable .change_cdo').on('click', '#dtrInputModal #dtrInputTable .change_cdo', function (e) {
+    var thisBtn = $(this);
+    var val = thisBtn.data('val');
+    var id = thisBtn.data('id');
+    var n = thisBtn.data('n');
+    if(val=='cdo'){
+        $('#dtrInputModal #dtrInputTable #'+id).html('<div class="input-group mb-3"><input type="time" class="form-control" name="'+n+'">'+
+                    '<div class="input-group-prepend">'+
+                        '<button type="button" class="btn btn-info btn-info-scan change_cdo" data-val="time" data-id="'+id+'">'+
+                            '<span class="fa fa-refresh"></span></button>'+
+                    '</div></div>');
+    }else{
+        $('#dtrInputModal #dtrInputTable #'+id).html('<div class="input-group mb-3">'+
+                '<input type="text" class="form-control" name="'+n+'" value="CDO" readonly>'+
+                    '<div class="input-group-prepend">'+
+                        '<button type="button" class="btn btn-info btn-info-scan change_cdo" data-val="cdo" data-id="'+id+'">'+
+                            '<span class="fa fa-refresh"></span></button>'+
+                    '</div></div>');
+
+    }
+});
 $(document).off('click', '#dtrInputModal #dtrInputTable .change_travel').on('click', '#dtrInputModal #dtrInputTable .change_travel', function (e) {
     var thisBtn = $(this);
     var val = thisBtn.data('val');
@@ -81,6 +102,27 @@ $(document).off('click', '#dtrInputModal #dtrInputTable .change_vacant').on('cli
                 '<input type="text" class="form-control" name="'+n+'" value="Vacant" readonly>'+
                     '<div class="input-group-prepend">'+
                         '<button type="button" class="btn btn-info btn-info-scan change_vacant" data-val="vacant" data-id="'+id+'">'+
+                            '<span class="fa fa-refresh"></span></button>'+
+                    '</div></div>');
+
+    }
+});
+$(document).off('click', '#dtrInputModal #dtrInputTable .change_suspension').on('click', '#dtrInputModal #dtrInputTable .change_suspension', function (e) {
+    var thisBtn = $(this);
+    var val = thisBtn.data('val');
+    var id = thisBtn.data('id');
+    var n = thisBtn.data('n');
+    if(val=='suspension'){
+        $('#dtrInputModal #dtrInputTable #'+id).html('<div class="input-group mb-3"><input type="time" class="form-control" name="'+n+'">'+
+                    '<div class="input-group-prepend">'+
+                        '<button type="button" class="btn btn-info btn-info-scan change_suspension" data-val="time" data-id="'+id+'">'+
+                            '<span class="fa fa-refresh"></span></button>'+
+                    '</div></div>');
+    }else{
+        $('#dtrInputModal #dtrInputTable #'+id).html('<div class="input-group mb-3">'+
+                '<input type="text" class="form-control" name="'+n+'" value="Suspension" readonly>'+
+                    '<div class="input-group-prepend">'+
+                        '<button type="button" class="btn btn-info btn-info-scan change_suspension" data-val="suspension" data-id="'+id+'">'+
                             '<span class="fa fa-refresh"></span></button>'+
                     '</div></div>');
 
@@ -194,6 +236,7 @@ function dtr_input(thisBtn){
     var id_no = $('input[name="id_no"]').val();
     var year = $('#dtrDiv select[name="year"] option:selected').val();
     var month = $('#dtrDiv select[name="month"] option:selected').val();
+    var option = $('#dtrDiv select[name="option"] option:selected').val();
     var url = base_url+'/hrims/dtr/dtrInputModal';
     var modal = 'primary';
     var modal_size = 'modal-xl';
@@ -209,7 +252,8 @@ function dtr_input(thisBtn){
         time_type:time_type,
         id_no:id_no,
         year:year,
-        month:month
+        month:month,
+        option:option
     };
     loadModal(form_data,thisBtn);
 }
@@ -498,12 +542,14 @@ function dtrPrint(thisBtn){
     var year = thisBtn.data('y');
     var month = thisBtn.data('m');
     var range = thisBtn.data('r');
+    var option_id = thisBtn.data('o');
     var form_data = {
         id_no:id_no,
         option:option,
         year:year,
         month:month,
-        range:range
+        range:range,
+        option_id:option_id
     };
     $.ajax({
         url: base_url+'/hrims/employee/dtrSubmit',

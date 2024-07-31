@@ -37,32 +37,35 @@ table td{
     <div class="col-lg-12">
         @if($count_days<=0)
             {{-- <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/o')}}" method="GET" target="_blank"> --}}
-                <button class="btn btn-info btn-info-scan dtrPrint"
+                {{-- <button class="btn btn-info btn-info-scan dtrPrint"
                     data-id="o"
                     data-y="{{$year}}"
                     data-m="{{$month}}"
                     data-r="{{$range}}"
+                    data-o="{{$option_id}}"
                     style="float:right">
                 <span class="fa fa-file-pdf"></span>
                 Overload Print
-                </button>
+                </button> --}}
             {{-- </form> --}}
             {{-- <form action="{{url('/hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/p')}}" method="GET" target="_blank"> --}}
-                <button class="btn btn-primary btn-primary-scan dtrPrint"
+
+            <button class="btn btn-primary btn-primary-scan dtrPrint"
                     data-id="p"
                     data-y="{{$year}}"
                     data-m="{{$month}}"
                     data-r="{{$range}}"
+                    data-o="{{$option_id}}"
                     style="float:right">
                 <span class="fa fa-file-pdf"></span>
                 Print
-                </button>
+            </button>
             {{-- </form> --}}
         @else
-            <button class="btn btn-info btn-info-scan" style="float:right" disabled>
+            {{-- <button class="btn btn-info btn-info-scan" style="float:right" disabled>
                 <span class="fa fa-file-pdf"></span>
                 Overload Print
-            </button>
+            </button> --}}
             <button class="btn btn-primary btn-primary-scan" style="float:right" disabled>
                 <span class="fa fa-file-pdf"></span>
                 Print
@@ -77,7 +80,7 @@ table td{
             <button class="btn btn-primary btn-primary-scan" name="department"><span class="fa fa-edit"></span> Department</button>
             @endif
 
-        <button class="btn btn-primary btn-primary-scan" name="schedule" style="float:right"><span class="fa fa-edit"></span> Schedule</button>
+        <button class="btn btn-info btn-info-scan" name="schedule" style="float:right"><span class="fa fa-edit"></span> Schedule</button>
     </div>
 </div>
 <div class="center table-responsive">

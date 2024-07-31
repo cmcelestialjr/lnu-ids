@@ -48,9 +48,9 @@ class PDFController extends Controller
         }
         $src = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'.pdf';
 
-        $data = array(
+        $data = [
                 'src' => $src
-            );
+        ];
         return view('pdf/main_view',$data);
     }
     public function PDF(Request $request){
@@ -140,8 +140,9 @@ class PDFController extends Controller
         $year = $request->year;
         $month = $request->month;
         $range = $request->range;
+        $option_id = $request->option_id;
 
-        $url = $this->generateQR($id_no,$year,$month,$range,$option);
+        $url = $this->generateQR($id_no,$year,$month,$range,$option_id);
 
         return response()->json(['result' => 'success',
                                 'url' => $url
@@ -213,7 +214,7 @@ class PDFController extends Controller
 
         $signatory = '';
 
-        if($option=='o'){
+        if($option==2){
             if($user->instructor_info->position->office_designate->current_user){
                 $current_user = $user->instructor_info->position->office_designate->current_user;
                 $signatory = mb_strtoupper($name_services->firstname($current_user->lastname,$current_user->firstname,$current_user->middlename,$current_user->extname));

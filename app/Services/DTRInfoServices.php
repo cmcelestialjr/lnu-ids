@@ -22,6 +22,7 @@ class DTRInfoServices
         $month = $data['month'];
         $option_id = $data['option_id'];
         $holidays = $data['holidays'];
+        $range = $data['range'];
         $days = 0;
 
         $user = Auth::user();
@@ -369,7 +370,8 @@ class DTRInfoServices
             'updated_by' => $updated_by,
             'option_id' => $option_id,
             'days' => $days,
-            'holidays' => $holidays
+            'holidays' => $holidays,
+            'range' => $range
         ];
         $this->total($dtr_info);
     }
@@ -443,6 +445,7 @@ class DTRInfoServices
         $updated_by = $data['updated_by'];
         $days = $data['days'];
         $holidays = $data['holidays'];
+        $range = $data['range'];
         $hours = 0;
         $minutes = 0;
         $tardy_hr = 0;
@@ -471,22 +474,29 @@ class DTRInfoServices
             ->get();
         if($query->count()>0){
             foreach($query as $row){
-                $hours += $row->hours;
-                $minutes += $row->minutes;
-                $tardy_hr += $row->tardy_hr;
-                $tardy_min += $row->tardy_min;
-                $tardy_no += $row->tardy_no;
-                $ud_hr += $row->ud_hr;
-                $ud_min += $row->ud_min;
-                $ud_no += $row->ud_no;
-                $hd_hr += $row->hd_hr;
-                $hd_min += $row->hd_min;
-                $hd_no += $row->hd_no;
-                $abs_hr += $row->abs_hr;
-                $abs_min += $row->abs_min;
-                $abs_no += $row->abs_no;
-                $earned_hours += $row->earned_hours;
-                $earned_minutes += $row->earned_minutes;
+                $day = date('j', strtotime($row->date));
+                $include = 'yes';
+                if($range==2 && $day>15){
+                    $include = 'no';
+                }
+                if($include=='yes'){
+                    $hours += $row->hours;
+                    $minutes += $row->minutes;
+                    $tardy_hr += $row->tardy_hr;
+                    $tardy_min += $row->tardy_min;
+                    $tardy_no += $row->tardy_no;
+                    $ud_hr += $row->ud_hr;
+                    $ud_min += $row->ud_min;
+                    $ud_no += $row->ud_no;
+                    $hd_hr += $row->hd_hr;
+                    $hd_min += $row->hd_min;
+                    $hd_no += $row->hd_no;
+                    $abs_hr += $row->abs_hr;
+                    $abs_min += $row->abs_min;
+                    $abs_no += $row->abs_no;
+                    $earned_hours += $row->earned_hours;
+                    $earned_minutes += $row->earned_minutes;
+                }
             }
             if($minutes>=60){
                 $hours = $hours+floor($minutes / 60);

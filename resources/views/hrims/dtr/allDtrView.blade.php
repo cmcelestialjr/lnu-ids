@@ -1,7 +1,7 @@
 <div class="modal-content" id="dtrDiv">
     <div class="modal-header">
         <h4 class="modal-title">
-           {{$name}} - {{$id_no}}
+            {{$id_no}} - {{$name}}
         </h4>
     </div>
     <div class="modal-body">

@@ -567,7 +567,8 @@ class PartTimeController extends Controller
             'year' => $year,
             'month' => $month,
             'option_id' => $option_id,
-            'holidays' => $holidays
+            'holidays' => $holidays,
+            'range' => 1
         ];
         $dtr_info_service->index($data_info);
 

@@ -128,22 +128,28 @@ class IndividualController extends Controller
                 $dtr[$i] = $defaultValues;
                 $dtr[$i]['day'] = $i;
 
-                foreach ($getDtrSched as $row){
-                    if($weekDay==$row->day){
-                        if($row->time->date_from<=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i)) &&
-                            $row->time->date_to>=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i))
-                        ){
-                            $dtr[$i]['check'] = 'included';
-                            $dtr[$i]['sched_time'][] = [
-                                'in' => $row->time->time_from,
-                                'out' => $row->time->time_to,
-                                'is_rotation_duty' => $row->time->is_rotation_duty
-                            ];
+                $include = 'yes';
+                if($range==2 && $i>15){
+                    $include = 'no';
+                }
+                if($include=='yes'){
+                    foreach ($getDtrSched as $row){
+                        if($weekDay==$row->day){
+                            if($row->time->date_from<=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i)) &&
+                                $row->time->date_to>=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i))
+                            ){
+                                $dtr[$i]['check'] = 'included';
+                                $dtr[$i]['sched_time'][] = [
+                                    'in' => $row->time->time_from,
+                                    'out' => $row->time->time_to,
+                                    'is_rotation_duty' => $row->time->is_rotation_duty
+                                ];
+                            }
                         }
                     }
-                }
-                if($dtr[$i]['check'] == 'included'){
-                    $included_days[] = $i;
+                    if($dtr[$i]['check'] == 'included'){
+                        $included_days[] = $i;
+                    }
                 }
             }
 
@@ -159,7 +165,6 @@ class IndividualController extends Controller
                     $holidays++;
                 }
             }
-
 
             $data_info = [
                 'user_id' => $id,
@@ -179,13 +184,14 @@ class IndividualController extends Controller
             for ($k = 0; $k < $getDtr->count(); $k++){
                 $row = $getDtr[$k];
                 $day = date('j', strtotime($row->date));
-                $include = 'yes';
 
-                if($range==2 && $k>15){
+                $dtrEntry = &$dtr[$day];
+
+                $include = 'yes';
+                if($range==2 && $day>15){
                     $dtrEntry['check'] = '---';
                     $include = 'no';
                 }
-
                 if($include=='yes'){
                     $index = array_search($day, $included_days);
                     if ($index !== false) {
@@ -202,8 +208,6 @@ class IndividualController extends Controller
                     $time_in_pm_type = $row->time_in_pm_type;
                     $time_out_pm_type = $row->time_out_pm_type;
                     $time_type = $row->time_type;
-
-                    $dtrEntry = &$dtr[$day];
 
                     $dtrEntry['check'] = 'time';
                     $dtrEntry['in_am'] = $in_am;
@@ -268,22 +272,29 @@ class IndividualController extends Controller
 
             foreach ($getDtrInfo as $row){
                 $day = date('j',strtotime($row->date));
-                $dtr[$day]['hours'] = $row->hours;
-                $dtr[$day]['minutes'] = $row->minutes;
-                $dtr[$day]['tardy_hr'] = $row->tardy_hr;
-                $dtr[$day]['tardy_min'] = $row->tardy_min;
-                $dtr[$day]['tardy_no'] = $row->tardy_no;
-                $dtr[$day]['ud_hr'] = $row->ud_hr;
-                $dtr[$day]['ud_min'] = $row->ud_min;
-                $dtr[$day]['ud_no'] = $row->ud_no;
-                $dtr[$day]['hd_hr'] = $row->hd_hr;
-                $dtr[$day]['hd_min'] = $row->hd_min;
-                $dtr[$day]['hd_no'] = $row->hd_no;
-                $dtr[$day]['abs_hr'] = $row->abs_hr;
-                $dtr[$day]['abs_min'] = $row->abs_min;
-                $dtr[$day]['abs_no'] = $row->abs_no;
-                $dtr[$day]['earned_hours'] = $row->earned_hours;
-                $dtr[$day]['earned_minutes'] = $row->earned_minutes;
+
+                $include = 'yes';
+                if($range==2 && $day>15){
+                    $include = 'no';
+                }
+                if($include=='yes'){
+                    $dtr[$day]['hours'] = $row->hours;
+                    $dtr[$day]['minutes'] = $row->minutes;
+                    $dtr[$day]['tardy_hr'] = $row->tardy_hr;
+                    $dtr[$day]['tardy_min'] = $row->tardy_min;
+                    $dtr[$day]['tardy_no'] = $row->tardy_no;
+                    $dtr[$day]['ud_hr'] = $row->ud_hr;
+                    $dtr[$day]['ud_min'] = $row->ud_min;
+                    $dtr[$day]['ud_no'] = $row->ud_no;
+                    $dtr[$day]['hd_hr'] = $row->hd_hr;
+                    $dtr[$day]['hd_min'] = $row->hd_min;
+                    $dtr[$day]['hd_no'] = $row->hd_no;
+                    $dtr[$day]['abs_hr'] = $row->abs_hr;
+                    $dtr[$day]['abs_min'] = $row->abs_min;
+                    $dtr[$day]['abs_no'] = $row->abs_no;
+                    $dtr[$day]['earned_hours'] = $row->earned_hours;
+                    $dtr[$day]['earned_minutes'] = $row->earned_minutes;
+                }
             }
 
             $getDtrInfoTotal = UsersDTRInfoTotal::where('user_id',$id)
@@ -301,6 +312,7 @@ class IndividualController extends Controller
                 'year' => $year,
                 'month' => $month,
                 'range' => $range,
+                'option_id' => $option_id,
                 'lastDay' => $lastDay,
                 'current_url' => $current_url,
                 'check_user_role' => $check_user_role,
@@ -547,6 +559,7 @@ class IndividualController extends Controller
         $id_no_req = $request->id_no;
         $year = $request->year;
         $month = $request->month;
+        $option = $request->option;
         $day = $request->day;
         if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req)){
             $weekDay = date('w', strtotime($year.'-'.$month.'-'.$day));
@@ -563,21 +576,21 @@ class IndividualController extends Controller
 
             $user_id = $users->id;
 
-            $time_from_to = $this->time_from_to($user_id,$year,$month,$weekDay);
-            $emp_type = $this->emp_type($user_id);
+            $time_from_to = $this->time_from_to($user_id,$year,$month,$weekDay,$option);
+            $emp_type = $this->emp_type($user_id,$option);
             $emp_stat_id = $emp_type['emp_stat_id'];
             $emp_type = $emp_type['emp_type'];
             $time_from = $time_from_to['time_from'];
             $time_to = $time_from_to['time_to'];
-            $time_type_ids = array(1,2,3,4,5,6,7,8);
-            $time_type_ids_not = array('');
+            $time_type_ids = [1,2,3,4,5,6,7,8];
+            $time_type_ids_not = [];
             if($query!=NULL){
                 if(($query->status==1) ||
                     ($query->time_in_am!=NULL && $query->time_in_am_type==NULL &&
                      $query->time_out_am!=NULL && $query->time_out_am_type==NULL &&
                      $query->time_in_pm!=NULL && $query->time_in_pm_type==NULL &&
                      $query->time_out_pm!=NULL && $query->time_out_pm_type==NULL)){
-                    $time_type_ids = array('');
+                    $time_type_ids = [];
                 }else{
                     $push = 0;
                     if($query->time_in_am!=NULL && $query->time_in_am_type==NULL){
@@ -616,7 +629,7 @@ class IndividualController extends Controller
             $time_type_ = DTRtimeType::whereIn('id',$time_type_ids)
                 ->whereNotIn('id',$time_type_ids_not)->get();
 
-            $data = array(
+            $data = [
                 'query' => $query,
                 'users' => $users,
                 'day' => $day,
@@ -626,7 +639,7 @@ class IndividualController extends Controller
                 'time_to' => $time_to,
                 'emp_type' => $emp_type,
                 'emp_stat_id' => $emp_stat_id
-            );
+            ];
             return view('hrims/dtr/dtrInputModal',$data);
         }else{
 
@@ -1020,38 +1033,33 @@ class IndividualController extends Controller
                         );
         return response()->json($response);
     }
-    private function emp_type($user_id){
+    private function emp_type($user_id,$option){
         $work = _Work::where('user_id',$user_id)
-                ->where('date_to','present')
-                ->orderBy('emp_stat_id','ASC')
+                ->where('date_to','present');
+        $work = ($option==2) ? $work->whereIn('emp_stat_id',[5,7]) : $work->whereNotIn('emp_stat_id',[5,7]);
+        $work = $work->orderBy('emp_stat_id','ASC')
                 ->orderBy('date_from','DESC')
                 ->first();
         $emp_type = 'Employee';
-        if($work!=NULL){
+        $emp_stat_id = NULL;
+        if($work){
             $emp_stat_id = $work->emp_stat_id;
             if($work->role_id==3){
-                if($work->credit_type_id==2 || $work->credit_type_id==NULL){
-                    $emp_type = 'Employee';
-                }else{
-                    $emp_type = 'Faculty';
-                }
+                $emp_type = ($work->credit_type_id==2 || $work->credit_type_id==NULL) ? 'Employee' : 'Faculty';
             }
         }
-
-        return array(
+        return [
             'emp_type' => $emp_type,
             'emp_stat_id' => $emp_stat_id
-        );
+        ];
     }
-    private function time_from_to($user_id,$year,$month,$weekDay){
-            $emp_type1 = $this->emp_type($user_id);
-            $emp_type = $emp_type1['emp_type'];
-            //$emp_type = 'Faculty';
+    private function time_from_to($user_id,$year,$month,$weekDay,$option){
             $time_from = '';
             $time_to = '';
             $day = UsersSchedDays::where('user_id',$user_id)
                 ->where('day',$weekDay)
-                ->whereHas('time', function ($query) use ($year,$month) {
+                ->whereHas('time', function ($query) use ($year,$month,$option) {
+                    $query->where('option_id','=',$option);
                     $query->whereYear('date_from','<=',$year);
                     $query->whereYear('date_to','>=',$year);
                     $query->whereMonth('date_from','<=',$month);

@@ -1,7 +1,7 @@
 <div class="modal-content" id="dtrInputModal">
     <div class="modal-header">
         <h4 class="modal-title">
-           {{$users->lastname}}, {{$users->firstname}} - {{$date_name}}
+           {{$users->id_no}} - {{$users->lastname}}, {{$users->firstname}} {{$users->extname}} - {{$date_name}}
         </h4>
     </div>
     <div class="modal-body">
@@ -19,7 +19,7 @@
                         @endphp
                         <div class="row">
                             <div class="col-lg-4">
-                                <label>Time Type</label> {{$time_from}}
+                                <label>Time Type</label>
                                 <select class="form-control select2-primary" name="time_type">
                                     <option value="">Default</option>
                                     @foreach($time_type_ as $row)
