@@ -7,6 +7,7 @@ use App\Models\UsersDTRInfoTotal;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\Switch_;
 
 class DTRInfoServices
 {
@@ -38,31 +39,18 @@ class DTRInfoServices
                 unset($included_days[$index]);
             }
 
-            $time_in_am = (strtotime($row->time_in_am)) ? date('H:i',strtotime($row->time_in_am)) : NULL;
-            $time_out_am = (strtotime($row->time_out_am)) ? date('H:i',strtotime($row->time_out_am)) : NULL;
-            $time_in_pm = (strtotime($row->time_in_pm)) ? date('H:i',strtotime($row->time_in_pm)) : NULL;
-            $time_out_pm = (strtotime($row->time_out_pm)) ? date('H:i',strtotime($row->time_out_pm)) : NULL;
+            $time_in_am = $this->formatTime($row->time_in_am);
+            $time_out_am = $this->formatTime($row->time_out_am);
+            $time_in_pm = $this->formatTime($row->time_in_pm);
+            $time_out_pm = $this->formatTime($row->time_out_pm);
 
-            $time_in_am_type = $row->time_in_am_type;
-            $time_out_am_type = $row->time_out_am_type;
-            $time_in_pm_type = $row->time_in_pm_type;
-            $time_out_pm_type = $row->time_out_pm_type;
-
-            $total_minutes = 0;
-            $tardy_minutes = 0;
-            $tardy_no = 0;
-            $ud_minutes = 0;
-            $ud_no = 0;
-            $hd_minutes = 0;
-            $hd_no = 0;
-            $abs_minutes = 0;
-            $abs_no = 0;
-            $time_out_am_next = NULL;
-            $check_day = 0;
-            $sched_count = count($dtr[$day]['sched_time']);
+            $total_minutes = $tardy_minutes = $ud_minutes = $hd_minutes = $abs_minutes = 0;
+            $tardy_no = $ud_no = $hd_no = $abs_no = 0;
+            $check_day = $sched_tardy = $sched_ud = 0;
             $total_time_diff = 0;
-            $sched_tardy = 0;
-            $sched_ud = 0;
+
+            $sched_count = count($dtr[$day]['sched_time']);
+
 
             foreach($dtr[$day]['sched_time'] as $sched){
                 if(strtotime($sched['in']) && strtotime($sched['out'])){
@@ -70,116 +58,84 @@ class DTRInfoServices
                     $out_to = date('H:i',strtotime($sched['out']));
                     $check_day = 1;
 
-                    if($out_to>$in_from){
-                        $in_from_ = Carbon::parse($in_from)->seconds(0);
-                        $out_to_ = Carbon::parse($out_to)->seconds(0);
-                        $total_time_diff += $out_to_->diffInMinutes($in_from_);
-                    }else{
-                        $in_from_ = Carbon::parse($in_from)->seconds(0);
-                        $out_to_ = Carbon::parse('23:59')->seconds(0);
-                        $in_from_add_ = Carbon::parse('00:00')->seconds(0);
-                        $out_to_add_ = Carbon::parse($out_to)->seconds(0);
+                    $in_from_ = Carbon::parse($in_from)->seconds(0);
+                    $out_to_ = Carbon::parse($out_to)->seconds(0);
 
-                        $total_time_diff += $out_to_->diffInMinutes($in_from_);
-                        $total_time_diff += $out_to_add_->diffInMinutes($in_from_add_);
+                    if($out_to>$in_from){
+                        $total_time_diff += $this->calculateTimeDifference($in_from,$out_to);
+                    }else{
+                        $total_time_diff += $this->calculateTimeDifference($in_from, '23:59');
+                        $total_time_diff += $this->calculateTimeDifference('00:00', $out_to);
                     }
 
                     if($out_to>$in_from){
-                        if($in_from>='00:00' && $out_to<='13:59'){
-                            if($time_in_am && $time_in_am>$in_from){
-                                $time_from_ = Carbon::parse($in_from)->seconds(0);
-                                $time_to_ = Carbon::parse($time_in_am)->seconds(0);
-                                $tardy_minutes += $time_to_->diffInMinutes($time_from_);
+
+                        $is_am = $in_from >= '00:00' && $out_to <= '13:59';
+                        $is_pm = $in_from >= '10:00' && $out_to <= '23:59';
+
+                        if ($is_am || $is_pm) {
+                            $time_in = $is_am ? $time_in_am : $time_in_pm;
+                            $time_out = $is_am ? $time_out_am : $time_out_pm;
+                            $type_in = $is_am ? 'am' : 'pm';
+                            $type_in_value = $is_am ? $row->time_in_am_type : $row->time_in_pm_type;
+                            $type_out_value = $is_am ? $row->time_out_am_type : $row->time_out_pm_type;
+
+                            if ($time_in && $time_in > $in_from) {
+                                $tardy_minutes += $this->calculateTimeDifference($in_from, $time_in);
                                 $total_minutes += $tardy_minutes;
                                 $tardy_no++;
                             }
 
-                            if($time_out_am && $time_out_am<$out_to){
-                                $time_from_ = Carbon::parse(($time_out_am<$in_from) ? $in_from : $time_out_pm)->seconds(0);
-                                $time_to_ = Carbon::parse($out_to)->seconds(0);
-                                $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                            if ($time_out && $time_out < $out_to) {
+                                $ud_minutes += $this->calculateTimeDifference(($time_out < $in_from) ? $in_from : $time_out, $out_to);
                                 $total_minutes += $ud_minutes;
                                 $ud_no++;
                             }
 
-                            if($option_id==2 && $time_in_am_type>1 && $time_out_am_type>1){
+                            if ($option_id == 2 && $type_in_value > 1 && $type_out_value > 1) {
                                 $total_minutes += $total_time_diff;
-                                $sched_tardy = 1;
-                            }
+                                switch ($type_in) {
+                                    case 'am':
+                                        $sched_tardy = 1;
+                                        break;
 
-                            if($time_in_am==NULL && $time_out_am==NULL &&
-                                $time_in_am_type==NULL && $time_out_am_type==NULL
-                            ){
-                                if($sched_count>1){
-                                    $hd_minutes = $out_to_->diffInMinutes($in_from_);
-                                    $total_minutes += $hd_minutes;
-                                    $hd_no = 1;
-                                }else{
-                                    $abs_minutes = $out_to_->diffInMinutes($in_from_);
-                                    $total_minutes += $abs_minutes;
-                                    $abs_no = 1;
+                                    default:
+                                        $sched_ud = 1;
+                                        break;
                                 }
                             }
-                        }elseif($in_from>='10:00' && $out_to<='23:59'){
-                            if($time_in_pm && $time_in_pm>$in_from){
-                                $time_from_ = Carbon::parse($in_from)->seconds(0);
-                                $time_to_ = Carbon::parse($time_in_pm)->seconds(0);
-                                $tardy_minutes += $time_to_->diffInMinutes($time_from_);
-                                $total_minutes += $tardy_minutes;
-                                $tardy_no++;
-                            }
 
-                            if($time_out_pm && $time_out_pm<$out_to){
-                                $time_from_ = Carbon::parse(($time_out_pm<$in_from) ? $in_from : $time_out_pm)->seconds(0);
-                                $time_to_ = Carbon::parse($out_to)->seconds(0);
-                                $ud_minutes += $time_to_->diffInMinutes($time_from_);
-                                $total_minutes += $ud_minutes;
-                                $ud_no++;
-                            }
-
-                            if($option_id==2 && $time_in_pm_type>1 && $time_out_pm_type>1){
-                                $total_minutes += $total_time_diff;
-                                $sched_ud = 1;
-                            }
-
-                            if($time_in_pm==NULL && $time_out_pm==NULL &&
-                                $time_in_pm_type==NULL && $time_out_pm_type==NULL
-                            ){
-                                if($sched_count>1){
+                            if ($time_in == NULL && $time_out == NULL && $type_in_value == NULL && $type_out_value == NULL) {
+                                if ($sched_count > 1) {
                                     $hd_minutes = $out_to_->diffInMinutes($in_from_);
-                                    $total_minutes += $hd_minutes;
                                     $hd_no = 1;
-                                }else{
+                                } else {
                                     $abs_minutes = $out_to_->diffInMinutes($in_from_);
-                                    $total_minutes += $abs_minutes;
                                     $abs_no = 1;
                                 }
+                                $total_minutes += $hd_minutes ?: $abs_minutes;
                             }
                         }else{
-                            if($time_in_am && $time_in_am>$in_from){
-                                $time_from_ = Carbon::parse($in_from)->seconds(0);
-                                $time_to_ = Carbon::parse($time_in_am)->seconds(0);
-                                $tardy_minutes += $time_to_->diffInMinutes($time_from_);
+                            if($time_in_am && $time_in_am > $in_from){
+                                $tardy_minutes += $this->calculateTimeDifference($in_from,$time_in_am);
                                 $total_minutes += $tardy_minutes;
                                 $tardy_no++;
                             }
 
-                            if($time_out_pm && $time_out_pm<$out_to){
-                                $time_from_ = Carbon::parse(($time_out_pm<$in_from) ? $in_from : $time_out_pm)->seconds(0);
-                                $time_to_ = Carbon::parse($out_to)->seconds(0);
-                                $ud_minutes += $time_to_->diffInMinutes($time_from_);
+                            if($time_out_pm && $time_out_pm < $out_to){
+                                $ud_minutes += $this->calculateTimeDifference(($time_out_pm<$in_from) ? $in_from : $time_out_pm,$out_to);
                                 $total_minutes += $ud_minutes;
                                 $ud_no++;
                             }
 
-                            if($option_id==2 && $time_in_am_type>1 && $time_out_pm_type>1){
+                            if($option_id==2 && $row->time_in_am_type > 1 && $row->time_out_pm_type > 1){
                                 $total_minutes += $total_time_diff;
                             }
 
-                            if($time_in_am==NULL && $time_out_pm==NULL &&
-                                $time_in_am_type==NULL && $time_out_pm_type==NULL
+                            if($time_in_am == NULL && $time_out_pm == NULL &&
+                                $row->time_in_am_type == NULL && $row->time_out_pm_type == NULL
                             ){
-                                if($sched_count>1){
+                                if($sched_count > 1){
                                     $hd_minutes = $out_to_->diffInMinutes($in_from_);
                                     $total_minutes += $hd_minutes;
                                     $hd_no = 1;
@@ -191,35 +147,143 @@ class DTRInfoServices
                             }
                         }
                     }else{
-                        if($time_in_pm && $time_in_pm>$in_from){
-                            $time_from_ = Carbon::parse($in_from)->seconds(0);
-                            $time_to_ = Carbon::parse($time_in_pm)->seconds(0);
-                            $tardy_minutes += $time_to_->diffInMinutes($time_from_);
+                        if($time_in_pm && $time_in_pm > $in_from){
+                            $tardy_minutes += $this->calculateTimeDifference($in_from,$time_in_pm);
                             $total_minutes += $tardy_minutes;
                             $tardy_no++;
                         }
+
                         if($time_out_pm && $time_out_pm>$out_to){
-                            $time_from_ = Carbon::parse($time_out_pm)->seconds(0);
-                            $time_to_ = Carbon::parse('23:59')->seconds(0);
-                            $time_from_add_ = Carbon::parse('00:00')->seconds(0);
-                            $time_to_add_ = Carbon::parse($out_to)->seconds(0);
-                            $ud_minutes += $time_to_->diffInMinutes($time_from_);
-                            $ud_minutes += $time_to_add_->diffInMinutes($time_from_add_);
+                            $ud_minutes += $this->calculateTimeDifference($time_out_pm,'23:59');
+                            $ud_minutes += $this->calculateTimeDifference('00:00',$out_to);
                             $total_minutes += $ud_minutes;
                             $ud_no++;
-                        }else{
-                            if($row_next){
-                                $time_out_am_next = (strtotime($row_next->time_out_am)) ? date('H:i',strtotime($row_next->time_out_am)) : NULL;
-                                if($time_out_am_next && $time_out_am_next<$out_to){
-                                    $time_from_ = Carbon::parse($time_out_am_next)->seconds(0);
-                                    $time_to_ = Carbon::parse($out_to)->seconds(0);
-                                    $ud_minutes += $time_to_->diffInMinutes($time_from_);
-                                    $total_minutes += $ud_minutes;
-                                    $ud_no++;
-                                }
+
+                        }elseif($row_next){
+                            $time_out_am_next = $this->formatTime($row_next->time_out_am);
+                            if($time_out_am_next && $time_out_am_next < $out_to){
+                                $ud_minutes += $this->calculateTimeDifference($time_out_am_next,$out_to);
+                                $total_minutes += $ud_minutes;
+                                $ud_no++;
                             }
                         }
                     }
+
+                    // if($out_to>$in_from){
+                    //     if($in_from>='00:00' && $out_to<='13:59'){
+                    //         if($time_in_am && $time_in_am > $in_from){
+                    //             $tardy_minutes += $this->calculateTimeDifference($in_from,$time_in_am);
+                    //             $total_minutes += $tardy_minutes;
+                    //             $tardy_no++;
+                    //         }
+
+                    //         if($time_out_am && $time_out_am<$out_to){
+                    //             $ud_minutes += $this->calculateTimeDifference(($time_out_am<$in_from) ? $in_from : $time_out_am,$out_to);
+                    //             $total_minutes += $ud_minutes;
+                    //             $ud_no++;
+                    //         }
+
+                    //         if($option_id==2 && $time_in_am_type>1 && $time_out_am_type>1){
+                    //             $total_minutes += $total_time_diff;
+                    //             $sched_tardy = 1;
+                    //         }
+
+                    //         if($time_in_am==NULL && $time_out_am==NULL &&
+                    //             $time_in_am_type==NULL && $time_out_am_type==NULL
+                    //         ){
+                    //             if($sched_count>1){
+                    //                 $hd_minutes = $out_to_->diffInMinutes($in_from_);
+                    //                 $total_minutes += $hd_minutes;
+                    //                 $hd_no = 1;
+                    //             }else{
+                    //                 $abs_minutes = $out_to_->diffInMinutes($in_from_);
+                    //                 $total_minutes += $abs_minutes;
+                    //                 $abs_no = 1;
+                    //             }
+                    //         }
+                    //     }elseif($in_from>='10:00' && $out_to<='23:59'){
+                    //         if($time_in_pm && $time_in_pm>$in_from){
+                    //             $tardy_minutes += $this->calculateTimeDifference($in_from,$time_in_pm);
+                    //             $total_minutes += $tardy_minutes;
+                    //             $tardy_no++;
+                    //         }
+
+                    //         if($time_out_pm && $time_out_pm<$out_to){
+                    //             $ud_minutes += $this->calculateTimeDifference(($time_out_pm<$in_from) ? $in_from : $time_out_pm,$out_to);
+                    //             $total_minutes += $ud_minutes;
+                    //             $ud_no++;
+                    //         }
+
+                    //         if($option_id==2 && $time_in_pm_type>1 && $time_out_pm_type>1){
+                    //             $total_minutes += $total_time_diff;
+                    //             $sched_ud = 1;
+                    //         }
+
+                    //         if($time_in_pm==NULL && $time_out_pm==NULL &&
+                    //             $time_in_pm_type==NULL && $time_out_pm_type==NULL
+                    //         ){
+                    //             if($sched_count>1){
+                    //                 $hd_minutes = $out_to_->diffInMinutes($in_from_);
+                    //                 $total_minutes += $hd_minutes;
+                    //                 $hd_no = 1;
+                    //             }else{
+                    //                 $abs_minutes = $out_to_->diffInMinutes($in_from_);
+                    //                 $total_minutes += $abs_minutes;
+                    //                 $abs_no = 1;
+                    //             }
+                    //         }
+                    //     }else{
+                    //         if($time_in_am && $time_in_am>$in_from){
+                    //             $tardy_minutes += $this->calculateTimeDifference($in_from,$time_in_am);
+                    //             $total_minutes += $tardy_minutes;
+                    //             $tardy_no++;
+                    //         }
+
+                    //         if($time_out_pm && $time_out_pm<$out_to){
+                    //             $ud_minutes += $this->calculateTimeDifference(($time_out_pm<$in_from) ? $in_from : $time_out_pm,$out_to);
+                    //             $total_minutes += $ud_minutes;
+                    //             $ud_no++;
+                    //         }
+
+                    //         if($option_id==2 && $time_in_am_type>1 && $time_out_pm_type>1){
+                    //             $total_minutes += $total_time_diff;
+                    //         }
+
+                    //         if($time_in_am == NULL && $time_out_pm == NULL &&
+                    //             $time_in_am_type == NULL && $time_out_pm_type == NULL
+                    //         ){
+                    //             if($sched_count>1){
+                    //                 $hd_minutes = $out_to_->diffInMinutes($in_from_);
+                    //                 $total_minutes += $hd_minutes;
+                    //                 $hd_no = 1;
+                    //             }else{
+                    //                 $abs_minutes = $out_to_->diffInMinutes($in_from_);
+                    //                 $total_minutes += $abs_minutes;
+                    //                 $abs_no = 1;
+                    //             }
+                    //         }
+                    //     }
+                    // }
+                    // else{
+                    //     if($time_in_pm && $time_in_pm > $in_from){
+                    //         $tardy_minutes += $this->calculateTimeDifference($in_from,$time_in_pm);
+                    //         $total_minutes += $tardy_minutes;
+                    //         $tardy_no++;
+                    //     }
+                    //     if($time_out_pm && $time_out_pm>$out_to){
+                    //         $ud_minutes += $this->calculateTimeDifference($time_out_pm,'23:59');
+                    //         $ud_minutes += $this->calculateTimeDifference('00:00',$out_to);
+                    //         $total_minutes += $ud_minutes;
+                    //         $ud_no++;
+                    //     }elseif($row_next){
+                    //         $time_out_am_next = $this->formatTime($row_next->time_out_am);
+                    //         if($time_out_am_next && $time_out_am_next < $out_to){
+                    //             $ud_minutes += $this->calculateTimeDifference($time_out_am_next,$out_to);
+                    //             $total_minutes += $ud_minutes;
+                    //             $ud_no++;
+                    //         }
+                    //     }
+                    // }
                 }
             }
 
@@ -230,30 +294,34 @@ class DTRInfoServices
                 $check_day = 0;
             }
 
-            if($option_id==2){
-                if($total_time_diff==$total_minutes && $total_minutes>0 && $total_time_diff>0){
-                    $abs_minutes = $total_time_diff;
-                    $abs_no = 1;
-                }else{
-                    if($sched_count>1){
-                        if($sched_tardy==1){
-                            $tardy_minutes = $total_time_diff;
-                            $tardy_no = 1;
-                        }
-                        if($sched_ud==1){
-                            $ud_minutes = $total_time_diff;
-                            $ud_no = 1;
+            switch ($option_id) {
+                case 2:
+                    if($total_time_diff==$total_minutes && $total_minutes>0 && $total_time_diff>0){
+                        $abs_minutes = $total_time_diff;
+                        $abs_no = 1;
+                    }else{
+                        if($sched_count>1){
+                            if($sched_tardy==1){
+                                $tardy_minutes = $total_time_diff;
+                                $tardy_no = 1;
+                            }
+                            if($sched_ud==1){
+                                $ud_minutes = $total_time_diff;
+                                $ud_no = 1;
+                            }
                         }
                     }
-                }
-            }else{
-                if($row->time_type==2 || $row->time_type==3){
-                    $hd_minutes = $total_time_diff/2;
-                    $total_minutes += $hd_minutes;
-                    if($total_minutes>0){
-                        $hd_no = 1;
+                    break;
+
+                default:
+                    if($row->time_type==2 || $row->time_type==3){
+                        $hd_minutes = $total_time_diff/2;
+                        $total_minutes += $hd_minutes;
+                        if($total_minutes>0){
+                            $hd_no = 1;
+                        }
                     }
-                }
+                    break;
             }
 
             if($check_day==1){
@@ -807,6 +875,14 @@ class DTRInfoServices
         $update->holidays = $holidays;
         $update->updated_by = $updated_by;
         $update->save();
+    }
+    private function formatTime($time) {
+        return strtotime($time) ? date('H:i', strtotime($time)) : NULL;
+    }
+    private function calculateTimeDifference($start, $end) {
+        $start_ = Carbon::parse($start)->seconds(0);
+        $end_ = Carbon::parse($end)->seconds(0);
+        return $end_->diffInMinutes($start_);
     }
     public function defaultValues()
     {

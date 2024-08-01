@@ -68,19 +68,20 @@ class IndividualController extends Controller
 
             $id = $user->id;
             $option_id = $request->option;
-            $last_date = date('Y-m-t',strtotime($year.'-'.$month.'-01'));
             $holidays = 0;
-            $lastDay = date('t',strtotime($year.'-'.$month.'-01'));
             $dtr = [];
             $included_days = [];
-            $defaultValues = $dtr_info_service->defaultValues();
+            $start_date = date('Y-m-01', strtotime("$year-$month-01"));
+            $last_date = date('Y-m-t',strtotime($start_date));
+            $next_day = date('Y-m-d', strtotime($last_date . ' +1 day'));
+            $lastDay = date('t',strtotime($last_date));
 
-            $data_info = [
+
+            $dtr_info_service->removeDuplicate([
                 'id_no' => $id_no,
                 'year' => $year,
                 'month' => $month
-            ];
-            $dtr_info_service->removeDuplicate($data_info);
+            ]);
 
             $getDtr = UsersDTR::with('time_type_')
                 ->whereHas('user', function ($query) use ($id) {
@@ -92,21 +93,21 @@ class IndividualController extends Controller
             $getDtrNext = UsersDTR::with('time_type_')
                 ->whereHas('user', function ($query) use ($id) {
                     $query->where('id', $id);
-                })->whereDate('date',date('Y-m-d',strtotime($last_date . ' +1 day')))
+                })->whereDate('date',$next_day)
                 ->orderBy('date','ASC')
                 ->first();
-            $getDtrSched = UsersSchedDays::with(['time' => function ($query) use ($id,$year,$month,$option_id) {
+            $getDtrSched = UsersSchedDays::with(['time' => function ($query) use ($id,$start_date,$last_date,$option_id) {
                     $query->where('user_id',$id)
                     ->where('option_id',$option_id)
-                    ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
-                    ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')))
+                    ->where('date_to','>=',$start_date)
+                    ->where('date_from','<=',$last_date)
                     ->orderBy('time_from', 'DESC');
                 }])
-                ->whereHas('time', function ($query) use ($id,$year,$month,$option_id) {
+                ->whereHas('time', function ($query) use ($id,$start_date,$last_date,$option_id) {
                     $query->where('user_id',$id)
                     ->where('option_id',$option_id)
-                    ->where('date_to','>=',date('Y-m-d',strtotime($year.'-'.$month.'-01')))
-                    ->where('date_from','<=',date('Y-m-t',strtotime($year.'-'.$month.'-01')));
+                    ->where('date_to','>=',$start_date)
+                    ->where('date_from','<=',$last_date);
                 })->get();
             $getHolidays = Holidays::where(function ($query) use ($month) {
                 $query->whereMonth('date', $month)
@@ -116,31 +117,29 @@ class IndividualController extends Controller
                         ->whereMonth('date', $month);
                 })->get();
 
-            $dtr_info = [
+            $getDtrInitial = $dtr_info_service->initial([
                 'lastDay' => $lastDay,
                 'year' => $year,
                 'month' => $month,
-                'defaultValues' => $defaultValues,
+                'defaultValues' => $dtr_info_service->defaultValues(),
                 'range' => $range,
                 'getDtrSched' => $getDtrSched,
                 'dtr' => $dtr
-            ];
-            $getDtrInitial = $dtr_info_service->initial($dtr_info);
+            ]);
             $dtr = $getDtrInitial['dtr'];
             $included_days = $getDtrInitial['included_days'];
 
-            $dtr_info = [
+            $getDtrHolidays = $dtr_info_service->holidays([
                 'getHolidays' => $getHolidays,
                 'included_days' => $included_days,
                 'holidays' => $holidays,
                 'dtr' => $dtr
-            ];
-            $getDtrHolidays = $dtr_info_service->holidays($dtr_info);
+            ]);
             $dtr = $getDtrHolidays['dtr'];
             $included_days = $getDtrHolidays['included_days'];
             $holidays = $getDtrHolidays['holidays'];
 
-            $data_info = [
+            $dtr_info_service->index([
                 'user_id' => $id,
                 'id_no' => $id_no,
                 'dtr' => $dtr,
@@ -152,28 +151,25 @@ class IndividualController extends Controller
                 'option_id' => $option_id,
                 'holidays' => $holidays,
                 'range' => $range
-            ];
-            $dtr_info_service->index($data_info);
+            ]);
 
-            $dtr_info = [
+            $getDtrUser = $dtr_info_service->dtr([
                 'getDtr' => $getDtr,
                 'dtr' => $dtr,
                 'range' => $range,
                 'included_days' => $included_days
-            ];
-            $getDtrUser = $dtr_info_service->dtr($dtr_info);
+            ]);
             $dtr = $getDtrUser['dtr'];
             $included_days = $getDtrUser['included_days'];
 
-            $dtr_info = [
+            $getDtrInfo = $dtr_info_service->dtrInfo([
                 'id' => $id,
                 'year' => $year,
                 'month' => $month,
                 'option_id' => $option_id,
                 'dtr' => $dtr,
                 'range' => $range
-            ];
-            $getDtrInfo = $dtr_info_service->dtrInfo($dtr_info);
+            ]);
             $dtr = $getDtrInfo['dtr'];
 
 
