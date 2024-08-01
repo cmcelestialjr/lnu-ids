@@ -61,6 +61,8 @@ class DTRInfoServices
             $check_day = 0;
             $sched_count = count($dtr[$day]['sched_time']);
             $total_time_diff = 0;
+            $sched_tardy = 0;
+            $sched_ud = 0;
 
             foreach($dtr[$day]['sched_time'] as $sched){
                 if(strtotime($sched['in']) && strtotime($sched['out'])){
@@ -100,6 +102,11 @@ class DTRInfoServices
                                 $ud_no++;
                             }
 
+                            if($option_id==2 && $time_in_am_type>1 && $time_out_am_type>1){
+                                $total_minutes += $total_time_diff;
+                                $sched_tardy = 1;
+                            }
+
                             if($time_in_am==NULL && $time_out_am==NULL &&
                                 $time_in_am_type==NULL && $time_out_am_type==NULL
                             ){
@@ -130,6 +137,11 @@ class DTRInfoServices
                                 $ud_no++;
                             }
 
+                            if($option_id==2 && $time_in_pm_type>1 && $time_out_pm_type>1){
+                                $total_minutes += $total_time_diff;
+                                $sched_ud = 1;
+                            }
+
                             if($time_in_pm==NULL && $time_out_pm==NULL &&
                                 $time_in_pm_type==NULL && $time_out_pm_type==NULL
                             ){
@@ -151,6 +163,7 @@ class DTRInfoServices
                                 $total_minutes += $tardy_minutes;
                                 $tardy_no++;
                             }
+
                             if($time_out_pm && $time_out_pm<$out_to){
                                 $time_from_ = Carbon::parse(($time_out_pm<$in_from) ? $in_from : $time_out_pm)->seconds(0);
                                 $time_to_ = Carbon::parse($out_to)->seconds(0);
@@ -158,6 +171,11 @@ class DTRInfoServices
                                 $total_minutes += $ud_minutes;
                                 $ud_no++;
                             }
+
+                            if($option_id==2 && $time_in_am_type>1 && $time_out_pm_type>1){
+                                $total_minutes += $total_time_diff;
+                            }
+
                             if($time_in_am==NULL && $time_out_pm==NULL &&
                                 $time_in_am_type==NULL && $time_out_pm_type==NULL
                             ){
@@ -210,16 +228,31 @@ class DTRInfoServices
                 $total_minutes += $abs_minutes;
                 $abs_no = 1;
                 $check_day = 0;
-            }elseif($row->time_type==4 && $option_id==2){
-                $abs_minutes = $total_time_diff;
-                $total_minutes += $abs_minutes;
-                $abs_no = 1;
-                $check_day = 0;
-            }elseif($row->time_type==2 || $row->time_type==3){
-                $hd_minutes = $total_time_diff/2;
-                $total_minutes += $hd_minutes;
-                if($total_minutes>0){
-                    $hd_no = 1;
+            }
+
+            if($option_id==2){
+                if($total_time_diff==$total_minutes && $total_minutes>0 && $total_time_diff>0){
+                    $abs_minutes = $total_time_diff;
+                    $abs_no = 1;
+                }else{
+                    if($sched_count>1){
+                        if($sched_tardy==1){
+                            $tardy_minutes = $total_time_diff;
+                            $tardy_no = 1;
+                        }
+                        if($sched_ud==1){
+                            $ud_minutes = $total_time_diff;
+                            $ud_no = 1;
+                        }
+                    }
+                }
+            }else{
+                if($row->time_type==2 || $row->time_type==3){
+                    $hd_minutes = $total_time_diff/2;
+                    $total_minutes += $hd_minutes;
+                    if($total_minutes>0){
+                        $hd_no = 1;
+                    }
                 }
             }
 
@@ -440,6 +473,222 @@ class DTRInfoServices
         $update->updated_by = $data['updated_by'];
         $update->save();
     }
+    public function initial($data)
+    {
+        $lastDay = $data['lastDay'];
+        $year = $data['year'];
+        $month = $data['month'];
+        $defaultValues = $data['defaultValues'];
+        $range = $data['range'];
+        $getDtrSched = $data['getDtrSched'];
+        $dtr = $data['dtr'];
+
+        for ($i = 1; $i <= $lastDay; $i++){
+            $weekDay = date('w', strtotime($year.'-'.$month.'-'.$i));
+            if($weekDay==0){
+                $weekDay = 7;
+            }
+            $dtr[$i] = $defaultValues;
+            $dtr[$i]['day'] = $i;
+
+            $include = 'yes';
+            if(($range==2 && $i>15) || date('Y-m-d', strtotime($year.'-'.$month.'-'.$i))>date('Y-m-d')){
+                $include = 'no';
+            }
+            if($include=='yes'){
+                foreach ($getDtrSched as $row){
+                    if($weekDay==$row->day){
+                        if($row->time->date_from<=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i)) &&
+                            $row->time->date_to>=date('Y-m-d', strtotime($year.'-'.$month.'-'.$i))
+                        ){
+                            $dtr[$i]['check'] = 'included';
+                            $dtr[$i]['sched_time'][] = [
+                                'in' => $row->time->time_from,
+                                'out' => $row->time->time_to,
+                                'is_rotation_duty' => $row->time->is_rotation_duty
+                            ];
+                        }
+                    }
+                }
+                if($dtr[$i]['check'] == 'included'){
+                    $included_days[] = $i;
+                }
+            }
+        }
+        return [
+            'dtr' => $dtr,
+            'included_days' => $included_days
+        ];
+    }
+    public function holidays($data)
+    {
+        $getHolidays = $data['getHolidays'];
+        $included_days = $data['included_days'];
+        $holidays = $data['holidays'];
+        $dtr = $data['dtr'];
+
+        foreach($getHolidays as $row){
+            $day = date('j',strtotime($row->date));
+            $dtr[$day]['check'] = '';
+            $dtr[$day]['holiday'] = $row->name;
+
+            $index = array_search($day, $included_days);
+            if ($index !== false) {
+                unset($included_days[$index]);
+            }else{
+                $holidays++;
+            }
+        }
+        return [
+            'dtr' => $dtr,
+            'included_days' => $included_days,
+            'holidays' => $holidays
+        ];
+    }
+    public function dtr($data)
+    {
+        $getDtr = $data['getDtr'];
+        $dtr = $data['dtr'];
+        $range = $data['range'];
+        $included_days = $data['included_days'];
+
+        for ($k = 0; $k < $getDtr->count(); $k++){
+            $row = $getDtr[$k];
+            $day = date('j', strtotime($row->date));
+
+            $include = 'yes';
+            if($range==2 && $day>15){
+                $dtr[$day]['check'] = '---';
+                $include = 'no';
+            }
+            if($include=='yes'){
+                $index = array_search($day, $included_days);
+                if ($index !== false) {
+                    unset($included_days[$index]);
+                }
+
+                $in_am = (strtotime($row->time_in_am)) ? date('h:ia',strtotime($row->time_in_am)) : NULL;
+                $out_am = (strtotime($row->time_out_am)) ? date('h:ia',strtotime($row->time_out_am)) : NULL;
+                $in_pm = (strtotime($row->time_in_pm)) ? date('h:ia',strtotime($row->time_in_pm)) : NULL;
+                $out_pm = (strtotime($row->time_out_pm)) ? date('h:ia',strtotime($row->time_out_pm)) : NULL;
+
+                $time_in_am_type = $row->time_in_am_type;
+                $time_out_am_type = $row->time_out_am_type;
+                $time_in_pm_type = $row->time_in_pm_type;
+                $time_out_pm_type = $row->time_out_pm_type;
+                $time_type = $row->time_type;
+
+                $dtr[$day]['check'] = 'time';
+                $dtr[$day]['in_am'] = $in_am;
+                $dtr[$day]['out_am'] = $out_am;
+                $dtr[$day]['in_pm'] = $in_pm;
+                $dtr[$day]['out_pm'] = $out_pm;
+                $dtr[$day]['time_type'] = $time_type;
+                $dtr[$day]['time_in_am_type'] = $time_in_am_type;
+                $dtr[$day]['time_out_am_type'] = $time_out_am_type;
+                $dtr[$day]['time_in_pm_type'] = $time_in_pm_type;
+                $dtr[$day]['time_out_pm_type'] = $time_out_pm_type;
+
+                if($row->time_type_){
+                    $dtr[$day]['time_type_name'] = $row->time_type_->name;
+                }
+
+                foreach($dtr[$day]['sched_time'] as $sched){
+                    if(strtotime($sched['in']) && strtotime($sched['out'])){
+                        $in_from = date('H:i',strtotime($sched['in']));
+                        $out_to = date('H:i',strtotime($sched['out']));
+                        if(!$time_type){
+                            if($in_from<'12:00' && $out_to>='14:01'){
+                                if(!$in_am){
+                                    $dtr[$day]['time_in_am_type'] = 0;
+                                }
+                                if(!$out_am){
+                                    $dtr[$day]['time_out_am_type'] = 0;
+                                }
+                                if(!$in_pm){
+                                    $dtr[$day]['time_in_pm_type'] = 0;
+                                }
+                                if(!$out_pm){
+                                    $dtr[$day]['time_out_pm_type'] = 0;
+                                }
+                            }elseif($in_from<'12:00' && $out_to<='14:00'){
+                                if(!$in_am){
+                                    $dtr[$day]['time_in_am_type'] = 0;
+                                }
+                                if(!$out_am){
+                                    $dtr[$day]['time_out_am_type'] = 0;
+                                }
+                            }elseif($in_from>='12:00' && $out_to>'12:00'){
+                                if(!$in_pm){
+                                    $dtr[$day]['time_in_pm_type'] = 0;
+                                }
+                                if(!$out_pm){
+                                    $dtr[$day]['time_out_pm_type'] = 0;
+                                }
+                            }elseif($in_from>='12:00' && $out_to<'12:00'){
+                                if(!$out_am){
+                                    $dtr[$day]['time_out_am_type'] = 0;
+                                }
+                                if(!$out_pm){
+                                    $dtr[$day]['time_out_pm_type'] = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return [
+            'dtr' => $dtr,
+            'included_days' => $included_days
+        ];
+    }
+    public function dtrInfo($data)
+    {
+        $id = $data['id'];
+        $year = $data['year'];
+        $month = $data['month'];
+        $option_id = $data['option_id'];
+        $dtr = $data['dtr'];
+        $range = $data['range'];
+
+        $getDtrInfo = UsersDTRInfo::where('user_id',$id)
+                ->whereYear('date',$year)
+                ->whereMonth('date',$month)
+                ->where('option_id',$option_id)
+                ->orderBy('date','ASC')
+                ->get();
+
+        foreach ($getDtrInfo as $row){
+            $day = date('j',strtotime($row->date));
+
+            $include = 'yes';
+            if(($range==2 && $day>15) || date('Y-m-d', strtotime($row->date))>date('Y-m-d')){
+                $include = 'no';
+            }
+            if($include=='yes'){
+                $dtr[$day]['hours'] = $row->hours;
+                $dtr[$day]['minutes'] = $row->minutes;
+                $dtr[$day]['tardy_hr'] = $row->tardy_hr;
+                $dtr[$day]['tardy_min'] = $row->tardy_min;
+                $dtr[$day]['tardy_no'] = $row->tardy_no;
+                $dtr[$day]['ud_hr'] = $row->ud_hr;
+                $dtr[$day]['ud_min'] = $row->ud_min;
+                $dtr[$day]['ud_no'] = $row->ud_no;
+                $dtr[$day]['hd_hr'] = $row->hd_hr;
+                $dtr[$day]['hd_min'] = $row->hd_min;
+                $dtr[$day]['hd_no'] = $row->hd_no;
+                $dtr[$day]['abs_hr'] = $row->abs_hr;
+                $dtr[$day]['abs_min'] = $row->abs_min;
+                $dtr[$day]['abs_no'] = $row->abs_no;
+                $dtr[$day]['earned_hours'] = $row->earned_hours;
+                $dtr[$day]['earned_minutes'] = $row->earned_minutes;
+            }
+        }
+        return [
+            'dtr' => $dtr
+        ];
+    }
 
     private function total($data){
         $updated_by = $data['updated_by'];
@@ -476,7 +725,7 @@ class DTRInfoServices
             foreach($query as $row){
                 $day = date('j', strtotime($row->date));
                 $include = 'yes';
-                if($range==2 && $day>15){
+                if(($range==2 && $day>15) || date('Y-m-d', strtotime($row->date))>date('Y-m-d')){
                     $include = 'no';
                 }
                 if($include=='yes'){
@@ -558,7 +807,38 @@ class DTRInfoServices
         $update->holidays = $holidays;
         $update->updated_by = $updated_by;
         $update->save();
-
-
+    }
+    public function defaultValues()
+    {
+        return [
+            'day' => null,
+            'check' => '',
+            'holiday' => '',
+            'in_am' => '',
+            'out_am' => '',
+            'in_pm' => '',
+            'out_pm' => '',
+            'time_type' => '',
+            'time_type_name' => '',
+            'time_in_am_type' => 0,
+            'time_out_am_type' => 0,
+            'time_in_pm_type' => 0,
+            'time_out_pm_type' => 0,
+            'hours' => 0,
+            'minutes' => 0,
+            'tardy_hr' => 0,
+            'tardy_min' => 0,
+            'tardy_no' => 0,
+            'ud_hr' => 0,
+            'ud_min' => 0,
+            'ud_no' => 0,
+            'hd_hr' => 0,
+            'hd_min' => 0,
+            'hd_no' => 0,
+            'abs_hr' => 0,
+            'abs_min' => 0,
+            'abs_no' => 0,
+            'sched_time' => []
+        ];
     }
 }
