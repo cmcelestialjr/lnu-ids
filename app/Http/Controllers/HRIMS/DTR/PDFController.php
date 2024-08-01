@@ -8,10 +8,12 @@ use App\Models\EducOfferedScheduleDay;
 use App\Models\Holidays;
 use App\Models\Users;
 use App\Models\UsersDTR;
+use App\Models\UsersDTRInfo;
 use App\Models\UsersDTRTrack;
 use App\Models\UsersRoleList;
 use App\Models\UsersSchedDays;
 use App\Models\UsersSchedTime;
+use App\Services\DTRInfoServices;
 use App\Services\NameServices;
 use App\Services\PasswordServices;
 use App\Services\TokenServices;
@@ -46,7 +48,7 @@ class PDFController extends Controller
         if($employee==NULL || $check_pdf_code!=mb_substr($date, -1)){
             return view('layouts/error/404');
         }
-        $src = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'.pdf';
+        $src = 'storage/hrims/employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'_'.$range.'_'.$option.'.pdf';
 
         $data = [
                 'src' => $src
@@ -142,7 +144,7 @@ class PDFController extends Controller
         $range = $request->range;
         $option_id = $request->option_id;
 
-        $url = $this->generateQR($id_no,$year,$month,$range,$option_id);
+        $url = $this->generateQR($id_no,$year,$month,$range,$option);
 
         return response()->json(['result' => 'success',
                                 'url' => $url
@@ -185,22 +187,154 @@ class PDFController extends Controller
         $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
         $height = 185;
         $width = 260;
+
+        $permissions = [
+            'print' => true,
+            'modify' => false,
+            'copy' => false,
+            'annotate' => false
+        ];
+
         $pdf::reset();
         $pdf = $this->generatePDFDetails($pdf,$id_no,$year,$month,$range,$qrcode,$option,$password);
-        $pdf::setProtection();
-        $pathUserUnprotected = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'.pdf';
+        $pdf::setProtection($permissions);
+        $pathUserUnprotected = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'_'.$range.'_'.$option.'.pdf';
         $pdf::Output(public_path($pathUserUnprotected),'F');
 
         // $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
         // $pdf::reset();
         // $pdf = $this->generatePDFDetails($id_no,$year,$month,$range,$qrcode,$option,$password);
-        // $pdf::setProtection(array('print'), $password, $master_password, 0, null);
+        // $pdf::setProtection($permissions, $password, $master_password, 0, null);
         // $pathUserUnprotected = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'_protected.pdf';
         // $pdf::Output(public_path($pathUserProtected),'F');
 
         return 'hrims/dtr/pdf/'.$year.'/'.$month.'/'.$id_no.'/'.$range.'/'.$option.'/'.$password;
     }
     private function generatePDFDetails($pdf,$id_no,$year,$month,$range,$qrcode,$option,$password){
+        $name_services = new NameServices;
+        $pathUser = NULL;
+        $user = Users::with('employee_default.position.office_designate.current_user','instructor_info.position.office_designate.current_user')->where('id_no',$id_no)->first();
+        $user_id = $user->id;
+        $emp_stat_gov = $user->employee_default->emp_stat->gov;
+        $name = mb_strtoupper($name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname));
+
+        $logo = public_path('assets\images\logo\lnu_logo.png');
+        $logo_blur = public_path('assets\images\logo\lnu_logo_blur1.png');
+        $scissor = public_path('assets\images\icons\png\scissor1.png');
+
+        $signatory = '';
+
+        if($option==2){
+            if($user->instructor_info->position->office_designate->current_user){
+                $current_user = $user->instructor_info->position->office_designate->current_user;
+                $signatory = mb_strtoupper($name_services->firstname($current_user->lastname,$current_user->firstname,$current_user->middlename,$current_user->extname));
+            }
+        }else{
+            if($user->employee_default->position->office_designate->current_user){
+                $current_user = $user->instructor_info->position->office_designate->current_user;
+                $signatory = mb_strtoupper($name_services->firstname($current_user->lastname,$current_user->firstname,$current_user->middlename,$current_user->extname));
+            }
+        }
+
+        $dtr_info_service = new DTRInfoServices;
+        $option_id = $option;
+        $holidays = 0;
+        $dtr = [];
+        $start_date = date('Y-m-01', strtotime("$year-$month-01"));
+        $last_date = date('Y-m-t',strtotime($start_date));
+        $next_day = date('Y-m-d', strtotime($last_date . ' +1 day'));
+        $lastDay = date('t',strtotime($last_date));
+
+        $getDtr = $dtr_info_service->getDtr($user_id, $year, $month);
+        $getDtrNext = $dtr_info_service->getDtrNext($user_id, $next_day);
+        $getDtrSched = $dtr_info_service->getDtrSched($user_id, $start_date, $last_date, $option_id);
+        $getHolidays = $dtr_info_service->getHolidays($year, $month);
+
+        $getDtrInitial = $dtr_info_service->initial([
+                'lastDay' => $lastDay,
+                'year' => $year,
+                'month' => $month,
+                'defaultValues' => $dtr_info_service->defaultValues(),
+                'range' => $range,
+                'getDtrSched' => $getDtrSched,
+                'dtr' => $dtr
+        ]);
+        $dtr = $getDtrInitial['dtr'];
+        $included_days = $getDtrInitial['included_days'];
+
+        $getDtrHolidays = $dtr_info_service->holidays([
+            'getHolidays' => $getHolidays,
+            'included_days' => $included_days,
+            'holidays' => $holidays,
+            'dtr' => $dtr
+        ]);
+        $dtr = $getDtrHolidays['dtr'];
+        $included_days = $getDtrHolidays['included_days'];
+        $holidays = $getDtrHolidays['holidays'];
+
+        $getDtrUser = $dtr_info_service->dtr([
+            'getDtr' => $getDtr,
+            'dtr' => $dtr,
+            'range' => $range,
+            'included_days' => $included_days
+        ]);
+        $dtr = $getDtrUser['dtr'];
+        $included_days = $getDtrUser['included_days'];
+
+        $getDtrInfo = $dtr_info_service->dtrInfo([
+            'id' => $user_id,
+            'year' => $year,
+            'month' => $month,
+            'option_id' => $option_id,
+            'dtr' => $dtr,
+            'range' => $range
+        ]);
+        $dtr = $getDtrInfo['dtr'];
+
+        $getDtrInfoTotal = $dtr_info_service->getDtrInfoTotal($user_id, $year, $month, $option_id);
+
+
+
+        //$pdf = new PDF('A4', 'mm', '', true, 'UTF-8', false);
+        $page_size = array(215.9, 330.2);
+        // $pdf = new Pdf('P', 'mm', $page_size, true, 'UTF-8', false);
+        // $height = 185;
+        // $width = 260;
+        // $pdf::reset();
+        $pdf::AddPage('P',$page_size);
+        $pdf::SetAutoPageBreak(TRUE, 3);
+       //landscape scale A4
+        //$height = 185;
+        //$width = 260;
+        //Portrait scale A4
+        //$width = 210;
+        //height = 270;
+        for ($j = 1; $j <= $lastDay; $j++)
+        {
+            if($j==0){
+                $x_add = 0;
+            }else{
+                $x_add = 105;
+            }
+
+            $y = 6;
+            $y_add = 14;
+
+        }
+
+        $pdf::SetXY(103, 281);
+        $pdf::Image($scissor, '', '', 4, 7, '', '', 'T', false, 0, '', false, false, 0, false, false, false);
+
+        $pdf::SetXY(100, 5);
+        $pdf::SetFont('typewriteb','',6);
+        $pdf::MultiCell(10, 270, "|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n", 0, 'C', 0, 0, '', '', true);
+
+        // $pathUser = 'storage\hrims\employee/'.$id_no.'\dtr/'.$year.'/'.$id_no.'_'.$year.'_'.$month.'.pdf';
+        // $pdf::Output(public_path($pathUser),'F');
+
+        return $pdf;
+    }
+    private function generatePDFDetails1($pdf,$id_no,$year,$month,$range,$qrcode,$option,$password){
         $name_services = new NameServices;
         $pathUser = NULL;
         $user = Users::with('employee_default.position.office_designate.current_user','instructor_info.position.office_designate.current_user')->where('id_no',$id_no)->first();
@@ -1147,7 +1281,6 @@ class PDFController extends Controller
         }
         return $pdf;
     }
-
     /**
      * Validate the request data.
      *

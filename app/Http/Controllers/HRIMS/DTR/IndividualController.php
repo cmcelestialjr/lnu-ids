@@ -57,7 +57,7 @@ class IndividualController extends Controller
             ->whereMonth('date',$month)->first();
         if(($user_access_level==1 || $user_access_level==2) || ($id_no==$id_no_req) && $check!=NULL){
             $result = 'success';
-            $dtr_info_service = new DTRInfoServices;
+
             $name_services = new NameServices;
             $user = Users::where('id_no',$id_no)->first();
             $name = mb_strtoupper($name_services->firstname($user->lastname,$user->firstname,$user->middlename,$user->extname));
@@ -66,16 +66,15 @@ class IndividualController extends Controller
                 ->where('role_id',3)
                 ->first();
 
+            $dtr_info_service = new DTRInfoServices;
             $id = $user->id;
             $option_id = $request->option;
             $holidays = 0;
             $dtr = [];
-            $included_days = [];
             $start_date = date('Y-m-01', strtotime("$year-$month-01"));
             $last_date = date('Y-m-t',strtotime($start_date));
             $next_day = date('Y-m-d', strtotime($last_date . ' +1 day'));
             $lastDay = date('t',strtotime($last_date));
-
 
             $dtr_info_service->removeDuplicate([
                 'id_no' => $id_no,
@@ -83,39 +82,10 @@ class IndividualController extends Controller
                 'month' => $month
             ]);
 
-            $getDtr = UsersDTR::with('time_type_')
-                ->whereHas('user', function ($query) use ($id) {
-                    $query->where('id', $id);
-                })->whereYear('date',$year)
-                ->whereMonth('date',$month)
-                ->orderBy('date','ASC')
-                ->get();
-            $getDtrNext = UsersDTR::with('time_type_')
-                ->whereHas('user', function ($query) use ($id) {
-                    $query->where('id', $id);
-                })->whereDate('date',$next_day)
-                ->orderBy('date','ASC')
-                ->first();
-            $getDtrSched = UsersSchedDays::with(['time' => function ($query) use ($id,$start_date,$last_date,$option_id) {
-                    $query->where('user_id',$id)
-                    ->where('option_id',$option_id)
-                    ->where('date_to','>=',$start_date)
-                    ->where('date_from','<=',$last_date)
-                    ->orderBy('time_from', 'DESC');
-                }])
-                ->whereHas('time', function ($query) use ($id,$start_date,$last_date,$option_id) {
-                    $query->where('user_id',$id)
-                    ->where('option_id',$option_id)
-                    ->where('date_to','>=',$start_date)
-                    ->where('date_from','<=',$last_date);
-                })->get();
-            $getHolidays = Holidays::where(function ($query) use ($month) {
-                $query->whereMonth('date', $month)
-                    ->where('option', 'Yes');
-                })->orWhere(function ($query) use ($year,$month) {
-                    $query->whereYear('date', $year)
-                        ->whereMonth('date', $month);
-                })->get();
+            $getDtr = $dtr_info_service->getDtr($id, $year, $month);
+            $getDtrNext = $dtr_info_service->getDtrNext($id, $next_day);
+            $getDtrSched = $dtr_info_service->getDtrSched($id, $start_date, $last_date, $option_id);
+            $getHolidays = $dtr_info_service->getHolidays($year, $month);
 
             $getDtrInitial = $dtr_info_service->initial([
                 'lastDay' => $lastDay,
@@ -139,7 +109,7 @@ class IndividualController extends Controller
             $included_days = $getDtrHolidays['included_days'];
             $holidays = $getDtrHolidays['holidays'];
 
-            $dtr_info_service->index([
+            $dtr_info_service->dtrCalculate([
                 'user_id' => $id,
                 'id_no' => $id_no,
                 'dtr' => $dtr,
@@ -172,12 +142,7 @@ class IndividualController extends Controller
             ]);
             $dtr = $getDtrInfo['dtr'];
 
-
-            $getDtrInfoTotal = UsersDTRInfoTotal::where('user_id',$id)
-                ->whereYear('date',$year)
-                ->whereMonth('date',$month)
-                ->where('option_id',$option_id)
-                ->first();
+            $getDtrInfoTotal = $dtr_info_service->getDtrInfoTotal($id, $year, $month, $option_id);
 
             $data = [
                 'id_no' => $id_no,

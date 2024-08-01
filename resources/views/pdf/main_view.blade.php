@@ -20,14 +20,14 @@
 </head>
 <body class="hold-transition layout-top-nav">
     <div class="wrapper">
-        <div class="content-wrapper">            
+        <div class="content-wrapper">
             <section class="content center">
                 <div class="container-fluid" style="width: 95%">
                     <iframe id="documentPreview" src="{{url($src)}}#zoom=120" style="width:100%;"></iframe>
                 </div>
             </section>
         </div>
-    </div>    
+    </div>
 </body>
 <script src="{{ asset('_adminLTE/plugins/jquery/jquery-3.6.3.min.js') }}"></script>
 <script>
